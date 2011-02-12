@@ -12,7 +12,7 @@ class System::Command {
     is => 'System::Command::Base',
 };
 
-my @SUB_COMMANDS = qw/ /;
+my @SUB_COMMANDS = qw/ disk /;
 
 our %SUB_COMMAND_CLASSES = 
     map {
@@ -26,7 +26,7 @@ our %SUB_COMMAND_CLASSES =
     }
     @SUB_COMMANDS;
 
-$SUB_COMMAND_CLASSES{'tools'} = 'System::Model::Tools';
+#$SUB_COMMAND_CLASSES{'tools'} = 'System::Model::Tools';
 
 our @SUB_COMMAND_CLASSES = map { $SUB_COMMAND_CLASSES{$_} } @SUB_COMMANDS;
 
@@ -74,7 +74,3 @@ sub class_for_sub_command {
 }
 
 1;
-
-#$HeadURL$
-#$Id$
-
