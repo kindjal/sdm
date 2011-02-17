@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use System;
-
 use Data::Dumper;
-require File::Basename;
+use File::Basename;
+use Getopt::Long;
+use Term::ANSIColor;
+require Text::Wrap;
 
 class System::Command::Base {
     is => 'Command',
@@ -23,6 +25,204 @@ class System::Command::Base {
         }
     ],
 };
+
+
+sub sub_command_classes {
+    my $class = shift;
+    
+    my @original_paths = $class->sub_command_dirs;
+    my @paths = 
+        grep { s/\.pm$// } 
+        map { glob("$_/*") } 
+        grep { -d $_ }
+        grep { defined($_) and length($_) } 
+        @original_paths;
+    
+    my @classes;
+    if (@paths) {
+        @classes =
+            grep {
+                ($_->is_sub_command_delegator or !$_->is_abstract) 
+            }
+            grep { $_ and $_->isa('Command') }
+            map { $class->class_for_sub_command($_) }
+            map { s/_/-/g; $_ }
+            map { File::Basename::basename($_) }
+            @paths;
+    }
+    
+    $DB::single = 1;
+    my $class_above = $class;
+    $class_above =~ s/::Command//;
+    my $inc_subdir = $class_above;
+    $inc_subdir =~ s|::|/|;
+
+    @paths = 
+        grep { -f $_ } 
+        grep { defined($_) and length($_) } 
+        map { 
+            my $pattern = $_ . '/' . $inc_subdir . '/*/Command.pm';
+            glob($pattern);
+        }
+        @INC;
+    
+    my @classes2;
+    if (@paths) {
+        @classes2 =
+            grep {
+                ($_->is_sub_command_delegator or !$_->is_abstract) 
+            }
+            grep { $_ and $_->isa('Command') }
+            map { 
+                my $last_word = File::Basename::basename($_);
+                $last_word =~ s/.pm$//;
+                my $dir = File::Basename::dirname($_);
+                my $second_to_last_word = File::Basename::basename($dir);
+                $class_above . '::' . $second_to_last_word . '::' . $last_word;
+            }
+            @paths;
+    }
+    return (@classes, @classes2);
+}
+
+sub _smarter_resolve_class_and_params_for_argv {
+
+    # This is used by execute_with_shell_params_and_exit, but might be used within an application.
+    my $self = shift;
+    my @argv = @_;
+
+    if ($self->is_sub_command_delegator) {
+        # determine the correct class for the sub-command and delegate to it
+
+        if (@argv == 0) {
+            # no sub command specified
+            return ($self->class, undef);
+        }
+
+        my @command_words;
+        for my $word (@argv) {
+            last if substr($word,0,1) eq '-';
+            last if $word =~ /[\W\.]/;
+            my $camelcase = join('', map { ucfirst($_) } split(/-/, $word));
+            push @command_words, $camelcase;
+        }
+
+        my $class_for_sub_command;
+        my $class_for_sub_command_base = $self->class;
+        $class_for_sub_command_base =~ s/::Command//g;
+        while (@command_words) {
+            my $cmd_pos = scalar(@command_words);
+            for ($cmd_pos = scalar(@command_words); $cmd_pos >= 1; $cmd_pos--) {
+                my @command_words_with_cmd = @command_words;
+                splice(@command_words_with_cmd,$cmd_pos,0,'Command');
+                my $possible_class_name = join('::', $class_for_sub_command_base, @command_words_with_cmd);
+                eval { $possible_class_name->class };
+                unless ($@) {
+                    $class_for_sub_command = $possible_class_name;
+                    last;
+                }
+            }
+            last if $class_for_sub_command;
+            pop @command_words;
+        }
+
+        unless ($class_for_sub_command) {
+            return ($self->class, undef);
+        }
+
+        for (0..$#command_words) {
+            shift @argv;
+        }
+        return $class_for_sub_command->resolve_class_and_params_for_argv(@argv);
+    }
+
+    my ($params_hash,@spec) = $self->_shell_args_getopt_specification;
+    unless (grep { /^help\W/ } @spec) {
+        push @spec, "help!";
+    }
+
+    # Thes nasty GetOptions modules insist on working on
+    # the real @ARGV, while we like a little more flexibility.
+    # Not a problem in Perl. :)  (which is probably why it was never fixed)
+    local @ARGV;
+    @ARGV = @argv;
+
+    do {
+        # GetOptions also likes to emit warnings instead of return a list of errors :( 
+        my @errors;
+        local $SIG{__WARN__} = sub { push @errors, @_ };
+
+        unless (GetOptions($params_hash,@spec)) {
+            for my $error (@errors) {
+                $self->error_message($error);
+            }
+            return($self, undef);
+        }
+    };
+
+    # Q: Is there a standard getopt spec for capturing non-option paramters?
+    # Perhaps that's not getting "options" :)
+    # A: Yes.  Use '<>'.  But we need to process this anyway, so it won't help us.
+
+    if (my @names = $self->_bare_shell_argument_names) {
+        for (my $n=0; $n < @ARGV; $n++) {
+            my $name = $names[$n];
+            unless ($name) {
+                $self->error_message("Unexpected bare arguments: @ARGV[$n..$#ARGV]!");
+                return($self, undef);
+            }
+            my $value = $ARGV[$n];
+            my $meta = $self->__meta__->property_meta_for_name($name);
+            if ($meta->is_many) {
+                if ($n == $#names) {
+                    # slurp the rest
+                    $params_hash->{$name} = [@ARGV[$n..$#ARGV]];
+                    last;
+                }
+                else {
+                    die "has-many property $name is not last in bare_shell_argument_names for $self?!";
+                }
+            }
+            else {
+                $params_hash->{$name} = $value;
+            }
+        }
+    } elsif (@ARGV) {
+        ## argv but no names
+        $self->error_message("Unexpected bare arguments: @ARGV!");
+        return($self, undef);
+    }
+
+    for my $key (keys %$params_hash) {
+        # handle any has-many comma-sep values
+        my $value = $params_hash->{$key};
+        if (ref($value)) {
+            my @new_value;
+            for my $v (@$value) {
+                my @parts = split(/,\s*/,$v);
+                push @new_value, @parts;
+            }
+            @$value = @new_value;
+        }
+
+        # turn dashes into underscores
+        my $new_key = $key;
+
+        next unless ($new_key =~ tr/-/_/);
+        if (exists $params_hash->{$new_key} && exists $params_hash->{$key}) {
+            # this corrects a problem where is_many properties badly interact
+            # with bare args leaving two entries in the hash like:
+            # a-bare-opt => [], a_bare_opt => ['with','vals']
+            delete $params_hash->{$key};
+            next;
+        }
+        $params_hash->{$new_key} = delete $params_hash->{$key};
+    }
+
+    $Command::_resolved_params_from_get_options = $params_hash;
+
+    return $self, $params_hash;
+}
 
 our %ALTERNATE_FROM_CLASS = (
     # find_class => via_class => via_class_methods
@@ -656,14 +856,15 @@ sub _params_to_resolve {
 
 sub resolve_class_and_params_for_argv {
     my $self = shift;
-    my ($class, $params) = $self->SUPER::resolve_class_and_params_for_argv(@_);
+
+    my ($class, $params) = $self->_smarter_resolve_class_and_params_for_argv(@_);
     unless ($self eq $class) {
         return ($class, $params);
     }
     unless (@_ && scalar($self->_missing_parameters($params)) == 0) {
         return ($class, $params);
     }
-    
+
     local $ENV{UR_COMMAND_DUMP_STATUS_MESSAGES} = 1;
 
     my @params_to_resolve = $self->_params_to_resolve($params);
@@ -675,7 +876,7 @@ sub resolve_class_and_params_for_argv {
         eval {
             @params = $self->resolve_param_value_from_cmdline_text($p);
         };
-        
+
         if ($@) {
             push @error_tags, UR::Object::Tag->create(
                 type => 'invalid',
@@ -776,7 +977,3 @@ sub display_summary_report {
 }
 
 1;
-
-#$HeadURL$
-#$Id$
-
