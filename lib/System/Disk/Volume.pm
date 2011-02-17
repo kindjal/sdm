@@ -7,21 +7,20 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
-        dv_id => { is => 'INTEGER', is_optional => 1 },
+        dv_id         => { is => 'INTEGER' },
     ],
     has => [
-        mount_path    => { is => 'VARCHAR(255)', is_optional => 1 },
-        physical_path => { is => 'VARCHAR(255)', is_optional => 1 },
+        mount_path    => { is => 'VARCHAR(255)' },
+        physical_path => { is => 'VARCHAR(255)' },
         total_kb      => { is => 'UNSIGNED INTEGER' },
         used_kb       => { is => 'UNSIGNED INTEGER' },
+        df_id         => { is => 'INTEGER' },
     ],
-    has_many_optional => [
-        disk_group_names => { via => 'groups', to => 'disk_group_name' },
-        groups           => { is => 'System::Disk::Group', via => 'assignments', to => 'group' },
-        assignments      => { is => 'System::Disk::Assignment', id_by => 'dv_id', reverse_as => 'volume' },
-        allocations      => { is => 'System::Disk::Allocation', calculate_from => 'mount_path',
-                              calculate => q( return System::Disk::Allocation->get(mount_path => $mount_path); ) },
-    ],
+    #has_many_optional => [
+    #    disk_group_names => { via => 'groups', to => 'disk_group_name' },
+    #    groups           => { is => 'System::Disk::Group', via => 'assignments', to => 'group' },
+    #    assignments      => { is => 'System::Disk::Assignment', id_by => 'dv_id', reverse_as => 'volume' },
+    #],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };

@@ -13,13 +13,12 @@ class System::Disk::Volume::Command::List {
             value => 'System::Disk::Volume',
         },
         show => { 
-            #default_value => 'mount_path,total_kb,unallocated_kb,disk_group_names' 
-            default_value => 'mount_path,total_kb,disk_group_names' 
+            #default_value => 'mount_path,total_kb,disk_group_names' 
+            default_value => 'physical_path,mount_path,total_kb' 
         },
     ],
 };
 
-sub sub_command_sort_position { 4 }
+#sub sub_command_sort_position { 4 }
 
 1;
-
