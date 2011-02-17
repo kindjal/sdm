@@ -40,6 +40,7 @@ INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DI
 INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','volume_id',1);
 INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'FILER','filer_id',1);
 INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','dv_id',1);
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','dg_id',1);
 CREATE TABLE dd_table (
      data_source varchar NOT NULL,
      owner varchar,
@@ -98,6 +99,9 @@ INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP
 INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','TOTAL_KB','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
 INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','UNIX_UID','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
 INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','CREATED','DATE',NULL,'N','2011-02-12 14:33:58','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','DG_ID','INTEGER',NULL,'Y','2011-02-12 16:12:27','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','USER_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 16:12:27','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','DISK_GROUP_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 16:12:27','');
 CREATE TABLE dd_unique_constraint_column (
     data_source varchar NOT NULL,
     owner varchar,

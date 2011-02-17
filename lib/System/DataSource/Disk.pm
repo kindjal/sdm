@@ -9,7 +9,7 @@ class System::DataSource::Disk {
 
 sub driver { 'SQLite' };
 
-sub server { 'Disk.sqlite3' };
+sub server { 'DiskDB.sqlite3' };
 
 
 1;
