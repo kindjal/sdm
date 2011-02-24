@@ -1,0 +1,60 @@
+BEGIN TRANSACTION;
+CREATE TABLE DISK_USER (
+  user_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  email         VARCHAR(255) NOT NULL,
+  created       DATE,
+  last_modified DATE
+);
+DELETE FROM sqlite_sequence;
+CREATE TABLE DISK_ARRAY (
+  array_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  model         VARCHAR(255) NOT NULL,
+  type          VARCHAR(255) NOT NULL,
+  size          UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE DISK_HOST (
+  host_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  hostname      VARCHAR(255) NOT NULL,
+  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE DISK_FILER (
+  filer_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  hostname      VARCHAR(255) NOT NULL,
+  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  filesystem    VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE DISK_VOLUME (
+  volume_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+  filer_id      INTEGER NOT NULL REFERENCES FILER,
+  mount_path    VARCHAR(255) NOT NULL,
+  physical_path VARCHAR(255) NOT NULL,
+  total_kb      UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  used_kb       UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE DISK_GROUP (
+  group_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  name          VARCHAR(255) NOT NULL,
+  permissions   UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  sticky        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  subdirectory  VARCHAR(255),
+  unix_uid      UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  unix_gid      UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  username      VARCHAR(255),
+  parent_group_id INTEGER,
+  created       DATE,
+  last_modified DATE
+);
+CREATE UNIQUE INDEX volumeindex ON DISK_VOLUME(volume_id);
+COMMIT;
