@@ -1,52 +1,30 @@
-package System::Disk::Group;
+package System::DiskGroup;
 
 use strict;
 use warnings;
 
-class System::Disk::Group {
-    table_name => 'GROUP',
+use System;
+class System::DiskGroup {
+    type_name => 'disk group',
+    table_name => 'DISK_GROUP',
     id_by => [
-        dg_id => { is => 'Number' },
+        group_id => { is => 'INTEGER' },
     ],
     has => [
-        disk_group_name => { is => 'Text' },
-        permissions => { is => 'Number' },
-        sticky => { is => 'Number' },
-        subdirectory => { is => 'Text' },
-        unix_uid => { is => 'Number' },
-        unix_gid => { is => 'Number' },
-        user_name => {
-            calculate_from => 'unix_uid',
-            calculate => q|
-                my ($user_name) = getpwuid($unix_uid);
-                return $user_name;
-            |,
-        },
-        group_name => {
-            calculate_from => 'unix_gid',
-            calculate => q| 
-                my ($group_name) = getgrgid($unix_gid);
-                return $group_name;
-            |,
-        },
+        created         => { is => 'DATE', is_optional => 1 },
+        last_modified   => { is => 'DATE', is_optional => 1 },
+        name            => { is => 'VARCHAR(255)' },
+        parent_group_id => { is => 'INTEGER', is_optional => 1 },
+        permissions     => { is => 'UNSIGNED INTEGER' },
+        sticky          => { is => 'UNSIGNED INTEGER' },
+        subdirectory    => { is => 'VARCHAR(255)', is_optional => 1 },
+        unix_gid        => { is => 'UNSIGNED INTEGER' },
+        unix_uid        => { is => 'UNSIGNED INTEGER' },
+        username        => { is => 'VARCHAR(255)', is_optional => 1 },
     ],
-    has_many_optional => [
-        mount_paths => {
-            via => 'volumes',
-            to => 'mount_path',
-        },
-        volumes => {
-            is => 'System::Disk::Volume',
-            via => 'assignments',
-            to =>  'volume',
-        },
-        assignments => {
-            is => 'System::Disk::Assignment',
-            reverse_id_by => 'group',
-        },
-    ],
+    schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
-    doc => 'Represents a disk group (eg, info_apipe), which contains any number of disk volumes',
+    doc => 'Represents a disk group which contains any number of disk volumes',
 };
 
 1;

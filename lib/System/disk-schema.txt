@@ -1,36 +1,69 @@
-DROP TABLE HOST;
-DROP TABLE FILER;
-DROP TABLE VOLUME;
-DROP TABLE GROUP;
 /*
-How do we represent a cluster filer?
+ Note that I use the prefix DISK_ because I wanted a GROUP table
+ but GROUP is a reserved word.  I need a prefix for that, and
+ DISK_GROUP made sense.  So I used DISK_ on the other tables too.
 */
-CREATE TABLE IF NOT EXISTS HOST (
+DROP TABLE IF EXISTS DISK_USER;
+DROP TABLE IF EXISTS DISK_ARRAY;
+DROP TABLE IF EXISTS DISK_HOST;
+DROP TABLE IF EXISTS DISK_FILER;
+DROP TABLE IF EXISTS DISK_VOLUME;
+DROP TABLE IF EXISTS DISK_GROUP;
+DROP INDEX IF EXISTS volumeindex;
+CREATE TABLE IF NOT EXISTS DISK_USER (
+  user_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  email         VARCHAR(255) NOT NULL,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE IF NOT EXISTS DISK_ARRAY (
+  array_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  model         VARCHAR(255) NOT NULL,
+  type          VARCHAR(255) NOT NULL,
+  size          UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE IF NOT EXISTS DISK_HOST (
   host_id       INTEGER PRIMARY KEY AUTOINCREMENT,
   hostname      VARCHAR(255) NOT NULL,
-  host_status  UNSIGNED INTEGER NOT NULL DEFAULT 0
+  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
 );
-CREATE TABLE IF NOT EXISTS FILER (
-  df_id         INTEGER PRIMARY KEY AUTOINCREMENT,
+CREATE TABLE IF NOT EXISTS DISK_FILER (
+  filer_id      INTEGER PRIMARY KEY AUTOINCREMENT,
   hostname      VARCHAR(255) NOT NULL,
-  filer_status  UNSIGNED INTEGER NOT NULL DEFAULT 0
+  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  filesystem    VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
 );
-CREATE TABLE IF NOT EXISTS VOLUME (
-  dv_id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  df_id         INTEGER NOT NULL REFERENCES FILER,
+CREATE TABLE IF NOT EXISTS DISK_VOLUME (
+  volume_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+  filer_id      INTEGER NOT NULL REFERENCES FILER,
   mount_path    VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
   total_kb      UNSIGNED INTEGER NOT NULL DEFAULT 0,
-  used_kb       UNSIGNED INTEGER NOT NULL DEFAULT 0
+  used_kb       UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  created       DATE,
+  last_modified DATE
 );
-CREATE INDEX volumeindex ON VOLUME(df_id);
-CREATE TABLE IF NOT EXISTS GROUP (
-  dg_id         INTEGER PRIMARY KEY AUTOINCREMENT,
-  group_name VARCHAR(255) NOT NULL,
+CREATE UNIQUE INDEX IF NOT EXISTS volumeindex ON DISK_VOLUME(volume_id);
+CREATE TABLE IF NOT EXISTS DISK_GROUP (
+  group_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  name          VARCHAR(255) NOT NULL,
   permissions   UNSIGNED INTEGER NOT NULL DEFAULT 0,
   sticky        UNSIGNED INTEGER NOT NULL DEFAULT 0,
   subdirectory  VARCHAR(255),
   unix_uid      UNSIGNED INTEGER NOT NULL DEFAULT 0,
   unix_gid      UNSIGNED INTEGER NOT NULL DEFAULT 0,
-  user_name     VARCHAR(255)
+  username      VARCHAR(255),
+  parent_group_id INTEGER,
+  created       DATE,
+  last_modified DATE
 );

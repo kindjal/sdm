@@ -35,12 +35,12 @@ CREATE TABLE dd_pk_constraint_column (
     rank integer NOT NULL,
     PRIMARY KEY (data_source,owner,table_name,column_name,rank)
 );
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','host_id',1);
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_USER','user_id',1);
 INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','group_id',1);
-INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','df_id',1);
-INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','volume_id',1);
-INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'FILER','filer_id',1);
-INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','dv_id',1);
-INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','dg_id',1);
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','volume_id',1);
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','array_id',1);
+INSERT INTO "dd_pk_constraint_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','filer_id',1);
 CREATE TABLE dd_table (
      data_source varchar NOT NULL,
      owner varchar,
@@ -52,11 +52,12 @@ CREATE TABLE dd_table (
      remarks varchar,
      PRIMARY KEY(data_source, owner, table_name)
 );
-INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'VOLUME','TABLE','entity',NULL,'2011-02-12 14:33:59',NULL);
-INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','TABLE','entity',NULL,'2011-02-12 14:33:58',NULL);
-INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','TABLE','entity',NULL,'2011-02-12 14:33:58',NULL);
-INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','TABLE','entity',NULL,'2011-02-12 14:33:59',NULL);
-INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'FILER','TABLE','entity',NULL,'2011-02-12 14:33:59',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','TABLE','entity',NULL,'2011-02-23 23:25:42',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_USER','TABLE','entity',NULL,'2011-02-23 23:25:42',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','TABLE','entity',NULL,'2011-02-23 23:25:42',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','TABLE','entity',NULL,'2011-02-23 23:25:42',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','TABLE','entity',NULL,'2011-02-23 23:25:42',NULL);
+INSERT INTO "dd_table" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','TABLE','entity',NULL,'2011-02-23 23:25:41',NULL);
 CREATE TABLE dd_table_column (
     data_source varchar NOT NULL,
     owner varchar,
@@ -69,39 +70,50 @@ CREATE TABLE dd_table_column (
     remarks varchar,
     PRIMARY KEY(data_source, owner, table_name, column_name)
 );
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','HOSTNAME','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','PHYSICAL_PATH','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','DF_ID','INTEGER',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','UNIX_GID','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'FILER','CREATED','DATE',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','LAST_MODIFIED','DATE',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','MOUNT_PATH','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','MOUNT_PATH','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','VOLUME_ID','INTEGER',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','PHYSICAL_PATH','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','USED_KB','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','CREATED','DATE',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'FILER','LAST_MODIFIED','DATE',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','TOTAL_KB','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','USED_KB','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'FILER','SNMP_OK','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','GROUP_ID','INTEGER',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','LAST_MODIFIED','DATE',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','STICKY','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','GROUP_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'FILER','HOSTNAME','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','SUBDIRECTORY','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','DV_ID','INTEGER',NULL,'Y','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'FILER','FILER_ID','INTEGER',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'VOLUME','GROUP_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','FILER_STATUS','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:59','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','PERMISSIONS','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','TOTAL_KB','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','UNIX_UID','UNSIGNED INTEGER',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','CREATED','DATE',NULL,'N','2011-02-12 14:33:58','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','DG_ID','INTEGER',NULL,'Y','2011-02-12 16:12:27','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','USER_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 16:12:27','');
-INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','DISK_GROUP_NAME','VARCHAR(255)',NULL,'Y','2011-02-12 16:12:27','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','HOSTNAME','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','ARRAY_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','MOUNT_PATH','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','CREATED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','PHYSICAL_PATH','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','CREATED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','MODEL','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','PARENT_GROUP_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','USED_KB','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_USER','EMAIL','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','STATUS','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','NAME','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','CREATED','DATE',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','STICKY','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','STATUS','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_USER','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','TOTAL_KB','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','UNIX_UID','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','CREATED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','UNIX_GID','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','HOST_ID','INTEGER',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','COMMENTS','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','HOSTNAME','VARCHAR(255)',NULL,'N','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','LOCATION','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_USER','CREATED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','CREATED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','VOLUME_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','TYPE','VARCHAR(255)',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','GROUP_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','FILESYSTEM','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','USERNAME','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','SUBDIRECTORY','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','LAST_MODIFIED','DATE',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','COMMENTS','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_USER','USER_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_FILER','FILER_ID','INTEGER',NULL,'Y','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_ARRAY','SIZE','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_GROUP','PERMISSIONS','UNSIGNED INTEGER',NULL,'N','2011-02-23 23:25:42','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_HOST','OS','VARCHAR(255)',NULL,'Y','2011-02-23 23:25:41','');
+INSERT INTO "dd_table_column" VALUES('System::DataSource::Disk',NULL,'DISK_VOLUME','FILER_ID','INTEGER',NULL,'N','2011-02-23 23:25:42','');
 CREATE TABLE dd_unique_constraint_column (
     data_source varchar NOT NULL,
     owner varchar,
