@@ -1,11 +1,10 @@
-package System::DiskHost;
+package System::Disk::Host;
 
 use strict;
 use warnings;
 
 use System;
-class System::DiskHost {
-    type_name => 'disk host',
+class System::Disk::Host {
     table_name => 'DISK_HOST',
     id_by => [
         host_id => { is => 'INTEGER' },
@@ -18,6 +17,7 @@ class System::DiskHost {
         location      => { is => 'VARCHAR(255)', is_optional => 1 },
         os            => { is => 'VARCHAR(255)', is_optional => 1 },
         status        => { is => 'UNSIGNED INTEGER' },
+        filer_id      => { is => 'INTEGER' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

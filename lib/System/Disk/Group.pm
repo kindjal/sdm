@@ -1,11 +1,10 @@
-package System::DiskGroup;
+package System::Disk::Group;
 
 use strict;
 use warnings;
 
 use System;
-class System::DiskGroup {
-    type_name => 'disk group',
+class System::Disk::Group {
     table_name => 'DISK_GROUP',
     id_by => [
         group_id => { is => 'INTEGER' },

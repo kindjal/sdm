@@ -1,11 +1,10 @@
-package System::DiskFiler;
+package System::Disk::Filer;
 
 use strict;
 use warnings;
 
 use System;
-class System::DiskFiler {
-    type_name => 'disk filer',
+class System::Disk::Filer {
     table_name => 'DISK_FILER',
     id_by => [
         filer_id => { is => 'INTEGER' },
