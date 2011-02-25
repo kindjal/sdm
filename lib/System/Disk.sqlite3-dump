@@ -1,31 +1,15 @@
 BEGIN TRANSACTION;
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('URMETA_DISK_VOLUME_VOLUME_ID_seq',1);
+CREATE TABLE URMETA_DISK_VOLUME_VOLUME_ID_seq (next_value integer PRIMARY KEY AUTOINCREMENT);
 CREATE TABLE DISK_USER (
-  user_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id       INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   email         VARCHAR(255) NOT NULL,
   created       DATE,
   last_modified DATE
 );
-DELETE FROM sqlite_sequence;
-CREATE TABLE DISK_ARRAY (
-  array_id      INTEGER PRIMARY KEY AUTOINCREMENT,
-  model         VARCHAR(255) NOT NULL,
-  type          VARCHAR(255) NOT NULL,
-  size          UNSIGNED INTEGER NOT NULL DEFAULT 0,
-  created       DATE,
-  last_modified DATE
-);
-CREATE TABLE DISK_HOST (
-  host_id       INTEGER PRIMARY KEY AUTOINCREMENT,
-  hostname      VARCHAR(255) NOT NULL,
-  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
-  os            VARCHAR(255),
-  location      VARCHAR(255),
-  comments      VARCHAR(255),
-  created       DATE,
-  last_modified DATE
-);
 CREATE TABLE DISK_FILER (
-  filer_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  filer_id      INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   hostname      VARCHAR(255) NOT NULL,
   status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
   filesystem    VARCHAR(255),
@@ -33,18 +17,38 @@ CREATE TABLE DISK_FILER (
   created       DATE,
   last_modified DATE
 );
+CREATE TABLE DISK_HOST (
+  host_id       INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  hostname      VARCHAR(255) NOT NULL,
+  status        UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE,
+  filer_id      INTEGER NOT NULL
+);
+CREATE TABLE DISK_ARRAY (
+  array_id      INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  model         VARCHAR(255) NOT NULL,
+  type          VARCHAR(255) NOT NULL,
+  size          UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  created       DATE,
+  last_modified DATE,
+  host_id       INTEGER NOT NULL
+);
 CREATE TABLE DISK_VOLUME (
-  volume_id     INTEGER PRIMARY KEY AUTOINCREMENT,
-  filer_id      INTEGER NOT NULL REFERENCES FILER,
+  volume_id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   mount_path    VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
   total_kb      UNSIGNED INTEGER NOT NULL DEFAULT 0,
   used_kb       UNSIGNED INTEGER NOT NULL DEFAULT 0,
   created       DATE,
-  last_modified DATE
+  last_modified DATE,
+  filer_id      INTEGER NOT NULL
 );
 CREATE TABLE DISK_GROUP (
-  group_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  group_id      INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   name          VARCHAR(255) NOT NULL,
   permissions   UNSIGNED INTEGER NOT NULL DEFAULT 0,
   sticky        UNSIGNED INTEGER NOT NULL DEFAULT 0,
@@ -56,5 +60,10 @@ CREATE TABLE DISK_GROUP (
   created       DATE,
   last_modified DATE
 );
-CREATE UNIQUE INDEX volumeindex ON DISK_VOLUME(volume_id);
+CREATE TABLE DISK_VOLUME_GROUP (
+  group_id      INTEGER NOT NULL,
+  volume_id     INTEGER NOT NULL
+);
+CREATE INDEX hostindex ON DISK_HOST(host_id);
+CREATE INDEX filerindex ON DISK_FILER(filer_id);
 COMMIT;
