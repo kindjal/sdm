@@ -12,8 +12,9 @@ class System::Disk::Volume::Command::List {
             is_constant => 1,
             value => 'System::Disk::Volume',
         },
-        show => { 
-            default_value => 'volume_id,physical_path,mount_path,total_kb' 
+        show => {
+            # FIXME: add filer hostname when we can
+            default_value => 'physical_path,mount_path,total_kb,used_kb'
         },
     ],
 };
