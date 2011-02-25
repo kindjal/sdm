@@ -5,13 +5,13 @@ use warnings;
 
 class System::Disk::Assignment {
     # TODO This is really really site specific and needs to be changed
-    table_name => 'ASSIGNMENT',
+    table_name => 'DISK_VOLUME_GROUP',
     id_by => [
-        dg_id => {
+        group_id => {
             is => 'Number',
             doc => 'disk group ID',
         },
-        dv_id => {
+        volume_id => {
             is => 'Number',
             doc => 'disk volume ID'
         },
@@ -45,6 +45,7 @@ class System::Disk::Assignment {
             calculate => q| return $mount_path .'/'. $subdirectory; |,
         },
     ],
+    schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };
 
