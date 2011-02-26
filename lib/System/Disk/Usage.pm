@@ -29,7 +29,7 @@ use System::Utility::SNMP;
 local $| = 1;
 
 class System::Disk::Usage {
-  is => 'Command',
+  #is => 'Command',
   has => [
     debug => {
       is => 'Number',
@@ -439,7 +439,7 @@ sub update_cache {
   $self->{cache}->validate_volumes();
 }
 
-sub execute {
+sub create {
 
   my $self = shift;
   my @args = @_;
