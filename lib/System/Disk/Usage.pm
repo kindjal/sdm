@@ -34,75 +34,75 @@ class System::Disk::Usage {
     debug => {
       is => 'Number',
       default => 0,
-    }
+    },
     force => {
       is => 'Number',
       default => 0,
-    }
+    },
     db_tries => {
       is => 'Number',
       default => 5,
-    }
+    },
     timeout => {
       is => 'Number',
       default => 15,
-    }
+    },
     host_maxage => {
       is => 'Number',
       default => 86400,
       doc => 'max seconds since last check',
-    }
+    },
     vol_maxage => {
       is => 'Number',
       default => 15,
       doc => 'max days until volume is considered purgable',
-    }
+    },
     diskconf => {
       is => 'Text',
       default => './disk.conf',
       doc => 'Disk configuration file',
-    }
+    },
     # FIXME: remove
     configfile => {
       is => 'Text',
       default => undef,
       doc => 'Application configuration file (not used currently)',
-    }
+    },
     # FIXME: remove
     cachefile => {
       is => 'Text',
       default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
       doc => 'Path to cache.file (deprecated)',
-    }
+    },
     rrdpath => {
       is => 'Text',
       default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
       doc => 'Path to rrd file storage',
-    }
+    },
     logfile => {
       is => 'Text',
       default => 'STDERR',
       doc => 'Path to log file',
-    }
+    },
     loglevel => {
       is => 'Text',
       default => 'INFO',
       doc => 'Loglevel',
-    }
+    },
     purge => {
       is => 'Number',
       default => 0,
       doc => 'Purge aged volume entries',
-    }
+    },
     cache => {
       is => 'System::Disk::Volume',
-    }
+    },
     snmp => {
       is => 'System::Utility::SNMP',
-    }
+    },
     rrd => {
       is => 'System::Utility::RRD',
-    }
+    },
   ]
 };
 

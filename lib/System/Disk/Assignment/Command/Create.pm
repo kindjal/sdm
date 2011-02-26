@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::Assignment::Command::Create {
-    is => 'UR::Object::Command::Create',
+    is => 'System::Command::Base',
     #has => [
     #    subject_class_name  => {
     #        is_constant => 1,

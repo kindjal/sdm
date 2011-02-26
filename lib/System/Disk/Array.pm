@@ -11,7 +11,7 @@ class System::Disk::Array {
         array_id => { is => 'INTEGER' },
     ],
     has => [
-        System::Disk::Host => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
+        #System::Disk::Host => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
         created            => { is => 'DATE', is_optional => 1 },
         host_id            => { is => 'INTEGER' },
         last_modified      => { is => 'DATE', is_optional => 1 },
