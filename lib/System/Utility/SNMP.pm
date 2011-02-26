@@ -388,7 +388,9 @@ sub get_disk_group {
 
   # Does the cache already have the disk group name?
   # FIXME: URify
-  my $res = $self->{parent}->{cache}->fetch_disk_group($mount_path);
+  #my $res = $self->{parent}->{cache}->fetch_disk_group($mount_path);
+  my $res = System::Disk::Volume->get( mount_path => $mount_path );
+
   if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
     $group_name = pop @{ pop @$res };
     $self->{logger}->debug("$mount_path is cached for: $group_name\n");

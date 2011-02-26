@@ -15,8 +15,11 @@ class System::Disk::Volume {
         physical_path => { is => 'VARCHAR(255)' },
         total_kb      => { is => 'UNSIGNED INTEGER' },
         used_kb       => { is => 'UNSIGNED INTEGER' },
-        created       => { is => 'DATE', is_optional => 1 },
-        last_modified => { is => 'DATE', is_optional => 1 },
+    ],
+    has_optional => [
+        created       => { is => 'DATE' },
+        last_modified => { is => 'DATE' },
+        disk_group    => { is => 'System::Disk::Group' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
