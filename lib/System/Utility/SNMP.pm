@@ -47,6 +47,14 @@ my $oids = {
 };
 
 class System::Utility::SNMP {
+    is => 'System::Command::Base',
+    has => [
+      snmp_session => { is => 'Object', default => undef },
+      no_snmp => { is => 'Number', default => 0 },
+      timeout => { is => 'Number', default => 15 },
+      hosttype => { is => 'Text', default => undef },
+      groups => { is => 'List', default => undef },
+    ],
 };
 
 sub new {
@@ -368,8 +376,10 @@ sub lookup_disk_group_via_snmp {
 
 sub get_disk_group {
   # Look on a mount point for a DISK_ touch file.
-
   my $self = shift;
+  # FIXME
+  $self->error("Not yet implemented\n");
+
   my $physical_path = shift;
   my $mount_path = shift;
   my $group_name;
@@ -377,6 +387,7 @@ sub get_disk_group {
   $self->{logger}->debug("get_disk_group($physical_path,$mount_path)\n");
 
   # Does the cache already have the disk group name?
+  # FIXME: URify
   my $res = $self->{parent}->{cache}->fetch_disk_group($mount_path);
   if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
     $group_name = pop @{ pop @$res };
@@ -421,9 +432,14 @@ sub get_disk_group {
 sub connect_snmp {
   my $self = shift;
   my $host = shift;
-  my $timeout = int($self->{parent}->{timeout});
+  my $timeout = int($self->{timeout});
+  my $debug = 0x0;
 
   $self->{logger}->debug("connect_snmp($host)\n");
+
+  # SNMP connection debugging
+  $debug = 0x20
+    if ($self->{logger}->is_debug());
 
   my ($sess,$err);
   eval {
@@ -436,14 +452,12 @@ sub connect_snmp {
      -debug => 0x0,
     );
   };
-
-  # SNMP connection debugging
-  $sess->debug( [ 0x2, 0x4, 0x8, 0x10, 0x20 ] )
-    if ($self->{parent}->{debug});
-
   if ($@ or ! defined $sess) {
     $self->error("SNMP failed to connect to host: $host: $err");
   }
+
+  $sess->debug( [ 0x2, 0x4, 0x8, 0x10, 0x20 ] )
+    if ($self->{logger}->is_debug());
 
   if (defined $self->{snmp_session}) {
     $self->{snmp_session}->close();
