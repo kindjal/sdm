@@ -439,7 +439,7 @@ sub update_cache {
   $self->{cache}->validate_volumes();
 }
 
-sub create {
+sub execute {
 
   my $self = shift;
   my @args = @_;

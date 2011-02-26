@@ -34,12 +34,14 @@ sub execute {
     foreach my $method ($meta->get_method_list()) {
       print "$method\n";
     }
-    eval {
-      System::Disk::Usage->create();
-    };
-    if ($@) {
-        Carp::confess "Error during execute(): $@";
-    }
+    System::Disk::Usage->execute();
+    #eval {
+    #  my $u = System::Disk::Usage;
+    #  $u->create();
+    #};
+    #if ($@) {
+    #    Carp::confess "Error during execute(): $@";
+    #}
 
     return 1;
 }
