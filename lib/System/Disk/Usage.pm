@@ -29,6 +29,7 @@ use System::Utility::SNMP;
 local $| = 1;
 
 class System::Disk::Usage {
+  is => 'Command',
   has => [
     debug => {
       is => 'Number',
@@ -93,7 +94,6 @@ class System::Disk::Usage {
       default => 0,
       doc => 'Purge aged volume entries',
     }
-    # FIXME: cache becomes a UR object
     cache => {
       is => 'System::Disk::Volume',
     }
@@ -439,7 +439,7 @@ sub update_cache {
   $self->{cache}->validate_volumes();
 }
 
-sub main {
+sub execute {
 
   my $self = shift;
   my @args = @_;
