@@ -9,6 +9,7 @@ use File::Basename;
 use Getopt::Long;
 use Term::ANSIColor;
 require Text::Wrap;
+use Log::Log4perl qw(:easy);
 
 class System::Command::Base {
     is => 'Command',
@@ -24,12 +25,23 @@ class System::Command::Base {
             is_optional => 1,
         }
     ],
+    has_optional => [
+        loglevel => { is => 'Text', default => 'INFO' },
+        logfile  => { is => 'Text', default => 'STDERR' },
+    ]
 };
 
+sub prepare_logger {
+    my $self = shift;
+    Log::Log4perl->easy_init(
+        { level => $self->{loglevel}, category => __PACKAGE__, file => $self->{logfile} }
+    );
+    $self->{logger} = Log::Log4perl->get_logger();
+}
 
 sub sub_command_classes {
     my $class = shift;
-    
+
     my @original_paths = $class->sub_command_dirs;
     my @paths = 
         grep { s/\.pm$// } 
@@ -37,7 +49,7 @@ sub sub_command_classes {
         grep { -d $_ }
         grep { defined($_) and length($_) } 
         @original_paths;
-    
+
     my @classes;
     if (@paths) {
         @classes =
@@ -50,7 +62,7 @@ sub sub_command_classes {
             map { File::Basename::basename($_) }
             @paths;
     }
-    
+
     $DB::single = 1;
     my $class_above = $class;
     $class_above =~ s/::Command//;
@@ -65,7 +77,7 @@ sub sub_command_classes {
             glob($pattern);
         }
         @INC;
-    
+
     my @classes2;
     if (@paths) {
         @classes2 =
