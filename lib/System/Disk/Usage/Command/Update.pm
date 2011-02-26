@@ -4,11 +4,10 @@ use strict;
 use warnings;
 
 use System;
-use System::Disk::Usage;
 
 class System::Disk::Usage::Command::Update {
     is => 'System::Command::Base',
-    doc => 'Queries volumes for usage'
+    doc => 'Queries and stores volume usage data'
 };
 
 sub help_brief {
@@ -30,9 +29,11 @@ EOS
 sub execute {
     my $self = shift;
 
-    my $result = System::Disk::Usage->new();
-    unless ($result) {
-        Carp::confess "Error during execute(): $!";
+    eval {
+      System::Disk::Usage->main();
+    };
+    if ($@) {
+        Carp::confess "Error during execute(): $@";
     }
 
     return 1;

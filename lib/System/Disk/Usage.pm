@@ -4,6 +4,8 @@ package System::Disk::Usage;
 use strict;
 use warnings;
 
+use Class::MOP;
+
 use System;
 
 # Use Dumper for debugging
@@ -26,7 +28,91 @@ use System::Utility::SNMP;
 # Autoflush
 local $| = 1;
 
-sub new {
+class System::Disk::Usage {
+  has => [
+    debug => {
+      is => 'Number',
+      default => 0,
+    }
+    force => {
+      is => 'Number',
+      default => 0,
+    }
+    db_tries => {
+      is => 'Number',
+      default => 5,
+    }
+    timeout => {
+      is => 'Number',
+      default => 15,
+    }
+    host_maxage => {
+      is => 'Number',
+      default => 86400,
+      doc => 'max seconds since last check',
+    }
+    vol_maxage => {
+      is => 'Number',
+      default => 15,
+      doc => 'max days until volume is considered purgable',
+    }
+    diskconf => {
+      is => 'Text',
+      default => './disk.conf',
+      doc => 'Disk configuration file',
+    }
+    # FIXME: remove
+    configfile => {
+      is => 'Text',
+      default => undef,
+      doc => 'Application configuration file (not used currently)',
+    }
+    # FIXME: remove
+    cachefile => {
+      is => 'Text',
+      default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
+      doc => 'Path to cache.file (deprecated)',
+    }
+    rrdpath => {
+      is => 'Text',
+      default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
+      doc => 'Path to rrd file storage',
+    }
+    logfile => {
+      is => 'Text',
+      default => 'STDERR',
+      doc => 'Path to log file',
+    }
+    loglevel => {
+      is => 'Text',
+      default => 'INFO',
+      doc => 'Loglevel',
+    }
+    purge => {
+      is => 'Number',
+      default => 0,
+      doc => 'Purge aged volume entries',
+    }
+    # FIXME: cache becomes a UR object
+    cache => {
+      is => 'System::Disk::Volume',
+    }
+    snmp => {
+      is => 'System::Utility::SNMP',
+    }
+    rrd => {
+      is => 'System::Utility::RRD',
+    }
+  ]
+};
+
+sub prep {
+  my $self = shift;
+  print Dumper $self;
+}
+
+# FIXME: deprecated, remove
+sub new_orig {
   my $self = {
     debug      => 0,
     force      => 0,
@@ -38,11 +124,8 @@ sub new {
     configfile => undef,
     cachefile  => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
     rrdpath    => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/rrd",
-    logdir     => undef,
     logfile    => 'STDERR',
     loglevel   => 'INFO',
-    logfh      => undef,
-    dbh        => undef,
     purge      => undef, # max days since last volume update are "aged"
     config     => {},
     # FIXME: cache becomes a UR object
@@ -70,12 +153,6 @@ sub error {
   die "@_";
 }
 
-sub version {
-  my $self = shift;
-  print "disk_usage $VERSION\n";
-  exit;
-}
-
 sub prepare_logger {
   # Set the file handle for the log.
   # Use logfile in .cfg if not given on CLI.
@@ -99,6 +176,7 @@ sub prepare_logger {
   $self->{logger} = Log::Log4perl->get_logger();
 }
 
+# FIXME: deprecated, remove
 # FIXME: Avoiding the use of a configuration file for now.
 #sub read_config {
 #  # Read a simple configuration file that contains a hash object
@@ -138,6 +216,7 @@ sub prepare_logger {
 #  }
 #}
 
+# FIXME: deprecated, remove
 # FIXME: Remove and use DISK_FILER table
 sub parse_disk_conf {
   # Read the config file and find NFS servers.
@@ -194,6 +273,7 @@ sub parse_disk_conf {
   return $result;
 }
 
+# FIXME: deprecated, remove
 # FIXME: Remove and use DISK_FILER table
 sub define_hosts {
   # Target host may be a CLI arg or come from a config file.
@@ -222,6 +302,7 @@ sub define_hosts {
   return $hosts;
 }
 
+# FIXME: deprecated, remove
 # FIXME: Remove and use DISK_VOLUME table
 sub cache {
   # Iterate over the result hash and add to sqlite cache.
@@ -363,14 +444,17 @@ sub main {
   my $self = shift;
   my @args = @_;
 
-  print "I'm running!\n";
+  my $meta = Class::MOP::Class->initialize("System::Disk::Usage");
+  foreach my $method ($meta->get_method_list()) {
+    print "$method\n";
+  }
+
+  print "In main...!\n";
+  $self->prep();
   return;
 
-  # Set auto flush, useful with "tee".
-  $| = 1;
-
   # Parse CLI args
-  $self->parse_args();
+  #$self->parse_args();
 
   # Open log file as soon as we have options parsed.
   $self->prepare_logger();
