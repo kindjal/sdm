@@ -1,6 +1,12 @@
 
 package System::Disk::Usage;
 
+class System::Disk::Usage {
+};
+
+1;
+
+__END__
 use strict;
 use warnings;
 
@@ -75,7 +81,7 @@ class System::Disk::Usage {
     },
     rrdpath => {
       is => 'Text',
-      default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
+      default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/rrd",
       doc => 'Path to rrd file storage',
     },
     logfile => {
@@ -95,6 +101,7 @@ class System::Disk::Usage {
     },
     # FIXME: How do we connect to UR objects here?
     cache => {
+      # This is probably wrong.
       is => 'System::Disk::Volume',
       calculate_from => 'mount_path',
       calculate => q| return Genome::Disk::Volume->get(mount_path => $mount_path); |
@@ -112,7 +119,9 @@ class System::Disk::Usage {
 };
 
 sub create {
+  print "create\n";
   my ($class,%params) = @_;
+  print Dumper %params;
   $params{rrd} = System::Utility::RRD->new();
   $params{snmp} = System::Utility::SNMP->new();
   my $self = $class->SUPER::create(%params);
@@ -420,17 +429,13 @@ sub update_cache {
 }
 
 sub execute {
+  print "execute\n";
 
-  my ($class,@args) = @_;
-  my $self = $class->create();
+  my ($class,%args) = @_;
+  print Dumper %args;
+  my $self = $class->create(%args);
 
-  # FIXME: remove
-  #my $meta = Class::MOP::Class->initialize("System::Disk::Usage");
-  #foreach my $method ($meta->get_method_list()) {
-  #  print "$method\n";
-  #  print "value: " . $self->$method . "\n";
-  #}
-  #print Dumper $self;
+  print Dumper $self;
   return;
   # Parse CLI args
   #$self->parse_args();
