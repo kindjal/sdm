@@ -1,5 +1,5 @@
 
-package DiskUsage::SNMP;
+package System::Utility::SNMP;
 
 use strict;
 use warnings;
@@ -46,18 +46,27 @@ my $oids = {
   },
 };
 
+class System::Utility::SNMP {
+};
+
 sub new {
-  my $class = shift;
-  my $self = {
-    parent => shift,
-    snmp_session => undef,
-    no_snmp => 0,
-    hosttype => undef,
-    groups => undef,
-    logger => Log::Log4perl->get_logger(__PACKAGE__),
-  };  bless $self, $class;
+  my ($class,%params) = @_;
+  my $self = $class->SUPER::create(%params);
   return $self;
 }
+
+#sub new {
+#  my $class = shift;
+#  my $self = {
+#    parent => shift,
+#    snmp_session => undef,
+#    no_snmp => 0,
+#    hosttype => undef,
+#    groups => undef,
+#    logger => Log::Log4perl->get_logger(__PACKAGE__),
+#  };  bless $self, $class;
+#  return $self;
+#}
 
 sub error {
   my $self = shift;

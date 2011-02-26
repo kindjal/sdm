@@ -29,7 +29,6 @@ use System::Utility::SNMP;
 local $| = 1;
 
 class System::Disk::Usage {
-  #is => 'Command',
   has => [
     debug => {
       is => 'Number',
@@ -63,11 +62,11 @@ class System::Disk::Usage {
       doc => 'Disk configuration file',
     },
     # FIXME: remove
-    configfile => {
-      is => 'Text',
-      default => undef,
-      doc => 'Application configuration file (not used currently)',
-    },
+    #configfile => {
+    #  is => 'Text',
+    #  default => undef,
+    #  doc => 'Application configuration file (not used currently)',
+    #},
     # FIXME: remove
     cachefile => {
       is => 'Text',
@@ -94,52 +93,33 @@ class System::Disk::Usage {
       default => 0,
       doc => 'Purge aged volume entries',
     },
+    # FIXME: How do we connect to UR objects here?
     cache => {
       is => 'System::Disk::Volume',
+      calculate_from => 'mount_path',
+      calculate => q| return Genome::Disk::Volume->get(mount_path => $mount_path); |
     },
     snmp => {
       is => 'System::Utility::SNMP',
+      default => undef,
     },
     rrd => {
       is => 'System::Utility::RRD',
+      default => undef,
     },
-  ]
+  ],
+  data_source => undef,
 };
 
-sub prep {
-  my $self = shift;
-  print Dumper $self;
-}
-
-# FIXME: deprecated, remove
-sub new_orig {
-  my $self = {
-    debug      => 0,
-    force      => 0,
-    db_tries   => 5,
-    timeout    => 15,
-    host_maxage => 86400, # max seconds since last check
-    vol_maxage => 15, # max days since last check
-    diskconf   => "./disk.conf",
-    configfile => undef,
-    cachefile  => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache",
-    rrdpath    => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/rrd",
-    logfile    => 'STDERR',
-    loglevel   => 'INFO',
-    purge      => undef, # max days since last volume update are "aged"
-    config     => {},
-    # FIXME: cache becomes a UR object
-    cache      => new DiskUsage::Cache,
-    snmp       => new System::Utility::SNMP,
-    rrd        => new System::Utility::RRD,
-  };
-  bless $self, 'DiskUsage';
-  $self->{cache}->{parent} = $self;
-  $self->{snmp}->{parent} = $self;
-  $self->{rrd}->{parent} = $self;
+sub create {
+  my ($class,%params) = @_;
+  $params{rrd} = System::Utility::RRD->new();
+  $params{snmp} = System::Utility::SNMP->new();
+  my $self = $class->SUPER::create(%params);
   return $self;
 }
 
+# FIXME: deprecate
 sub error {
   # I had been using Exception::Class::TryCatch and would throw()
   # here, but this presented problems in perl 5.8.8 where catch()
@@ -441,18 +421,17 @@ sub update_cache {
 
 sub execute {
 
-  my $self = shift;
-  my @args = @_;
+  my ($class,@args) = @_;
+  my $self = $class->create();
 
-  my $meta = Class::MOP::Class->initialize("System::Disk::Usage");
-  foreach my $method ($meta->get_method_list()) {
-    print "$method\n";
-  }
-
-  print "In main...!\n";
-  $self->prep();
+  # FIXME: remove
+  #my $meta = Class::MOP::Class->initialize("System::Disk::Usage");
+  #foreach my $method ($meta->get_method_list()) {
+  #  print "$method\n";
+  #  print "value: " . $self->$method . "\n";
+  #}
+  #print Dumper $self;
   return;
-
   # Parse CLI args
   #$self->parse_args();
 

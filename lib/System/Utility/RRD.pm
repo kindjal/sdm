@@ -1,6 +1,5 @@
-#!/usr/bin/perl
 
-package DiskUsage::RRD;
+package System::Utility::RRD;
 
 use strict;
 use warnings;
@@ -9,14 +8,19 @@ use RRDTool::OO;
 use Time::Local;
 use Log::Log4perl qw/:levels/;
 
+class System::Utility::RRD {
+};
+
 sub new {
-  my $class = shift;
-  my $self = {
-    parent => shift,
-    logger => Log::Log4perl->get_logger(__PACKAGE__),
-  };
-  bless $self,$class;
+  my ($class,%params) = @_;
+  my $self = $class->SUPER::create(%params);
   return $self;
+  #my $self = {
+  #  parent => shift,
+  #  logger => Log::Log4perl->get_logger(__PACKAGE__),
+  #};
+  #bless $self,$class;
+  #return $self;
 }
 
 sub error {
