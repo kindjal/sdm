@@ -30,7 +30,7 @@ sub execute {
     my $self = shift;
 
     eval {
-      System::Disk::Usage->main();
+      System::Disk::Usage->execute();
     };
     if ($@) {
         Carp::confess "Error during execute(): $@";
