@@ -74,9 +74,11 @@ sub execute {
     $params{created} = $self->created if defined $self->created;
     $params{last_modified} = $self->last_modified if defined $self->last_modified;
 
-    my $volume = System::Disk::Volume->create(%params);
-    unless ($volume) {
-        Carp::confess "Could not create volume: $!";
+    eval {
+      System::Disk::Volume->create(%params);
+    };
+    if ($@) {
+        Carp::confess "Could not create volume: $@";
     }
 
     return 1;

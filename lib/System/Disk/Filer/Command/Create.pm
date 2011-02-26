@@ -8,39 +8,47 @@ use System;
 class System::Disk::Filer::Command::Create {
     is => 'System::Command::Base',
     has => [
-        subject_class_name  => {
-            is_constant => 1,
-            value => 'System::Disk::Filer',
-        },
-        show => { 
-            default_value => 'filer_id,filesystem,status'
-        },
+        hostname      => { is => 'VARCHAR(255)' },
+    ],
+    has_optional => [
+        status        => { is => 'UNSIGNED INTEGER' },
+        comments      => { is => 'VARCHAR(255)' },
+        filesystem    => { is => 'VARCHAR(255)' },
+        created       => { is => 'DATE' },
+        last_modified => { is => 'DATE' },
     ],
 };
 
 sub help_brief {
-    return 'Creates a volume';
+    return 'Creates a filer';
 }
 
 sub help_synopsis {
-    return 'Creates a volume';
+    return <<EOS
+Creates a filer
+EOS
 }
 
 sub help_detail {
     return <<EOS
-This tool creates a volume.  Blah blah blah details blah.
+This tool creates a filer.  Blah blah blah details blah.
 EOS
 }
 
 sub execute {
     my $self = shift;
     my %params = (
-        name => $self->name,
+        hostname => $self->hostname,
+        status => $self->status,
+        comments => $self->comments,
+        filesystem => $self->filesystem,
     );
 
-    my $volume = System::Disk::Filer->create(%params);
-    unless ($volume) {
-        Carp::confess "Could not create filer: $!";
+    eval {
+      System::Disk::Filer->create(%params);
+    };
+    if ($@) {
+        Carp::confess "Could not create filer: $@";
     }
 
     return 1;

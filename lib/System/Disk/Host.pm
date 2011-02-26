@@ -16,7 +16,7 @@ class System::Disk::Host {
         last_modified => { is => 'DATE', is_optional => 1 },
         location      => { is => 'VARCHAR(255)', is_optional => 1 },
         os            => { is => 'VARCHAR(255)', is_optional => 1 },
-        status        => { is => 'UNSIGNED INTEGER' },
+        status        => { is => 'UNSIGNED INTEGER', is_optional => 1 },
         filer_id      => { is => 'INTEGER' },
     ],
     schema_name => 'Disk',

@@ -15,7 +15,7 @@ class System::Disk::Filer {
         filesystem    => { is => 'VARCHAR(255)', is_optional => 1 },
         hostname      => { is => 'VARCHAR(255)' },
         last_modified => { is => 'DATE', is_optional => 1 },
-        status        => { is => 'UNSIGNED INTEGER' },
+        status        => { is => 'UNSIGNED INTEGER', is_optional => 1 },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

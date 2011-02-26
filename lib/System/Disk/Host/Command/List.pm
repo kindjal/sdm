@@ -1,24 +1,21 @@
-package System::Disk::Volume::Command::List;
+package System::Disk::Host::Command::List;
 
 use strict;
 use warnings;
 
 use System;
 
-class System::Disk::Volume::Command::List {
+class System::Disk::Host::Command::List {
     is => 'UR::Object::Command::List',
     has => [
         subject_class_name  => {
             is_constant => 1,
-            value => 'System::Disk::Volume',
+            value => 'System::Disk::Host',
         },
         show => { 
-            #default_value => 'mount_path,total_kb,disk_group_names' 
-            default_value => 'physical_path,mount_path,total_kb' 
+            default_value => 'hostname,os,status' 
         },
     ],
 };
-
-#sub sub_command_sort_position { 4 }
 
 1;

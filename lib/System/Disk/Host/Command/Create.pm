@@ -8,39 +8,50 @@ use System;
 class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
-        subject_class_name  => {
-            is_constant => 1,
-            value => 'System::Disk::Host',
-        },
-        show => { 
-            default_value => 'host_id,hostname,OS'
-        },
+        hostname      => { is => 'VARCHAR(255)' },
+        filer_id      => { is => 'INTEGER' },
+    ],
+    has_optional => [
+        comments      => { is => 'VARCHAR(255)' },
+        location      => { is => 'VARCHAR(255)' },
+        os            => { is => 'VARCHAR(255)' },
+        status        => { is => 'UNSIGNED INTEGER', default => 0 },
     ],
 };
 
 sub help_brief {
-    return 'Creates a volume';
+    return 'Creates a host';
 }
 
 sub help_synopsis {
-    return 'Creates a volume';
+    return <<EOS
+Creates a host
+EOS
 }
 
 sub help_detail {
     return <<EOS
-This tool creates a volume.  Blah blah blah details blah.
+This tool creates a host.  Blah blah blah details blah.
 EOS
 }
 
 sub execute {
     my $self = shift;
+    # FIXME: Is there a way in one statement to map params to $self->attributes
     my %params = (
-        name => $self->name,
+        hostname => $self->hostname,
+        filer_id => $self->filer_id,
+        comments => $self->comments,
+        location => $self->location,
+        status => $self->status,
+        os => $self->os,
     );
 
-    my $volume = System::Disk::Host->create(%params);
-    unless ($volume) {
-        Carp::confess "Could not create host: $!";
+    eval {
+      System::Disk::Host->create(%params);
+    };
+    if ($@) {
+        Carp::confess "Could not create host: $@";
     }
 
     return 1;
