@@ -43,8 +43,8 @@ sub execute {
         filer    => $self->filer,
         comments => $self->comments,
         location => $self->location,
-        status => $self->status,
-        os => $self->os,
+        status   => $self->status,
+        os       => $self->os,
     );
 
     eval {
