@@ -9,7 +9,7 @@ class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
         hostname      => { is => 'VARCHAR(255)' },
-        filer_id      => { is => 'INTEGER' },
+        filer         => { is => 'VARCHAR(255)' },
     ],
     has_optional => [
         comments      => { is => 'VARCHAR(255)' },
@@ -40,7 +40,7 @@ sub execute {
     # FIXME: Is there a way in one statement to map params to $self->attributes
     my %params = (
         hostname => $self->hostname,
-        filer_id => $self->filer_id,
+        filer    => $self->filer,
         comments => $self->comments,
         location => $self->location,
         status => $self->status,
