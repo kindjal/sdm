@@ -9,7 +9,7 @@ class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
         hostname      => { is => 'VARCHAR(255)' },
-        filer         => { is => 'VARCHAR(255)' },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id' },
     ],
     has_optional => [
         comments      => { is => 'VARCHAR(255)' },
@@ -47,9 +47,9 @@ sub execute {
         os       => $self->os,
     );
 
-    eval {
+    #eval {
       System::Disk::Host->create(%params);
-    };
+      #};
     if ($@) {
         Carp::confess "Could not create host: $@";
     }
