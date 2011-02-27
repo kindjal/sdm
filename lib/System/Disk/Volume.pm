@@ -10,6 +10,10 @@ class System::Disk::Volume {
         volume_id => { is => 'INTEGER' },
     ],
     has => [
+        subject_class_name  => {
+            is_constant => 1,
+            value => 'System::Disk::Volume',
+        },
         filer_id      => { is => 'INTEGER' },
         mount_path    => { is => 'VARCHAR(255)' },
         physical_path => { is => 'VARCHAR(255)' },
@@ -19,7 +23,7 @@ class System::Disk::Volume {
     has_optional => [
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
-        disk_group    => { is => 'System::Disk::Group' },
+        disk_group    => { is => 'System::Disk::Group', id_by => 'volume_id' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

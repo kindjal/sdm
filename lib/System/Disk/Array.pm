@@ -11,13 +11,26 @@ class System::Disk::Array {
         array_id => { is => 'INTEGER' },
     ],
     has => [
-        created            => { is => 'DATE', is_optional => 1 },
-        host_id            => { is => 'INTEGER' },
-        last_modified      => { is => 'DATE', is_optional => 1 },
+        host_id            => {
+            is => 'Integer',
+            calculate_from   => ['host'],
+            calculate        => sub {
+                                  my $host = @_;
+                                  return unless $host;
+                                  my $h = System::Disk::Host->get( hostname => $host );
+                                  return $h->id;
+                                },
+        },
         model              => { is => 'VARCHAR(255)' },
         size               => { is => 'UNSIGNED INTEGER' },
         type               => { is => 'VARCHAR(255)' },
-        #host_id            => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
+    ],
+    has_optional => [
+        created            => { is => 'DATE' },
+        last_modified      => { is => 'DATE' },
+    ],
+    has_param => [
+        host               => { is => 'Text' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

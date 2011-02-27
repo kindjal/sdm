@@ -378,7 +378,7 @@ sub get_disk_group {
   # Look on a mount point for a DISK_ touch file.
   my $self = shift;
   # FIXME
-  $self->error("Not yet implemented\n");
+  #$self->error("Not yet implemented\n");
 
   my $physical_path = shift;
   my $mount_path = shift;
@@ -389,10 +389,13 @@ sub get_disk_group {
   # Does the cache already have the disk group name?
   # FIXME: URify
   #my $res = $self->{parent}->{cache}->fetch_disk_group($mount_path);
-  my $res = System::Disk::Volume->get( mount_path => $mount_path );
+  my $res = System::Disk::Volume->get(
+    mount_path => $mount_path
+  );
 
-  if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
-    $group_name = pop @{ pop @$res };
+  #if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
+  if (defined $res and ! $self->{parent}->{recache}) {
+    $group_name = $res->disk_group;
     $self->{logger}->debug("$mount_path is cached for: $group_name\n");
     return $group_name;
   }

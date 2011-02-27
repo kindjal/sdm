@@ -12,11 +12,11 @@ class System::Disk::Group::Command::List {
             is_constant => 1,
             value => 'System::Disk::Group',
         },
-        show => { 
-            default_value => 'disk_group_name,dg_id,user_name,group_name,subdirectory' 
-        },
-        filter => { 
-            default_value => 'user_name=systems' 
+        #show => {
+        #    default_value => 'disk_group_name,dg_id,user_name,group_name,subdirectory'
+        #},
+        show => {
+            default_value => 'name,username,subdirectory',
         },
     ],
 };

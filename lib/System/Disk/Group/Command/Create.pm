@@ -15,6 +15,17 @@ class System::Disk::Group::Command::Create {
         show => { 
             default_value => 'group_id,name'
         },
+        name            => { is => 'VARCHAR(255)' },
+        permissions     => { is => 'UNSIGNED INTEGER' },
+        sticky          => { is => 'UNSIGNED INTEGER' },
+        unix_gid        => { is => 'UNSIGNED INTEGER' },
+        unix_uid        => { is => 'UNSIGNED INTEGER' },
+    ],
+    has_optional => [
+        last_modified   => { is => 'DATE' },
+        parent_group_id => { is => 'INTEGER' },
+        subdirectory    => { is => 'VARCHAR(255)' },
+        username        => { is => 'VARCHAR(255)' },
     ],
 };
 
@@ -36,6 +47,13 @@ sub execute {
     my $self = shift;
     my %params = (
         name => $self->name,
+        permissions => $self->permissions,
+        sticky => $self->permissions,
+        unix_gid => $self->permissions,
+        unix_uid => $self->permissions,
+        parent_group_id => $self->permissions,
+        subdirectory => $self->permissions,
+        username => $self->permissions,
     );
 
     my $volume = System::Disk::Group->create(%params);

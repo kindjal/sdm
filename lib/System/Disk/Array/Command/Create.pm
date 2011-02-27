@@ -12,9 +12,15 @@ class System::Disk::Array::Command::Create {
             is_constant => 1,
             value => 'System::Disk::Array',
         },
-        show => { 
+        show => {
             default_value => 'array_id,model,size'
         },
+        model => { is => 'Text' },
+        type => { is => 'Text' },
+        size => { is => 'Integer' },
+    ],
+    has_param => [
+        host => { is => 'Text' },
     ],
 };
 
@@ -35,7 +41,10 @@ EOS
 sub execute {
     my $self = shift;
     my %params = (
-        name => $self->name,
+        host => $self->host,
+        model => $self->model,
+        size => $self->size,
+        type => $self->type,
     );
 
     my $volume = System::Disk::Array->create(%params);

@@ -174,12 +174,25 @@ sub test_target {
   my $obj = $self->test_start();
   # Requires active network access to real host
   my $host = "ntap9";
-  my $err = 0;
   $obj->connect_snmp($host);
   lives_ok { my $result = $obj->query_snmp($host); } "test_target: runs ok";
   my $result = $obj->query_snmp($host);
   ok( ref $result eq 'HASH', "test target" );
   $count+=2;
+}
+
+sub test_snmp_get_disk_group {
+  my $self = shift;
+  return if (! $self->{live});
+  my $obj = $self->test_start();
+  # Requires active network access to real host
+  my $host = "nfs10home";
+  my $physical_path = "/vol/home/mcallaway";
+  my $mount_path = "/gscuser/mcallawa";
+  $obj->get_disk_group($physical_path,$mount_path);
+  #lives_ok { my $result = $obj->query_snmp($host); } "test_target: runs ok";
+  #my $result = $obj->query_snmp($host);
+  $count+=1;
 }
 
 # -- end test subs

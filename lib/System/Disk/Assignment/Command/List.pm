@@ -12,8 +12,8 @@ class System::Disk::Assignment::Command::List {
             is_constant => 1,
             value => 'System::Disk::Assignment',
         },
-        show => { 
-            default_value => 'assignment_date,disk_group_name,absolute_path,total_kb,unallocated_kb,percent_allocated' 
+        show => {
+            default_value => 'group_id,volume_id',
         },
     ],
 };

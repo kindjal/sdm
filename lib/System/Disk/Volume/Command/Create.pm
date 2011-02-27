@@ -8,10 +8,10 @@ use System;
 class System::Disk::Volume::Command::Create {
     is => 'System::Command::Base',
     has => [
-        #subject_class_name  => {
-        #    is_constant => 1,
-        #    value => 'System::Disk::Volume',
-        #},
+        subject_class_name  => {
+            is_constant => 1,
+            value => 'System::Disk::Volume',
+        },
         filer_id => {
             is  => 'Number',
             doc => 'The ID of the filer serving this volume',
