@@ -10,12 +10,18 @@ class System::Disk::Filer {
         filer_id => { is => 'INTEGER' },
     ],
     has => [
-        comments      => { is => 'VARCHAR(255)', is_optional => 1 },
-        created       => { is => 'DATE', is_optional => 1 },
-        filesystem    => { is => 'VARCHAR(255)', is_optional => 1 },
         hostname      => { is => 'VARCHAR(255)' },
-        last_modified => { is => 'DATE', is_optional => 1 },
-        status        => { is => 'UNSIGNED INTEGER', is_optional => 1 },
+    ],
+    has_optional => [
+        comments      => { is => 'VARCHAR(255)' },
+        created       => { is => 'DATE' },
+        filesystem    => { is => 'VARCHAR(255)' },
+        last_modified => { is => 'DATE' },
+        status        => { is => 'UNSIGNED INTEGER' },
+    ],
+    has_many => [
+        hosts         => { is => 'System::Disk::Host', reverse_as => 'filer' },
+        arrays        => { is => 'System::Disk::Array', via => 'hosts', to => 'arrays' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
