@@ -10,7 +10,6 @@ class System::Disk::Volume {
         volume_id => { is => 'INTEGER', implied_by => 'disk_group' },
     ],
     has => [
-        subject_class_name => { default_value => 'System::Disk::Volume', is_constant => 1 },
         filer_id           => { is => 'INTEGER' },
         mount_path         => { is => 'VARCHAR(255)' },
         physical_path      => { is => 'VARCHAR(255)' },
