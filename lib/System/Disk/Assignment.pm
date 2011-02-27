@@ -11,12 +11,10 @@ class System::Disk::Assignment {
         volume_id => { is => 'Integer', implied_by => 'volume' },
     ],
     has => [
-        group                => { is => 'System::Disk::Group', id_by => 'group_id' },
         disk_group_name      => { via => 'group' },
         user_name            => { via => 'group' },
         group_name           => { via => 'group' },
         subdirectory         => { via => 'group' },
-        volume               => { is => 'System::Disk::Volume', id_by => 'volume_id' },
         mount_path           => { via => 'volume' },
         total_kb             => { via => 'volume' },
         unallocated_kb       => { via => 'volume' },
@@ -26,10 +24,10 @@ class System::Disk::Assignment {
                 my @split_pct_full = split(/%/,$pct_full[-1]);
                 @split_pct_full = split (/ /,$split_pct_full[0]);
                 return $split_pct_full[-1]; ) },
-        absolute_path        => { calculate_from => [ 'mount_path', 'subdirectory' ],
+        absolute_path       => { calculate_from => [ 'mount_path', 'subdirectory' ],
                                   calculate => q( return $mount_path .'/'. $subdirectory; ) },
-        #System::Disk::Group  => { is => 'System::Disk::Group', id_by => 'group_id', constraint_name => 'DISK_VOLUME_GROUP_GROUP_ID_DISK_GROUP_GROUP_ID_FK' },
-        #System::Disk::Volume => { is => 'System::Disk::Volume', id_by => 'volume_id', constraint_name => 'VOLUME_GROUP_VOLUME_FK' },
+        group               => { is => 'System::Disk::Group', id_by => 'group_id', constraint_name => 'DISK_VOLUME_GROUP_GROUP_ID_DISK_GROUP_GROUP_ID_FK' },
+        volume              => { is => 'System::Disk::Volume', id_by => 'volume_id', constraint_name => 'VOLUME_GROUP_VOLUME_FK' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
