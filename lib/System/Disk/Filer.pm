@@ -10,12 +10,12 @@ class System::Disk::Filer {
         filer_id        => { is => 'INTEGER' },
     ],
     has => [
-        hostname        => { is => 'VARCHAR(255)' },
+        name            => { is => 'Text', len => 255 },
     ],
     has_optional => [
-        comments        => { is => 'VARCHAR(255)' },
+        comments        => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
-        filesystem      => { is => 'VARCHAR(255)' },
+        filesystem      => { is => 'Text', len => 255 },
         last_modified   => { is => 'DATE' },
         status          => { is => 'UNSIGNED INTEGER' },
     ],
