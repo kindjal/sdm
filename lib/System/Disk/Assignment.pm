@@ -11,7 +11,6 @@ class System::Disk::Assignment {
         volume_id => { is => 'INTEGER', implied_by => 'volume' },
     ],
     has => [
-        subject_class_name   => { default_value => 'System::Disk::Assignment', is_constant => 1 },
         group                => { is => 'System::Disk::Group', id_by => 'group_id' },
         disk_group_name      => { via => 'group' },
         user_name            => { via => 'group' },
