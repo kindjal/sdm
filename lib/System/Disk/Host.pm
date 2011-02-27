@@ -7,19 +7,19 @@ use System;
 class System::Disk::Host {
     table_name => 'DISK_HOST',
     id_by => [
-        host_id => { is => 'INTEGER' },
+        host_id => { is => 'Integer' },
     ],
     has => [
-        hostname => { is => 'VARCHAR(255)' },
+        hostname => { is => 'Text', len => 255 },
     ],
     has_optional => [
         filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
-        comments      => { is => 'VARCHAR(255)' },
+        comments      => { is => 'Text', len => 255 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
-        location      => { is => 'VARCHAR(255)' },
-        os            => { is => 'VARCHAR(255)' },
-        status        => { is => 'UNSIGNED INTEGER' },
+        location      => { is => 'Text', len => 255 },
+        os            => { is => 'Text', len => 255 },
+        status        => { is => 'UnsignedInteger' },
     ],
     has_many_optional => [
         arrays => { is => 'System::Disk::Array', id_by => 'array_id', reverse_as => 'host' },

@@ -8,14 +8,14 @@ class System::Disk::Array {
     type_name => 'disk array',
     table_name => 'DISK_ARRAY',
     id_by => [
-        array_id => { is => 'INTEGER' },
+        array_id => { is => 'Integer' },
     ],
     has => [
-        host_id            => { is => 'INTEGER', implied_by => 'host' },
+        host_id            => { is => 'Integer', implied_by => 'host' },
         host               => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
-        model              => { is => 'VARCHAR(255)' },
-        size               => { is => 'UNSIGNED INTEGER' },
-        type               => { is => 'VARCHAR(255)' },
+        model              => { is => 'Text', len => 255 },
+        size               => { is => 'UnsignedInteger' },
+        type               => { is => 'Text', len => 255 },
     ],
     has_optional => [
         created       => { is => 'DATE' },

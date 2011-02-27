@@ -7,14 +7,14 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
-        volume_id => { is => 'INTEGER', implied_by => 'disk_group' },
+        volume_id => { is => 'Integer', implied_by => 'disk_group' },
     ],
     has => [
-        filer_id      => { is => 'INTEGER' },
-        mount_path    => { is => 'VARCHAR(255)' },
-        physical_path => { is => 'VARCHAR(255)' },
-        total_kb      => { is => 'UNSIGNED INTEGER' },
-        used_kb       => { is => 'UNSIGNED INTEGER' },
+        filer_id      => { is => 'Integer' },
+        mount_path    => { is => 'Text', len => 255 },
+        physical_path => { is => 'Text', len => 255 },
+        total_kb      => { is => 'UnsignedInteger' },
+        used_kb       => { is => 'UnsignedInteger' },
     ],
     has_optional => [
         created       => { is => 'DATE' },

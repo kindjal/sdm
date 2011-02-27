@@ -7,8 +7,8 @@ use System;
 class System::Disk::Assignment {
     table_name => 'DISK_VOLUME_GROUP',
     id_by => [
-        group_id  => { is => 'INTEGER', implied_by => 'group' },
-        volume_id => { is => 'INTEGER', implied_by => 'volume' },
+        group_id  => { is => 'Integer', implied_by => 'group' },
+        volume_id => { is => 'Integer', implied_by => 'volume' },
     ],
     has => [
         group                => { is => 'System::Disk::Group', id_by => 'group_id' },

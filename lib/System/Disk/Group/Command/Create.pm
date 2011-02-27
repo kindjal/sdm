@@ -15,17 +15,17 @@ class System::Disk::Group::Command::Create {
         show => { 
             default_value => 'group_id,name'
         },
-        name            => { is => 'VARCHAR(255)' },
-        permissions     => { is => 'UNSIGNED INTEGER' },
-        sticky          => { is => 'UNSIGNED INTEGER' },
-        unix_gid        => { is => 'UNSIGNED INTEGER' },
-        unix_uid        => { is => 'UNSIGNED INTEGER' },
+        name            => { is => 'Text', len => 255 },
+        permissions     => { is => 'UnsignedInteger' },
+        sticky          => { is => 'UnsignedInteger' },
+        unix_gid        => { is => 'UnsignedInteger' },
+        unix_uid        => { is => 'UnsignedInteger' },
     ],
     has_optional => [
         last_modified   => { is => 'DATE' },
-        parent_group_id => { is => 'INTEGER' },
-        subdirectory    => { is => 'VARCHAR(255)' },
-        username        => { is => 'VARCHAR(255)' },
+        parent_group_id => { is => 'Integer' },
+        subdirectory    => { is => 'Text', len => 255 },
+        username        => { is => 'Text', len => 255 },
     ],
 };
 
