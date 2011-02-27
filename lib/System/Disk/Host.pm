@@ -11,8 +11,10 @@ class System::Disk::Host {
     ],
     has => [
         hostname      => { is => 'VARCHAR(255)' },
-        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
-        filer_id      => { is => 'INTEGER', implied_by => 'filer' },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id' },
+    ],
+    has_many => [
+        arrays        => { is => 'System::Disk::Array', reverse_as => 'host' },
     ],
     has_optional => [
         comments      => { is => 'VARCHAR(255)' },
