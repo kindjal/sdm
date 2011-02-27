@@ -6,9 +6,9 @@ use warnings;
 use System;
 
 class System::Disk::Filer::Command {
-    is => 'Command',
+    is          => 'Command',
+    doc         => 'work with disk filers',
     is_abstract => 1,
-    doc => 'work with disk filers',
 };
 
 1;

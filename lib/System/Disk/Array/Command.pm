@@ -6,9 +6,9 @@ use warnings;
 use System;
 
 class System::Disk::Array::Command {
-    is => 'Command',
+    is          => 'Command',
+    doc         => 'work with disk arrays',
     is_abstract => 1,
-    doc => 'work with disk arrays',
 };
 
 1;

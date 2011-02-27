@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 class System::Disk::Command {
-    is => 'System::Command::Base',
+    is          => 'System::Command::Base',
+    doc         => 'Work with disk',
     is_abstract => 1,
-    doc => 'Work with disk',
 };
 
 1;

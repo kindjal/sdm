@@ -6,9 +6,9 @@ use warnings;
 use System;
 
 class System::Disk::Usage::Command {
-    is => 'System::Command::Base',
+    is          => 'System::Command::Base',
+    doc         => 'work with disk usage',
     is_abstract => 1,
-    doc => 'work with disk usage',
 };
 
 1;

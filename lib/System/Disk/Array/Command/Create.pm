@@ -8,19 +8,14 @@ use System;
 class System::Disk::Array::Command::Create {
     is => 'System::Command::Base',
     has => [
-        subject_class_name  => {
-            is_constant => 1,
-            value => 'System::Disk::Array',
-        },
-        show => {
-            default_value => 'array_id,model,size'
-        },
+        subject_class_name  => { value => 'System::Disk::Array', is_constant => 1, },
+        show  => { default_value => 'array_id,model,size' },
         model => { is => 'Text' },
-        type => { is => 'Text' },
-        size => { is => 'Integer' },
+        type  => { is => 'Text' },
+        size  => { is => 'Integer' },
     ],
     has_param => [
-        host => { is => 'Text' },
+        host  => { is => 'Text' },
     ],
 };
 

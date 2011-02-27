@@ -6,12 +6,10 @@ use warnings;
 use System;
 
 class System::Disk::Assignment::Command {
-    is => 'Command',
+    is          => 'Command',
+    doc         => 'work with disk assignments',
     is_abstract => 1,
-    doc => 'work with disk assignments',
 };
-
-############################################
 
 sub command_name {
     my $class = ref($_[0]) || $_[0];
@@ -25,10 +23,4 @@ sub command_name_brief {
     return 'assignment';
 }
 
-############################################
-
-
-
-
 1;
-
