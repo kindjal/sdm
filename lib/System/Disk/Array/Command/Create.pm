@@ -9,7 +9,7 @@ class System::Disk::Array::Command::Create {
     is => 'System::Command::Base',
     has => [
         subject_class_name  => { value => 'System::Disk::Array', is_constant => 1, },
-        show  => { default_value => 'array_id,model,size' },
+        show  => { default_value => 'array_id,filer_name,host_name,model,size' },
         model => { is => 'Text' },
         type  => { is => 'Text' },
         size  => { is => 'Integer' },
