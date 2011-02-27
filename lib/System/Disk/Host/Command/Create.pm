@@ -8,14 +8,14 @@ use System;
 class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
-        hostname      => { is => 'VARCHAR(255)' },
-        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id' },
+        hostname      => { is => 'Text', len => 255 },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
     ],
     has_optional => [
-        comments      => { is => 'VARCHAR(255)' },
-        location      => { is => 'VARCHAR(255)' },
-        os            => { is => 'VARCHAR(255)' },
-        status        => { is => 'UNSIGNED INTEGER', default => 0 },
+        comments      => { is => 'Text', len => 255 },
+        location      => { is => 'Text', len => 255 },
+        os            => { is => 'Text', len => 255 },
+        status        => { is => 'Number', default => 0 },
     ],
 };
 

@@ -8,12 +8,12 @@ use System;
 class System::Disk::Filer::Command::Create {
     is => 'System::Command::Base',
     has => [
-        hostname      => { is => 'VARCHAR(255)' },
+        name          => { is => 'Text', len => 255 },
     ],
     has_optional => [
-        status        => { is => 'UNSIGNED INTEGER' },
-        comments      => { is => 'VARCHAR(255)' },
-        filesystem    => { is => 'VARCHAR(255)' },
+        status        => { is => 'Number' },
+        comments      => { is => 'Text', len => 255 },
+        filesystem    => { is => 'Text', len => 255 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
@@ -38,7 +38,7 @@ EOS
 sub execute {
     my $self = shift;
     my %params = (
-        hostname => $self->hostname,
+        name => $self->name,
         status => $self->status,
         comments => $self->comments,
         filesystem => $self->filesystem,
