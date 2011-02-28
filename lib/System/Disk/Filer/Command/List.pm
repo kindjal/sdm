@@ -13,7 +13,7 @@ class System::Disk::Filer::Command::List {
             value => 'System::Disk::Filer',
         },
         show => { 
-            default_value => 'hostname,filesystem,status,comments' 
+            default_value => 'name,filesystem,status,comments' 
         },
     ],
 };

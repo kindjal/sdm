@@ -11,11 +11,10 @@ class System::Disk::Array {
         array_id => { is => 'Integer' },
     ],
     has => [
-        host_id            => { is => 'Integer', implied_by => 'host' },
-        host               => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
-        model              => { is => 'Text', len => 255 },
-        size               => { is => 'UnsignedInteger' },
-        type               => { is => 'Text', len => 255 },
+        host          => { is => 'System::Disk::Host', id_by => 'host_id', constraint_name => 'ARRAY_HOST_FK' },
+        model         => { is => 'Text', len => 255 },
+        size          => { is => 'UnsignedInteger' },
+        type          => { is => 'Text', len => 255 },
     ],
     has_optional => [
         created       => { is => 'DATE' },

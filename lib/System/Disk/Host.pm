@@ -14,6 +14,7 @@ class System::Disk::Host {
     ],
     has_optional => [
         filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
+        filer_name    => { via => 'filer', to => 'name' },
         comments      => { is => 'Text', len => 255 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
@@ -22,7 +23,7 @@ class System::Disk::Host {
         status        => { is => 'UnsignedInteger' },
     ],
     has_many_optional => [
-        arrays => { is => 'System::Disk::Array', id_by => 'array_id', reverse_as => 'host' },
+        arrays => { is => 'System::Disk::Array', reverse_as => 'host' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

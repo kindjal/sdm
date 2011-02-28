@@ -13,7 +13,7 @@ class System::Disk::Host::Command::List {
             value => 'System::Disk::Host',
         },
         show => { 
-            default_value => 'hostname,os,status' 
+            default_value => 'filer_name,hostname,os,status' 
         },
     ],
 };

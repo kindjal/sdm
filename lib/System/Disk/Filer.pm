@@ -17,7 +17,7 @@ class System::Disk::Filer {
         status          => { is => 'UnsignedInteger' },
     ],
     has_many_optional => [
-        hosts  => { is => 'System::Disk::Host', id_by => 'host_id', reverse_as => 'filer' },
+        hosts  => { is => 'System::Disk::Host', reverse_as => 'filer' },
         arrays => { is => 'System::Disk::Array', via => 'hosts', to => 'arrays' },
     ],
     schema_name => 'Disk',

@@ -8,8 +8,14 @@ use System;
 class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
-        hostname      => { is => 'Text', len => 255 },
-        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
+        filer         => { is => 'System::Disk::Filer', 
+                            constraint_name => 'HOST_FILER_FK',
+                            shell_args_position => 1,
+                            doc => "the filer which owns this host",
+                        },
+        hostname      => { is => 'Text', len => 255,
+                            doc => "the name of the host owned by the filer"
+                        },
     ],
     has_optional => [
         comments      => { is => 'Text', len => 255 },
@@ -17,15 +23,12 @@ class System::Disk::Host::Command::Create {
         os            => { is => 'Text', len => 255 },
         status        => { is => 'Number', default => 0 },
     ],
+    doc => 'add a host to the set owned by a specific filer',
 };
-
-sub help_brief {
-    return 'Creates a host';
-}
 
 sub help_synopsis {
     return <<EOS
-Creates a host
+system disk host create myfiler1.mydomain.org myhost1.mydyomain.org --location "here!" --os "linx" --status 1 --comments "goody" 
 EOS
 }
 
