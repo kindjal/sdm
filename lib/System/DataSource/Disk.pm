@@ -8,5 +8,6 @@ class System::DataSource::Disk {
 };
 
 sub driver { 'SQLite' };
+sub dump_on_commit { 1 };
 
 1;
