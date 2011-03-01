@@ -1,12 +1,21 @@
 #!/bin/sh
+set -e
 # convenience script to "start from scratch"
-#cd ..
-#rm -f System.pm System/DataSource/Meta.* && ur define namespace System
-#cd -
-sqlite3 Disk.sqlite3 < disk-schema.txt
-sqlite3 Disk.sqlite3 .dump > Disk.sqlite3-dump
-# Fix FK column issues with sqlite3.  This is a known URism.
-perl -pi -e ' if ( /dd_fk_constraint_column/../\)/sgm ) { s/owner varchar.*/owner varchar,/};' DataSource/Meta.sqlite3-dump
-ur update classes-from-db
-#
-./system disk filer create --name nfs10home
+echo flush sqlite3 DB
+rm -f DataSource/Disk.sqlite3
+rm -f DataSource/Disk.sqlite3-dump
+rm -f DataSource/Disk.sqlite3n
+rm -f DataSource/Disk.sqlite3n-dump
+
+echo flush and remake Meta
+cd ..
+rm -f System/DataSource/Meta.sqlite3
+rm -f System/DataSource/Meta.sqlite3n
+rm -f System/DataSource/Meta.sqlite3-dump
+rm -f System/DataSource/Meta.sqlite3n-dump
+cd -
+
+echo make new sqlite3 DB
+sqlite3 DataSource/Disk.sqlite3n < DataSource/Disk.sqlite3n-schema
+sqlite3 DataSource/Disk.sqlite3n .dump > DataSource/Disk.sqlite3n-dump
+
