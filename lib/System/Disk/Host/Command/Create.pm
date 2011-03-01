@@ -9,9 +9,10 @@ class System::Disk::Host::Command::Create {
     is => 'System::Command::Base',
     has => [
         filer         => { is => 'System::Disk::Filer', 
-                            constraint_name => 'HOST_FILER_FK',
-                            shell_args_position => 1,
-                            doc => "the filer which owns this host",
+                           id_by => 'filername',
+                           constraint_name => 'HOST_FILER_FK',
+                           shell_args_position => 1,
+                           doc => "the filer which owns this host",
                         },
         hostname      => { is => 'Text', len => 255,
                             doc => "the name of the host owned by the filer"
@@ -42,17 +43,18 @@ sub execute {
     my $self = shift;
     # FIXME: Is there a way in one statement to map params to $self->attributes
     my %params = (
-        hostname => $self->hostname,
-        filer    => $self->filer,
-        comments => $self->comments,
-        location => $self->location,
-        status   => $self->status,
-        os       => $self->os,
+        hostname  => $self->hostname,
+        #filer     => $self->filer,
+        filername => $self->filername,
+        comments  => $self->comments,
+        location  => $self->location,
+        status    => $self->status,
+        os        => $self->os,
     );
 
-    #eval {
+    eval {
       System::Disk::Host->create(%params);
-      #};
+    };
     if ($@) {
         Carp::confess "Could not create host: $@";
     }

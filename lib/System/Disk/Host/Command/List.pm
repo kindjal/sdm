@@ -12,8 +12,8 @@ class System::Disk::Host::Command::List {
             is_constant => 1,
             value => 'System::Disk::Host',
         },
-        show => { 
-            default_value => 'filer_name,hostname,os,status' 
+        show => {
+            default_value => 'hostname,filername,os,status'
         },
     ],
 };

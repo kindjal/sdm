@@ -8,43 +8,47 @@ use System;
 class System::Disk::Array::Command::Create {
     is => 'System::Command::Base',
     has => [
-        subject_class_name  => { value => 'System::Disk::Array', is_constant => 1, },
-        show  => { default_value => 'array_id,filer_name,host_name,model,size' },
-        model => { is => 'Text' },
-        type  => { is => 'Text' },
-        size  => { is => 'Integer' },
+        name  => { is => 'Text', len => 255 },
+        host  => { is => 'System::Disk::Host', id_by => 'hostname', constraint_name => 'ARRAY_HOST_FK' },
     ],
-    has_param => [
-        host  => { is => 'Text' },
+    has_optional_param => [
+        model => { is => 'Text', len => 255 },
+        type  => { is => 'Text', len => 255 },
+        size  => { is => 'Integer' },
     ],
 };
 
 sub help_brief {
-    return 'Creates a volume';
+    return 'Creates an array';
 }
 
 sub help_synopsis {
-    return 'Creates a volume';
+    return <<EOS
+Creates an array
+EOS
 }
 
 sub help_detail {
     return <<EOS
-This tool creates a volume.  Blah blah blah details blah.
+This tool creates an array.  Blah blah blah details blah.
 EOS
 }
 
 sub execute {
     my $self = shift;
     my %params = (
-        host => $self->host,
+        name  => $self->name,
+        hostname => $self->hostname,
         model => $self->model,
         size => $self->size,
         type => $self->type,
     );
 
-    my $volume = System::Disk::Array->create(%params);
-    unless ($volume) {
-        Carp::confess "Could not create array: $!";
+    eval {
+      System::Disk::Array->create(%params);
+    };
+    if ($@) {
+      Carp::confess "Could not create array: $!";
     }
 
     return 1;

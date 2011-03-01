@@ -7,14 +7,12 @@ use System;
 class System::Disk::Host {
     table_name => 'DISK_HOST',
     id_by => [
-        host_id => { is => 'Integer' },
+        hostname      => { is => 'Text', len => 255 },
     ],
     has => [
-        hostname => { is => 'Text', len => 255 },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'HOST_FILER_FK' },
     ],
     has_optional => [
-        filer         => { is => 'System::Disk::Filer', id_by => 'filer_id', constraint_name => 'HOST_FILER_FK' },
-        filer_name    => { via => 'filer', to => 'name' },
         comments      => { is => 'Text', len => 255 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },

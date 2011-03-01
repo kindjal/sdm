@@ -12,8 +12,8 @@ class System::Disk::Array::Command::List {
             is_constant => 1,
             value => 'System::Disk::Array',
         },
-        show => { 
-            default_value => 'array_id,model,size',
+        show => {
+            default_value => 'name,model,size',
         },
     ],
 };
