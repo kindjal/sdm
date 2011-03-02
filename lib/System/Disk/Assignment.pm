@@ -20,14 +20,19 @@ class System::Disk::Assignment {
         filername       => { via => 'volume' },
     # FIXME: should allocation be part of volume? Or a DISK_ALLOCATION new table?
     #    unallocated_kb  => { via => 'volume' },
-        percent_full    => { calculate_from => 'absolute_path',
-                             calculate => q(
-                my @pct_full = `df -h $absolute_path`;
-                my @split_pct_full = split(/%/,$pct_full[-1]);
-                @split_pct_full = split (/ /,$split_pct_full[0]);
-                return $split_pct_full[-1]; ) },
-        absolute_path   => { calculate_from => [ 'mount_path', 'subdirectory' ],
-                             calculate => q( return join('/', grep { ! /^$/ } ( $mount_path,$subdirectory ) ); ) },
+        percent_full    => {
+                calculate_from => 'absolute_path',
+                calculate => q(
+                  my @pct_full = `df -h $absolute_path`;
+                  my @split_pct_full = split(/%/,$pct_full[-1]);
+                  @split_pct_full = split (/ /,$split_pct_full[0]);
+                  return $split_pct_full[-1];
+                ) },
+        absolute_path   => {
+                calculate_from => [ 'mount_path', 'subdirectory' ],
+                calculate => q(
+                  return join('/', grep { ! /^$/ } ( $mount_path,$subdirectory ) );
+                ) },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
