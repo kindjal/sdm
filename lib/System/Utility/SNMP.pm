@@ -50,7 +50,7 @@ my $oids = {
 
 class System::Utility::SNMP {
     is => 'System::Command::Base',
-    has => [
+    has_optional => [
       snmp_session => { is => 'Object', default => undef },
       no_snmp => { is => 'Number', default => 0 },
       timeout => { is => 'Number', default => 15 },
@@ -59,24 +59,11 @@ class System::Utility::SNMP {
     ],
 };
 
-sub new {
+sub create {
   my ($class,%params) = @_;
   my $self = $class->SUPER::create(%params);
   return $self;
 }
-
-#sub new {
-#  my $class = shift;
-#  my $self = {
-#    parent => shift,
-#    snmp_session => undef,
-#    no_snmp => 0,
-#    hosttype => undef,
-#    groups => undef,
-#    logger => Log::Log4perl->get_logger(__PACKAGE__),
-#  };  bless $self, $class;
-#  return $self;
-#}
 
 sub error {
   my $self = shift;
@@ -218,71 +205,74 @@ sub get_snmp_disk_usage {
   # Iterate over all volumes and get consumption info.
   $self->{logger}->debug("get consumption of each volume...\n");
   foreach my $volume_path_oid (keys %$ref) {
-    # Iterate over subset of volumes that we export, based on
-    # a naming convention adopted by Systems team.
-    foreach my $prefix (@prefixes) {
+    $self->{logger}->debug("volume oid $volume_path_oid...\n");
 
-      if (defined $ref->{$volume_path_oid} and $ref->{$volume_path_oid} =~ /^$prefix/) {
+    # Determine if the Filer exports Volumes that we care to track.
+    # This is determined by a naming scheme that start with one of
+    # the set of @prefixes.
+    my $prefix_rx = '(' . join('|',@prefixes) . ')';
+    if (defined $ref->{$volume_path_oid} and $ref->{$volume_path_oid} =~ /^$prefix_rx/) {
 
-        my $id = pop @{ [ split /\./, $volume_path_oid ] };
+      my $id = pop @{ [ split /\./, $volume_path_oid ] };
 
-        # FIXME This is a mess...
+      # FIXME This is a mess...
 
-        # Create arg list for SNMP, what to ask for.
-        my @args;
-        my @items;
-        if ($host_type eq 'netapp') {
-          # NetApps do this
-          @items = ('dfHighTotalKbytes','dfLowTotalKbytes','dfHighUsedKbytes','dfLowUsedKbytes');
-        } else {
-          # Linux boxes do this
-          @items = ('hrStorageUsed','hrStorageSize','hrStorageAllocationUnits');
-        }
-        foreach my $item (@items) {
-          my $oid = $oids->{$host_type}->{$item} . ".$id";
-          push @args, $oid;
-        }
-
-        # Query SNMP
-        my $disk = $self->snmp_get_request( \@args );
-
-        my $total;
-        my $used;
-
-        # Convert result blocks to bytes
-        if ($host_type eq 'netapp') {
-          # Fix 32 bit integer stuff
-          my $low = $disk->{$oids->{$host_type}->{'dfLowTotalKbytes'} . ".$id"};
-          my $high = $disk->{$oids->{$host_type}->{'dfHighTotalKbytes'} . ".$id"};
-          $total = $self->netapp_int32($low,$high);
-
-          $low = $disk->{$oids->{$host_type}->{'dfLowUsedKbytes'} . ".$id"};
-          $high = $disk->{$oids->{$host_type}->{'dfHighUsedKbytes'} . ".$id"};
-          $used = $self->netapp_int32($low,$high);
-
-        } else {
-          # Correct for block size
-          my $correction = $disk->{$oids->{$host_type}->{'hrStorageAllocationUnits'} . ".$id"} / 1024;
-          $total = $disk->{$oids->{$host_type}->{'hrStorageSize'} . ".$id"} * $correction;
-          $used = $disk->{$oids->{$host_type}->{'hrStorageUsed'} . ".$id"} * $correction;
-        }
-
-        # Empty hash if not present
-        $result->{$ref->{$volume_path_oid}} = {} if (! defined $result->{$ref->{$volume_path_oid}} );
-
-        # Add mount point
-        $self->{logger}->debug("get mount point of volume " . $ref->{$volume_path_oid} . "\n");
-        $result->{$ref->{$volume_path_oid}}->{'mount_path'} = $self->get_mount_point($ref->{$volume_path_oid});
-        $self->{logger}->debug($result->{$ref->{$volume_path_oid}}->{'mount_path'} . "\n");
-
-        # The last digit in the OID is the volume we want
-
-        # Account for reported block size in size calculation, track in KB
-        # Correct for signed 32 bit INTs
-        $result->{$ref->{$volume_path_oid}}->{'used_kb'} = $used;
-        $result->{$ref->{$volume_path_oid}}->{'total_kb'} = $total;
-        $result->{$ref->{$volume_path_oid}}->{'physical_path'} = $ref->{$volume_path_oid};
+      # Create arg list for SNMP, what to ask for.
+      my @args;
+      my @items;
+      if ($host_type eq 'netapp') {
+        # NetApps do this
+        @items = ('dfHighTotalKbytes','dfLowTotalKbytes','dfHighUsedKbytes','dfLowUsedKbytes');
+      } else {
+        # Linux boxes do this
+        @items = ('hrStorageUsed','hrStorageSize','hrStorageAllocationUnits');
       }
+      foreach my $item (@items) {
+        my $oid = $oids->{$host_type}->{$item} . ".$id";
+        push @args, $oid;
+      }
+
+      # Query SNMP
+      my $disk = $self->snmp_get_request( \@args );
+
+      my $total;
+      my $used;
+
+      # Convert result blocks to bytes
+      if ($host_type eq 'netapp') {
+        # Fix 32 bit integer stuff
+        my $low = $disk->{$oids->{$host_type}->{'dfLowTotalKbytes'} . ".$id"};
+        my $high = $disk->{$oids->{$host_type}->{'dfHighTotalKbytes'} . ".$id"};
+        $total = $self->netapp_int32($low,$high);
+
+        $low = $disk->{$oids->{$host_type}->{'dfLowUsedKbytes'} . ".$id"};
+        $high = $disk->{$oids->{$host_type}->{'dfHighUsedKbytes'} . ".$id"};
+        $used = $self->netapp_int32($low,$high);
+
+      } else {
+        # Correct for block size
+        my $correction = $disk->{$oids->{$host_type}->{'hrStorageAllocationUnits'} . ".$id"} / 1024;
+        $total = $disk->{$oids->{$host_type}->{'hrStorageSize'} . ".$id"} * $correction;
+        $used = $disk->{$oids->{$host_type}->{'hrStorageUsed'} . ".$id"} * $correction;
+      }
+
+      # Empty hash if not present
+      $result->{$ref->{$volume_path_oid}} = {} if (! defined $result->{$ref->{$volume_path_oid}} );
+
+      # Add mount point
+      $self->{logger}->debug("get mount point of volume " . $ref->{$volume_path_oid} . "\n");
+      $result->{$ref->{$volume_path_oid}}->{'mount_path'} = $self->get_mount_point($ref->{$volume_path_oid});
+      $self->{logger}->debug($result->{$ref->{$volume_path_oid}}->{'mount_path'} . "\n");
+
+      # The last digit in the OID is the volume we want
+
+      # Account for reported block size in size calculation, track in KB
+      # Correct for signed 32 bit INTs
+      $result->{$ref->{$volume_path_oid}}->{'used_kb'} = $used;
+      $result->{$ref->{$volume_path_oid}}->{'total_kb'} = $total;
+      $result->{$ref->{$volume_path_oid}}->{'physical_path'} = $ref->{$volume_path_oid};
+    } else {
+      $self->{logger}->debug("ignoring $ref->{$volume_path_oid}\n");
     }
   }
 }
