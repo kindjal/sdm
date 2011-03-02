@@ -155,18 +155,19 @@ sub test_get_snmp_disk_usage {
   $count+=2;
 }
 
-sub test_cache_snmp {
-  my $self = shift;
-  return if (! $self->{live});
-  my $obj = $self->test_start();
-  # Requires active network access to real host
-  my $host = "nfs24";
-  my $err = 0;
-  $obj->connect_snmp($host);
-  my $result = $obj->query_snmp($host);
-  lives_ok { $obj->cache($host,$result,$err); } "cache_snmp: doesn't crash";
-  $count+=1;
-}
+# FIXME: cache a value then confirm we retrieve it
+#sub test_cache_snmp {
+#  my $self = shift;
+#  return if (! $self->{live});
+#  my $obj = $self->test_start();
+#  # Requires active network access to real host
+#  my $host = "nfs24";
+#  my $err = 0;
+#  $obj->connect_snmp($host);
+#  my $result = $obj->query_snmp($host);
+#  lives_ok { $obj->cache($host,$result,$err); } "cache_snmp: doesn't crash";
+#  $count+=1;
+#}
 
 sub test_target {
   my $self = shift;
@@ -186,13 +187,14 @@ sub test_snmp_get_disk_group {
   return if (! $self->{live});
   my $obj = $self->test_start();
   # Requires active network access to real host
-  my $host = "nfs10home";
-  my $physical_path = "/vol/home/mcallaway";
-  my $mount_path = "/gscuser/mcallawa";
-  $obj->get_disk_group($physical_path,$mount_path);
-  #lives_ok { my $result = $obj->query_snmp($host); } "test_target: runs ok";
-  #my $result = $obj->query_snmp($host);
-  $count+=1;
+  my $host = "nfs11";
+  my $physical_path = "/vol/sata840";
+  my $mount_path = "/gscmnt/sata840";
+  my $group;
+  lives_ok { $obj->connect_snmp($host); } "test_snmp_get_disk_group: connect ok";
+  lives_ok { $group = $obj->get_disk_group($physical_path,$mount_path); } "test_snmp_get_disk_group: query ok";
+  ok( $group eq "INFO_GENOME_MODELS", "test_snmp_get_disk_group: answer ok");
+  $count+=3;
 }
 
 # -- end test subs

@@ -4,6 +4,8 @@ package System::Utility::SNMP;
 use strict;
 use warnings;
 
+use System;
+
 use File::Basename;
 use POSIX;
 use Net::SNMP;
@@ -377,9 +379,6 @@ sub lookup_disk_group_via_snmp {
 sub get_disk_group {
   # Look on a mount point for a DISK_ touch file.
   my $self = shift;
-  # FIXME
-  #$self->error("Not yet implemented\n");
-
   my $physical_path = shift;
   my $mount_path = shift;
   my $group_name;
@@ -387,11 +386,8 @@ sub get_disk_group {
   $self->{logger}->debug("get_disk_group($physical_path,$mount_path)\n");
 
   # Does the cache already have the disk group name?
-  # FIXME: URify
-  #my $res = $self->{parent}->{cache}->fetch_disk_group($mount_path);
-  my $res = System::Disk::Volume->get(
-    mount_path => $mount_path
-  );
+  # FIXME: correct?
+  my $res = System::Disk::Volume->get( mount_path => $mount_path );
 
   #if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
   if (defined $res and ! $self->{parent}->{recache}) {
