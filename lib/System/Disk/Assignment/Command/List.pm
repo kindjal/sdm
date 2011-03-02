@@ -13,7 +13,7 @@ class System::Disk::Assignment::Command::List {
             value => 'System::Disk::Assignment',
         },
         show => {
-            default_value => 'group_id,volume_id',
+            default_value => 'name,filername,subdirectory,mount_path,absolute_path,percent_full'
         },
     ],
 };

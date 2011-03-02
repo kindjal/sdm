@@ -17,6 +17,7 @@ class System::Disk::Volume {
         used_kb       => { is => 'UnsignedInteger' },
     ],
     has_optional => [
+        # FIXME: should be id_by name
         disk_group    => { is => 'System::Disk::Group', id_by => 'volume_id', constraint_name => 'VOLUME_GROUP_FK' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
