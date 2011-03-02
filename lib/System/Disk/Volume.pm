@@ -1,3 +1,4 @@
+
 package System::Disk::Volume;
 
 use strict;
@@ -5,6 +6,7 @@ use warnings;
 
 use Date::Manip;
 use System;
+
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
@@ -30,6 +32,9 @@ class System::Disk::Volume {
 
 sub is_current {
   my $self = shift;
+  my $vol_maxage = shift;
+
+  print "is_current($vol_maxage) compare " . $self->last_modified . "\n";
 
   return 0 if (! defined $self->last_modified);
 
@@ -46,11 +51,13 @@ sub is_current {
   die "Error in DateCalc: $date0, $date1, $err\n" if (! defined $calc);
 
   my $delta = Delta_Format($calc,0,'%st');
+
+  print "is_current: delta $delta\n";
+
   return 0 if (! defined $delta);
 
-  # FIXME: define host_maxage someplace, but not as a db column.
   return 1
-    if $delta < $self->{host_maxage};
+    if $delta < $vol_maxage;
 
   return 0;
 }
