@@ -7,19 +7,20 @@ use System;
 class System::Disk::Group {
     table_name => 'DISK_GROUP',
     id_by => [
-        group_id => { is => 'Integer' },
+        name => { is => 'Text' },
     ],
     has => [
-        created         => { is => 'DATE', is_optional => 1 },
-        last_modified   => { is => 'DATE', is_optional => 1 },
-        name            => { is => 'Text', len => 255 },
-        parent_group_id => { is => 'Integer', is_optional => 1 },
         permissions     => { is => 'UnsignedInteger' },
         sticky          => { is => 'UnsignedInteger' },
-        subdirectory    => { is => 'Text', len => 255, is_optional => 1 },
         unix_gid        => { is => 'UnsignedInteger' },
         unix_uid        => { is => 'UnsignedInteger' },
-        username        => { is => 'Text', len => 255, is_optional => 1 },
+    ],
+    has_optional => [
+        parent_group    => { is => 'Text' },
+        subdirectory    => { is => 'Text', len => 255 },
+        username        => { is => 'Text', len => 255 },
+        created         => { is => 'DATE' },
+        last_modified   => { is => 'DATE' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

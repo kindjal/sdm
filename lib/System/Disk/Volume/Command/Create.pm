@@ -8,40 +8,16 @@ use System;
 class System::Disk::Volume::Command::Create {
     is => 'System::Command::Base',
     has => [
-        subject_class_name  => {
-            is_constant => 1,
-            value => 'System::Disk::Volume',
-        },
-        filer_id => {
-            is  => 'Number',
-            doc => 'The ID of the filer serving this volume',
-        },
-        mount_path => {
-            is  => 'Text',
-            doc => 'The path this volume is mounted at',
-        },
-        physical_path => {
-            is  => 'Text',
-            doc => 'The path this volume is exported from',
-        },
-        total_kb => {
-            is  => 'Number',
-            doc => 'Total KB in this volume',
-        },
-        used_kb => {
-            is  => 'Number',
-            doc => 'Used KB in this volume',
-        }
+        filer => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'VOLUME_FILER_FK' },
+        mount_path => { is  => 'Text' },
+        physical_path => { is  => 'Text' },
+        total_kb => { is  => 'Number', default => 0 },
+        used_kb => { is  => 'Number', default => 0 }
     ],
     has_optional => [
-        created => {
-            is  => 'Date',
-            doc => 'Date this volume was added',
-        },
-        last_modified => {
-            is  => 'Date',
-            doc => 'Date this volume was last modified',
-        }
+        disk_group => { is => 'System::Disk::Group', id_by => 'name', constraint_name => 'VOLUME_GROUP_FK' },
+        created => { is  => 'Date', },
+        last_modified => { is  => 'Date', }
     ],
     doc => 'Creates a volume entry'
 };
@@ -65,12 +41,13 @@ EOS
 sub execute {
     my $self = shift;
     my %params = (
-        physical_path => $self->physical_path,
+        filer         => $self->filer,
         mount_path    => $self->mount_path,
-        filer_id      => $self->filer_id,
+        physical_path => $self->physical_path,
         total_kb      => $self->total_kb,
         used_kb       => $self->used_kb,
     );
+    $params{disk_group} = $self->disk_group if defined $self->disk_group;
     $params{created} = $self->created if defined $self->created;
     $params{last_modified} = $self->last_modified if defined $self->last_modified;
 

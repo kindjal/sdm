@@ -44,7 +44,6 @@ sub execute {
     # FIXME: Is there a way in one statement to map params to $self->attributes
     my %params = (
         hostname  => $self->hostname,
-        #filer     => $self->filer,
         filername => $self->filername,
         comments  => $self->comments,
         location  => $self->location,

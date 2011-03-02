@@ -174,11 +174,11 @@ sub test_target {
   my $obj = $self->test_start();
   # Requires active network access to real host
   my $host = "ntap9";
-  $obj->connect_snmp($host);
+  lives_ok { $obj->connect_snmp($host); } "connect_snmp: runs ok";
   lives_ok { my $result = $obj->query_snmp($host); } "test_target: runs ok";
   my $result = $obj->query_snmp($host);
   ok( ref $result eq 'HASH', "test target" );
-  $count+=2;
+  $count+=3;
 }
 
 sub test_snmp_get_disk_group {

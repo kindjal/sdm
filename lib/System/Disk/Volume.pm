@@ -7,19 +7,19 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
-        volume_id => { is => 'Integer', implied_by => 'disk_group' },
+        volume_id => { is => 'Integer' },
     ],
     has => [
-        filer_id      => { is => 'Integer' },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'VOLUME_FILER_FK' },
         mount_path    => { is => 'Text', len => 255 },
         physical_path => { is => 'Text', len => 255 },
         total_kb      => { is => 'UnsignedInteger' },
         used_kb       => { is => 'UnsignedInteger' },
     ],
     has_optional => [
+        disk_group    => { is => 'System::Disk::Group', id_by => 'volume_id', constraint_name => 'VOLUME_GROUP_FK' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
-        disk_group    => { is => 'System::Disk::Group', id_by => 'volume_id' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
