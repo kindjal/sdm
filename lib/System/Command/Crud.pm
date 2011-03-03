@@ -208,12 +208,13 @@ sub _command_properties_for_target_class {
     my @properties;
     my @seen_properties;
     for my $target_property ( $target_meta->property_metas ) {
+
         my $property_name = $target_property->property_name;
         push @seen_properties, $property_name;
 
         next if $target_property->class_name eq 'UR::Object';
-        next if $property_name =~ /^_/;
-        next if grep { $target_property->$_ } (qw/ is_id is_calculated is_constant is_transient /);
+        next if $property_name =~ /^(_|id)$/;
+        next if grep { $target_property->$_ } (qw/ is_calculated is_constant is_transient /);
         next if grep { not $target_property->$_ } (qw/ is_mutable /);
 
         my %property = (
