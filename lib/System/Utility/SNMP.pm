@@ -471,7 +471,7 @@ sub query_snmp {
   $self->get_snmp_disk_usage($result);
 
   foreach my $physical_path (keys %$result) {
-    $result->{$physical_path}->{'group_name'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
+    $result->{$physical_path}->{'disk_group'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
   }
 
   return $result;
