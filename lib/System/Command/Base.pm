@@ -12,7 +12,7 @@ require Text::Wrap;
 use Log::Log4perl qw(:easy);
 
 class System::Command::Base {
-    is => 'Command',
+    is => 'Command::V2',
     is_abstract => 1,
     attributes_have => [
         require_user_verify => {
@@ -738,14 +738,14 @@ sub _shell_args_property_meta
             push @required, $property_meta;
         }
     }
-    
+
     my @result;
     @result = ( 
         (sort { $a->property_name cmp $b->property_name } @required),
         (sort { $a->property_name cmp $b->property_name } @optional),
         (sort { $a->{shell_args_position} <=> $b->{shell_args_position} } @positional),
     );
-    
+
     return @result;
 }
 
