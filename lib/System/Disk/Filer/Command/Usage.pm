@@ -85,6 +85,28 @@ Updates volume usage information. Blah blah blah details blah.
 EOS
 }
 
+sub store {
+    my $self = shift;
+    my $filer = shift;
+    my $result = shift;
+
+    $self->{logger}->debug("Store result");
+
+    foreach my $physical_path (keys %$result) {
+        my $volume = System::Disk::Volume->get_or_create( filer => $filer, physical_path => $physical_path );
+        #print Dumper $volume->__meta__->properties;
+        #foreach my $a ($volume->__meta__->properties) {
+        #  print $a->property_name . "\n";
+        #}
+        # FIXME: Can't we do a bulk update?
+        foreach my $attr (keys %{ $result->{$physical_path} }) {
+           print Dumper $attr;
+           #$volume->$attr($result->{$physical_path})
+           #  if (defined $attr->is_id and $attr->is_id);
+        }
+    }
+}
+
 sub execute {
 
   my $self = shift;
@@ -133,8 +155,10 @@ sub execute {
         $self->{logger}->info("Filer " . $filer->name . "has no exported volumes\n");
       } else {
         $self->{logger}->info("Updating filer " . $filer->name . "\n");
-        #System::Disk::Volume->update( $result );
+
+        $self->store( $filer, $result );
       }
+      print Dumper $result;
 
     } else {
       $self->{logger}->info("filer " . $filer->name . "is current\n");

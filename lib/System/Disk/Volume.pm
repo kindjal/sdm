@@ -10,19 +10,17 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
-        volume_id => { is => 'Integer' },
+        filer         => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'VOLUME_FILER_FK' },
+        physical_path => { is => 'Text', len => 255 },
     ],
     has => [
-        filer         => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'VOLUME_FILER_FK' },
         mount_path    => { is => 'Text', len => 255 },
-        physical_path => { is => 'Text', len => 255 },
         total_kb      => { is => 'UnsignedInteger' },
         used_kb       => { is => 'UnsignedInteger' },
         status        => { via => 'filer' },
     ],
     has_optional => [
-        # FIXME: How do we link with DISK_ASSIGNMENT here?
-        #disk_group    => { is => 'System::Disk::Assignment', id_by => {'group_name','volume_id'}},
+        group    => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
