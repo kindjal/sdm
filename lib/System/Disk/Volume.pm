@@ -15,12 +15,12 @@ class System::Disk::Volume {
     ],
     has => [
         mount_path    => { is => 'Text', len => 255 },
-        total_kb      => { is => 'UnsignedInteger' },
-        used_kb       => { is => 'UnsignedInteger' },
-        status        => { via => 'filer' },
     ],
     has_optional => [
-        group    => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
+        status        => { via => 'filer' },
+        group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
+        total_kb      => { is => 'UnsignedInteger' },
+        used_kb       => { is => 'UnsignedInteger' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],

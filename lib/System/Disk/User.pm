@@ -9,9 +9,9 @@ class System::Disk::User {
     id_by => [
         email => { is => 'Text', len => 255 },
     ],
-    has => [
-        created       => { is => 'DATE', is_optional => 1 },
-        last_modified => { is => 'DATE', is_optional => 1 },
+    has_optional => [
+        created       => { is => 'DATE' },
+        last_modified => { is => 'DATE' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
