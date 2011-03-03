@@ -7,7 +7,7 @@ use System;
 
 class System::Disk::Host::Command {
     is          => 'Command::Tree',
-    doc         => 'work with disk users',
+    doc         => 'work with disk hosts',
     is_abstract => 1
 };
 

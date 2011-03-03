@@ -4,8 +4,6 @@ package System::Disk::Filer::Command::Usage;
 use strict;
 use warnings;
 
-use Data::Dumper;
-
 use System;
 
 # Checking currentness in host_is_current()
@@ -85,24 +83,18 @@ Updates volume usage information. Blah blah blah details blah.
 EOS
 }
 
-sub store {
+sub update_volume {
     my $self = shift;
     my $filer = shift;
     my $result = shift;
 
     $self->{logger}->debug("Store result");
-
     foreach my $physical_path (keys %$result) {
         my $volume = System::Disk::Volume->get_or_create( filer => $filer, physical_path => $physical_path );
-        #print Dumper $volume->__meta__->properties;
-        #foreach my $a ($volume->__meta__->properties) {
-        #  print $a->property_name . "\n";
-        #}
-        # FIXME: Can't we do a bulk update?
         foreach my $attr (keys %{ $result->{$physical_path} }) {
-           print Dumper $attr;
-           #$volume->$attr($result->{$physical_path})
-           #  if (defined $attr->is_id and $attr->is_id);
+           my $p = $volume->__meta__->property($attr);
+           $volume->$attr($result->{$physical_path}->{$attr})
+             if (! $p->is_id);
         }
     }
 }
@@ -156,10 +148,8 @@ sub execute {
       } else {
         $self->{logger}->info("Updating filer " . $filer->name . "\n");
 
-        $self->store( $filer, $result );
+        $self->update_volume( $filer, $result );
       }
-      print Dumper $result;
-
     } else {
       $self->{logger}->info("filer " . $filer->name . "is current\n");
     }

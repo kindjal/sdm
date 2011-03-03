@@ -7,7 +7,7 @@ use System;
 
 class System::Disk::Array::Command {
     is          => 'Command::Tree',
-    doc         => 'work with disk users',
+    doc         => 'work with disk arrays',
     is_abstract => 1
 };
 

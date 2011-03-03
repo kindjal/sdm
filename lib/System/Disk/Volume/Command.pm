@@ -7,7 +7,7 @@ use System;
 
 class System::Disk::Volume::Command {
     is          => 'Command::Tree',
-    doc         => 'work with disk users',
+    doc         => 'work with disk volumes',
     is_abstract => 1
 };
 

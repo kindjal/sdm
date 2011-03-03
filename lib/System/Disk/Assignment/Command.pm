@@ -7,7 +7,7 @@ use System;
 
 class System::Disk::Assignment::Command {
     is          => 'Command::Tree',
-    doc         => 'work with disk users',
+    doc         => 'work with disk assignments',
     is_abstract => 1
 };
 

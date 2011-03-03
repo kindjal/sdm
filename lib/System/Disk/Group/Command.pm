@@ -7,7 +7,7 @@ use System;
 
 class System::Disk::Group::Command {
     is          => 'Command::Tree',
-    doc         => 'work with disk users',
+    doc         => 'work with disk groups',
     is_abstract => 1,
 };
 
