@@ -102,13 +102,15 @@ sub update_volume {
 sub execute {
 
   my $self = shift;
+  my $filer = shift;
 
   $self->prepare_logger();
+
   $self->{logger}->debug("execute()\n");
 
   my @filers;
-  if (defined $self->filer) {
-    push @filers, $self->filer;
+  if (defined $filer) {
+    push @filers, $filer;
   } else {
     @filers = System::Disk::Filer->get( status => 1 );
   }
