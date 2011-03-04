@@ -7,9 +7,11 @@ use System;
 
 class System::Command {
     is => 'System::Command::Base',
+    #is => 'Command::Tree',
 };
 
-my @SUB_COMMANDS = qw/ disk /;
+# FIXME: Is this necessary?
+my @SUB_COMMANDS = qw/ disk service /;
 
 our %SUB_COMMAND_CLASSES =
     map {
