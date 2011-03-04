@@ -92,7 +92,10 @@ sub update_volume {
     foreach my $physical_path (keys %$result) {
         my $volume = System::Disk::Volume->get_or_create( filer => $filer, physical_path => $physical_path );
         foreach my $attr (keys %{ $result->{$physical_path} }) {
+           # Don't update disk group from filesystem, only the reverse.
+           next if ($attr eq 'disk_group');
            my $p = $volume->__meta__->property($attr);
+           # Primary keys are immutable
            $volume->$attr($result->{$physical_path}->{$attr})
              if (! $p->is_id);
         }
