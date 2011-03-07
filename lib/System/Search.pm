@@ -231,7 +231,7 @@ sub cache_key_for_doc {
     my $class = shift;
     my $doc = shift;
 
-    return 'genome_search:' . $doc->value_for('id');
+    return 'system_search:' . $doc->value_for('id');
 }
 
 

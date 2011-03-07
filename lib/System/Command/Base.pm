@@ -534,6 +534,7 @@ sub _get_user_verification_for_param_value {
     $self->status_message("The IDs for your selection are:\n" . join(',', @ids) . "\n\n");
     return @new_list;
 }
+
 sub _get_user_verification_for_param_value_drilldown {
     my ($self, $param_name, @results) = @_;
     my $n_results = scalar(@results);
