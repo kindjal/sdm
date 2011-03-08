@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use Web::Simple 'System::Service::WebApp::CGI';
+use File::Basename qw/basename/;
 
 package System::Service::WebApp::CGI;
 
@@ -8,16 +9,14 @@ dispatch {
 
     sub () {
         my ($self,$args) = @_;
-        print "DEBUG:" . Data::Dumper::Dumper $args;
 
-        # Find a load a class based on the requested cgi
+        # Find and load a class based on the requested cgi
         my $class = $args->{PATH_INFO};
+        $class = File::Basename::basename($class);
         $class =~ s/^\///g;
+        $class = ucfirst($class);
         $class = "System::View::Resource::Html::Cgi::$class";
-        my $mod = $class;
-        $mod =~ s/::/\//g;
-        $mod .= ".pm";
-        require "$mod";
+        eval "require $class";
 
         my $app = $class->new();
         my $content = $app->run();
