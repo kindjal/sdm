@@ -37,10 +37,12 @@ sub run {
     my @aaData;
     #my $params;
     foreach my $v (System::Disk::Volume->get( )) {
+        print Data::Dumper::Dumper $v;
         my $mount_path = $v->{mount_path};
         my $physical_path = $v->{physical_path};
-        my $total_kb = $v->{total_kb} ? defined $v->{total_kb} : 0;
-        my $used_kb = $v->{used_kb} ? defined $v->{used_kb} : 0;
+        my $total_kb = $v->{total_kb} ? $v->{total_kb} : 0;
+        print "total: $total_kb\n";
+        my $used_kb = $v->{used_kb} ? $v->{used_kb} : 0;
 
         my $percentage = 0;
         if ( $used_kb > 0 and $total_kb > 0 ) {
