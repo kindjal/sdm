@@ -34,6 +34,7 @@ our %app = map { $_ => load_app($_) } qw/
   404Handler.psgi
   Dump.psgi
   Cache.psgi
+  CGI.psgi
   /;
 
 ## Utility functions
@@ -60,21 +61,25 @@ sub redirect_to {
 
 ## Web::Simple dispatcher for all apps
 dispatch {
-    ## make 404's pretty by sending them to 404Handler.psgi
-    response_filter {
-        my $resp = $_[1];
+      ## make 404's pretty by sending them to 404Handler.psgi
+      response_filter {
+          my $resp = $_[1];
 
-        if ( ref($resp) eq 'ARRAY' && $resp->[0] == 404 ) {
-            return redispatch_psgi( $app{'404Handler.psgi'}, $resp->[2] );
-        } elsif ( ref($resp) eq 'ARRAY' && $resp->[0] == 500 ) {
-            return redispatch_psgi( $app{'404Handler.psgi'}, $resp->[2] );
-        }
+          if ( ref($resp) eq 'ARRAY' && $resp->[0] == 404 ) {
+              return redispatch_psgi( $app{'404Handler.psgi'}, $resp->[2] );
+          } elsif ( ref($resp) eq 'ARRAY' && $resp->[0] == 500 ) {
+              return redispatch_psgi( $app{'404Handler.psgi'}, $resp->[2] );
+          }
 
-        return $resp;
-    },
-    sub (/res/**) {
-      redispatch_to "/view/system/resource.html/$_[1]";
-    },
+          return $resp;
+      },
+      # Any CGI should go to this CGI handler
+      sub (GET + .cgi) {
+          redispatch_psgi($app{'CGI.psgi'});
+      },
+      sub (/res/**) {
+        redispatch_to "/view/system/resource.html/$_[1]";
+      },
       ## send /view without a trailing slash to /view/
       ## although thats probably a 404
       sub (/view) {
