@@ -24,6 +24,41 @@ sub _get_filtered_record_count {
     return 1;
 }
 
+sub short {
+  my $self = shift;
+  my $number = shift;
+
+  my $cn = $self->commify($number);
+  my $size = 0;
+  $size++ while $cn =~ /,/g;
+
+  my $units = {
+    0 => 'KB',
+    1 => 'MB',
+    2 => 'GB',
+    3 => 'TB',
+    4 => 'PB',
+  };
+  my $round = {
+    0 => 1,
+    1 => 1000,
+    2 => 1000000,
+    3 => 1000000000,
+    4 => 1000000000000,
+  };
+  my $n = int($number / $round->{$size} + 0.5);
+  return "$n " . $units->{$size};
+}
+
+sub commify {
+  my $self = shift;
+  my $number = shift;
+  # commify a number. Perl Cookbook, 2.17, p. 64
+  my $text = reverse $number;
+  $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+  return scalar reverse $text;
+}
+
 sub run {
 
     my ($self,$args) = @_;
@@ -37,17 +72,17 @@ sub run {
     my @aaData;
     #my $params;
     foreach my $v (System::Disk::Volume->get( )) {
-        print Data::Dumper::Dumper $v;
         my $mount_path = $v->{mount_path};
         my $physical_path = $v->{physical_path};
         my $total_kb = $v->{total_kb} ? $v->{total_kb} : 0;
-        print "total: $total_kb\n";
         my $used_kb = $v->{used_kb} ? $v->{used_kb} : 0;
 
         my $percentage = 0;
         if ( $used_kb > 0 and $total_kb > 0 ) {
-            $percentage = $used_kb / $total_kb;
+            $percentage = sprintf "%d %", $used_kb / $total_kb * 100;
         }
+        $total_kb = $self->commify($total_kb) . " (" . $self->short($total_kb) . ")";
+        $used_kb = $self->commify($used_kb) . " (" . $self->short($used_kb) . ")";
 
         my $disk_group = $v->{disk_group} ? defined $v->{disk_group} : 'unknown';
         my $last_modified = $v->{last_modified} ? defined $v->{last_modified} : 'unknown';
