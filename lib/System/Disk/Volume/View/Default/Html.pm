@@ -12,11 +12,11 @@ class System::Disk::Volume::View::Default::Html {
 
 sub _generate_content {
     my $self = shift;
-    open(FH,"<volumetable.html") or die "Failed to open volumetable.html: $!";
-    my $content = <FH>;
+    my $html = System->base_dir . "/View/Resource/Html/html/volumetable.html";
+    open(FH,"<$html") or die "Failed to open $html: $!";
+    my $content = do { local $/; <FH> };
     close(FH);
-    return "<html>hi</html>":
-    #return $content;
+    return $content;
 }
 
 1;
