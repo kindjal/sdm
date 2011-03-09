@@ -38,7 +38,7 @@ dispatch {
     sub (GET + /**/*/* + .*) {
         # these get passed in from the matcher as documented above!
         my ( $self, $class, $perspective_toolkit, $filename, $extension ) = @_;
-        
+
         load_modules();
 
         if ( $class =~ /\./ ) {
@@ -63,6 +63,9 @@ dispatch {
         }
 
         $class = url_to_type($class);
+
+        warn "DEBUG: class $class\n";
+
         my ( $perspective, $toolkit ) = split( /\./, $perspective_toolkit );
         my $mime_type = Plack::MIME->mime_type(".$extension");
 
@@ -71,6 +74,8 @@ dispatch {
             perspective        => $perspective,
             toolkit            => $toolkit
         );
+
+        warn "DEBUG: view class $view_class\n";
 
         # 404 handler will rewrite text/plain into a prettier format 
         unless ($view_class) {
@@ -136,6 +141,8 @@ dispatch {
         $class = url_to_type($class);
         $perspective =~ s/\.$toolkit$//g;
 
+        warn "DEBUG: class $class $perspective\n";
+
         my $mime_type = Plack::MIME->mime_type(".$toolkit");
 
         # flatten these where only one arg came in (don't want x=>['y'], just x=>'y')
@@ -156,11 +163,16 @@ dispatch {
             $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
         }
 
+        warn "DEBUG: args " . Data::Dumper::Dumper $args;
+
         my @matches = $class->get(%$args);
         unless (@matches) {
             return [ 404, [ 'Content-type', 'text/plain' ],
                 ['No object found'] ];
         }
+
+        warn "DEBUG: @matches\n";
+
         die 'matched too many; list not yet supported' unless ( @matches == 1 );
 
         my %view_args = (

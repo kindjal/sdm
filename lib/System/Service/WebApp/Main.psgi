@@ -73,13 +73,22 @@ dispatch {
 
           return $resp;
       },
+
+      sub (/site/) {
+          redispatch_psgi($app{'Site.psgi'});
+      },
+
       # Any CGI should go to this CGI handler
+      # This is a special case where we want to just load Foo.pm and have
+      # it return JSON data.  We use this for HTML pages using jQuery.
       sub (GET + .cgi) {
           redispatch_psgi($app{'CGI.psgi'});
       },
+
       sub (/res/**) {
         redispatch_to "/view/system/resource.html/$_[1]";
       },
+
       ## send /view without a trailing slash to /view/
       ## although thats probably a 404
       sub (/view) {
