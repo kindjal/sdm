@@ -79,7 +79,7 @@ sub run {
 
         my $percentage = 0;
         if ( $used_kb > 0 and $total_kb > 0 ) {
-            $percentage = sprintf "%d %", $used_kb / $total_kb * 100;
+            $percentage = sprintf "%d %%", $used_kb / $total_kb * 100;
         }
         $total_kb = $self->commify($total_kb) . " (" . $self->short($total_kb) . ")";
         $used_kb = $self->commify($used_kb) . " (" . $self->short($used_kb) . ")";
