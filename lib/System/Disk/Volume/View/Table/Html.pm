@@ -2,13 +2,15 @@ use strict;
 use warnings;
 
 use System;
-use Data::Dumper;
 
-package System::Disk::Volume::View::Default::Html;
+package System::Disk::Volume::View::Table::Html;
 
-class System::Disk::Volume::View::Default::Html {
-    is => 'UR::Object::View::Default::Html'
-};
+sub new {
+    my ($class,$args) = @_;
+    my $self = {};
+    bless $self,$class;
+    return $self;
+}
 
 sub _generate_content {
     my $self = shift;

@@ -84,8 +84,8 @@ sub run {
         $total_kb = $self->commify($total_kb) . " (" . $self->short($total_kb) . ")";
         $used_kb = $self->commify($used_kb) . " (" . $self->short($used_kb) . ")";
 
-        my $disk_group = $v->{disk_group} ? defined $v->{disk_group} : 'unknown';
-        my $last_modified = $v->{last_modified} ? defined $v->{last_modified} : 'unknown';
+        my $disk_group = $v->{disk_group} ? $v->{disk_group} : 'unknown';
+        my $last_modified = $v->{last_modified} ? $v->{last_modified} : 'unknown';
 
         push @aaData, [$mount_path,$physical_path,$total_kb,$used_kb,$percentage,$disk_group,$last_modified];
     }
