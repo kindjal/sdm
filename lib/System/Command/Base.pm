@@ -114,7 +114,7 @@ sub _smarter_resolve_class_and_params_for_argv {
         my @command_words;
         for my $word (@argv) {
             last if substr($word,0,1) eq '-';
-            last if $word =~ /[\W\.]/;
+            last if $word =~ /^[\W\.]/;
             my $camelcase = join('', map { ucfirst($_) } split(/-/, $word));
             push @command_words, $camelcase;
         }
