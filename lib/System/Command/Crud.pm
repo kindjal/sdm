@@ -41,7 +41,7 @@ sub init_sub_commands {
     my @namespace_sub_command_names = map {
         s/$config{namespace}:://; $_ = lc($_); $_;
     } $config{namespace}->sub_command_classes;
-    my @sub_commands = (qw/ create update list delete /);
+    my @sub_commands = (qw/ add update list delete /);
     my @sub_classes;
     for my $sub_command ( @sub_commands ) {
         # config for this sub command
@@ -85,19 +85,19 @@ sub init_sub_commands {
     return 1;
 }
 
-sub _build_create_sub_class {
+sub _build_add_sub_class {
     my ($class, %config) = @_;
 
     # get the properties for creating
     my @properties = $class->_command_properties_for_target_class($config{target_class});
 
     # define class
-    my $sub_class = $config{namespace}.'::Create';
+    my $sub_class = $config{namespace}.'::Add';
     UR::Object::Type->define(
         class_name => $sub_class,
-        is => 'System::Command::Create',
+        is => 'System::Command::Add',
         has => [ map { $_->{property_name} => $_ } @properties ],
-        doc => 'create '.$config{name_for_objects},
+        doc => 'add '.$config{name_for_objects},
     );
 
     no strict;

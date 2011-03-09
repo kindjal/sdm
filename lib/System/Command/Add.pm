@@ -9,8 +9,7 @@ require Carp;
 use Data::Dumper 'Dumper';
 
 class System::Command::Add {
-    #is => 'System::Command::Base',
-    is => 'Command::V2',
+    is => 'System::Command::Base',
     is_abstract => 1,
     doc => 'CRUD add command class.',
 };
