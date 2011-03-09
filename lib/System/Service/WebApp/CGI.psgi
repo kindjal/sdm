@@ -28,7 +28,7 @@ dispatch {
 
         return [
                 200,
-                [ 'Content-type', 'text/html' ],
+                [ 'Content-type', 'text/json' ],
                 [$content],
             ];
         }

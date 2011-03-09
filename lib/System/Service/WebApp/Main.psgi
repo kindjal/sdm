@@ -35,6 +35,7 @@ our %app = map { $_ => load_app($_) } qw/
   Dump.psgi
   Cache.psgi
   CGI.psgi
+  Site.psgi
   /;
 
 ## Utility functions
@@ -74,15 +75,16 @@ dispatch {
           return $resp;
       },
 
-      sub (/site/) {
-          redispatch_psgi($app{'Site.psgi'});
-      },
-
       # Any CGI should go to this CGI handler
       # This is a special case where we want to just load Foo.pm and have
       # it return JSON data.  We use this for HTML pages using jQuery.
       sub (GET + .cgi) {
           redispatch_psgi($app{'CGI.psgi'});
+      },
+
+      # Serve "regular web pages" outside of UR views.
+      sub (/site/...) {
+          redispatch_psgi($app{'Site.psgi'});
       },
 
       sub (/res/**) {
