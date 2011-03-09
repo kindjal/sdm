@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::User::Command {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'work with disk users',
     is_abstract => 1
 };

@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::Host::Command {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'work with disk hosts',
     is_abstract => 1
 };

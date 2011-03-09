@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::Assignment::Command {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'work with disk assignments',
     is_abstract => 1
 };

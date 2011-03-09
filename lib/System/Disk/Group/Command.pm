@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::Group::Command {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'work with disk groups',
     is_abstract => 1,
 };
