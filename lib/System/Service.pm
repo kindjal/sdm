@@ -4,7 +4,7 @@ use warnings;
 use System;
 
 class System::Service {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'Work with services',
 };
 

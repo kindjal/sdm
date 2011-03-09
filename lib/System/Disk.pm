@@ -4,7 +4,7 @@ use warnings;
 use System;
 
 class System::Disk {
-    is          => 'Command::Tree',
+    is          => 'System::Command::Base',
     doc         => 'Work with disk',
 };
 
