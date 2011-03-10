@@ -21,6 +21,7 @@ class System::Disk::Volume {
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
         total_kb      => { is => 'UnsignedInteger' },
         used_kb       => { is => 'UnsignedInteger' },
+        capacity      => { is => 'Number', is_calculated => 1 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
