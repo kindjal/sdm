@@ -81,28 +81,26 @@ sub _generate_where_clause {
 
     my @where;
 
-    if( defined $q->query_param('sSearch') ) {
+    if (defined $q->query_param('sSearch')) {
         my $search_string = $q->query_param('sSearch');
-        for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
+        for (my $i = 0; $i < $q->query_param('iColumns'); $i++) {
             # Iterate over each column and check if it is searchable.
             # If so, add a constraint to the where clause restricting the given
             # column. In the query, the column is identified by it's index, we
             # need to translates the index to the column name.
             my $searchable_ident = 'bSearchable_'.$i;
-            #if( $q->query_param($searchable_ident) and $q->query_param($searchable_ident) eq 'true' ) {
-                if( length $search_string > 0 and
-                        $q->query_param($searchable_ident) and
-                        $q->query_param($searchable_ident) eq 'true' ) {
-                    my $column = $self->_fnColumnToField( $i );
-                    push @where,"$column LIKE \"%%$search_string%%\"";
-                }
+            if (length $search_string > 0 and
+                    $q->query_param($searchable_ident) and
+                    $q->query_param($searchable_ident) eq 'true' ) {
+                my $column = $self->_fnColumnToField( $i );
+                push @where,"$column LIKE \"%%$search_string%%\"";
             }
         }
-
-        my $where;
-        $where .= " WHERE " . join(" OR ",@where) if (@where);
-        return $where;
     }
+
+    my $where;
+    $where .= " WHERE " . join(" OR ",@where) if (@where);
+    return $where;
 }
 
 sub _generate_order_clause {
