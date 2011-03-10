@@ -17,120 +17,113 @@ sub new {
     return $self;
 }
 
-sub _get_total_record_count {
-    return 1;
+sub _short {
+    my $self = shift;
+    my $number = shift;
+
+    my $cn = $self->_commify($number);
+    my $size = 0;
+    $size++ while $cn =~ /,/g;
+
+    my $units = {
+        0 => 'KB',
+        1 => 'MB',
+        2 => 'GB',
+        3 => 'TB',
+        4 => 'PB',
+    };
+    my $round = {
+        0 => 1,
+        1 => 1000,
+        2 => 1000000,
+        3 => 1000000000,
+        4 => 1000000000000,
+    };
+    my $n = int($number / $round->{$size} + 0.5);
+    return "$n " . $units->{$size};
 }
 
-sub _get_filtered_record_count {
-    return 1;
-}
-
-sub short {
-  my $self = shift;
-  my $number = shift;
-
-  my $cn = $self->commify($number);
-  my $size = 0;
-  $size++ while $cn =~ /,/g;
-
-  my $units = {
-    0 => 'KB',
-    1 => 'MB',
-    2 => 'GB',
-    3 => 'TB',
-    4 => 'PB',
-  };
-  my $round = {
-    0 => 1,
-    1 => 1000,
-    2 => 1000000,
-    3 => 1000000000,
-    4 => 1000000000000,
-  };
-  my $n = int($number / $round->{$size} + 0.5);
-  return "$n " . $units->{$size};
-}
-
-sub commify {
-  my $self = shift;
-  my $number = shift;
-  # commify a number. Perl Cookbook, 2.17, p. 64
-  my $text = reverse $number;
-  $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
-  return scalar reverse $text;
+sub _commify {
+    my $self = shift;
+    my $number = shift;
+    # commify a number. Perl Cookbook, 2.17, p. 64
+    my $text = reverse $number;
+    $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
+    return scalar reverse $text;
 }
 
 sub _fnColumnToField {
-  my $self = shift;
-  my $i = shift;
+    my $self = shift;
+    my $i = shift;
 
-  # Note: we could have used an array, but for dispatching purposes, this is
-  # more readable.
-  my %dispatcher = (
-    # column => 'rowname',
-    0 => 'mount_path',
-    1 => 'physical_path',
-    2 => 'total_kb',
-    3 => 'used_kb',
-    4 => 'capacity',
-    5 => 'filername',
-    6 => 'disk_group',
-    7 => 'last_modified',
-  );
+    # Note: we could have used an array, but for dispatching purposes, this is
+    # more readable. These are the column names on the disk summary datatable.
+    my %dispatcher = (
+            # column => 'rowname',
+            0 => 'mount_path',
+            1 => 'physical_path',
+            2 => 'total_kb',
+            3 => 'used_kb',
+            4 => 'capacity',
+            5 => 'filername',
+            6 => 'disk_group',
+            7 => 'last_modified',
+            );
 
-  die("No such row index defined: $i") unless exists $dispatcher{$i};
+    die("No such row index defined: $i") unless exists $dispatcher{$i};
 
-  return $dispatcher{$i};
-} # /_fnColumnToField
+    return $dispatcher{$i};
+}
 
 sub _generate_where_clause {
-  my $self = shift;
-  my $q = shift;
+    my $self = shift;
+    my $q = shift;
 
-  my @where;
+    my @where;
 
-  if( defined $q->query_param('sSearch') ) {
-    my $search_string = $q->query_param('sSearch');
-    for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
-      # Iterate over each column and check if it is searchable.
-      # If so, add a constraint to the where clause restricting the given
-      # column. In the query, the column is identified by it's index, we
-      # need to translates the index to the column name.
-      my $searchable_ident = 'bSearchable_'.$i;
-      #if( $q->query_param($searchable_ident) and $q->query_param($searchable_ident) eq 'true' ) {
-      if( length $search_string > 0 and
-          $q->query_param($searchable_ident) and
-          $q->query_param($searchable_ident) eq 'true' ) {
-        my $column = $self->_fnColumnToField( $i );
-        push @where,"$column LIKE \"%%$search_string%%\"";
-      }
+    if( defined $q->query_param('sSearch') ) {
+        my $search_string = $q->query_param('sSearch');
+        for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
+            # Iterate over each column and check if it is searchable.
+            # If so, add a constraint to the where clause restricting the given
+            # column. In the query, the column is identified by it's index, we
+            # need to translates the index to the column name.
+            my $searchable_ident = 'bSearchable_'.$i;
+            #if( $q->query_param($searchable_ident) and $q->query_param($searchable_ident) eq 'true' ) {
+                if( length $search_string > 0 and
+                        $q->query_param($searchable_ident) and
+                        $q->query_param($searchable_ident) eq 'true' ) {
+                    my $column = $self->_fnColumnToField( $i );
+                    push @where,"$column LIKE \"%%$search_string%%\"";
+                }
+            }
+        }
+
+        my $where;
+        $where .= " WHERE " . join(" OR ",@where) if (@where);
+        return $where;
     }
-  }
-
-  my $where;
-  $where .= " WHERE " . join(" OR ",@where) if (@where);
-  return $where;
-} # /_generate_where_clause
+}
 
 sub _generate_order_clause {
-  my $self = shift;
-  my $q = shift;
+    my $self = shift;
+    my $q = shift;
 
-  my @order = ();
-  if( defined $q->query_param('iSortCol_0') ){
-    for( my $i = 0; $i < $q->query_param('iSortingCols'); $i++ ) {
-      # We only get the column index (starting from 0), so we have to
-      # translate the index into a column name.
-      my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
-      my $direction = $q->query_param('sSortDir_'.$i);
-      push @order, "$column_name $direction";
+    my @order = ();
+    if( defined $q->query_param('iSortCol_0') ){
+        for( my $i = 0; $i < $q->query_param('iSortingCols'); $i++ ) {
+            # We only get the column index (starting from 0), so we have to
+            # translate the index into a column name.
+            my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
+            my $direction = $q->query_param('sSortDir_'.$i);
+            push @order, "$column_name $direction";
+        }
     }
-  }
 
-  my $order;
-  $order .= " ORDER BY " . join(',',@order) if (@order);
-  return $order;
-} # /_generate_order_clause
+    my $order;
+    $order .= " ORDER BY " . join(',',@order) if (@order);
+    return $order;
+}
 
 sub _build_sql_select {
     my ($self,$query) = @_;
@@ -168,6 +161,102 @@ sub _build_sql_select {
     return $select;
 }
 
+sub _build_result_set1 {
+    my ($self,$q) = @_;
+    my $param;
+
+    my $result = {};
+
+    if( defined $q->query_param('sSearch') ) {
+        my $search_string = $q->query_param('sSearch');
+        for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
+            # Iterate over each column and check if it is searchable.
+            # If so, add a constraint to the where clause restricting the given
+            # column. In the query, the column is identified by it's index, we
+            # need to translates the index to the column name.
+            my $searchable_ident = 'bSearchable_'.$i;
+            if( length $search_string > 0 and
+                    $q->query_param($searchable_ident) and
+                    $q->query_param($searchable_ident) eq 'true' ) {
+                my $column = $self->_fnColumnToField( $i );
+                warn "column $column search $search_string\n";
+                foreach my $r ( System::Disk::Volume->get( { "$column LIKE" => "%%$search_string%%", } )) {
+                    $result->{ $r->{id} } = $r;
+                }
+            }
+        }
+    }
+    unless (%$result) {
+        foreach my $r ( System::Disk::Volume->get() ) {
+            $result->{ $r->{id} } = $r;
+        }
+    }
+    return $result;
+}
+
+sub _build_order_param {
+    # FIXME: UR does not have ASC and DESC, it's always ASC
+    my ($self,$q) = @_;
+    my @order;
+    if( defined $q->query_param('iSortCol_0') ){
+        for( my $i = 0; $i < $q->query_param('iSortingCols'); $i++ ) {
+            # We only get the column index (starting from 0), so we have to
+            # translate the index into a column name.
+            my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
+            my $direction = $q->query_param('sSortDir_'.$i);
+            push @order, "$column_name";
+        }
+    }
+    return @order;
+}
+
+sub _build_where_param {
+    my ($self,$q) = @_;
+    my @where;
+    if( defined $q->query_param('sSearch') ) {
+        my $search_string = $q->query_param('sSearch');
+        for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
+            # Iterate over each column and check if it is searchable.
+            # If so, add a constraint to the where clause restricting the given
+            # column. In the query, the column is identified by it's index, we
+            # need to translates the index to the column name.
+            my $searchable_ident = 'bSearchable_'.$i;
+            if( length $search_string > 0 and
+                    $q->query_param($searchable_ident) and
+                    $q->query_param($searchable_ident) eq 'true' ) {
+                my $column = $self->_fnColumnToField( $i );
+                push @where, { "$column like" => "%%$search_string%%" };
+            }
+        }
+    }
+    return @where;
+}
+
+sub _build_result_set {
+    # This requires UR beyond 94fbaa5086fc252078d2c25f368468bc76605e14
+    # to support the -or clause.
+    # FIXME: we still want LIMIT and OFFSET.
+    my ($self,$q) = @_;
+    my $param = {};
+    my @where = $self->_build_where_param($q);
+    my @order = $self->_build_order_param($q);
+    if (scalar @where) {
+        $param->{ -or } = [ \@where ];
+    }
+    # FIXME: UR order can't do DEC
+    if (scalar @order) {
+        $param->{ -order } = \@order;
+    }
+    my @result = System::Disk::Volume->get( $param );
+    # Implement limit and offset here to make up for lack of feature in get();
+    sub max ($$) { int($_[ $_[0] < $_[1] ]) };
+    sub min ($$) { int($_[ $_[0] > $_[1] ]) };
+    my $limit  = $q->query_param('iDisplayLength') || 10;
+    my $offset = $q->query_param('iDisplayStart') || 0;
+    @result = @result[$offset..min($limit,$#result)];
+    return @result;
+}
+
 sub run {
 
     my ($self,$args) = @_;
@@ -177,19 +266,13 @@ sub run {
 
     my $query = URI->new( $args->{REQUEST_URI} );
 
-    # UR Missing feature: Can't to OR clauses in get()
-    # So try building SQL for get()
-    # UR BUG: duplicate data somehow?
-    my @vols = System::Disk::Volume->get( sql => $self->_build_sql_select( $query ) );
-    # Next try:
-    # 1 get() for each searchable column
-    # build the hash with key of object id in result set
-    foreach my $v (@vols) {
+    my @vols = $self->_build_result_set( $query );
+    foreach my $v ( @vols ) {
         push @aaData, [
             $v->{mount_path},
             $v->{physical_path},
-            $self->commify($v->{total_kb}) . " (" . $self->short($v->{total_kb}) . ")",
-            $self->commify($v->{used_kb}) . " (" . $self->short($v->{used_kb}) . ")",
+            $self->_commify($v->{total_kb}) . " (" . $self->_short($v->{total_kb}) . ")",
+            $self->_commify($v->{used_kb}) . " (" . $self->_short($v->{used_kb}) . ")",
             sprintf("%d %%", $v->{capacity} ? $v->{capacity} : 0 ),
             $v->{filername},
             $v->{disk_group} ? $v->{disk_group} : 'unknown',
@@ -198,7 +281,7 @@ sub run {
     }
 
     my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
-    # FIXME: find total?
+    # FIXME: total count requires feature addition to UR
     my @results = System::Disk::Volume->get();
     my $iTotal = scalar @results;
     warn "DEBUG total $iTotal\n";
