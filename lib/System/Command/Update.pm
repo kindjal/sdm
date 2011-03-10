@@ -53,11 +53,10 @@ sub execute {
         next PROPERTY if $property_meta->class_name ne $class;
         my $property_name = $property_meta->property_name;
         next PROPERTY if $property_name eq $name_for_objects_ub;
-        my $new_value;
+        my $new_value = $self->$property_name;
         if ($property_name eq 'last_modified') {
             $new_value = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
         }
-        $new_value = $self->$property_name;
         next PROPERTY if not defined $new_value;
         $self->status_message("Update property: $property_name");
         $properties_requested_to_update++;
