@@ -12,7 +12,7 @@ require Text::Wrap;
 use Log::Log4perl qw(:easy);
 
 class System::Command::Base {
-    is => 'Command::V2',
+    is => 'Command::V1',
     is_abstract => 1,
     attributes_have => [
         require_user_verify => {
