@@ -376,14 +376,14 @@ sub get_disk_group {
   $self->{logger}->debug("get_disk_group($physical_path,$mount_path)\n");
 
   # Does the cache already have the disk group name?
-  # FIXME: correct?
   my $res = System::Disk::Volume->get( mount_path => $mount_path );
 
-  #if (defined $res and scalar @$res > 0 and ! $self->{parent}->{recache}) {
-  if (defined $res and ! $self->{parent}->{recache}) {
-    $group_name = $res->disk_group;
-    $self->{logger}->debug("$mount_path is cached for: $group_name\n");
-    return $group_name;
+  if (defined $res) {
+      $group_name = $res->disk_group;
+      if (defined $group_name) {
+          $self->{logger}->debug("$mount_path is cached for: $group_name\n");
+          return $group_name;
+      }
   }
 
   $self->{logger}->debug("no group known for $mount_path\n");
@@ -402,6 +402,9 @@ sub get_disk_group {
     return $group_name if (defined $group_name and $group_name ne '');
   }
 
+  return 'unknown';
+
+  # FIXME: This should be optional or replaced or something
   $self->{logger}->debug("mount $mount_path and look for touchfile\n");
 
   # This will actually mount a mount point via automounter.
