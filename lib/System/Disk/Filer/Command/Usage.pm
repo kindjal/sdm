@@ -106,7 +106,6 @@ sub update_volume {
     my @volumes = System::Disk::Volume->get( filer => $filer );
     foreach my $volume ( @volumes ) {
         my $path = $volume->physical_path;
-        $self->{logger}->warn("Volume $path");
         $path =~ s/\//\\\//g;
         # FIXME: do we want to remove like this?
         if ( ! grep /$path/, keys %$volumedata ) {
