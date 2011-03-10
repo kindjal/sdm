@@ -37,9 +37,11 @@ sub execute {
     my %attrs;
     for my $property ( @properties ) {
         my $property_name = $property->property_name;
-        my @values = $self->$property_name;
+        my @values;
         if ($property_name eq 'created') {
-            @values = [ Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) ];
+            push @values, Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+        } else {
+            @values = $self->$property_name;
         }
         next if not defined $values[0];
         if ( $property->is_many ) {
