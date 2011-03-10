@@ -8,6 +8,7 @@ use System;
 
 # Checking currentness in host_is_current()
 use Date::Manip;
+use Date::Manip::Date;
 # Usage function
 use Pod::Find qw(pod_where);
 use Pod::Usage;
@@ -102,10 +103,15 @@ sub update_volume {
     }
     # Now, for this filer, find any stored volumes that aren't present
     # in the volumedata retrieved via SNMP.
-    foreach my $volume ( System::Disk::Volume->get( filer => $filer )) {
-        if (! grep($volume, @$volumedata)) {
-            $self->{logger}->warning("Volume $volume no longer appears on filer $filer->name!");
-            System::Disk::Volume->delete( filer => $filer, volume => $volume );
+    my @volumes = System::Disk::Volume->get( filer => $filer );
+    foreach my $volume ( @volumes ) {
+        my $path = $volume->physical_path;
+        $self->{logger}->warn("Volume $path");
+        $path =~ s/\//\\\//g;
+        # FIXME: do we want to remove like this?
+        if ( ! grep /$path/, keys %$volumedata ) {
+            $self->{logger}->warn("Volume " . $volume->physical_path . " no longer appears on filer " . $filer->name . "\n");
+            $volume->delete();
         }
     }
 }
@@ -117,29 +123,29 @@ sub fetch_aging_volumes {
         if (! defined $self->vol_maxage);
     $self->error("max age makes no sense: $self->vol_maxage\n")
         if ($self->vol_maxage < 0 or $self->vol_maxage !~ /\d+/);
-    #my $sql = "SELECT physical_path, mount_path, last_modified FROM disk_df WHERE last_modified < date(\"now\",\"-$self->vol_maxage days\") ORDER BY last_modified";
-    return System::Disk::Volumes->get( { "last_modified <" => $self->vol_maxage } );
+    my $date = Date::Manip::Date->new();
+    $date->parse($self->vol_maxage . " days ago");
+    #return System::Disk::Volume->get( { "last_modified <" => $date->printf("%Y-%m-%d %H:%M:%S") } );
+    my $sql = "SELECT physical_path, filername FROM disk_volume WHERE last_modified < date(\"now\",\"-" . $self->vol_maxage . " days\") ORDER BY last_modified";
+    $self->{logger}->debug("sql $sql\n");
+    return System::Disk::Volume->get( sql => $sql );
 }
 
 sub validate_volumes {
-  # See if we have volumes that haven't been updated since maxage.
-  my $self = shift;
-  $self->{logger}->debug("validate_volumes()\n");
-  foreach my $row (@{ $self->fetch_aging_volumes() }) {
-    $self->{logger}->warn("Aging volume: " . join(' ',@$row) . "\n");
-  }
+    # See if we have volumes that haven't been updated since maxage.
+    my $self = shift;
+    $self->{logger}->debug("validate_volumes()\n");
+    foreach my $volume ($self->fetch_aging_volumes()) {
+        $self->{logger}->warn("Aging volume: $volume->filername $volume->mount_path\n");
+    }
 }
 
 sub purge_volumes {
-  my $self = shift;
-  $self->{logger}->debug("purge_volumes()\n");
-  foreach my $row (@{ $self->fetch_aging_volumes() }) {
-    $self->{logger}->warn("Delete volume: " . join(' ',@$row) . "\n");
-    my $sql = "DELETE FROM disk_df WHERE physical_path = ? AND mount_path = ?";
-    my $physical_path = $row->[0];
-    my $mount_path = $row->[1];
-    $self->sql_exec($sql,($physical_path,$mount_path));
-  }
+    my $self = shift;
+    $self->{logger}->debug("purge_volumes()\n");
+    foreach my $volume ($self->fetch_aging_volumes()) {
+        $volume->delete();
+    }
 }
 
 sub execute {
