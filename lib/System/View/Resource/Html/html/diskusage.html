@@ -28,7 +28,7 @@
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
           "aaSorting": [ [2,'desc'] ],
-          "sAjaxSource": "/site/system/disk/volume/table.html.cgi",
+          "sAjaxSource": "/site/system/disk/volume/status.html.cgi",
           "fnServerData": function ( sSource, aoData, fnCallback )
           {
                 /* Add some extra data to the sender */
@@ -66,7 +66,7 @@
         } );
         /* end volume summary table */
 
-        /* summary table */
+        /* summary by disk group table */
         $('#group').dataTable( {
           "sDom": 'T<"clear">lfrtip',
           "bProcessing": true,
@@ -109,16 +109,16 @@
             return nRow;
           }
         } );
-        /* end #summary */
+        /* end summary by disk  group*/
 
-        /* hosts table */
+        /* filer table */
         $('#hosts_table').dataTable( {
           "bProcessing": true,
           "bServerSide": true,
           "iDisplayLength": 10,
           "sPaginationType": "full_numbers",
           "bAutoWidth": false,
-          "sAjaxSource": "/site/system/disk/host/table.html.cgi",
+          "sAjaxSource": "/site/system/disk/filer/status.html.cgi",
           "fnServerData": function ( sSource, aoData, fnCallback ) {
                 aoData.push( { "name": "rm", "value": "table_data" } );
                 $.getJSON( sSource, aoData, function (json) {
@@ -144,10 +144,10 @@
               return nRow;
           },
         } );
-        /* end #hosts_table */
+        /* end filer table */
 
-        /* Top of page total host summary */
-        $.getJSON('../cgi-bin/du_total.cgi', function(result) {
+        /* Top of page total summary */
+        $.getJSON('/site/system/disk/filer/summary.html.cgi', function(result) {
           $("div#total").html(
             '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
             + '<h3>Disk usage added over all reporting NFS servers</h3>'
