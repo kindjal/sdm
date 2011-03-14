@@ -120,7 +120,7 @@ sub run {
             $v->{physical_path},
             System::Disk::View::Lib::commify($v->{total_kb}) . " (" . System::Disk::View::Lib::short($v->{total_kb}) . ")",
             System::Disk::View::Lib::commify($v->{used_kb}) . " (" . System::Disk::View::Lib::short($v->{used_kb}) . ")",
-            sprintf("%d %%", $v->{capacity} ? $v->{capacity} : 0 ),
+            sprintf("%d %%", $v->{used_kb} / $v->{total_kb} * 100 ),
             $v->{filername},
             $v->{disk_group} ? $v->{disk_group} : 'unknown',
             $v->{last_modified} ? $v->{last_modified} : 'unknown'
