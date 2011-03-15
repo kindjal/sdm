@@ -35,20 +35,21 @@ sub run {
     foreach my $r ( System::Disk::Volume->get() ) {
         $result->{total_kb} += $r->{total_kb};
         $result->{used_kb} += $r->{used_kb};
+        $result->{last_modified} = $r->{last_modified} ? $r->{last_modified} : $result->{last_modified};
 
         # FIXME: super slow
-        my $date0 = Date::Manip::Date->new();
-        my $date1 = Date::Manip::Date->new();
-        my $mod = $r->{last_modified} ? $r->{last_modified} : '0000:00:00:00:00:00';
-        $mod =~ s/[ -]/:/g;
-        $date0->parse( $result->{last_modified} );
-        $date1->parse( $mod );
-        $result->{last_modified} = $r->{last_modified} if ( $date0->cmp($date1));
+        #my $date0 = Date::Manip::Date->new();
+        #my $date1 = Date::Manip::Date->new();
+        #my $mod = $r->{last_modified} ? $r->{last_modified} : '0000:00:00:00:00:00';
+        #$mod =~ s/[ -]/:/g;
+        #$date0->parse( $result->{last_modified} );
+        #$date1->parse( $mod );
+        #$result->{last_modified} = $r->{last_modified} if ( $date0->cmp($date1));
     }
 
+    $result->{capacity} = sprintf "%d %%", $result->{used_kb} / $result->{total_kb} * 100;
     $result->{total_kb} = System::Disk::View::Lib::commify($result->{total_kb}) . " (" . System::Disk::View::Lib::short($result->{total_kb}) . ")",
     $result->{used_kb} = System::Disk::View::Lib::commify($result->{used_kb}) . " (" . System::Disk::View::Lib::short($result->{used_kb}) . ")",
-    $result->{capacity} = sprintf "%d %%", $result->{used_kb} / $result->{total_kb} * 100;
 
     return $json->encode($result);
 }

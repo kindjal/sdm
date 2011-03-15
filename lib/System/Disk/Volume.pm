@@ -10,14 +10,16 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
-        filer         => { is => 'System::Disk::Filer', id_by => 'filername', constraint_name => 'VOLUME_FILER_FK' },
-        physical_path => { is => 'Text', len => 255 },
-    ],
-    has => [
         mount_path    => { is => 'Text', len => 255 },
     ],
+    has_many => [
+        filerpaths    => { is => 'System::Disk::Filerpath', reverse_as => 'volume' },
+        filers        => { is => 'System::Disk::Filer', via => 'filerpaths', to => 'filer' },
+    ],
     has_optional => [
-        status        => { via => 'filer' },
+        filername     => { via => 'filers', to => 'name', is_many => 1 },
+        physical_path => { via => 'filers', to => 'physical_path', is_many => 1 },
+        status        => { via => 'filers' },
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
         total_kb      => { is => 'UnsignedInteger' },
         used_kb       => { is => 'UnsignedInteger' },

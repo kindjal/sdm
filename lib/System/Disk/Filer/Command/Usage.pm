@@ -99,6 +99,7 @@ sub update_volume {
            # Primary keys are immutable, don't try to update them
            $volume->$attr($volumedata->{$physical_path}->{$attr})
              if (! $p->is_id);
+           $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()));
         }
     }
     # Now, for this filer, find any stored volumes that aren't present
@@ -171,6 +172,7 @@ sub execute {
                 $self->{logger}->info("Filer is current: " . $filer->name . "\n");
             } else {
                 my $last = $filer->last_modified;
+                # FIXME: is this right?
                 $last = "<NULL>" if (! defined $last);
                 $self->{logger}->info("Filer '" . $filer->name . "' is out of date, last updated: " . "$last\n");
             }

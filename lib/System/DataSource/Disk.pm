@@ -10,4 +10,12 @@ class System::DataSource::Disk {
 sub driver { 'SQLite' };
 sub dump_on_commit { 1 };
 
+sub create_dbh {
+    my $self = shift->_singleton_object();
+    $self->_init_database;
+    my $dbh = $self->SUPER::create_dbh(@_);
+    $dbh->do("PRAGMA foreign_keys = ON");
+    return $dbh;
+}
+
 1;

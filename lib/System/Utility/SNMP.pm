@@ -473,9 +473,10 @@ sub query_snmp {
   # Query SNMP for df stats
   $self->get_snmp_disk_usage($result);
 
-  foreach my $physical_path (keys %$result) {
-    $result->{$physical_path}->{'disk_group'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
-  }
+  # FIXME: gets multiple results
+  #foreach my $physical_path (keys %$result) {
+  #  $result->{$physical_path}->{'disk_group'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
+  #}
 
   return $result;
 }

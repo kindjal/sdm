@@ -72,7 +72,6 @@ sub _build_where_param {
                     $q->query_param($searchable_ident) and
                     $q->query_param($searchable_ident) eq 'true' ) {
                 my $column = $self->_fnColumnToField( $i );
-                #push @where, { "$column like" => "%%$search_string%%" };
                 push @where, [ { "$column like" => "%$search_string%" } ];
             }
         }
@@ -95,7 +94,6 @@ sub _build_result_set {
     if (scalar @order) {
         $param->{ -order } = \@order;
     }
-    warn "param: " . Data::Dumper::Dumper $param;
     my @result = System::Disk::Volume->get( $param );
     # Implement limit and offset here to make up for lack of feature in get();
     sub max ($$) { int($_[ $_[0] < $_[1] ]) };
