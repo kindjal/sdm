@@ -81,6 +81,9 @@ sub purge {
 
 sub create {
     my ($self,$param) = @_;
+    warn "debug: " . Data::Dumper::Dumper $param;
+    delete $param->{filername};
+    delete $param->{physical_path};
 
     my $mount = System::Disk::Mount->get( mount_path => $param->{mount_path}, filername => $param->{filername}, physical_path => $param->{physical_path} );
     if (defined $mount) {
@@ -96,7 +99,7 @@ sub create {
 
     # Many volumes may exist with the same mount_path, but only one
     #   mount_path + ( filername + physical_path )
-    my $volume = $self->SUPER::create( mount_path => $param->{mount_path} );
+    my $volume = $self->SUPER::create( $param );
     die "Unable to create volume: $!"
         if (! defined $volume);
 

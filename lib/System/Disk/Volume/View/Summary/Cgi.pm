@@ -91,7 +91,9 @@ sub _build_result_set {
         $param->{ -order } = \@order;
     }
 
-    my $set = System::Disk::Volume->define_set( $param );
+    # FIXME: UR: Bug: order-by is clobbering group-by here
+    #my $set = System::Disk::Volume->define_set( $param );
+    my $set = System::Disk::Volume->define_set( );
     my @result = $set->group_by( 'disk_group' );
 
     # Implement limit and offset here to make up for lack of feature in get();
@@ -115,12 +117,23 @@ sub run {
     my @group_totals = $self->_build_result_set( $query );
 
     foreach my $result ( @group_totals ) {
-        my $item = $result->members;
+        my $disk_group;
+        my $total_kb = 0;
+        my $used_kb = 0;
+        foreach my $item ( $result->members ) {
+            $disk_group = $item->disk_group ? $item->disk_group : "unknown";
+            $total_kb += $item->total_kb;
+            $used_kb += $item->used_kb;
+        }
+        my $capacity = 0;
+        if ($total_kb) {
+            $capacity = sprintf("%d %%", $used_kb / $total_kb * 100);
+        }
         push @aaData, [
-            $item->{disk_group} ? $item->{disk_group} : 'unknown',
-            System::Disk::View::Lib::commify($item->{total_kb}) . " (" . System::Disk::View::Lib::short($item->{total_kb}) . ")",
-            System::Disk::View::Lib::commify($item->{used_kb}) . " (" . System::Disk::View::Lib::short($item->{used_kb}) . ")",
-            sprintf("%d %%", $item->{capacity} ? $item->{capacity} : 0 ),
+            $disk_group,
+            System::Disk::View::Lib::commify($total_kb) . " (" . System::Disk::View::Lib::short($total_kb) . ")",
+            System::Disk::View::Lib::commify($used_kb) . " (" . System::Disk::View::Lib::short($used_kb) . ")",
+            $capacity,
         ];
     }
 

@@ -16,7 +16,8 @@ class System::Disk::Volume::Command::Add {
     ],
     has_optional => [
         total_kb      => { is => 'Number' },
-        used_kb      => { is => 'Number' },
+        used_kb       => { is => 'Number' },
+        disk_group    => { is => 'Text' },
     ],
 };
 
@@ -30,6 +31,7 @@ sub execute {
     };
     $param->{total_kb} = $self->total_kb ? $self->total_kb : 0;
     $param->{used_kb} = $self->used_kb ? $self->used_kb : 0;
+    $param->{disk_group} = $self->disk_group if (defined $self->disk_group);
 
     my $volume = System::Disk::Volume->get( mount_path => $self->mount_path );
     if (defined $volume) {

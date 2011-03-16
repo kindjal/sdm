@@ -10,10 +10,10 @@ class System::Disk::Group {
         name => { is => 'Text' },
     ],
     has => [
-        permissions     => { is => 'UnsignedInteger' },
-        sticky          => { is => 'UnsignedInteger' },
-        unix_gid        => { is => 'UnsignedInteger' },
-        unix_uid        => { is => 'UnsignedInteger' },
+        permissions     => { is => 'UnsignedInteger', default => 0 },
+        sticky          => { is => 'UnsignedInteger', default => 0 },
+        unix_gid        => { is => 'UnsignedInteger', default => 0 },
+        unix_uid        => { is => 'UnsignedInteger', default => 0 },
     ],
     has_optional => [
         parent_group    => { is => 'Text' },
