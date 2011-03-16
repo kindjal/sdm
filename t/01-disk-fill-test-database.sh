@@ -1,4 +1,5 @@
 #! /bin/bash
+set -x
 
 . ./t/00-disk-prep-test-database.sh
 

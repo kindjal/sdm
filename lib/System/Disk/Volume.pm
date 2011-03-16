@@ -10,16 +10,18 @@ use System;
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
     id_by => [
+        id            => { is => 'Number' },
+    ],
+    has => [
         mount_path    => { is => 'Text', len => 255 },
     ],
-    has_many => [
-        filerpaths    => { is => 'System::Disk::Filerpath', reverse_as => 'volume' },
-        filers        => { is => 'System::Disk::Filer', via => 'filerpaths', to => 'filer' },
+    has_many_optional => [
+        # Mount is optional because "Mount" is a bridge entry that may not exist yet.
+        mounts        => { is => 'System::Disk::Mount', reverse_as => 'volume' },
+        exports       => { is => 'System::Disk::Export', reverse_as => 'volume' },
+        filername     => { via => 'mounts' },
     ],
     has_optional => [
-        filername     => { via => 'filers', to => 'name', is_many => 1 },
-        physical_path => { via => 'filers', to => 'physical_path', is_many => 1 },
-        status        => { via => 'filers' },
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
         total_kb      => { is => 'UnsignedInteger' },
         used_kb       => { is => 'UnsignedInteger' },
@@ -32,64 +34,91 @@ class System::Disk::Volume {
 };
 
 sub is_current {
-  my $self = shift;
-  my $vol_maxage = shift;
+    my $self = shift;
+    my $vol_maxage = shift;
 
-  print "is_current($vol_maxage) compare " . $self->last_modified . "\n";
+    print "is_current($vol_maxage) compare " . $self->last_modified . "\n";
 
-  return 0 if (! defined $self->last_modified);
+    return 0 if (! defined $self->last_modified);
 
-  return 0 if ($self->last_modified eq "0000-00-00 00:00:00");
+    return 0 if ($self->last_modified eq "0000-00-00 00:00:00");
 
-  my $date0 = ParseDate($self->last_modified);
-  return 0 if (! defined $date0);
+    my $date0 = ParseDate($self->last_modified);
+    return 0 if (! defined $date0);
 
-  my $err;
-  my $date1 = ParseDate(scalar gmtime());
-  my $calc = DateCalc($date0,$date1,\$err);
+    my $err;
+    my $date1 = ParseDate(scalar gmtime());
+    my $calc = DateCalc($date0,$date1,\$err);
 
-  die "Error in DateCalc: $date0, $date1, $err\n" if ($err);
-  die "Error in DateCalc: $date0, $date1, $err\n" if (! defined $calc);
+    die "Error in DateCalc: $date0, $date1, $err\n" if ($err);
+    die "Error in DateCalc: $date0, $date1, $err\n" if (! defined $calc);
 
-  my $delta = Delta_Format($calc,0,'%st');
+    my $delta = Delta_Format($calc,0,'%st');
 
-  print "is_current: delta $delta\n";
+    print "is_current: delta $delta\n";
 
-  return 0 if (! defined $delta);
+    return 0 if (! defined $delta);
 
-  return 1
-    if $delta < $vol_maxage;
+    return 1
+        if $delta < $vol_maxage;
 
-  return 0;
+    return 0;
 }
 
 sub validate_volumes {
-  # FIXME: Add code to validate volumes
-  # similar to DiskUsage::Cache
-  my $self = shift;
-  return 0;
+    # FIXME: Add code to validate volumes
+    # similar to DiskUsage::Cache
+    my $self = shift;
+    return 0;
 }
 
 sub purge {
-  # FIXME: Add code to remove stale volumes
-  # similar to DiskUsage::Cache
-  my $self = shift;
-  return 0;
-}
-
-__END__
-
-sub unusable_volume_percent { return .05 }
-sub maximum_reserve_size { return 1_073_741_824 } # 1 TB
-
-sub most_recent_allocation {
+    # FIXME: Add code to remove stale volumes
+    # similar to DiskUsage::Cache
     my $self = shift;
-    # Unless otherwise specified, the objects returned by this get will be sorted by increasing
-    # id value. This is ONLY true if the id is numeric and single-column. If any fields other than
-    # allocator id are ever added to the id_by property of allocations, this get will need to be modified
-    my @allocations = System::Disk::Allocation->get(mount_path => $self->mount_path);
-    return unless @allocations;
-    return $allocations[-1];
+    return 0;
 }
 
-1;
+sub create {
+    my ($self,$param) = @_;
+
+    print "param: " . Data::Dumper::Dumper $param;
+
+    my $mount = System::Disk::Mount->get( mount_path => $param->{mount_path}, filername => $param->{filername}, physical_path => $param->{physical_path} );
+    if (defined $mount) {
+        $self->warning_message("Volume already exists: $param->{mount_path} -> $param->{filername} $param->{physical_path}" );
+        return;
+    }
+    print "mount: " . Data::Dumper::Dumper $mount;
+
+    my $export = System::Disk::Export->get( filername => $param->{filername}, physical_path => $param->{physical_path} );
+    die "Filer '" . $param->{filername} ."' has no export '" . $param->{physical_path} ."'"
+        if (! defined $export);
+
+    print "export: " . Data::Dumper::Dumper $export;
+
+    # Many volumes may exist with the same mount_path, but only one
+    #   mount_path + ( filername + physical_path )
+    my $volume = $self->SUPER::create( mount_path => $param->{mount_path} );
+    die "Unable to create volume: $!"
+        if (! defined $volume);
+
+    # FIXME: This commit() should not be required.  UR bug?
+    UR::Context->commit();
+
+    #my $mount  = System::Disk::Mount->create( volume_id => $volume->id, export_id => $export->id );
+    $mount  = System::Disk::Mount->create( volume_id => $volume->id, export_id => $export->id );
+
+    return $volume;
+}
+
+sub delete {
+    my $self = shift;
+    # Remove bridge table entires from Mount first
+    # Then delete the Volume
+    foreach my $m (System::Disk::Mount->get( volume_id => $self->id )) {
+        $m->delete() or die "Failed to delete mount for volume: " . $self->id;
+    }
+    return $self->SUPER::delete();
+}
+

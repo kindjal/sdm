@@ -19,7 +19,7 @@ class System::Disk::Filer {
         status          => { is => 'UnsignedInteger' },
     ],
     has_many_optional => [
-        filerpaths => { is => 'System::Disk::Filerpath', reverse_as => 'filer' },
+        exports    => { is => 'System::Disk::Export', reverse_as => 'filer' },
         hosts      => { is => 'System::Disk::Host', reverse_as => 'filer' },
         arrays     => { is => 'System::Disk::Array', via => 'hosts', to => 'arrays' },
     ],

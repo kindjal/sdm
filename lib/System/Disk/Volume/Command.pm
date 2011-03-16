@@ -15,7 +15,7 @@ use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
     target_class => 'System::Disk::Volume',
     target_name => 'volume',
-    list => { show => 'mount_path,total_kb,used_kb,disk_group' }
+    list => { show => 'id,mount_path,total_kb,used_kb,disk_group,filername' }
 );
 
 1;
