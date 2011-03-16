@@ -1,11 +1,11 @@
-package System::Disk::Filerpath::Command;
+package System::Disk::Mount::Command;
 
 use strict;
 use warnings;
 
 use System;
 
-class System::Disk::Filerpath::Command {
+class System::Disk::Mount::Command {
     is          => 'System::Command::Base',
     doc         => 'work with disk filers',
     is_abstract => 1
@@ -13,9 +13,9 @@ class System::Disk::Filerpath::Command {
 
 use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
-    target_class => 'System::Disk::Filerpath',
-    target_name => 'filerpath',
-    list => { show => 'filername,mount_path' }
+    target_class => 'System::Disk::Mount',
+    target_name => 'mount',
+    list => { show => 'filername,mount_path,physical_path' }
 );
 
 1;
