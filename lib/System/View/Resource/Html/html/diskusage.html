@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
-<html> 
-  <head> 
+<html>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
     <title>Disk Usage Information</title>
@@ -27,7 +27,8 @@
           "bFilter": true,
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
-          "aaSorting": [ [2,'desc'] ],
+          /* Sort by Total KB column by default */
+          "aaSorting": [ [1,'desc'] ],
           "sAjaxSource": "/site/system/disk/volume/status.html.cgi",
           "fnServerData": function ( sSource, aoData, fnCallback )
           {
@@ -47,15 +48,15 @@
           "fnRowCallback": function( nRow, aaData, iDisplayIndex )
           {
                 /* append a css class based on cell content */
-                /* capacity > 95 */
-                var $col = 4;
+                /* capacity > 95 is column 3*/
+                var $col = 3;
                 var $cell = $(nRow).children('td').eq($col);
                 if ( aaData[$col] > 95 )
                 {
                   $cell.addClass('warning');
                 }
-                /* group is 'unknown' */
-                var $col = 5;
+                /* group is 'unknown' is column 4 */
+                var $col = 4;
                 var $cell = $(nRow).children('td').eq($col);
                 if ( aaData[$col] == 'unknown' )
                 {
@@ -87,7 +88,6 @@
             null,
             null,
             null,
-            /* cost */  { "bVisible":    false },
           ],
           "fnRowCallback": function( nRow, aaData, iDisplayIndex )
           {
@@ -223,12 +223,11 @@
       <th>Total KB</th>
       <th>Used KB</th>
       <th>Capacity</th>
-      <th>Estimated Cost ($)</th>
       </tr>
       </thead>
       <tbody>
       <tr>
-      <td colspan="5" class="dataTables_empty">Loading data from server</td>
+      <td colspan="4" class="dataTables_empty">Loading data from server</td>
       </tr>
       </tbody>
       <tfoot>
@@ -237,7 +236,6 @@
       <th>Total KB</th>
       <th>Used KB</th>
       <th>Capacity</th>
-      <th>Estimated Cost ($)</th>
       </tr>
       </tfoot>
       </table>
@@ -256,7 +254,6 @@
         <thead>
         <tr>
         <th>Mount Path</th>
-        <th>Physical Path</th>
         <th width="15%">Total KB</th>
         <th width="15%">Used KB</th>
         <th width="2%" align=center>Capacity</th>
@@ -267,13 +264,12 @@
         </thead>
         <tbody>
           <tr>
-            <td colspan="8" class="dataTables_empty">Loading data from server</td>
+            <td colspan="7" class="dataTables_empty">Loading data from server</td>
           </tr>
         </tbody>
         <tfoot>
         <tr>
         <th>Mount Path</th>
-        <th>Physical Path</th>
         <th width="15%">Total KB</th>
         <th width="15%">Used KB</th>
         <th width="2%" align=center>Capacity</th>

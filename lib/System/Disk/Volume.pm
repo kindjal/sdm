@@ -82,20 +82,17 @@ sub purge {
 sub create {
     my ($self,$param) = @_;
 
-    print "param: " . Data::Dumper::Dumper $param;
-
     my $mount = System::Disk::Mount->get( mount_path => $param->{mount_path}, filername => $param->{filername}, physical_path => $param->{physical_path} );
     if (defined $mount) {
         $self->warning_message("Volume already exists: $param->{mount_path} -> $param->{filername} $param->{physical_path}" );
         return;
     }
-    print "mount: " . Data::Dumper::Dumper $mount;
 
-    my $export = System::Disk::Export->get( filername => $param->{filername}, physical_path => $param->{physical_path} );
-    die "Filer '" . $param->{filername} ."' has no export '" . $param->{physical_path} ."'"
-        if (! defined $export);
-
-    print "export: " . Data::Dumper::Dumper $export;
+    my $export = System::Disk::Export->get_or_create( filername => $param->{filername}, physical_path => $param->{physical_path} );
+    unless ($export) {
+        $self->error_message("Filer '" . $param->{filername} ."' has no export '" . $param->{physical_path} ."' and we failed to create one.");
+        return;
+    }
 
     # Many volumes may exist with the same mount_path, but only one
     #   mount_path + ( filername + physical_path )
@@ -106,7 +103,7 @@ sub create {
     # FIXME: This commit() should not be required.  UR bug?
     UR::Context->commit();
 
-    #my $mount  = System::Disk::Mount->create( volume_id => $volume->id, export_id => $export->id );
+    # Mount is a bridge table between Volume and Filer.
     $mount  = System::Disk::Mount->create( volume_id => $volume->id, export_id => $export->id );
 
     return $volume;

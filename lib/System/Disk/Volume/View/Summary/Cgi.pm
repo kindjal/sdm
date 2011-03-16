@@ -27,9 +27,9 @@ sub _fnColumnToField {
     my %dispatcher = (
             # column => 'rowname',
             0 => 'disk_group',
-            2 => 'total_kb',
-            3 => 'used_kb',
-            4 => 'capacity',
+            1 => 'total_kb',
+            2 => 'used_kb',
+            3 => 'capacity',
             );
 
     die("No such row index defined: $i") unless exists $dispatcher{$i};
@@ -91,11 +91,8 @@ sub _build_result_set {
         $param->{ -order } = \@order;
     }
 
-    # FIXME: use of sets
-    #my @result = System::Disk::Volume->get( $param );
     my $set = System::Disk::Volume->define_set( $param );
     my @result = $set->group_by( 'disk_group' );
-    print Data::Dumper::Dumper @result;
 
     # Implement limit and offset here to make up for lack of feature in get();
     sub max ($$) { int($_[ $_[0] < $_[1] ]) };
@@ -115,13 +112,15 @@ sub run {
 
     my $query = URI->new( $args->{REQUEST_URI} );
 
-    my @vols = $self->_build_result_set( $query );
-    foreach my $v ( @vols ) {
+    my @group_totals = $self->_build_result_set( $query );
+
+    foreach my $result ( @group_totals ) {
+        my $item = $result->members;
         push @aaData, [
-            $v->{disk_group},
-            System::Disk::View::Lib::commify($v->{total_kb}) . " (" . System::Disk::View::Lib::short($v->{total_kb}) . ")",
-            System::Disk::View::Lib::commify($v->{used_kb}) . " (" . System::Disk::View::Lib::short($v->{used_kb}) . ")",
-            sprintf("%d %%", $v->{capacity} ? $v->{capacity} : 0 ),
+            $item->{disk_group} ? $item->{disk_group} : 'unknown',
+            System::Disk::View::Lib::commify($item->{total_kb}) . " (" . System::Disk::View::Lib::short($item->{total_kb}) . ")",
+            System::Disk::View::Lib::commify($item->{used_kb}) . " (" . System::Disk::View::Lib::short($item->{used_kb}) . ")",
+            sprintf("%d %%", $item->{capacity} ? $item->{capacity} : 0 ),
         ];
     }
 
@@ -129,7 +128,7 @@ sub run {
     # FIXME: total count requires feature addition to UR
     my @results = System::Disk::Volume->get();
     my $iTotal = scalar @results;
-    my $iFilteredTotal = scalar @vols;
+    my $iFilteredTotal = scalar @group_totals;
     my $sOutput = {
         sEcho => $sEcho,
         iTotalRecords => int($iTotal),

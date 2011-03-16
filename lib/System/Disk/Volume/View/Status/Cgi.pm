@@ -27,13 +27,12 @@ sub _fnColumnToField {
     my %dispatcher = (
             # column => 'rowname',
             0 => 'mount_path',
-            1 => 'physical_path',
-            2 => 'total_kb',
-            3 => 'used_kb',
-            4 => 'capacity',
-            5 => 'filername',
-            6 => 'disk_group',
-            7 => 'last_modified',
+            1 => 'total_kb',
+            2 => 'used_kb',
+            3 => 'capacity',
+            4 => 'filername',
+            5 => 'disk_group',
+            6 => 'last_modified',
             );
 
     die("No such row index defined: $i") unless exists $dispatcher{$i};
@@ -115,13 +114,16 @@ sub run {
 
     my @vols = $self->_build_result_set( $query );
     foreach my $v ( @vols ) {
+        my $capacity = 0;
+        if ($v->{total_kb}) {
+            $capacity = sprintf("%d %%", $v->{used_kb} / $v->{total_kb} * 100 );
+        }
         push @aaData, [
             $v->{mount_path},
-            $v->{physical_path},
             System::Disk::View::Lib::commify($v->{total_kb}) . " (" . System::Disk::View::Lib::short($v->{total_kb}) . ")",
             System::Disk::View::Lib::commify($v->{used_kb}) . " (" . System::Disk::View::Lib::short($v->{used_kb}) . ")",
-            sprintf("%d %%", $v->{used_kb} / $v->{total_kb} * 100 ),
-            $v->{filername},
+            $capacity,
+            $v->{filername} ? $v->{filername} : 'unknown',
             $v->{disk_group} ? $v->{disk_group} : 'unknown',
             $v->{last_modified} ? $v->{last_modified} : 'unknown'
         ];
