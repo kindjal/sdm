@@ -115,17 +115,17 @@ sub run {
     my @vols = $self->_build_result_set( $query );
     foreach my $v ( @vols ) {
         my $capacity = 0;
-        if ($v->{total_kb}) {
-            $capacity = sprintf("%d %%", $v->{used_kb} / $v->{total_kb} * 100 );
+        if ($v->total_kb) {
+            $capacity = sprintf("%d %%", $v->used_kb / $v->total_kb * 100 );
         }
         push @aaData, [
-            $v->{mount_path},
-            System::Disk::View::Lib::commify($v->{total_kb}) . " (" . System::Disk::View::Lib::short($v->{total_kb}) . ")",
-            System::Disk::View::Lib::commify($v->{used_kb}) . " (" . System::Disk::View::Lib::short($v->{used_kb}) . ")",
+            $v->mount_path,
+            System::Disk::View::Lib::commify($v->total_kb) . " (" . System::Disk::View::Lib::short($v->total_kb) . ")",
+            System::Disk::View::Lib::commify($v->used_kb) . " (" . System::Disk::View::Lib::short($v->used_kb) . ")",
             $capacity,
-            $v->{filername} ? $v->{filername} : 'unknown',
-            $v->{disk_group} ? $v->{disk_group} : 'unknown',
-            $v->{last_modified} ? $v->{last_modified} : 'unknown'
+            $v->filername ? $v->filername : 'unknown',
+            $v->disk_group ? $v->disk_group : 'unknown',
+            $v->last_modified ? $v->last_modified : 'unknown'
         ];
     }
 
