@@ -1,7 +1,14 @@
 #! /bin/bash
 set -x
+set -e
 
 . ./t/00-disk-prep-test-database.sh
+
+$SYSTEM disk group list --noheaders --filter name=SYSTEMS 2>/dev/null | grep -q SYSTEMS || \
+  $SYSTEM disk group add --name SYSTEMS
+
+$SYSTEM disk group list --noheaders --filter name=INFO_APIPE 2>/dev/null | grep -q INFO_APIPE || \
+  $SYSTEM disk group add --name INFO_APIPE
 
 $SYSTEM disk filer list --noheaders --filter name=nfs11 2>/dev/null | grep -q nfs11 || \
   $SYSTEM disk filer add --name nfs11
@@ -19,11 +26,14 @@ $SYSTEM disk array list --noheaders --filter name=GCEVA2 2>/dev/null | grep -q G
   $SYSTEM disk array add --name GCEVA2 --host nfs11
 
 $SYSTEM disk volume list --noheaders --filter filer=nfs11 2>/dev/null | grep -q sata821 || \
-  $SYSTEM disk volume add --mount-path=/gscmnt/sata821 --total-kb=6438990688 --used-kb=5722964896
+  $SYSTEM disk volume add --mount-path=/gscmnt/sata821 --total-kb=6438990688 --used-kb=5722964896 --filername nfs11 --physical-path=/vol/sata821 --disk-group=SYSTEMS
+
+$SYSTEM disk volume list --noheaders --filter filer=nfs11 2>/dev/null | grep -q sata822 || \
+  $SYSTEM disk volume add --mount-path=/gscmnt/sata822 --total-kb=6438990688 --used-kb=5722964896 --filername nfs11 --physical-path=/vol/sata822 --disk-group=SYSTEMS
 
 $SYSTEM disk volume list --noheaders --filter filer=nfs12 2>/dev/null | grep -q sata821 || \
-  $SYSTEM disk volume add --mount-path=/gscmnt/gc2000 --total-kb=16438990688 --used-kb=5722964896
+  $SYSTEM disk volume add --mount-path=/gscmnt/sata821 --total-kb=6438990688 --used-kb=5722964896 --filername nfs11 --physical-path=/vol/sata821 --disk-group=SYSTEMS
 
-$SYSTEM disk group list --noheaders --filter name=PRODUCTION_SOLID 2>/dev/null | grep -q PRODUCTION_SOLID || \
-  $SYSTEM disk group add --name PRODUCTION_SOLID --permissions 755 --sticky 0 --unix-uid 12376 --unix-gid 10001
+$SYSTEM disk volume list --noheaders --filter filer=nfs12 2>/dev/null | grep -q sata823 || \
+  $SYSTEM disk volume add --mount-path=/gscmnt/sata823 --total-kb=6438990688 --used-kb=5722964896 --filername nfs11 --physical-path=/vol/sata823 --disk-group=INFO_APIPE
 
