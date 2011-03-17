@@ -113,8 +113,8 @@ sub run {
         push @aaData, [
             $v->{name},
             $v->{status} ? $v->{status} : 0,
-            $v->{created} ?  $v->{created} : "0000-00-00 00:00:00:00",
-            $v->{last_modified} ? $v->{last_modified} : "0000-00-00 00:00:00:00",
+            $v->{created} ?  $v->{created} : "0000-00-00 00:00:00",
+            $v->{last_modified} ? $v->{last_modified} : "0000-00-00 00:00:00",
         ];
     }
 
