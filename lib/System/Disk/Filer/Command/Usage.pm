@@ -240,7 +240,10 @@ sub execute {
         }
 
         if (! scalar keys %$result) {
-            $self->warning_message("Filer returned empty SNMP result: " . $filer->name);
+            $self->warning_message("Filer " . $filer->name . " returned an empty SNMP result");
+            if ($self->physical_path) {
+                $self->error_message("Filer " . $filer->name . " does not export " . $self->physical_path);
+            }
         } else {
             $self->update_volume( $filer, $result );
         }
