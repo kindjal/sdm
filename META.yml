@@ -1,47 +1,230 @@
 ---
-abstract: 'System UR Namespace'
-author:
-  - 'Matthew Callaway <mcallawa@genome.wustl.edu>'
-requires:
-  UR: 0.29
-  CGI::Application: 0
-  CGI::Application::Plugin::ConfigAuto: 0
-  CGI::Application::Plugin::DBH: 0
-  CGI::Application::Plugin::JSON: 0
+name: System
+version: 0.01
+author: [Matthew Callaway <mcallawa@genome.wustl.edu>]
+abstract: Modules for system management
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+  Test::Exception: 0
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  AnyEvent::Util: 0
+  AnyEvent: 0
+  Cache::Memcached: 0
+  DBI: 0
+  Data::Dumper: 0
+  Date::Manip::Date: 0
   Date::Manip: 0
+  Digest::MD5: 0
+  EV: 0
+  FCGI: 0
   File::Basename: 0
-  File::Find::Rule: 0
-  Getopt::Std: 0
+  File::Find: 0
+  Getopt::Long: 0
+  IO::Socket: 0
+  JSON: 0
+  Log::Log4perl: 0
+  MRO::Compat: 0
   Net::SNMP: 0
+  POSIX: 0
+  Plack::Builder: 0
+  Plack::Runner: 0
+  Plack::Util: 0
   Pod::Find: 0
   Pod::Usage: 0
-  Time::Local: 0
+  RRDTool::OO: 0
+  Smart::Comments: 0
+  Socket: 0
+  Storable: 0
+  Sys::Hostname: 0
+  Term::ANSIColor: 0
   Time::HiRes: 0
+  Time::Local: 0
+  UR: 0.28
+  URI::QueryParam: 0
+  URI: 0
+  Web::Simple: 0
+  WebService::Solr: 0
+  Workflow: 0
+  FCGI::ProcManager: 0
+requires:
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  AnyEvent::Util: 0
+  AnyEvent: 0
+  Cache::Memcached: 0
+  DBI: 0
+  Data::Dumper: 0
+  Date::Manip::Date: 0
+  Date::Manip: 0
+  Digest::MD5: 0
+  EV: 0
+  FCGI: 0
+  File::Basename: 0
+  File::Find: 0
+  Getopt::Long: 0
+  IO::Socket: 0
+  JSON: 0
+  Log::Log4perl: 0
+  MRO::Compat: 0
+  Net::SNMP: 0
+  POSIX: 0
+  Plack::Builder: 0
+  Plack::Runner: 0
+  Plack::Util: 0
+  Pod::Find: 0
+  Pod::Usage: 0
   RRDTool::OO: 0
-build_requires:
-  UR: 0.29
-  Class::MOP: 0
-  RRDTool::OO: 0
+  Smart::Comments: 0
+  Socket: 0
+  Storable: 0
+  Sys::Hostname: 0
+  Term::ANSIColor: 0
+  Time::HiRes: 0
+  Time::Local: 0
+  UR: 0.28
+  URI::QueryParam: 0
+  URI: 0
+  Web::Simple: 0
+  WebService::Solr: 0
+  Workflow: 0
+  FCGI::ProcManager: 0
 configure_requires:
-  Module::Build: 0.36
-dynamic_config: 0
-generated_by: 'Module::Build version 0.3607'
-license: perl
-maintainer:
-  - 'Matthew Callaway <mcallawa@genome.wustl.edu>'
+  Module::Build: 0.340201
+provides:
+  System:
+    file: lib/System.pm
+  System::Command:
+    file: lib/System/Command.pm
+  System::Command::Add:
+    file: lib/System/Command/Add.pm
+  System::Command::Base:
+    file: lib/System/Command/Base.pm
+  System::Command::Create:
+    file: lib/System/Command/Create.pm
+  System::Command::Crud:
+    file: lib/System/Command/Crud.pm
+  System::Command::Delete:
+    file: lib/System/Command/Delete.pm
+  System::Command::Remove:
+    file: lib/System/Command/Remove.pm
+  System::Command::Update:
+    file: lib/System/Command/Update.pm
+  System::DataSource::Disk:
+    file: lib/System/DataSource/Disk.pm
+  System::DataSource::Meta:
+    file: lib/System/DataSource/Meta.pm
+  System::DataSource::Rtm:
+    file: lib/System/DataSource/Rtm.pm
+  System::Disk:
+    file: lib/System/Disk.pm
+  System::Disk::Array:
+    file: lib/System/Disk/Array.pm
+  System::Disk::Array::Command:
+    file: lib/System/Disk/Array/Command.pm
+  System::Disk::Array::View::Default::Html:
+    file: lib/System/Disk/Array/View/Default/Html.pm
+  System::Disk::Assignment:
+    file: lib/System/Disk/Assignment.pm
+  System::Disk::Assignment::Command:
+    file: lib/System/Disk/Assignment/Command.pm
+  System::Disk::Command:
+    file: lib/System/Disk/Command.pm
+  System::Disk::Export:
+    file: lib/System/Disk/Export.pm
+  System::Disk::Export::Command:
+    file: lib/System/Disk/Export/Command.pm
+  System::Disk::Filer:
+    file: lib/System/Disk/Filer.pm
+  System::Disk::Filer::Command:
+    file: lib/System/Disk/Filer/Command.pm
+  System::Disk::Filer::Command::Usage:
+    file: lib/System/Disk/Filer/Command/Usage.pm
+  System::Disk::Filer::View::Status::Cgi:
+    file: lib/System/Disk/Filer/View/Status/Cgi.pm
+  System::Disk::Filer::View::Summary::Cgi:
+    file: lib/System/Disk/Filer/View/Summary/Cgi.pm
+  System::Disk::Group:
+    file: lib/System/Disk/Group.pm
+  System::Disk::Group::Command:
+    file: lib/System/Disk/Group/Command.pm
+  System::Disk::Host:
+    file: lib/System/Disk/Host.pm
+  System::Disk::Host::Command:
+    file: lib/System/Disk/Host/Command.pm
+  System::Disk::Mount:
+    file: lib/System/Disk/Mount.pm
+  System::Disk::Mount::Command:
+    file: lib/System/Disk/Mount/Command.pm
+  System::Disk::User:
+    file: lib/System/Disk/User.pm
+  System::Disk::User::Command:
+    file: lib/System/Disk/User/Command.pm
+  System::Disk::View::Lib:
+    file: lib/System/Disk/View/Lib.pm
+  System::Disk::View::Status::Html:
+    file: lib/System/Disk/View/Status/Html.pm
+  System::Disk::Volume:
+    file: lib/System/Disk/Volume.pm
+  System::Disk::Volume::Command:
+    file: lib/System/Disk/Volume/Command.pm
+  System::Disk::Volume::Command::Add:
+    file: lib/System/Disk/Volume/Command/Add.pm
+  System::Disk::Volume::View::Status::Cgi:
+    file: lib/System/Disk/Volume/View/Status/Cgi.pm
+  System::Disk::Volume::View::Summary::Cgi:
+    file: lib/System/Disk/Volume/View/Summary/Cgi.pm
+  System::Memcache:
+    file: lib/System/Memcache.pm
+  System::Rtm:
+    file: lib/System/Rtm.pm
+  System::Rtm::Host:
+    file: lib/System/Rtm/Host.pm
+  System::Search:
+    file: lib/System/Search.pm
+  System::Search::Query:
+    file: lib/System/Search/Query.pm
+  System::Search::Query::View::Status::Html:
+    file: lib/System/Search/Query/View/Status/Html.pm
+  System::Search::Query::View::Status::Xml:
+    file: lib/System/Search/Query/View/Status/Xml.pm
+  System::Search::Result:
+    file: lib/System/Search/Result.pm
+  System::Search::View::Status::Html:
+    file: lib/System/Search/View/Status/Html.pm
+  System::Service:
+    file: lib/System/Service.pm
+  System::Service::Base:
+    file: lib/System/Service/Base.pm
+  System::Service::Command:
+    file: lib/System/Service/Command.pm
+  System::Service::WebApp:
+    file: lib/System/Service/WebApp.pm
+  System::Service::WebApp::Command:
+    file: lib/System/Service/WebApp/Command.pm
+  System::Service::WebApp::Command::Run:
+    file: lib/System/Service/WebApp/Command/Run.pm
+  System::Service::WebApp::Core:
+    file: lib/System/Service/WebApp/Core.pm
+  System::Service::WebApp::FCGI::Patch:
+    file: lib/System/Service/WebApp/FCGI/Patch.pm
+  System::Service::WebApp::FCGI::ProcManager:
+    file: lib/System/Service/WebApp/FCGI/ProcManager.pm
+  System::Utility::RRD:
+    file: lib/System/Utility/RRD.pm
+  System::Utility::SNMP:
+    file: lib/System/Utility/SNMP.pm
+  System::Utility::Text:
+    file: lib/System/Utility/Text.pm
+  System::View::Resource::Html:
+    file: lib/System/View/Resource/Html.pm
+  System::Vocabulary:
+    file: lib/System/Vocabulary.pm
+generated_by: Module::Build version 0.340201
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-name: DiskUsage
-provides:
-  DiskUsage:
-    file: lib/DiskUsage.pm
-  DiskUsage::Error:
-    file: lib/DiskUsage/Error.pm
-  DiskUsage::Cache:
-    file: lib/DiskUsage/Cache.pm
-  DiskUsage::SNMP:
-    file: lib/DiskUsage/SNMP.pm
-resources:
-  license: http://dev.perl.org/licenses/
-version: v0.01
