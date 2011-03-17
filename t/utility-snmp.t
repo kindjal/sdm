@@ -35,6 +35,7 @@ my $mount_path;
 my $group;
 
 $obj = System::Utility::SNMP->create();
+
 throws_ok { $obj->connect_snmp("foohost"); } qr/SNMP failed/, "test_connect: fails ok on bad host";
 lives_ok { $obj->connect_snmp("ntap11"); } "test_connect: ok on nost nap11";
 
@@ -93,6 +94,7 @@ $host = "nfs11";
 $physical_path = "/vol/sata840";
 $mount_path = "/gscmnt/sata840";
 lives_ok { $obj->connect_snmp($host); } "test_snmp_get_disk_group: connect ok";
+lives_ok { $result = $obj->query_snmp( { filer => $host, physical_path => $physical_path } ); } "query_snmp: runs ok";
 lives_ok { $group = $obj->get_disk_group($physical_path,$mount_path); } "test_snmp_get_disk_group: query ok";
 #ok( $group eq "INFO_GENOME_MODELS", "test_snmp_get_disk_group: answer ok");
 
