@@ -118,12 +118,14 @@ sub run {
         if ($v->total_kb) {
             $capacity = sprintf("%d %%", $v->used_kb / $v->total_kb * 100 );
         }
+        my $filername = join(',',$v->filername);
+        $filername = 'unknown' if (! defined $filername);
         push @aaData, [
             $v->mount_path,
             System::Disk::View::Lib::commify($v->total_kb) . " (" . System::Disk::View::Lib::short($v->total_kb) . ")",
             System::Disk::View::Lib::commify($v->used_kb) . " (" . System::Disk::View::Lib::short($v->used_kb) . ")",
             $capacity,
-            $v->filername ? $v->filername : 'unknown',
+            $filername,
             $v->disk_group ? $v->disk_group : 'unknown',
             $v->last_modified ? $v->last_modified : 'unknown'
         ];
