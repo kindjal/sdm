@@ -66,10 +66,16 @@ class System::Disk::Filer::Command::Usage {
       doc => 'Check currency status',
     },
     filer => {
-      is => 'System::Disk::Filer',
-      id_by => 'name',
+      # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
+      # If I use is => Text, then I can use get_or_create to add on the fly.
+      #is => 'System::Disk::Filer',
+      is => 'Text',
       doc => 'SNMP query the named filer',
-    }
+    },
+    physical_path => {
+      is => 'Text',
+      doc => 'SNMP query the named filer for this export',
+    },
   ],
   doc => 'Queries volume usage via SNMP',
 };
@@ -94,48 +100,53 @@ sub update_volume {
     my $self = shift;
     my $filer = shift;
     my $volumedata = shift;
-    ### update_volume for filer: $filer
+    ### Usage update_volume for filer: $filer
 
     unless ($filer) {
         $self->error_message("No filer given");
         return;
     }
 
-    ### First find and remove volumes in the DB that are not detected on this filer
-    # Now, for this filer, find any stored volumes that aren't present
-    # in the volumedata retrieved via SNMP.
-    foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
-        my $path = $volume->mount_path;
-        $path =~ s/\//\\\//g;
-        # FIXME: do we want to auto-remove like this?
-        if ( ! grep /$path/, keys %$volumedata ) {
-            $volume->delete;
+    unless ($self->physical_path) {
+        ### Usage First find and remove volumes in the DB that are not detected on this filer
+        # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
+        # Note that we skip this step if we specified a single physical_path to update.
+        foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
+            my $path = $volume->mount_path;
+            $path =~ s/\//\\\//g;
+            # FIXME: do we want to auto-remove like this?
+            if ( ! grep /$path/, keys %$volumedata ) {
+                $volume->delete;
+            }
         }
+        return if ($self->cleanonly);
     }
-    return if ($self->cleanonly);
 
     foreach my $physical_path (keys %$volumedata) {
-        ### update physical_path: $physical_path
+        ### Usage update physical_path: $physical_path
         # FIXME: How can we know the mount path aside from convention?
         my $mount_path = '/gscmnt/' . basename $physical_path;
-        my $params = { filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path };
-        my $volume = System::Disk::Volume->get_or_create( $params );
-        ### params: $params
-        ### volume returned: $volume
+        my $volume = System::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path );
+
+        # FIXME: This commit() should not be required.  UR bug?
+        UR::Context->commit();
+        ### Usage UR commit here
+
+        ### Usage volume returned: $volume
         unless ($volume) {
-            $self->error_message("Failed to get_or_create volume: " . Data::Dumper::Dumper $params);
+            $self->error_message("Failed to get_or_create volume");
             return;
         }
-        ### volume: $volume
-        ### volumedata: $volumedata
+        ### Usage volume: $volume
+        ### Usage volumedata: $volumedata
 
         foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
            # FIXME: Don't update disk group from filesystem, only the reverse.
            #next if ($attr eq 'disk_group');
            my $p = $volume->__meta__->property($attr);
            # Primary keys are immutable, don't try to update them
-           ### update volume attr: $attr
-           ### p: $p
+           ### Usage update volume attr: $attr
+           ### Usage p: $p
            $volume->$attr($volumedata->{$physical_path}->{$attr})
              if (! $p->is_id and $p->is_mutable);
            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
@@ -145,7 +156,7 @@ sub update_volume {
 
 sub fetch_aging_volumes {
     my $self = shift;
-    ### fetch_aging_volumes
+    ### Usage fetch_aging_volumes
     $self->error_message("max age has not been specified\n")
         if (! defined $self->vol_maxage);
     $self->error_message("max age makes no sense: $self->vol_maxage\n")
@@ -158,7 +169,7 @@ sub fetch_aging_volumes {
 }
 
 sub validate_volumes {
-    ### validate_volumes
+    ### Usage validate_volumes
     # See if we have volumes that haven't been updated since maxage.
     my $self = shift;
     foreach my $volume ($self->fetch_aging_volumes()) {
@@ -168,7 +179,7 @@ sub validate_volumes {
 
 sub purge_volumes {
     # FIXME: implement
-    ### purge_volumes
+    ### Usage purge_volumes
     my $self = shift;
     foreach my $volume ($self->fetch_aging_volumes()) {
         $volume->delete();
@@ -176,33 +187,41 @@ sub purge_volumes {
 }
 
 sub execute {
-    ### execute Usage
+    ### Usage execute Usage
     my $self = shift;
 
     my @filers;
     if (defined $self->filer) {
-        push @filers, $self->filer;
+        @filers = System::Disk::Filer->get_or_create( name => $self->filer );
     } else {
         @filers = System::Disk::Filer->get( status => 1 );
     }
 
+    if (defined $self->physical_path) {
+        unless ($self->filer) {
+            $self->error_message("Specify a filer to query for physical_path: " . $self->physical_path);
+            return;
+        }
+    }
+
     foreach my $filer (@filers) {
-        ### filer: $filer
+        ### Usage foreach loop at: $filer
         # Just check is_current
         if ($self->is_current) {
             if ($filer->is_current($self->host_maxage)) {
-                $self->warning_message("Filer $filer is current");
+                $self->warning_message("Filer $filer->name is current");
             } else {
-                $self->warning_message("Filer $filer is NOT current, last check: " . $filer->last_modified);
+                $self->warning_message("Filer $filer->name is NOT current, last check: $filer->last_modified");
             }
             next;
         }
 
         # Update any filers that are not current
         my $result = {};
+        my $params = { filer => $filer->name, physical_path => $self->physical_path };
         eval {
             my $snmp = System::Utility::SNMP->create();
-            $result = $snmp->query_snmp($filer->name);
+            $result = $snmp->query_snmp($params);
         };
         if ($@) {
             # log here, but not high priority, it's common
@@ -216,7 +235,7 @@ sub execute {
             $self->update_volume( $filer, $result );
         }
     }
-    ### execute Usage complete
+    ### Usage execute Usage complete
 }
 
 1;
