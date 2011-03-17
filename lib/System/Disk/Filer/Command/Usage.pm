@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use System;
-use Smart::Comments;
 
 # Checking currentness in host_is_current()
 use Date::Manip;
@@ -21,6 +20,8 @@ use System::Utility::SNMP;
 
 # Autoflush
 local $| = 1;
+
+use Smart::Comments -ENV;
 
 class System::Disk::Filer::Command::Usage {
   is => 'System::Command::Base',
@@ -76,6 +77,10 @@ class System::Disk::Filer::Command::Usage {
       is => 'Text',
       doc => 'SNMP query the named filer for this export',
     },
+    query_paths => {
+      is => 'Boolean',
+      doc => 'SNMP query the named filer for exports, but not usage',
+    },
   ],
   doc => 'Queries volume usage via SNMP',
 };
@@ -107,15 +112,23 @@ sub update_volume {
         return;
     }
 
+    $self->warning_message("Update filer " . $filer->name);
+
     unless ($self->physical_path) {
         ### Usage First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
         foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
-            my $path = $volume->mount_path;
+            my $path = $volume->physical_path;
+            next unless($path);
             $path =~ s/\//\\\//g;
             # FIXME: do we want to auto-remove like this?
             if ( ! grep /$path/, keys %$volumedata ) {
+                foreach my $m (System::Disk::Mount->get( $volume->id )) {
+                    ### Usage delete mount: $m
+                    $m->delete;
+                }
+                ### Usage delete volume: $volume
                 $volume->delete;
             }
         }
@@ -127,10 +140,6 @@ sub update_volume {
         # FIXME: How can we know the mount path aside from convention?
         my $mount_path = '/gscmnt/' . basename $physical_path;
         my $volume = System::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path );
-
-        # FIXME: This commit() should not be required.  UR bug?
-        UR::Context->commit();
-        ### Usage UR commit here
 
         ### Usage volume returned: $volume
         unless ($volume) {
@@ -173,7 +182,7 @@ sub validate_volumes {
     # See if we have volumes that haven't been updated since maxage.
     my $self = shift;
     foreach my $volume ($self->fetch_aging_volumes()) {
-        $self->warning_message("Aging volume: $volume->filername $volume->mount_path\n");
+        $self->warning_message("Aging volume: " . $volume->filername . " " . $volume->mount_path);
     }
 }
 
@@ -207,11 +216,12 @@ sub execute {
     foreach my $filer (@filers) {
         ### Usage foreach loop at: $filer
         # Just check is_current
+        $self->warning_message("Query filer " . $filer->name);
         if ($self->is_current) {
             if ($filer->is_current($self->host_maxage)) {
-                $self->warning_message("Filer $filer->name is current");
+                $self->warning_message("Filer " . $filer->name . " is current");
             } else {
-                $self->warning_message("Filer $filer->name is NOT current, last check: $filer->last_modified");
+                $self->warning_message("Filer " . $filer->name . " is NOT current, last check: " . $filer->last_modified);
             }
             next;
         }
