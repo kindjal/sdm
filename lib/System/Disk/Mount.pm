@@ -1,8 +1,6 @@
 
 package System::Disk::Mount;
 
-use Smart::Comments;
-
 class System::Disk::Mount {
     table_name => 'DISK_MOUNT',
     id_by => [

@@ -6,7 +6,8 @@ use warnings;
 
 use Date::Manip;
 use System;
-use Smart::Comments;
+
+use Smart::Comments -ENV;
 
 class System::Disk::Volume {
     table_name => 'DISK_VOLUME',
@@ -20,8 +21,8 @@ class System::Disk::Volume {
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
         mounts        => { is => 'System::Disk::Mount', reverse_as => 'volume' },
         filername     => { via => 'mounts' },
+        physical_path => { via => 'mounts' },
         exports       => { is => 'System::Disk::Export', reverse_as => 'volume' },
-        physical_path => { via => 'exports' },
     ],
     has_optional => [
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },

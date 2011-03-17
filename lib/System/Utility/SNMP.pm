@@ -11,7 +11,6 @@ use POSIX;
 use Net::SNMP;
 use Data::Dumper;
 use Log::Log4perl qw/:levels/;
-use Smart::Comments;
 
 # Autoflush
 local $| = 1;
