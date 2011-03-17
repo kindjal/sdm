@@ -1,6 +1,8 @@
 
 package System::Disk::Mount;
 
+use Smart::Comments;
+
 class System::Disk::Mount {
     table_name => 'DISK_MOUNT',
     id_by => [
@@ -17,3 +19,4 @@ class System::Disk::Mount {
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };
+

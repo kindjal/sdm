@@ -53,252 +53,252 @@ class System::Utility::SNMP {
     is => 'System::Command::Base',
     has_optional => [
       snmp_session => { is => 'Object', default => undef },
-      no_snmp => { is => 'Number', default => 0 },
-      timeout => { is => 'Number', default => 15 },
-      hosttype => { is => 'Text', default => undef },
-      groups => { is => 'List', default => undef },
+      no_snmp      => { is => 'Number', default => 0 },
+      timeout      => { is => 'Number', default => 15 },
+      hosttype     => { is => 'Text', default => undef },
+      groups       => { is => 'List', default => undef },
     ],
 };
 
-#sub create {
-#  my ($class,%params) = @_;
-#  my $self = $class->SUPER::create(%params);
-#  return $self;
-#}
-
 sub error {
-  my $self = shift;
-  die "@_";
+    my $self = shift;
+    die "@_";
 }
 
 sub snmp_get_request {
-  my $self = shift;
-  my $args = shift;
-  my $result = {};
-  ### snmp_get_request: $args
-  eval {
-    $result = $self->{snmp_session}->get_request(-varbindlist => $args );
-  };
-  if ($@ or length($self->{snmp_session}->error())) {
-    $self->error("SNMP error in request: $@: " . $self->{snmp_session}->error());
-  }
-  return $result;
+    my $self = shift;
+    my $args = shift;
+    my $result = {};
+    ### SNMP snmp_get_request: $args
+    eval {
+        $result = $self->{snmp_session}->get_request(-varbindlist => $args );
+    };
+    if ($@ or length($self->{snmp_session}->error())) {
+        $self->error("SNMP error in request: $@: " . $self->{snmp_session}->error());
+    }
+    return $result;
 }
 
 sub snmp_get_serial_request {
-  # This is a subroutine that hacks around limitations in get_table.
-  # get_table will periodically fail because message sizes are bigger
-  # or smaller than expected:
-  #  /Unexpected end of message/
-  #  /Message size exceeded/
-  # Using this, we read OIDs incrementally until we get noSuchInstance.
-  my $self = shift;
-  my $baseoid = shift;
-  my $result = {};
-  my $res = {};
+    # This is a subroutine that hacks around limitations in get_table.
+    # get_table will periodically fail because message sizes are bigger
+    # or smaller than expected:
+    #  /Unexpected end of message/
+    #  /Message size exceeded/
+    # Using this, we read OIDs incrementally until we get noSuchInstance.
+    my $self = shift;
+    my $baseoid = shift;
+    my $result = {};
+    my $res = {};
 
-  ### snmp_get_serial_request: $baseoid
-  my $idx = 1;
-  while (1) {
-    eval {
-      $res = $self->{snmp_session}->get_request(-varbindlist => [ $baseoid . ".$idx" ]);
-    };
-    if ($@ or length($self->{snmp_session}->error())) {
-      $self->error("SNMP error in serial request: " . $self->{snmp_session}->error());
+    ### SNMP snmp_get_serial_request: $baseoid
+    my $idx = 1;
+    while (1) {
+        eval {
+            $res = $self->{snmp_session}->get_request(-varbindlist => [ $baseoid . ".$idx" ]);
+        };
+        if ($@ or length($self->{snmp_session}->error())) {
+            $self->error("SNMP error in serial request: " . $self->{snmp_session}->error());
+        }
+        # Get a single value and if it isn't noSuchInstance, merge it
+        # into the result hash.
+        my $group = pop @{ [ values %$res ] };
+        last if ( $group =~ /noSuch(Instance|Object)/i );
+        $result->{ pop @{ [ keys %$res ] } } = pop @{ [ values %$res ] }
+        if (defined $res and ref $res eq 'HASH');
+        $idx++;
     }
-    # Get a single value and if it isn't noSuchInstance, merge it
-    # into the result hash.
-    my $group = pop @{ [ values %$res ] };
-    last if ( $group =~ /noSuch(Instance|Object)/i );
-    $result->{ pop @{ [ keys %$res ] } } = pop @{ [ values %$res ] }
-      if (defined $res and ref $res eq 'HASH');
-    $idx++;
-  }
-  return $result;
+    return $result;
 }
 
 sub snmp_get_table {
-  my $self = shift;
-  my $baseoid = shift;
-  my $result = {};
-  ### snmp_get_table: $baseoid
-  eval {
-    $result = $self->{snmp_session}->get_table(-baseoid => $baseoid);
-  };
-  if ($@ or length($self->{snmp_session}->error())) {
-    $self->error("SNMP error in table request: " . $self->{snmp_session}->error());
-  }
-  return $result;
+    my $self = shift;
+    my $baseoid = shift;
+    my $result = {};
+    ### SNMP snmp_get_table: $baseoid
+    eval {
+        $result = $self->{snmp_session}->get_table(-baseoid => $baseoid);
+    };
+    if ($@ or length($self->{snmp_session}->error())) {
+        $self->error("SNMP error in table request: " . $self->{snmp_session}->error());
+    }
+    return $result;
 }
 
 sub type_string_to_type {
-  my $self = shift;
-  my $typestr = shift;
-  ### type_string_to_type: $typestr
-  # List of regexes that map sysDescr to a system type
-  my %dispatcher = (
-    qw/^Linux/ => 'linux',
-    qw/^NetApp/ => 'netapp',
-  );
+    my $self = shift;
+    my $typestr = shift;
+    ### SNMP type_string_to_type: $typestr
+    # List of regexes that map sysDescr to a system type
+    my %dispatcher = (
+            qw/^Linux/ => 'linux',
+            qw/^NetApp/ => 'netapp',
+            );
 
-  foreach my $regex (keys %dispatcher) {
-    if ($typestr =~ $regex) {
-      return $dispatcher{$regex};
+    foreach my $regex (keys %dispatcher) {
+        if ($typestr =~ $regex) {
+            return $dispatcher{$regex};
+        }
     }
-  }
 
-  $self->error("No such host type defined for: $typestr");
+    $self->error("No such host type defined for: $typestr");
 }
 
 sub get_host_type {
-  my $self = shift;
-  my $sess = $self->{snmp_session};
+    my $self = shift;
+    my $sess = $self->{snmp_session};
 
-  ### get_host_type
+    ### SNMP get_host_type
 
-  return $self->{hosttype}
+    return $self->{hosttype}
     if (defined $self->{hosttype});
 
-  my $res = $self->snmp_get_request( [ $oids->{'sysDescr'} ] );
-  my $typestr = pop @{ [ values %$res ] };
+    my $res = $self->snmp_get_request( [ $oids->{'sysDescr'} ] );
+    my $typestr = pop @{ [ values %$res ] };
 
-  $self->{hosttype} = $self->type_string_to_type($typestr);
-  ### host is type: $self->{hosttype}
-  return $self->{hosttype};
+    $self->{hosttype} = $self->type_string_to_type($typestr);
+    ### SNMP host is type: $self->{hosttype}
+    return $self->{hosttype};
 }
 
 sub netapp_int32 {
-  my $self = shift;
-  my $low = shift;
-  my $high = shift;
-  if ($low >= 0) {
-    return $high * 2**32 + $low;
-  }
-  if ($low < 0) {
-    return ($high + 1) * 2**32 + $low;
-  }
+    my $self = shift;
+    my $low = shift;
+    my $high = shift;
+    if ($low >= 0) {
+        return $high * 2**32 + $low;
+    }
+    if ($low < 0) {
+        return ($high + 1) * 2**32 + $low;
+    }
 }
 
 sub get_snmp_disk_usage {
-  my $self = shift;
-  my $result = shift;
+    my $self = shift;
+    my $result = shift;
+    my $physical_path = shift;
 
-  ### get_snmp_disk_usage
+    ### SNMP get_snmp_disk_usage
 
-  # Need to know what sort of host this is to see what SNMP tables to ask for.
-  my $host_type = $self->get_host_type();
+    # Need to know what sort of host this is to see what SNMP tables to ask for.
+    my $host_type = $self->get_host_type();
 
-  # Fetch all volumes on target host
-  ### fetch list of volumes
-  my $ref;
-  if ($host_type eq 'netapp') {
-    # NetApp is different than Linux
-    #$ref = $self->snmp_get_serial_request( $oids->{$host_type}->{'dfFileSys'} );
-    $ref = $self->snmp_get_table( $oids->{$host_type}->{'dfFileSys'} );
-  } else {
-    #$ref = $self->snmp_get_serial_request( $oids->{$host_type}->{'hrStorageDescr'} );
-    $ref = $self->snmp_get_table( $oids->{$host_type}->{'hrStorageDescr'} );
-  }
-
-  # Iterate over all volumes and get consumption info.
-  ### get consumption of each volume...
-  foreach my $volume_path_oid (keys %$ref) {
-    ### volume oid $volume_path_oid
-
-    # Determine if the Filer exports Volumes that we care to track.
-    # This is determined by a naming scheme that start with one of
-    # the set of @prefixes.
-    my $prefix_rx = '(' . join('|',@prefixes) . ')';
-    if (defined $ref->{$volume_path_oid} and $ref->{$volume_path_oid} =~ /^$prefix_rx/) {
-
-      my $id = pop @{ [ split /\./, $volume_path_oid ] };
-
-      # FIXME This is a mess...
-
-      # Create arg list for SNMP, what to ask for.
-      my @args;
-      my @items;
-      if ($host_type eq 'netapp') {
-        # NetApps do this
-        @items = ('dfHighTotalKbytes','dfLowTotalKbytes','dfHighUsedKbytes','dfLowUsedKbytes');
-      } else {
-        # Linux boxes do this
-        @items = ('hrStorageUsed','hrStorageSize','hrStorageAllocationUnits');
-      }
-      foreach my $item (@items) {
-        my $oid = $oids->{$host_type}->{$item} . ".$id";
-        push @args, $oid;
-      }
-
-      # Query SNMP
-      my $disk = $self->snmp_get_request( \@args );
-
-      my $total;
-      my $used;
-
-      # Convert result blocks to bytes
-      if ($host_type eq 'netapp') {
-        # Fix 32 bit integer stuff
-        my $low = $disk->{$oids->{$host_type}->{'dfLowTotalKbytes'} . ".$id"};
-        my $high = $disk->{$oids->{$host_type}->{'dfHighTotalKbytes'} . ".$id"};
-        $total = $self->netapp_int32($low,$high);
-
-        $low = $disk->{$oids->{$host_type}->{'dfLowUsedKbytes'} . ".$id"};
-        $high = $disk->{$oids->{$host_type}->{'dfHighUsedKbytes'} . ".$id"};
-        $used = $self->netapp_int32($low,$high);
-
-      } else {
-        # Correct for block size
-        my $correction = $disk->{$oids->{$host_type}->{'hrStorageAllocationUnits'} . ".$id"} / 1024;
-        $total = $disk->{$oids->{$host_type}->{'hrStorageSize'} . ".$id"} * $correction;
-        $used = $disk->{$oids->{$host_type}->{'hrStorageUsed'} . ".$id"} * $correction;
-      }
-
-      # Empty hash if not present
-      $result->{$ref->{$volume_path_oid}} = {} if (! defined $result->{$ref->{$volume_path_oid}} );
-
-      # Add mount point
-      ### get mount point of volume: $ref->{$volume_path_oid}
-      $result->{$ref->{$volume_path_oid}}->{'mount_path'} = $self->get_mount_point($ref->{$volume_path_oid});
-      ### result: $result->{$ref->{$volume_path_oid}}->{'mount_path'}
-
-      # The last digit in the OID is the volume we want
-
-      # Account for reported block size in size calculation, track in KB
-      # Correct for signed 32 bit INTs
-      $result->{$ref->{$volume_path_oid}}->{'used_kb'} = $used;
-      $result->{$ref->{$volume_path_oid}}->{'total_kb'} = $total;
-      $result->{$ref->{$volume_path_oid}}->{'physical_path'} = $ref->{$volume_path_oid};
+    # Fetch all volumes on target host
+    ### SNMP fetch list of volumes
+    my $ref;
+    if ($host_type eq 'netapp') {
+        # NetApp is different than Linux
+        #$ref = $self->snmp_get_serial_request( $oids->{$host_type}->{'dfFileSys'} );
+        $ref = $self->snmp_get_table( $oids->{$host_type}->{'dfFileSys'} );
     } else {
-      ### ignoring: $ref->{$volume_path_oid}
+        #$ref = $self->snmp_get_serial_request( $oids->{$host_type}->{'hrStorageDescr'} );
+        $ref = $self->snmp_get_table( $oids->{$host_type}->{'hrStorageDescr'} );
     }
-  }
+
+    # Iterate over all volumes and get consumption info.
+    ### SNMP get consumption of each volume...
+    foreach my $volume_path_oid (keys %$ref) {
+        ### SNMP volume oid: $volume_path_oid
+        ###   value: $ref->{$volume_path_oid}
+
+        # This isn't the path we're looking for
+        next if (defined $physical_path and $ref->{$volume_path_oid} ne $physical_path);
+
+        # Determine if the Filer exports Volumes that we care to track.
+        # This is determined by a naming scheme that start with one of
+        # the set of @prefixes.
+        # FIXME: Remove use of hardcoded list of prefixes
+        my $prefix_rx = '(' . join('|',@prefixes) . ')';
+        if (defined $ref->{$volume_path_oid} and $ref->{$volume_path_oid} =~ /^$prefix_rx/) {
+
+            my $id = pop @{ [ split /\./, $volume_path_oid ] };
+
+            # FIXME This is a mess...
+
+            # Create arg list for SNMP, what to ask for.
+            my @args;
+            my @items;
+            if ($host_type eq 'netapp') {
+                # NetApps do this
+                @items = ('dfHighTotalKbytes','dfLowTotalKbytes','dfHighUsedKbytes','dfLowUsedKbytes');
+            } else {
+                # Linux boxes do this
+                @items = ('hrStorageUsed','hrStorageSize','hrStorageAllocationUnits');
+            }
+            foreach my $item (@items) {
+                my $oid = $oids->{$host_type}->{$item} . ".$id";
+                push @args, $oid;
+            }
+
+            # Query SNMP
+            my $disk = $self->snmp_get_request( \@args );
+
+            my $total;
+            my $used;
+
+            # Convert result blocks to bytes
+            if ($host_type eq 'netapp') {
+                # Fix 32 bit integer stuff
+                my $low = $disk->{$oids->{$host_type}->{'dfLowTotalKbytes'} . ".$id"};
+                my $high = $disk->{$oids->{$host_type}->{'dfHighTotalKbytes'} . ".$id"};
+                $total = $self->netapp_int32($low,$high);
+
+                $low = $disk->{$oids->{$host_type}->{'dfLowUsedKbytes'} . ".$id"};
+                $high = $disk->{$oids->{$host_type}->{'dfHighUsedKbytes'} . ".$id"};
+                $used = $self->netapp_int32($low,$high);
+
+            } else {
+                # Correct for block size
+                my $correction = $disk->{$oids->{$host_type}->{'hrStorageAllocationUnits'} . ".$id"} / 1024;
+                $total = $disk->{$oids->{$host_type}->{'hrStorageSize'} . ".$id"} * $correction;
+                $used = $disk->{$oids->{$host_type}->{'hrStorageUsed'} . ".$id"} * $correction;
+            }
+
+            # Empty hash if not present
+            $result->{$ref->{$volume_path_oid}} = {} if (! defined $result->{$ref->{$volume_path_oid}} );
+
+            # Add mount point
+            ### SNMP get mount point of volume: $ref->{$volume_path_oid}
+            $result->{$ref->{$volume_path_oid}}->{'mount_path'} = $self->get_mount_point($ref->{$volume_path_oid});
+            ### SNMP result: $result->{$ref->{$volume_path_oid}}->{'mount_path'}
+
+            # The last digit in the OID is the volume we want
+
+            # Account for reported block size in size calculation, track in KB
+            # Correct for signed 32 bit INTs
+            $result->{$ref->{$volume_path_oid}}->{'used_kb'} = $used;
+            $result->{$ref->{$volume_path_oid}}->{'total_kb'} = $total;
+            $result->{$ref->{$volume_path_oid}}->{'physical_path'} = $ref->{$volume_path_oid};
+        } else {
+            ### SNMP ignoring: $ref->{$volume_path_oid}
+        }
+    }
 }
 
 sub get_mount_point {
-  # Map a volume to a mount point.
+    # Map a volume to a mount point.
 
-  my $self = shift;
-  my $volume = shift;
+    my $self = shift;
+    my $volume = shift;
 
-  # This is a noisy place for a smart comment
-  # get_mount_point
+    # This is a noisy place for a smart comment
+    # get_mount_point
 
-  # These mount points are agreed upon by convention.
-  # Return empty if the $volume is shorter than the
-  # hash keys, preventing a substr() error on too short mounts.
-  return '' if (length($volume) <= 4);
-  my $mapping = {
-    qr|^/vol| => "/gscmnt" . substr($volume,4),
-    qr|^/home(\d+)| => "/gscmnt" . substr($volume,5),
-    qr|^/gpfs(\S+)| => $volume,
-  };
+    # These mount points are agreed upon by convention.
+    # Return empty if the $volume is shorter than the
+    # hash keys, preventing a substr() error on too short mounts.
+    return '' if (length($volume) <= 4);
+    my $mapping = {
+        qr|^/vol| => "/gscmnt" . substr($volume,4),
+        qr|^/home(\d+)| => "/gscmnt" . substr($volume,5),
+        qr|^/gpfs(\S+)| => $volume,
+    };
 
-  foreach my $rx (keys %$mapping) {
-    return $mapping->{$rx}
-      if ($volume =~ /$rx/);
-  }
-  $self->error("No mount point found for volume: $volume\n");
+    foreach my $rx (keys %$mapping) {
+        return $mapping->{$rx}
+        if ($volume =~ /$rx/);
+    }
+    $self->error("No mount point found for volume: $volume\n");
 }
 
 sub get_disk_groups_via_snmp {
@@ -306,7 +306,7 @@ sub get_disk_groups_via_snmp {
   my $physical_path = shift;
   my $mount_path = shift;
 
-  ### get_disk_groups_via_snmp
+  ### SNMP get_disk_groups_via_snmp
 
   # Try SNMP for linux hosts, which may have been configured to
   # report disk group touch files via SNMP.  Save the result so
@@ -319,20 +319,20 @@ sub get_disk_groups_via_snmp {
     if ($@ or length($self->{snmp_session}->error())) {
       my $msg = $self->{snmp_session}->error();
       if ($msg =~ /No response/) {
-        ### took too long looking for groups via snmp...proceeding
+        ### SNMP took too long looking for groups via snmp...proceeding
       } elsif ($msg =~ /table is empty/) {
-        ### this host doesn't serve groups via snmp...proceeding
+        ### SNMP this host doesn't serve groups via snmp...proceeding
         $self->{no_snmp} = 1;
       } elsif ($msg =~ /Message size exceeded/) {
         my $size = $self->{snmp_session}->max_msg_size();
         return if ($size == 12000); # don't do this twice
-        ### query snmp again with larger message size...
+        ### SNMP query snmp again with larger message size...
         $self->{snmp_session}->max_msg_size(12000); # try larger size
         return $self->get_disk_groups_via_snmp($physical_path,$mount_path);
       } elsif ($msg =~ /Unexpected end of/) {
         my $size = $self->{snmp_session}->max_msg_size();
         return if ($size == 12000); # don't do this twice
-        ### query snmp again with larger message size...
+        ### SNMP query snmp again with larger message size...
         $self->{snmp_session}->max_msg_size(12000); # try larger size
         return $self->get_disk_groups_via_snmp($physical_path,$mount_path);
       } else {
@@ -347,7 +347,7 @@ sub lookup_disk_group_via_snmp {
   my $physical_path = shift;
   my $mount_path = shift;
 
-  ### lookup_disk_group_via_snmp($physical_path,$mount_path)
+  ### SNMP lookup_disk_group_via_snmp($physical_path,$mount_path)
 
   $self->get_disk_groups_via_snmp($physical_path,$mount_path)
     if (! defined $self->{groups});
@@ -357,9 +357,9 @@ sub lookup_disk_group_via_snmp {
     my $dirname = $1;
     my $group_name = $2;
     if ($dirname eq $physical_path) {
-      ### snmp says:
-      ###  mount path: $mount_path
-      ###  group name: $group_name
+      ### SNMP snmp says:
+      ###  SNMP mount path: $mount_path
+      ###  SNMP group name: $group_name
       return $group_name;
     }
   }
@@ -367,15 +367,14 @@ sub lookup_disk_group_via_snmp {
 }
 
 sub get_disk_group {
-  # Look on a mount point for a DISK_ touch file.
   my $self = shift;
   my $physical_path = shift;
   my $mount_path = shift;
   my $group_name;
 
-  ### get_disk_group:
-  ###   physical_path: $physical_path
-  ###   mount_path: $mount_path
+  ### SNMP get_disk_group:
+  ###   SNMP physical_path: $physical_path
+  ###   SNMP mount_path: $mount_path
 
   # Does the cache already have the disk group name?
   my $res = System::Disk::Volume->get( mount_path => $mount_path );
@@ -383,14 +382,14 @@ sub get_disk_group {
   if (defined $res) {
       $group_name = $res->disk_group;
       if (defined $group_name) {
-          ### mount path X is cached for Y:
-          ###   mount_path: $mount_path
-          ###   group_name: $group_name
+          ### SNMP mount path X is cached for Y:
+          ###   SNMP mount_path: $mount_path
+          ###   SNMP group_name: $group_name
           return $group_name;
       }
   }
 
-  ### no group known for: $mount_path
+  ### SNMP no group currently known for: $mount_path
 
   # Special case of '.snapshot' mounts
   my $base = basename $physical_path;
@@ -410,7 +409,7 @@ sub get_disk_group {
   return 'unknown';
 
   # FIXME: This should be optional or replaced or something
-  ###: mount this path: $mount_path
+  ###: SNMP mount this path: $mount_path
 
   # This will actually mount a mount point via automounter.
   # Be careful to not overwhelm NFS servers.
@@ -422,9 +421,9 @@ sub get_disk_group {
     $group_name = 'unknown';
   }
 
-  ### mount path is group:
-  ###    mount path : $mount_path
-  ###    group: $group_name
+  ### SNMP mount path is group:
+  ### SNMP   mount path : $mount_path
+  ### SNMP   group: $group_name
 
   return $group_name;
 }
@@ -436,7 +435,7 @@ sub connect_snmp {
   my $timeout = int($self->{timeout});
   my $debug = 0x0;
 
-  ### connect_snmp: $host
+  ### SNMP connect_snmp: $host
 
   # SNMP connection debugging
   #$debug = 0x20
@@ -472,13 +471,16 @@ sub connect_snmp {
 
 sub query_snmp {
   my $self = shift;
-  my $host = shift;
+  my $params = shift;
+  ### SNMP query_snmp: $params
+  my $host = $params->{filer};
+  my $physical_path = $params->{physical_path};
   my $result = {};
 
   $self->connect_snmp($host);
 
   # Query SNMP for df stats
-  $self->get_snmp_disk_usage($result);
+  $self->get_snmp_disk_usage($result,$physical_path);
 
   # FIXME: gets multiple results
   #foreach my $physical_path (keys %$result) {

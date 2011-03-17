@@ -35,6 +35,13 @@ class System::Disk::Volume {
     data_source => 'System::DataSource::Disk',
 };
 
+sub _new {
+    # This new() method is only for testing.  Don't use it!
+    my $class = shift;
+    my $self = $class->SUPER::create( @_ );
+    return $self;
+}
+
 sub is_current {
     my $self = shift;
     my $vol_maxage = shift;
@@ -82,63 +89,60 @@ sub purge {
 }
 
 sub get_or_create {
-    my ($self,$param) = @_;
-    ### Volume->get_or_create: $param
-    my $volume = System::Disk::Volume->get( mount_path => $param->{mount_path}, filername => $param->{filername}, physical_path => $param->{physical_path} );
+    my ($self,%param) = @_;
+    ### Volume->get_or_create: %param
+    my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     unless ($volume) {
-        $volume = $self->create( $param );
+        $volume = $self->create( %param );
     }
     return $volume;
 }
 
 sub create {
-    my ($self,$param) = @_;
-    ### Volume->create: $param
+    my ($self,%param) = @_;
+    ### Volume->create: %param
     # A fully defined Volume has, in order:
     #   - Filer->name
     #   - Export->filername + Export->physical_path
     #   - Volume->mount_path
     #   - Mount->volume_id + Mount->export_id
-    my $volume = System::Disk::Volume->get( mount_path => $param->{mount_path}, filername => $param->{filername}, physical_path => $param->{physical_path} );
+    my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     if ($volume) {
+        ### volume: $volume
         # This exact volume + mount exists
         $self->error_message("Volume already exists");
         return;
     }
-    ### Volume->create get volume: $volume
+    ### Volume->create volume->get: $volume
 
     # The exact volume doesn't exist, so make sure we have the Filer
-    my $filer = System::Disk::Filer->get_or_create( name => $param->{filername} );
+    my $filer = System::Disk::Filer->get_or_create( name => $param{filername} );
     unless ($filer) {
-        $self->error_message("Failed to add filer: " . $param->{filername});
+        $self->error_message("Failed to add filer: " . $param{filername});
         return;
     }
-    ### Volume->create get filer: $filer
+    ### Volume->create filer->get_or_create: $filer
 
     # Now make sure the Filer has the Export
-    my $export = System::Disk::Export->get_or_create( filername => $param->{filername}, physical_path => $param->{physical_path} );
+    my $export = System::Disk::Export->get_or_create( filername => $param{filername}, physical_path => $param{physical_path} );
     unless ($export) {
-        $self->error_message("Failed to add export: '" . $param->{filername} ." " . $param->{physical_path} );
+        $self->error_message("Failed to add export: '" . $param{filername} ." " . $param{physical_path} );
         return;
     }
-    ### Volume->create get export: $export
+    ### Volume->create export->get_or_create: $export
 
     # Now that we're sure that a Filer and Export exist, and that we don't already
     # have this exact Volume, we can add the Volume and/or Mount.
-    $volume = System::Disk::Volume->get( mount_path => $param->{mount_path} );
+    $volume = System::Disk::Volume->get( mount_path => $param{mount_path} );
     unless ($volume) {
         # No volume at all at this mount, add the volume then the mount.
-        $volume = $self->SUPER::create( mount_path => $param->{mount_path} );
+        $volume = $self->SUPER::create( mount_path => $param{mount_path} );
         unless ($volume) {
             $self->error_message("Unable to create volume");
             return;
         }
     }
-    ### Volume->create create volume: $volume
-
-    # FIXME: This commit() should not be required.  UR bug?
-    UR::Context->commit();
-    ### UR commit here
+    ### Volume->create volume->SUPER::create: $volume
 
     # Now that we have a Volume, ensure there's a mount (bridge table)
     # Mount is a bridge table between Volume and Filer.
@@ -147,7 +151,7 @@ sub create {
         $self->error_message("Failed to add mount for volume");
         return;
     }
-    ### Volume->create get_or_create mount: $mount
+    ### Volume->create mount->get_or_create: $mount
 
     ### Volume->create returns volume: $volume
     return $volume;
