@@ -141,6 +141,17 @@ sub update_volume {
         my $mount_path = '/gscmnt/' . basename $physical_path;
         my $volume = System::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path );
 
+        # Ensure we have the Group before we update this attribute of a Volume
+        my $group_name = $volumedata->{$physical_path}->{disk_group};
+        if ($group_name) {
+            my $group = System::Disk::Group->get_or_create( name => $volumedata->{$physical_path}->{disk_group} );
+            unless ($group) {
+                $self->error_message("Failed to get_or_create group: $group_name");
+                return;
+            }
+            ### Usage get_or_create group returned: $group
+        }
+
         ### Usage volume returned: $volume
         unless ($volume) {
             $self->error_message("Failed to get_or_create volume");
@@ -160,6 +171,9 @@ sub update_volume {
              if (! $p->is_id and $p->is_mutable);
            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
+
+        ### UR commit here
+        UR::Context->commit();
     }
 }
 
