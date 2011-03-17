@@ -11,6 +11,7 @@ use POSIX;
 use Net::SNMP;
 use Data::Dumper;
 use Log::Log4perl qw/:levels/;
+use Smart::Comments -ENV;
 
 # Autoflush
 local $| = 1;
@@ -482,9 +483,9 @@ sub query_snmp {
   $self->get_snmp_disk_usage($result,$physical_path);
 
   # FIXME: gets multiple results
-  #foreach my $physical_path (keys %$result) {
-  #  $result->{$physical_path}->{'disk_group'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
-  #}
+  foreach my $physical_path (keys %$result) {
+      $result->{$physical_path}->{'disk_group'} = $self->get_disk_group($physical_path,$result->{$physical_path}->{'mount_path'});
+  }
 
   return $result;
 }
