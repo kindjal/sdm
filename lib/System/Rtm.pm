@@ -6,7 +6,8 @@ use warnings;
 use System;
 
 class System::Rtm {
-    data_source => 'System::DataSource::Rtm',
+    is          => 'System::Command::Base',
+    doc         => 'Work with rtm',
 };
 
 1;
