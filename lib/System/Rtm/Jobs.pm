@@ -12,6 +12,20 @@ class System::Rtm::Jobs{
         clusterid   => { is => 'Number' },
         submit_time => { is => 'Number' },
     ],
+    has_optional => [
+        mount_path      => {
+            calculate_from => ['execCwd'],
+            calculate => sub { my ($execCwd) = shift; my @a = split('/',$execCwd); return join('/',$a[0],$a[1],$a[2]); },
+        },
+        volume          => { is => 'System::Disk::Volume',
+            calculate_from => 'mount_path',
+            calculate => q| return System::Disk::Volume->get(mount_path => $mount_path); |,
+        },
+        filername       => { is => 'Test',
+            calculate_from => 'volume',
+            calculate => q| return $volume->filername if (defined $volume); return 'unknown'; |,
+        },
+    ],
     has => [
         options         => { is => 'Number' },
         options2        => { is => 'Number' },
