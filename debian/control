@@ -1,0 +1,14 @@
+Source: system-namespace
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl (>= 5.9.5)
+Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/Object-Accessor/
+
+Package: system-namespace
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5)
+Description: A UR Object framework for System Management
+ A UR Object framework for System Management, notably for disk space management.
