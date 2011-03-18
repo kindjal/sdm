@@ -9,7 +9,7 @@ class System::Command {
     is => 'System::Command::Base',
 };
 
-my @SUB_COMMANDS = qw/ disk service /;
+my @SUB_COMMANDS = qw/ disk rtm service /;
 
 our %SUB_COMMAND_CLASSES =
     map {
