@@ -27,4 +27,11 @@ class System::Disk::Host {
     data_source => 'System::DataSource::Disk',
 };
 
+sub create {
+    my $self = shift;
+    my %params = @_;
+    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    return $self->SUPER::create( %params );
+}
+
 1;

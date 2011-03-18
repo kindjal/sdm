@@ -27,4 +27,11 @@ class System::Disk::Group {
     doc => 'Represents a disk group which contains any number of disk volumes',
 };
 
+sub create {
+    my $self = shift;
+    my %params = @_;
+    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    return $self->SUPER::create( %params );
+}
+
 1;

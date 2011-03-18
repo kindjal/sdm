@@ -56,4 +56,11 @@ sub is_current {
   return 0;
 }
 
+sub create {
+    my $self = shift;
+    my %params = @_;
+    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    return $self->SUPER::create( %params );
+}
+
 1;

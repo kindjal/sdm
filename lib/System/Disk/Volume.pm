@@ -107,6 +107,7 @@ sub create {
     #   - Export->filername + Export->physical_path
     #   - Volume->mount_path
     #   - Mount->volume_id + Mount->export_id
+    #   - Group->disk_group if present
     my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     if ($volume) {
         ### volume: $volume
@@ -132,12 +133,22 @@ sub create {
     }
     ### Volume->create export->get_or_create: $export
 
+    # If a group is specified, make sure we have that too
+    if ($param{group}) {
+        my $group = System::Disk::Group->get_or_create( name => $param{group} );
+        unless ($group) {
+            $self->error_message("Unable to create group: " . $param{group} );
+            return;
+        }
+    }
+
     # Now that we're sure that a Filer and Export exist, and that we don't already
     # have this exact Volume, we can add the Volume and/or Mount.
     $volume = System::Disk::Volume->get( mount_path => $param{mount_path} );
     unless ($volume) {
         # No volume at all at this mount, add the volume then the mount.
-        $volume = $self->SUPER::create( mount_path => $param{mount_path} );
+        $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+        $volume = $self->SUPER::create( mount_path => $param{mount_path}, used_kb => $param{used_kb}, total_kb => $param{total_kb}, disk_group => $param{disk_group}, created => $param{created} );
         unless ($volume) {
             $self->error_message("Unable to create volume");
             return;

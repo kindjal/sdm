@@ -47,7 +47,7 @@ sub _build_order_param {
             # translate the index into a column name.
             my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
             my $direction = $q->query_param('sSortDir_'.$i);
-            push @order, "$column_name";
+            push @order, "$column_name $direction";
         }
     }
     return @order;
@@ -68,7 +68,7 @@ sub _build_where_param {
                     $q->query_param($searchable_ident) and
                     $q->query_param($searchable_ident) eq 'true' ) {
                 my $column = $self->_fnColumnToField( $i );
-                push @where, { "$column like" => "%%$search_string%%" };
+                push @where, [ { "$column like" => "%$search_string%" } ];
             }
         }
     }
@@ -81,27 +81,23 @@ sub _build_result_set {
     # FIXME: we still want LIMIT and OFFSET.
     my ($self,$q) = @_;
     my $param = {};
-    my @where = $self->_build_where_param($q);
-    my @order = $self->_build_order_param($q);
-    if (scalar @where) {
-        $param->{ -or } = [ \@where ];
-    }
-    # FIXME: UR order can't do DEC
-    if (scalar @order) {
-        $param->{ -order } = \@order;
-    }
 
-    # FIXME: UR: Bug: order-by is clobbering group-by here
-    #my $set = System::Disk::Volume->define_set( $param );
-    my $set = System::Disk::Volume->define_set( );
+    # FIXME: UR returns a list of Volumes instead of a Set if I include @where
+    #my @where = $self->_build_where_param($q);
+    #if (scalar @where) {
+    #    $param->{ -or } = \@where;
+    #}
+
+    # FIXME: UR order-by seems broken and doesn't do DESC
+    #my @order = $self->_build_order_param($q);
+    #if (scalar @order) {
+    #    $param->{ -order_by } = \@order;
+    #}
+
+    # FIXME: UR: Bug: order-by and group-by broken?
+    my $set = System::Disk::Volume->define_set( $param );
     my @result = $set->group_by( 'disk_group' );
 
-    # Implement limit and offset here to make up for lack of feature in get();
-    sub max ($$) { int($_[ $_[0] < $_[1] ]) };
-    sub min ($$) { int($_[ $_[0] > $_[1] ]) };
-    my $limit  = $q->query_param('iDisplayLength') || 10;
-    my $offset = $q->query_param('iDisplayStart') || 0;
-    @result = @result[$offset..min($limit,$#result)];
     return @result;
 }
 
@@ -110,36 +106,54 @@ sub run {
     my ($self,$args) = @_;
 
     my $json = new JSON;
-    my @aaData;
-
     my $query = URI->new( $args->{REQUEST_URI} );
+    my @results = $self->_build_result_set( $query );
+    my $disk_group = {};
 
-    my @group_totals = $self->_build_result_set( $query );
-
-    foreach my $result ( @group_totals ) {
-        my $disk_group;
+    # FIXME: This could go away if UR did sum() and order/group right.
+    foreach my $result ( @results ) {
+        my $name;
         my $total_kb = 0;
         my $used_kb = 0;
-        foreach my $item ( $result->members ) {
-            $disk_group = $item->disk_group ? $item->disk_group : "unknown";
-            $total_kb += $item->total_kb;
-            $used_kb += $item->used_kb;
-        }
         my $capacity = 0;
-        if ($total_kb) {
-            $capacity = sprintf("%d %%", $used_kb / $total_kb * 100);
+        foreach my $item ( $result->members ) {
+            my $name = $item->disk_group;
+            $disk_group->{$name} = {}
+                unless ($disk_group->{$name});
+            $disk_group->{$name}->{total_kb} += $item->total_kb;
+            $disk_group->{$name}->{used_kb} += $item->used_kb;
+            if ( $disk_group->{$name}->{total_kb} ) {
+                $disk_group->{$name}->{capacity} = sprintf("%d %%", $disk_group->{$name}->{used_kb} / $disk_group->{$name}->{total_kb} * 100);
+            }
         }
+    }
+    # Now sort and prettify
+    my @order = $self->_build_order_param($query);
+    # FIXME: for now, single column sort
+    my ($order,$direction) = split(' ',$order[0]);
+    my @keys = sort { $disk_group->{$a}->{$order} <=> $disk_group->{$b}->{$order} } keys %$disk_group;
+    if ($direction eq 'desc') {
+        @keys = reverse @keys;
+    }
+    my @data;
+    my @aaData;
+    foreach my $name ( @keys ) {
         push @aaData, [
-            $disk_group,
-            System::Disk::View::Lib::commify($total_kb) . " (" . System::Disk::View::Lib::short($total_kb) . ")",
-            System::Disk::View::Lib::commify($used_kb) . " (" . System::Disk::View::Lib::short($used_kb) . ")",
-            $capacity,
+            $name,
+            System::Disk::View::Lib::commify($disk_group->{$name}->{total_kb}) . " (" . System::Disk::View::Lib::short($disk_group->{$name}->{total_kb}) . ")",
+            System::Disk::View::Lib::commify($disk_group->{$name}->{used_kb}) . " (" . System::Disk::View::Lib::short($disk_group->{$name}->{used_kb}) . ")",
+            $disk_group->{$name}->{capacity}
         ];
     }
 
+    # Implement limit and offset here to make up for lack of feature in get();
+    sub max ($$) { int($_[ $_[0] < $_[1] ]) };
+    sub min ($$) { int($_[ $_[0] > $_[1] ]) };
+    my $limit  = $query->query_param('iDisplayLength') || 10;
+    my $offset = $query->query_param('iDisplayStart') || 0;
+    my @group_totals = @results[$offset..min($limit,$#results)];
+
     my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
-    # FIXME: total count requires feature addition to UR
-    my @results = System::Disk::Volume->get();
     my $iTotal = scalar @results;
     my $iFilteredTotal = scalar @group_totals;
     my $sOutput = {

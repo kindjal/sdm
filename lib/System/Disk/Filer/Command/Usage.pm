@@ -130,6 +130,7 @@ sub update_volume {
                 }
                 ### Usage delete volume: $volume
                 $volume->delete;
+                $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
             }
         }
         return if ($self->cleanonly);
@@ -150,6 +151,8 @@ sub update_volume {
                 return;
             }
             ### Usage get_or_create group returned: $group
+        } else {
+            $self->warning_message("No group found for $mount_path");
         }
 
         ### Usage volume returned: $volume
@@ -172,9 +175,8 @@ sub update_volume {
            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
 
-        ### UR commit here
-        UR::Context->commit();
     }
+    $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
 }
 
 sub fetch_aging_volumes {
@@ -246,10 +248,12 @@ sub execute {
         eval {
             my $snmp = System::Utility::SNMP->create();
             $result = $snmp->query_snmp($params);
+            $filer->status(1);
         };
         if ($@) {
             # log here, but not high priority, it's common
             $self->warning_message("Error with SNMP query: $@");
+            $filer->status(0);
             next;
         }
 

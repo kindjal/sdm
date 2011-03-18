@@ -26,6 +26,9 @@ class System::Disk::Export {
 
 sub create {
     my ($self,%params) = @_;
+
+    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+
     my $export = System::Disk::Export->get( filername => $params{filername}, physical_path => $params{physical_path} );
     if (defined $export) {
         $self->warning_message("Export already exists: " . $params{filername} . " " . $params{physical_path} );

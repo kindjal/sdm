@@ -406,7 +406,7 @@ sub get_disk_group {
   }
 
   # FIXME: don't mount, just return.
-  return 'unknown';
+  return;
 
   # FIXME: This should be optional or replaced or something
   ###: SNMP mount this path: $mount_path
@@ -418,7 +418,7 @@ sub get_disk_group {
   if (defined $file and $file =~ m/^\S+\/DISK_(\S+)/) {
     $group_name = $1;
   } else {
-    $group_name = 'unknown';
+    $group_name = undef;
   }
 
   ### SNMP mount path is group:
