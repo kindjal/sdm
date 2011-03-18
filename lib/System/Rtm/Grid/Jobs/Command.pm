@@ -15,7 +15,7 @@ use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
     target_class => 'System::Rtm::Grid::Jobs',
     target_name => 'jobs',
-    list => { show => 'jobid,stat' },
+    list => { show => 'jobid,stat,jobname,user,cpu_used,efficiency,stime,pend_time,run_time' },
     delete => { do_not_init => 1, },
     update => { do_not_init => 1, },
     add    => { do_not_init => 1, },
