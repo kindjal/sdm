@@ -471,10 +471,10 @@ sub connect_snmp {
 
 sub query_snmp {
   my $self = shift;
-  my $params = shift;
-  ### SNMP query_snmp: $params
-  my $host = $params->{filer};
-  my $physical_path = $params->{physical_path};
+  my (%params) = @_;
+  ### SNMP query_snmp: %params
+  my $host = $params{filer};
+  my $physical_path = $params{physical_path};
   my $result = {};
 
   $self->connect_snmp($host);
