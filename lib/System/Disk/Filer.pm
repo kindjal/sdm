@@ -20,9 +20,9 @@ class System::Disk::Filer {
         status          => { is => 'UnsignedInteger' },
     ],
     has_many_optional => [
-        exports    => { is => 'System::Disk::Export', reverse_as => 'filer' },
-        hosts      => { is => 'System::Disk::Host', reverse_as => 'filer' },
-        arrays     => { is => 'System::Disk::Array', via => 'hosts', to => 'arrays' },
+        hosts           => { is => 'System::Disk::Host', reverse_as => 'filer' },
+        exports         => { is => 'System::Disk::Export', via => 'hosts' },
+        #arrays          => { is => 'System::Disk::Array', via => 'hosts', to => 'arrays' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',

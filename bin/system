@@ -3,17 +3,17 @@
 use strict;
 use warnings;
 
-#BEGIN {
-#    # This allows the genome command to self-serve as a tab completer for the bash shell.
-#    # When "genome" is run by bash as a tab completer, the code below will service the
-#    # tab-completion request and then exit before doing any real work.
-#    # The code is in an eval to prevent problems on systems which do not have Getopt::Complete
-#    # installed.  The code is in a BEGIN block to ensure it still runs before anything else.
-#    if ($ENV{COMP_LINE}) {
-#        eval "use Getopt::Complete::Cache (class => 'Genome::Command', above => 1)";
-#        exit if ($@);
-#    }
-#};
+BEGIN {
+    # This allows the genome command to self-serve as a tab completer for the bash shell.
+    # When "genome" is run by bash as a tab completer, the code below will service the
+    # tab-completion request and then exit before doing any real work.
+    # The code is in an eval to prevent problems on systems which do not have Getopt::Complete
+    # installed.  The code is in a BEGIN block to ensure it still runs before anything else.
+    if ($ENV{COMP_LINE}) {
+        eval "use System::Complete::Cache (class => 'System::Command', above => 1)";
+        exit if ($@);
+    }
+};
 
 use above "System";
 

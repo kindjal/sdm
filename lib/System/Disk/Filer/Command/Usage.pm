@@ -101,6 +101,9 @@ Updates volume usage information. Blah blah blah details blah.
 EOS
 }
 
+=head2 update_volume
+Update SNMP data for all Volumes associated with this Filer.
+=cut
 sub update_volume {
     my $self = shift;
     my $filer = shift;
@@ -179,38 +182,41 @@ sub update_volume {
     $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
 }
 
-sub fetch_aging_volumes {
+=head2 purge_volumes
+Iterate over all Volumes associated with this Filer, check is_current() and warn on all stale volumes.
+=cut
+sub validate_volumes {
     my $self = shift;
-    ### Usage fetch_aging_volumes
+    ### S:D:V:C:Usage->validate_volumes
     $self->error_message("max age has not been specified\n")
         if (! defined $self->vol_maxage);
     $self->error_message("max age makes no sense: $self->vol_maxage\n")
         if ($self->vol_maxage < 0 or $self->vol_maxage !~ /\d+/);
-    my $date = Date::Manip::Date->new();
-    $date->parse($self->vol_maxage . " days ago");
-    #return System::Disk::Volume->get( { "last_modified <" => $date->printf("%Y-%m-%d %H:%M:%S") } );
-    my $sql = "SELECT physical_path, filername FROM disk_volume WHERE last_modified < date(\"now\",\"-" . $self->vol_maxage . " days\") ORDER BY last_modified";
-    return System::Disk::Volume->get( sql => $sql );
-}
 
-sub validate_volumes {
-    ### Usage validate_volumes
-    # See if we have volumes that haven't been updated since maxage.
-    my $self = shift;
-    foreach my $volume ($self->fetch_aging_volumes()) {
-        $self->warning_message("Aging volume: " . $volume->filername . " " . $volume->mount_path);
+    foreach my $volume (System::Disk::Volume->get( filername => $self->name )) {
+        $volume->validate($self->vol_maxage);
     }
 }
 
+=head2 purge_volumes
+Iterate over all Volumes associated with this Filer, check is_current() and purge all stale volumes.
+=cut
 sub purge_volumes {
-    # FIXME: implement
-    ### Usage purge_volumes
     my $self = shift;
-    foreach my $volume ($self->fetch_aging_volumes()) {
-        $volume->delete();
+    ### S:D:V:C:Usage->purge_volumes
+    $self->error_message("max age has not been specified\n")
+        if (! defined $self->vol_maxage);
+    $self->error_message("max age makes no sense: $self->vol_maxage\n")
+        if ($self->vol_maxage < 0 or $self->vol_maxage !~ /\d+/);
+
+    foreach my $volume (System::Disk::Volume->get( filername => $self->name )) {
+        $volume->purge($self->vol_maxage);
     }
 }
 
+=head2 execute
+Execute S:D:F:C:Usage() queries SNMP on a named Filer and stores disk usage information.
+=cut
 sub execute {
     ### Usage execute Usage
     my $self = shift;
