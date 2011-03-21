@@ -32,5 +32,6 @@ my $build = $class->new(
   },
 );
 
+$build->add_build_element('psgi');
 $build->add_build_element('sqlite3n-schema');
 $build->create_build_script;
