@@ -36,61 +36,85 @@ class System::Disk::Volume {
     data_source => 'System::DataSource::Disk',
 };
 
+=head2 _new
+This is a private method that is used so that the unit tests can call SUPER::create()
+=cut
 sub _new {
-    # This new() method is only for testing.  Don't use it!
+    # This _new() method is only for testing.
     my $class = shift;
     my $self = $class->SUPER::create( @_ );
     return $self;
 }
 
+=head2 is_current
+Check the given Volume's last_modified time and compare it to time().  If the difference is
+greater than vol_maxage, the volume is considered "stale" and a candiate for purging.
+=cut
 sub is_current {
     my $self = shift;
     my $vol_maxage = shift;
-
-    print "is_current($vol_maxage) compare " . $self->last_modified . "\n";
-
+    # Default max age is 15 days.
+    $vol_maxage = 1296000 unless (defined $vol_maxage and $vol_maxage > 0);
+    ### Volume->is_current: $vol_maxage
     return 0 if (! defined $self->last_modified);
-
     return 0 if ($self->last_modified eq "0000-00-00 00:00:00");
 
-    my $date0 = ParseDate($self->last_modified);
+    my $date0 = $self->last_modified;
+    $date0 =~ s/[- :]//g;
+    $date0 = ParseDate($date0);
     return 0 if (! defined $date0);
 
     my $err;
-    my $date1 = ParseDate(scalar gmtime());
+    my $date1 = ParseDate( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() ) );
     my $calc = DateCalc($date0,$date1,\$err);
 
     die "Error in DateCalc: $date0, $date1, $err\n" if ($err);
     die "Error in DateCalc: $date0, $date1, $err\n" if (! defined $calc);
 
-    my $delta = Delta_Format($calc,0,'%st');
+    my $delta = int(Delta_Format($calc,0,'%st'));
 
-    print "is_current: delta $delta\n";
+    ### Volume->is_current date0: $date0
+    ### Volume->is_current date1: $date1
+    ### Volume->is_current delta: $delta
+    ### Volume->is_current vol_maxage: $vol_maxage
 
     return 0 if (! defined $delta);
-
     return 1
-        if $delta < $vol_maxage;
-
+        if $delta > $vol_maxage;
     return 0;
 }
 
+=head2 validate_volumes
+Iterate through all volumes and apply is_current() reporting the result to STDOUT.
+=cut
 sub validate_volumes {
-    # FIXME: Add code to validate volumes
-    # similar to DiskUsage::Cache
     my $self = shift;
-    return 0;
+    foreach my $volume (System::Disk::Volume->get()) {
+        unless ($volume->is_current) {
+            $self->warning_message("Aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
+        }
+    }
 }
 
+=head2 purge
+Iterate through all volumes and apply is_current() and delete all those that fail that test.
+=cut
 sub purge {
-    # FIXME: Add code to remove stale volumes
-    # similar to DiskUsage::Cache
     my $self = shift;
-    return 0;
+    foreach my $volume (System::Disk::Volume->get()) {
+        unless ($volume->is_current) {
+            $self->warning_message("Aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
+            $volume->delete();
+        }
+    }
 }
 
+=head2 get_or_create
+Get an existing volume and create it if it doesn't exist.
+=cut
 sub get_or_create {
-    my ($self,%param) = @_;
+    my $self = shift;
+    my (%param) = @_ if (scalar @_);
     ### Volume->get_or_create: %param
     my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     unless ($volume) {
@@ -99,8 +123,13 @@ sub get_or_create {
     return $volume;
 }
 
+=head2 create
+Create a volume, error if it already exists.
+=cut
 sub create {
-    my ($self,%param) = @_;
+    my $self = shift;
+    my (%param) = @_ if (scalar @_);
+
     ### Volume->create: %param
     # A fully defined Volume has, in order:
     #   - Filer->name
@@ -108,6 +137,19 @@ sub create {
     #   - Volume->mount_path
     #   - Mount->volume_id + Mount->export_id
     #   - Group->disk_group if present
+    unless ($param{filername}) {
+        $self->error_message("filer name not specified in Volume->create()");
+        return;
+    }
+    unless ($param{physical_path}) {
+        $self->error_message("physical path not specified in Volume->create()");
+        return;
+    }
+    unless ($param{mount_path}) {
+        $self->error_message("mount path not specified in Volume->create()");
+        return;
+    }
+
     my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     if ($volume) {
         ### volume: $volume
@@ -169,17 +211,38 @@ sub create {
     return $volume;
 }
 
+=head2 delete
+Delete a Volume and its Mounts, or delete the described Mounts.
+=cut
 sub delete {
     my $self = shift;
+    my (%param) = @_ if (scalar @_);
+    my @args;
     ### Volume->delete: $self
+    ###   param: %param
     # Remove the Export entries, then the Mount entries, then the Volume
     #   - Export->filername + Export->physical_path
     #   - Volume->mount_path
     #   - Mount->volume_id + Mount->export_id
-    foreach my $m (System::Disk::Mount->get( volume_id => $self->id )) {
-        ### Volume->delete mount: $m
-        $m->delete or die "Failed to delete mount for volume: " . $self->id;
+    # If we gave arguments, find the subset of Mounts matching them:
+    if ($param{filername}) {
+        push @args, filername => $param{filername};
     }
-    return $self->SUPER::delete();
+    if ($param{physical_path}) {
+        push @args, physical_path => $param{physical_path};
+    }
+    if (scalar @args) {
+        foreach my $m (System::Disk::Mount->get( @args )) {
+            ### Volume->delete mount: $m
+            $m->delete or die "Failed to delete mount for volume: " . $self->id;
+        }
+    } else {
+        # Otherwise remove all mounts and this Volume
+        foreach my $m (System::Disk::Mount->get( volume_id => $self->id )) {
+            ### Volume->delete mount: $m
+            $m->delete or die "Failed to delete mount for volume: " . $self->id;
+        }
+        return $self->SUPER::delete();
+    }
 }
 
