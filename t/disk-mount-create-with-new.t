@@ -19,3 +19,4 @@ ok( $e = System::Disk::Export->get_or_create( filername => 'nfs11', physical_pat
 ok( $v = System::Disk::Volume->_new( mount_path => '/gscmnt/sata821' ), "create volume ok");
 ok( $m = System::Disk::Mount->get_or_create( export_id => $e->id, volume_id => $v->id ), "create mount ok");
 ok( UR::Context->commit(), "commit ok");
+done_testing();
