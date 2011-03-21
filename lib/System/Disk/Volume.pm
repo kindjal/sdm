@@ -87,12 +87,11 @@ sub is_current {
 =head2 validate_volumes
 Iterate through all volumes and apply is_current() reporting the result to STDOUT.
 =cut
-sub validate_volumes {
+sub validate {
     my $self = shift;
-    foreach my $volume (System::Disk::Volume->get()) {
-        unless ($volume->is_current) {
-            $self->warning_message("Aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
-        }
+    my $vol_maxage = shift;
+    unless ($self->is_current($vol_maxage)) {
+        $self->warning_message("Aging volume: " . $self->mount_path . " " . join(',',$self->filername));
     }
 }
 
@@ -101,11 +100,10 @@ Iterate through all volumes and apply is_current() and delete all those that fai
 =cut
 sub purge {
     my $self = shift;
-    foreach my $volume (System::Disk::Volume->get()) {
-        unless ($volume->is_current) {
-            $self->warning_message("Purging aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
-            $volume->delete();
-        }
+    my $vol_maxage = shift;
+    unless ($self->is_current($vol_maxage)) {
+        $self->warning_message("Purging aging volume: " . $self->mount_path . " " . join(',',$self->filername));
+        $self->delete();
     }
 }
 
