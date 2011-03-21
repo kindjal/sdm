@@ -16,6 +16,7 @@ System::Command::Crud->init_sub_commands(
     target_class => 'System::Disk::Array',
     target_name => 'array',
     list => { show => 'name,type,model,size,hostname' }
+    #list => { show => 'name,type,model,size' }
 );
 
 1;

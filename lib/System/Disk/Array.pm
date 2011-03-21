@@ -10,9 +10,6 @@ class System::Disk::Array {
     id_by => [
         name          => { is => 'Text', len => 255 },
     ],
-    has => [
-        host          => { is => 'System::Disk::Host', id_by => 'hostname', constraint_name => 'ARRAY_HOST_FK' },
-    ],
     has_optional => [
         model         => { is => 'Text', len => 255 },
         size          => { is => 'UnsignedInteger' },
@@ -20,13 +17,22 @@ class System::Disk::Array {
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
+    has_many_optional => [
+        mappings      => { is => 'System::Disk::HostArrayBridge', reverse_as => 'array' },
+        #host          => { is => 'System::Disk::Host', via => 'mappings', to => 'host' },
+        hostname      => { via => 'mappings' },
+    ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };
 
 sub create {
     my $self = shift;
-    my %params = @_;
+    my (%params) = @_;
+    unless ($params{name}) {
+        $self->error_message("No name given for Array");
+        return;
+    }
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( %params );
 }
