@@ -15,11 +15,6 @@ my $params;
 system('bash ./t/00-disk-prep-test-database.sh');
 ok($? >> 8 == 0, "prep test db ok");
 
-# Volume unit tests:
-#   is_current
-#   purge
-#   validate_volumes
-
 # Test insufficient creation params
 my @params = ();
 ok( ! defined System::Disk::Volume->create( @params ), "properly fail to create volume with empty param" );
