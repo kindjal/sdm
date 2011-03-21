@@ -244,10 +244,9 @@ sub execute {
 
         # Update any filers that are not current
         my $result = {};
-        my $params = { filer => $filer->name, physical_path => $self->physical_path };
         eval {
             my $snmp = System::Utility::SNMP->create();
-            $result = $snmp->query_snmp($params);
+            $result = $snmp->query_snmp( filer => $filer->name, physical_path => $self->physical_path );
             $filer->status(1);
         };
         if ($@) {

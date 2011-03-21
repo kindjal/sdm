@@ -118,6 +118,7 @@ sub run {
         my $capacity = 0;
         foreach my $item ( $result->members ) {
             my $name = $item->disk_group;
+            $name = 'unknown' unless ($name);
             $disk_group->{$name} = {}
                 unless ($disk_group->{$name});
             $disk_group->{$name}->{total_kb} += $item->total_kb;
