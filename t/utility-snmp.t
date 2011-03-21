@@ -28,7 +28,7 @@ my $cwd = dirname $thisfile;
 my $obj;
 my $host;
 my $res;
-my $result;
+my $result = {};
 my $oid;
 my $physical_path;
 my $mount_path;
@@ -77,25 +77,21 @@ ok( $res eq 'netapp', "test_get_host_type: ntap8 detected" );
 $host = "nfs11";
 $obj->connect_snmp($host);
 $obj->get_snmp_disk_usage($result);
-ok( scalar keys %$result > 1, "test_get_snmp_disk_usage: nfs11 ok");
+ok( scalar keys %$result > 1, "test_get_snmp_disk_usage: $host ok");
 
 $host = "ntap8";
 $obj->connect_snmp($host);
 $obj->get_snmp_disk_usage($result);
-ok( scalar keys %$result > 1, "test_get_snmp_disk_usage: ntap8 ok");
+ok( scalar keys %$result > 1, "test_get_snmp_disk_usage: $host ok");
 
 $host = "ntap9";
-lives_ok { $obj->connect_snmp($host); } "connect_snmp: runs ok";
-lives_ok { my $result = $obj->query_snmp($host); } "test_target: runs ok";
-$result = $obj->query_snmp($host);
+lives_ok { $result = $obj->query_snmp( filer => $host ); } "test_target: $host runs ok";
 ok( ref $result eq 'HASH', "test target" );
 
 $host = "nfs11";
 $physical_path = "/vol/sata840";
 $mount_path = "/gscmnt/sata840";
-lives_ok { $obj->connect_snmp($host); } "test_snmp_get_disk_group: connect ok";
-lives_ok { $result = $obj->query_snmp( { filer => $host, physical_path => $physical_path } ); } "query_snmp: runs ok";
+lives_ok { $result = $obj->query_snmp( filer => $host, physical_path => $physical_path ); } "query_snmp: runs ok";
 lives_ok { $group = $obj->get_disk_group($physical_path,$mount_path); } "test_snmp_get_disk_group: query ok";
-#ok( $group eq "INFO_GENOME_MODELS", "test_snmp_get_disk_group: answer ok");
 
 done_testing();
