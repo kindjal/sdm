@@ -1,23 +1,19 @@
-#!/gsc/bin/perl
 
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 use DBI;
-use above 'System'; #Otherwise we're testing the deployed code instead when running the test by hand
+
+use above 'System';
 
 our @dbi_classes = ();
-## I want to trap any call to DBI->connect
 
 sub my_connect {
     my $i = 1;
     while (1) {
         my @caller = caller($i++);
         last unless @caller;
-
-#        print $caller[0], $caller[3], "\n";
-
         if ($caller[0] =~ /^System/) {
             push @dbi_classes, $caller[0];
             last;
@@ -44,4 +40,4 @@ foreach my $c (@dbi_classes) {
 }
 ok(scalar @dbi_classes == 0, 'no classes caused DBI connect during loading');
 
-
+done_testing();
