@@ -5,6 +5,7 @@ use warnings;
 use above "System";
 
 use Test::More;
+use Test::Output;
 use Test::Exception;
 
 my $res;
@@ -71,8 +72,8 @@ $res->last_modified( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() - 87000 ) 
 ok( $res->is_current(86400) == 1, "volume is aged");
 
 # Test validate and purge for aging volumes
-lives_ok { $res = System::Disk::Volume->validate_volumes(); } "validate runs ok";
-lives_ok { $res = System::Disk::Volume->purge(); } "purge runs ok";
+stderr_like { $res = System::Disk::Volume->validate_volumes(); } qr|Aging volume: /gscmnt/sata800 nfs11,nfs12|, "validate runs ok";
+stderr_like { $res = System::Disk::Volume->purge(); } qr|Purging aging volume: /gscmnt/sata800 nfs11,nfs12|, "validate runs ok";
 
 # Now test 'delete'
 @params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );

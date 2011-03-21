@@ -103,7 +103,7 @@ sub purge {
     my $self = shift;
     foreach my $volume (System::Disk::Volume->get()) {
         unless ($volume->is_current) {
-            $self->warning_message("Aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
+            $self->warning_message("Purging aging volume: " . $volume->mount_path . " " . join(',',$volume->filername));
             $volume->delete();
         }
     }
