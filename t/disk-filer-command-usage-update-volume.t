@@ -6,7 +6,7 @@ use Log::Log4perl qw/:levels/;
 
 use above "System";
 
-use Test::More tests => 1;
+use Test::More;
 use Test::Exception;
 
 my $command = System::Disk::Filer::Command::Usage->create();
@@ -29,4 +29,4 @@ ok( $volume->used_kb == 5722964896, "used_kb matches" );
 ok( $volume->disk_group eq 'PRODUCTION_SOLID', "disk_group matches" );
 ok( $volume->mount_path eq '/gscmnt/sata812', "mount_path matches" );
 ok( $volume->physical_path eq '/vol/sata812', "physical_path matches" );
-
+done_testing();
