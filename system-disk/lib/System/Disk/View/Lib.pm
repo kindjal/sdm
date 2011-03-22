@@ -3,6 +3,11 @@ package System::Disk::View::Lib;
 
 use strict;
 use warnings;
+
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(short commify);
+
 use URI;
 use URI::QueryParam;
 
