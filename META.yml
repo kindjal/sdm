@@ -25,6 +25,7 @@ build_requires:
   File::Basename: 0
   File::Find: 0
   Getopt::Long: 0
+  Getopt::Complete: 0
   IO::Socket: 0
   JSON: 0
   Log::Log4perl: 0
@@ -67,6 +68,7 @@ requires:
   File::Basename: 0
   File::Find: 0
   Getopt::Long: 0
+  Getopt::Complete: 0
   IO::Socket: 0
   JSON: 0
   Log::Log4perl: 0

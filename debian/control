@@ -10,5 +10,6 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 Package: system-namespace
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5)
+Suggests: libgetopt-complete-perl
 Description: A UR Object framework for System Management
  A UR Object framework for System Management, notably for disk space management.
