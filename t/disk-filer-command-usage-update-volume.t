@@ -2,16 +2,16 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Log::Log4perl qw/:levels/;
 
 use above "System";
 
 use Test::More;
 use Test::Exception;
 
+system("bash t/00-disk-prep-test-database.sh");
+ok( $? >> 8 == 0, "DB prep ok");
+
 my $command = System::Disk::Filer::Command::Usage->create();
-$command->prepare_logger();
-$command->{logger}->level($DEBUG);
 my $filer = System::Disk::Filer->get_or_create( name => 'nfs11' );
 my $result = { '/vol/sata812' => {
                         'total_kb' => 6438990688,
