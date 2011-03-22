@@ -10,10 +10,7 @@ BEGIN {
 };
 
 use above "System";
-use Test::More;
-
-# FIXME: implement search
-exit;
+use Test::More skip_all => "search not yet implemented";
 
 is(System::Search->environment(), 'prod', 'using prod instance of solr');
 
