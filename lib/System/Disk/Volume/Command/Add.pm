@@ -33,7 +33,7 @@ sub execute {
     $param->{used_kb} = $self->used_kb ? $self->used_kb : 0;
     $param->{disk_group} = $self->disk_group if (defined $self->disk_group);
 
-    return System::Disk::Volume->create( $param );
+    return System::Disk::Volume->create( %$param );
 }
 
 1;
