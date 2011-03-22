@@ -47,7 +47,10 @@ sub run {
         #$result->{last_modified} = $r->{last_modified} if ( $date0->cmp($date1));
     }
 
-    $result->{capacity} = sprintf "%d %%", $result->{used_kb} / $result->{total_kb} * 100;
+    $result->{capacity} = 0;
+    if ($result->{total_kb}) {
+        $result->{capacity} = sprintf "%d %%", $result->{used_kb} / $result->{total_kb} * 100;
+    }
     $result->{total_kb} = System::Disk::View::Lib::commify($result->{total_kb}) . " (" . System::Disk::View::Lib::short($result->{total_kb}) . ")",
     $result->{used_kb} = System::Disk::View::Lib::commify($result->{used_kb}) . " (" . System::Disk::View::Lib::short($result->{used_kb}) . ")",
 
