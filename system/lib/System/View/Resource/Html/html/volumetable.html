@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <title>Disk Usage Information</title>
+    <style type="text/css" title="currentStyle">
+          @import "/res/css/diskusage_page.css";
+          @import "/res/css/diskusage_table.css";
+    </style>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <script type="text/javascript" language="javascript" src="/res/js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" src="/res/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/res/js/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/res/js/TableTools/media/js/TableTools.js"></script>
+    <style type="text/css">
+      @import "/res/js/TableTools/media/css/TableTools.css";
+    </style>
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function() {
+        TableToolsInit.sSwfPath = "/res/js/TableTools/media/swf/ZeroClipboard.swf";
+        /* volume table */
+        $('#volume').dataTable( {
+          "sDom": 'T<"clear">lfrtip',
+          "bProcessing": true,
+          "bServerSide": true,
+          "bFilter": true,
+          "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
+          "aaSorting": [ [2,'desc'] ],
+          "sAjaxSource": location.href + ".cgi",
+          "fnServerData": function ( sSource, aoData, fnCallback )
+          {
+                /* Add some extra data to the sender */
+                aoData.push( { "name": "rm", "value": "table_data" } );
+                $.getJSON( sSource, aoData, function (json) {
+                  /**
+                   * Insert an extra argument to the request: rm.
+                   * It's the the name of the CGI form parameter that
+                   * contains the run mode name. Its value is the
+                   * runmode, that produces the json output for
+                   * datatables.
+                   **/
+                  fnCallback(json)
+                } );
+          },
+          "fnRowCallback": function( nRow, aaData, iDisplayIndex )
+          {
+                /* append a css class based on cell content */
+                /* capacity > 95 */
+                var $col = 4;
+                var $cell = $(nRow).children('td').eq($col);
+                if ( aaData[$col] > 95 )
+                {
+                  $cell.addClass('warning');
+                }
+                /* group is 'unknown' */
+                var $col = 5;
+                var $cell = $(nRow).children('td').eq($col);
+                if ( aaData[$col] == 'unknown' )
+                {
+                  $cell.addClass('warning');
+                }
+              return nRow;
+          },
+        } );
+        /* end volume summary table */
+
+      } );
+    </script>
+  </head>
+  <body id="dt_example">
+    <div id="container">
+      <h1>Disk Usage Report</h1>
+
+      <div id="narrow">
+      <div id="total">
+      </div>
+      </div>
+
+      <div class="clear"></div>
+
+      <h1>Disk Usage By Volume</h1>
+
+      <div id="volume">
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="volume">
+        <thead>
+        <tr>
+        <th>Mount Path</th>
+        <th>Physical Path</th>
+        <th width="15%">Total KB</th>
+        <th width="15%">Used KB</th>
+        <th width="2%" align=center>Capacity</th>
+        <th>Filer</th>
+        <th>Disk Group</th>
+        <th>Last Checked</th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="8" class="dataTables_empty">Loading data from server</td>
+          </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+        <th>Mount Path</th>
+        <th>Physical Path</th>
+        <th width="15%">Total KB</th>
+        <th width="15%">Used KB</th>
+        <th width="2%" align=center>Capacity</th>
+        <th>Filer</th>
+        <th>Disk Group</th>
+        <th>Last Checked</th>
+        </tr>
+        </tfoot>
+      </table>
+      </div> <!-- end of volume div -->
+
+    </div> <!-- end of container -->
+  </body>
+</html>
+
