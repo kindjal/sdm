@@ -2,13 +2,13 @@ Source: ur-system-disk
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl, ur (>= 0.29), ur-system-namespace
+Build-Depends-Indep: perl, libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrd-oo-perl, rrdtool
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-system-disk
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur (>= 0.29), ur-system-namespace
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, perl/libjson-perl, librrds-perl, librrd-oo-perl, rrdtool
 Description: A UR Object framework for disk management
  A UR Object framework for disk management.
