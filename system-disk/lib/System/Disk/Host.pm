@@ -69,7 +69,7 @@ sub is_current {
     return 0;
 }
 
-=head create
+=head2 create
 Create method for Host sets created attribute.
 =cut
 sub create {
