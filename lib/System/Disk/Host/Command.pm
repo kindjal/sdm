@@ -15,7 +15,7 @@ use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
     target_class => 'System::Disk::Host',
     target_name => 'host',
-    list => { show => 'hostname,os,location,status,comments' }
+    list => { show => 'hostname,filername,arrayname,os,location,status,comments' }
 );
 
 1;
