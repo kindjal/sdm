@@ -11,6 +11,7 @@ class System::Command::Remove {
         items => { is_many => 1 },
         _deletion_params => { is_many => 1 },
     ],
+    is_abstract => 1,
     doc => 'delete selected items from the system',
 };
 

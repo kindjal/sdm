@@ -5,9 +5,8 @@ use strict;
 use warnings;
 
 class System::Service::Command {
-    is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'Work with services',
-    is_abstract => 1,
 };
 
 1;
