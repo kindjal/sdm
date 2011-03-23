@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 class System::Completion::Command {
-    is => 'System::Command::Base',
+    is => 'Command::Tree',
     is_abstract => 1,
 };
 

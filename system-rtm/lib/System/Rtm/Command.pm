@@ -5,9 +5,8 @@ use strict;
 use warnings;
 
 class System::Rtm::Command {
-    is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'Work with RTM',
-    is_abstract => 1,
 };
 
 1;

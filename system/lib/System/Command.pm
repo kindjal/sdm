@@ -4,7 +4,11 @@ use strict;
 use warnings;
 
 use System;
+class System::Command { is => 'Command::Tree' };
 
+1;
+
+__END__
 class System::Command {
     is => 'System::Command::Base',
 };
