@@ -1,0 +1,24 @@
+---
+name: System::Rtm
+version: 0.01
+author: [Matthew Callaway <mcallawa@genome.wustl.edu>]
+abstract: Modules for RTM job data management
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+  Test::Exception: 0
+  Date::Manip::Date: 0
+  Date::Manip: 0
+  JSON: 0
+requires:
+  UR: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
