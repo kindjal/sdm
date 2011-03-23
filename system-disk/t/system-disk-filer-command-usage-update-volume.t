@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use above "System";
+use System;
 
 use Test::More;
 use Test::Exception;

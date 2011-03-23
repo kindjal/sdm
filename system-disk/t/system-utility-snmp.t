@@ -7,7 +7,7 @@ package System::Utility::SNMP::TestSuite;
 use strict;
 use warnings;
 
-use above "System";
+use System;
 
 use Test::More;
 use Test::Output;
