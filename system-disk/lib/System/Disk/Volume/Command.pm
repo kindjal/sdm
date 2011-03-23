@@ -6,10 +6,8 @@ use warnings;
 use System;
 
 class System::Disk::Volume::Command {
-    #is          => 'System::Command::Base',
     is          => 'Command::Tree',
     doc         => 'work with disk volumes',
-    #is_abstract => 1
 };
 
 use System::Command::Crud;

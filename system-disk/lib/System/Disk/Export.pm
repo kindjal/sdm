@@ -25,7 +25,16 @@ class System::Disk::Export {
 };
 
 sub create {
-    my ($self,%params) = @_;
+    my $self = shift;
+    my (%params) = @_ if scalar (@_);
+    unless ($params{filername}) {
+        $self->error_message("filername not specified in Export->create()");
+        return;
+    }
+    unless ($params{physical_path}) {
+        $self->error_message("physical_path not specified in Export->create()");
+        return;
+    }
 
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
 
