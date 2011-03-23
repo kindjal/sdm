@@ -34,5 +34,4 @@ sub execute {
     $text .= "\n";
 
     print $text;
-
 }

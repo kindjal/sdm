@@ -33,7 +33,7 @@ sub help_detail {
 sub execute {
     my $self = shift;
 
-    my @command_classes = ('System::Model::Tools', 'System::Command');
+    my @command_classes = ('System::Model::Tools', 'Genome::Command');
     for my $classname (@command_classes) {
         my $genome_completion = UR::Namespace::Command::Update::TabCompletionSpec->create(
             classname => $classname,
