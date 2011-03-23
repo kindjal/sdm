@@ -6,9 +6,10 @@ use warnings;
 use System;
 
 class System::Disk::FilerHostBridge::Command {
-    is          => 'System::Command::Base',
+    #is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'map filers to hosts',
-    is_abstract => 1
+    #is_abstract => 1
 };
 
 use System::Command::Crud;

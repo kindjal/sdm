@@ -6,9 +6,10 @@ use warnings;
 use System;
 
 class System::Disk::Assignment::Command {
-    is          => 'System::Command::Base',
+    #is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'work with disk assignments',
-    is_abstract => 1
+    #is_abstract => 1
 };
 
 use System::Command::Crud;

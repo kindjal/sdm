@@ -6,9 +6,10 @@ use warnings;
 use System;
 
 class System::Disk::HostArrayBridge::Command {
-    is          => 'System::Command::Base',
+    #is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'map hosts to arrays',
-    is_abstract => 1
+    #is_abstract => 1
 };
 
 use System::Command::Crud;

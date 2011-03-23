@@ -6,9 +6,10 @@ use warnings;
 use System;
 
 class System::Disk::Filer::Command {
-    is          => 'System::Command::Base',
+    #is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'work with disk filers',
-    is_abstract => 1
+    #is_abstract => 1
 };
 
 use System::Command::Crud;
