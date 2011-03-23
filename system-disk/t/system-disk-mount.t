@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use above "System";
+use System;
 
 use Test::More;
 use Test::Output;
@@ -29,36 +29,26 @@ ok( ! defined System::Disk::Mount->create( @params ), "properly fail to create m
 # FIXME below here...
 #
 # Test creation
-@params = ( name => 'nsams2k1' );
+@params = ( filername => 'filer', physical_path => '/vol/sata800', mount_path => '/gscmnt/sata800' );
+my $volume = System::Disk::Volume->create( @params );
+ok( defined $volume->id, "properly created new volume");
+
+@params = ();
+$res = System::Disk::Mount->get( @params );
+ok( defined $res->id, "properly got new mount");
+
+@params = ( filername => 'filer', physical_path => '/vol/sata801' );
+my $export = System::Disk::Export->create( @params );
+ok( defined $export->id, "properly made new export");
+
+@params = ( volume_id => $volume->id , export_id => $export->id );
 $res = System::Disk::Mount->create( @params );
-ok( $res->id eq 'nsams2k1', "properly created new mount");
-@params = ( name => 'nsams2k1' );
-$res = System::Disk::Mount->get( @params );
-ok( $res->id eq 'nsams2k1', "properly got new mount");
-
-@params = ( name => 'nsams2k4' );
-$res = System::Disk::Mount->create( @params );
-ok( $res->id eq 'nsams2k4', "properly created another new mount");
-
-# Test deletion of 1 Mount
-@params = ( name => 'nsams2k1' );
-$res = System::Disk::Mount->get( @params );
-$res->delete();
-isa_ok( $res, 'UR::DeletedRef', "properly delete mount" );
-
-# Test update of value
-@params = ( name => 'nsams2k4' );
-$res = System::Disk::Mount->get( @params );
-$res->type("AMS");
-ok( $res->type eq "AMS", "Type set to AMS");
-
-# Update created and last modified
-$res->created( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time()) );
-$res->last_modified( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() - 87000 ) );
+ok( defined $res->id, "properly made new mount");
 
 # Now test 'delete'
-$res = System::Disk::Mount->get();
-$res->delete();
-isa_ok( $res, 'UR::DeletedRef' );
+foreach $res ( System::Disk::Mount->get() ) {
+    $res->delete();
+    isa_ok( $res, 'UR::DeletedRef' );
+}
 
 done_testing();
