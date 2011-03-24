@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Rtm::Jobs::Command {
-    is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'work with grid jobs',
 };
 
