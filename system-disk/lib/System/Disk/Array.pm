@@ -20,7 +20,7 @@ class System::Disk::Array {
     has_many_optional => [
         mappings      => { is => 'System::Disk::HostArrayBridge', reverse_as => 'array' },
         host          => { is => 'System::Disk::Host', via => 'mappings', to => 'host' },
-        hostname      => { via => 'mappings' },
+        hostname      => { via => 'mappings', to => 'hostname' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
