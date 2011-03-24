@@ -157,27 +157,35 @@ sub create {
     }
     ### Volume->create volume->get: $volume
 
+    # FIXME: Is it ok to auto-create Filers?  I say no for now.
     # The exact volume doesn't exist, so make sure we have the Filer
-    my $filer = System::Disk::Filer->get_or_create( name => $param{filername} );
+    #my $filer = System::Disk::Filer->get_or_create( name => $param{filername} );
+    my $filer = System::Disk::Filer->get( name => $param{filername} );
     unless ($filer) {
-        $self->error_message("Failed to add filer: " . $param{filername});
+        $self->error_message("Failed to identify filer: " . $param{filername});
         return;
     }
-    ### Volume->create filer->get_or_create: $filer
+    ### Volume->create filer->get: $filer
 
+    # FIXME: Is it ok to auto-create Exports?  I say yes for now, export and mount should be "under the hood"
     # Now make sure the Filer has the Export
     my $export = System::Disk::Export->get_or_create( filername => $param{filername}, physical_path => $param{physical_path} );
     unless ($export) {
-        $self->error_message("Failed to add export: '" . $param{filername} ." " . $param{physical_path} );
+        $self->error_message("Failed to get_or_create export: '" . $param{filername} ." " . $param{physical_path} );
         return;
     }
     ### Volume->create export->get_or_create: $export
 
+    # FIXME: Is it ok to auto-create Groups?  I say no for now, they shouldn't change often
+    # and they represent real people, which we should be careful to not mess with.
     # If a group is specified, make sure we have that too
-    if ($param{group}) {
-        my $group = System::Disk::Group->get_or_create( name => $param{group} );
+    my $group_name = uc($param{disk_group});
+    if ($param{disk_group}) {
+        $group_name = uc($param{disk_group});
+        my $group = System::Disk::Group->get( name => $group_name );
+        ### Volume->create Group->get: $group
         unless ($group) {
-            $self->error_message("Unable to create group: " . $param{group} );
+            $self->error_message("Failed to identify group: " . $group_name );
             return;
         }
     }
@@ -188,19 +196,20 @@ sub create {
     unless ($volume) {
         # No volume at all at this mount, add the volume then the mount.
         $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-        $volume = $self->SUPER::create( mount_path => $param{mount_path}, used_kb => $param{used_kb}, total_kb => $param{total_kb}, disk_group => $param{disk_group}, created => $param{created} );
+        $volume = $self->SUPER::create( mount_path => $param{mount_path}, used_kb => $param{used_kb}, total_kb => $param{total_kb}, disk_group => $group_name, created => $param{created} );
         unless ($volume) {
-            $self->error_message("Unable to create volume");
+            $self->error_message("Failed to create volume");
             return;
         }
     }
     ### Volume->create volume->SUPER::create: $volume
 
+    # FIXME: Is it ok to auto-create mounts?  I say yes for now, exports and mounts should be "under the hood".
     # Now that we have a Volume, ensure there's a mount (bridge table)
     # Mount is a bridge table between Volume and Filer.
     my $mount  = System::Disk::Mount->get_or_create( volume_id => $volume->id, export_id => $export->id );
     unless ($mount) {
-        $self->error_message("Failed to add mount for volume");
+        $self->error_message("Failed to get_or_create mount for volume");
         return;
     }
     ### Volume->create mount->get_or_create: $mount
