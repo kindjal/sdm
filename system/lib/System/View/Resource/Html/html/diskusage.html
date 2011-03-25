@@ -127,7 +127,9 @@
               },
           "aoColumns": [
             null,
-            /* snmp_ok */  { "bVisible":    false },
+            /* snmp_ok */ { "bVisible":    false },
+            null,
+            null,
             null,
             null,
           ],
@@ -172,10 +174,11 @@
       <div id="narrow">
       <div id="total">
       </div>
+      </div>
 
       <h1>Hosts Providing Storage Volumes</h1>
 
-      <div class="emphasis" id="narrow">
+      <div class="emphasis">
       Hosts that reported SNMP errors are red.<br/>
       Hosts that reported no Volume data are orange.<br/>
       </div>
@@ -184,28 +187,31 @@
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="hosts_table">
       <thead>
       <tr>
-      <th width="20%">Hostname</th>
-      <th >SNMP Status</th>
+      <th>Filer</th>
+      <th>SNMP Status</th>
+      <th>Hosts</th>
+      <th>Arrays</th>
       <th>Added</th>
       <th>Last Successful Check</th>
       </tr>
       </thead>
       <tbody>
       <tr>
-      <td colspan="4" class="dataTables_empty">Loading data from server</td>
+      <td colspan="6" class="dataTables_empty">Loading data from server</td>
       </tr>
       </tbody>
       <tfoot>
       <tr>
-      <th>Hostname</th>
-      <th >SNMP Status</th>
+      <th>Filer</th>
+      <th>SNMP Status</th>
+      <th>Hosts</th>
+      <th>Arrays</th>
       <th>Added</th>
       <th>Last Successful Check</th>
       </tr>
       </tfoot>
       </table>
       </div>
-      </div> <!-- end narrow -->
 
       <div class="clear"></div>
 
@@ -257,8 +263,8 @@
         <th width="15%">Total KB</th>
         <th width="15%">Used KB</th>
         <th width="2%" align=center>Capacity</th>
-        <th>Filer</th>
         <th>Disk Group</th>
+        <th>Filer</th>
         <th>Last Checked</th>
         </tr>
         </thead>
@@ -273,8 +279,8 @@
         <th width="15%">Total KB</th>
         <th width="15%">Used KB</th>
         <th width="2%" align=center>Capacity</th>
-        <th>Filer</th>
         <th>Disk Group</th>
+        <th>Filer</th>
         <th>Last Checked</th>
         </tr>
         </tfoot>

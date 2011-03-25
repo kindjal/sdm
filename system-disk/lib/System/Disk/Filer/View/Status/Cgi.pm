@@ -26,9 +26,10 @@ sub _fnColumnToField {
     my %dispatcher = (
             # column => 'rowname',
             0 => 'name',
-            1 => 'status',
-            2 => 'created',
-            3 => 'last_modified',
+            1 => 'hostname',
+            2 => 'arrayname',
+            3 => 'created',
+            4 => 'last_modified',
             );
 
     die("No such row index defined: $i") unless exists $dispatcher{$i};
@@ -108,20 +109,33 @@ sub run {
 
     my $query = URI->new( $args->{REQUEST_URI} );
 
-    my @vols = $self->_build_result_set( $query );
-    foreach my $v ( @vols ) {
+    my @filers = $self->_build_result_set( $query );
+    foreach my $f ( @filers ) {
+        my $hostname = 'unknown';
+        my @hosts = $f->hostname;
+        if ($#hosts) {
+            $hostname = join(",",@hosts);
+        }
+        my $arrayname = 'unknown';
+        my @arrays = $f->arrayname;
+        if ($#arrays) {
+            $arrayname = join(",",@arrays);
+        }
+
         push @aaData, [
-            $v->{name},
-            $v->{status} ? $v->{status} : 0,
-            $v->{created} ?  $v->{created} : "0000-00-00 00:00:00",
-            $v->{last_modified} ? $v->{last_modified} : "0000-00-00 00:00:00",
+            $f->{name},
+            $f->{status},
+            $hostname,
+            $arrayname,
+            $f->{created} ?  $f->{created} : "0000-00-00 00:00:00",
+            $f->{last_modified} ? $f->{last_modified} : "0000-00-00 00:00:00",
         ];
     }
 
     my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
     my @results = System::Disk::Filer->get();
     my $iTotal = scalar @results;
-    my $iFilteredTotal = scalar @vols;
+    my $iFilteredTotal = scalar @filers;
     my $sOutput = {
         sEcho => $sEcho,
         iTotalRecords => int($iTotal),

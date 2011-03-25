@@ -30,8 +30,8 @@ sub _fnColumnToField {
             1 => 'total_kb',
             2 => 'used_kb',
             3 => 'capacity',
-            4 => 'filername',
-            5 => 'disk_group',
+            4 => 'disk_group',
+            5 => 'filername',
             6 => 'last_modified',
             );
 
@@ -125,8 +125,8 @@ sub run {
             System::Disk::View::Lib::commify($v->total_kb) . " (" . System::Disk::View::Lib::short($v->total_kb) . ")",
             System::Disk::View::Lib::commify($v->used_kb) . " (" . System::Disk::View::Lib::short($v->used_kb) . ")",
             $capacity,
-            $filername,
             $v->disk_group ? $v->disk_group : 'unknown',
+            $filername,
             $v->last_modified ? $v->last_modified : 'unknown'
         ];
     }
