@@ -15,3 +15,23 @@ class System::Disk::HostArrayBridge {
     data_source => 'System::DataSource::Disk',
 };
 
+sub get_or_create {
+    my $self = shift;
+    my (%params) = @_;
+    my $res = System::Disk::HostArrayBridge->get( host => $params{host}, array => $params{array} );
+    unless ($res) {
+        $res = $self->create( host => $params{host}, array => $params{array} );
+    }
+    return $res;
+}
+
+sub create {
+    my $self = shift;
+    my (%params) = @_;
+    my $res = System::Disk::HostArrayBridge->get( host => $params{host}, array => $params{array} );
+    if ($res) {
+        $self->error_message("Array '" . $params{array}->name . "' is already assigned to Host '" . $params{host}->hostname . "'");
+        return;
+    }
+    return $self->SUPER::create( host => $params{host}, array => $params{array} );
+}
