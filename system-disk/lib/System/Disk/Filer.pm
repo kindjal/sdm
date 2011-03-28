@@ -6,6 +6,7 @@ use warnings;
 
 use System;
 use Date::Manip;
+use Smart::Comments -ENV;
 
 class System::Disk::Filer {
     table_name => 'DISK_FILER',
@@ -22,8 +23,8 @@ class System::Disk::Filer {
     has_many_optional => [
         hostmappings    => { is => 'System::Disk::FilerHostBridge', reverse_as => 'filer' },
         host            => { is => 'System::Disk::Host', via => 'hostmappings', to => 'host'  },
-        hostname       => { via => 'host', to => 'hostname' },
-        arrayname      => { via => 'host', to => 'arrayname' },
+        hostname        => { via => 'host', to => 'hostname' },
+        arrayname       => { via => 'host', to => 'arrayname' },
         exports         => { is => 'System::Disk::Export', via => 'host' },
     ],
     schema_name => 'Disk',
@@ -80,6 +81,49 @@ sub create {
     }
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( %params );
+}
+
+sub delete {
+    my $self = shift;
+    ### Filer->delete: $self
+
+    my @volumes = System::Disk::Volume->get( filername => $self->name );
+
+    # Before we remove the Filer, we must remove its Mounts and Exports
+    ### 1
+    foreach my $export ( $self->exports ) {
+    ### 2
+        # Remove any Mounts of this Export
+        foreach my $mount (System::Disk::Mount->get( export_id => $export->id ))  {
+    ### 3
+            ### Remove mount: $mount
+            $self->warning_message("Remove Mount " . $mount->mount_path . " for Export " . $export->id);
+            $mount->delete() or
+                die "Failed to remove Mount '" . $mount->id . "' for Filer: " . $self->name;
+        }
+    ### 4
+        ### Remove export: $export
+        $self->warning_message("Remove Export " . $export->id . " for Filer " . $self->name);
+        $export->delete() or
+            die "Failed to remove Export for Filer: " . $self->name;
+    }
+    ### 5
+
+    ### Filer delete();
+    $self->warning_message("Remove Filer " . $self->name);
+    my $res = $self->SUPER::delete();
+
+    # After we remove a filer, we iterate through Volumes that claimed to have been mounted
+    # on this filer and see if they're now orphans.
+    foreach my $volume (@volumes) {
+        if ($volume->is_orphan) {
+            ### Remove volume: $volume
+            $self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
+            $volume->delete();
+        }
+    }
+
+    return $res;
 }
 
 1;
