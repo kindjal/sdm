@@ -13,11 +13,6 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
-use Data::Dumper;
-use Cwd qw/abs_path/;
-use File::Basename qw/dirname/;
-#use Log::Log4perl qw/:levels/;
-
 use System::Utility::SNMP;
 
 BEGIN {
@@ -27,8 +22,6 @@ BEGIN {
 
 my $live = 1;
 my $count = 0;
-my $thisfile = Cwd::abs_path(__FILE__);
-my $cwd = dirname $thisfile;
 
 my $obj;
 my $host;
