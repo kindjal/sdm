@@ -10,7 +10,7 @@ class System::Disk::Host::Command::Assign {
         host  => { is => 'System::Disk::Host', shell_args_position => 1 },
         filer => { is => 'System::Disk::Filer',  shell_args_position => 2 },
     ],
-    doc => 'Assign an host to an array',
+    doc => 'assign a host to a filer',
 };
 
 sub execute {
@@ -18,7 +18,7 @@ sub execute {
 
     my $res = System::Disk::FilerHostBridge->create( host => $self->host, filer => $self->filer );
     unless ($res) {
-        $self->error_message("Failed to assign Host '" . $self->host . "' to Filer '" . $self->filer);
+        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Filer '" . $self->filer->name);
         return;
     }
     return $res;
