@@ -18,7 +18,7 @@ class System::Disk::Volume::Command::Assign {
 sub _prep_filesystem {
     my $self = shift;
     my ($volume,$group) = @_;
-    ### S:D:V->_prep_filesystem: $self
+    ### Volume->_prep_filesystem: $self
     $self->warning_message("Assign " . $volume->mount_path . " to " . $group->name);
     $self->error_message("Not yet implemented");
     return;
@@ -38,7 +38,7 @@ sub _prep_filesystem {
 sub execute {
     my $self = shift;
     my $disk_group = uc($self->disk_group);
-    ### S:D:V->assign: $self
+    ### Volume->assign: $self
 
     my $volume = System::Disk::Volume->get( mount_path => $self->{mount_path} );
     unless ($volume) {
