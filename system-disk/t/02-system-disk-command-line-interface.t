@@ -47,27 +47,28 @@ sub runcmd {
 runcmd("disk group add --name SYSTEMS");
 stdout_like { runcmd("disk group list --noheaders --show name --filter name=SYSTEMS"); } qr/SYSTEMS/, "ok: group list works";
 runcmd("disk group update --permissions 755 SYSTEMS");
-runcmd("disk group delete SYSTEMS");
 
 runcmd("disk filer add --name gpfs");
 stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfs"); } qr/gpfs/, "ok: filer list works";
 runcmd("disk filer update --comments Foo gpfs");
-runcmd("disk filer delete gpfs");
 runcmd("disk filer list --noheaders --show name --filter name=gpfs");
 
 runcmd("disk host add --hostname linuscs103");
 stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103"); } qr/linuscs103/, "ok: host list works";
 runcmd("disk host update --comments Foo linuscs103");
-runcmd("disk host delete linuscs103");
 
 runcmd("disk array add --name nsams2k1");
 stdout_like { runcmd("disk array list --noheaders --show name --filter name=nsams2k1"); } qr/nsams2k1/, "ok: array list works";
 runcmd("disk array update --model Foo nsams2k1");
-runcmd("disk array delete nsams2k1");
 
 runcmd("disk volume add --mount-path=/gscmnt/ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
 runcmd("disk volume update --total-kb=7438990688 1");
-stdout_like { runcmd("disk volume list --noheaders --show mount-path --filter mount-path=/gscmnt/ams1100"); } qr/ams1100/, "ok: volume list works";
+stdout_like { runcmd("disk volume list --noheaders --show mount_path --filter mount_path=/gscmnt/ams1100"); } qr/ams1100/, "ok: volume list works";
+
 runcmd("disk volume delete 1");
+runcmd("disk group delete SYSTEMS");
+runcmd("disk filer delete gpfs");
+runcmd("disk host delete linuscs103");
+runcmd("disk array delete nsams2k1");
 
 done_testing();

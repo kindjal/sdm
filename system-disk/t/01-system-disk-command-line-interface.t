@@ -46,13 +46,11 @@ runcmd("disk group add --name INFO_APIPE");
 runcmd("disk group add --name SYSTEMSDEL");
 stdout_like { runcmd("disk group list --noheaders --show name --filter name=SYSTEMSDEL"); } qr/SYSTEMSDEL/, "ok: group list works";
 $ENV{SYSTEM_NO_REQUIRE_USER_VERIFY}=1;
-runcmd("disk group delete SYSTEMSDEL");
 
 runcmd("disk filer add --name gpfs");
 runcmd("disk filer add --name gpfs2");
 runcmd("disk filer add --name gpfsdel");
 stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfsdel"); } qr/gpfsdel/, "ok: filer list works";
-runcmd("disk filer delete gpfsdel");
 
 runcmd("disk host add --hostname linuscs103");
 runcmd("disk host add --hostname linuscs104");
@@ -65,7 +63,6 @@ runcmd("disk host add --hostname linuscs113");
 runcmd("disk host add --hostname linuscs114");
 runcmd("disk host add --hostname linuscs103del");
 stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103del"); } qr/linuscs103del/, "ok: host list works";
-runcmd("disk host delete linuscs103del");
 
 runcmd("disk array add --name nsams2k1");
 runcmd("disk array add --name nsams2k2");
@@ -75,14 +72,6 @@ runcmd("disk array add --name nsams2k5");
 runcmd("disk array add --name nsams2k6");
 runcmd("disk array add --name nsams2k1del");
 stdout_like { runcmd("disk array list --noheaders --show name --filter name=nsams2k1del"); } qr/nsams2k1del/, "ok: array list works";
-runcmd("disk array delete nsams2k1del");
-
-runcmd("disk array assign nsams2k1 linuscs103");
-runcmd("disk array detach nsams2k1 linuscs103");
-runcmd("disk array assign nsams2k1 linuscs103");
-runcmd("disk host assign linuscs103 gpfs");
-runcmd("disk host detach linuscs103 gpfs");
-runcmd("disk host assign linuscs103 gpfs");
 
 runcmd("disk array assign nsams2k1 linuscs103");
 runcmd("disk array assign nsams2k1 linuscs104");
