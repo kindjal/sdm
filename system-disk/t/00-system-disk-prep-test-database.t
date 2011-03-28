@@ -1,4 +1,6 @@
-#! /usr/bin/perl
+#!/usr/bin/perl
+
+use Smart::Comments -ENV;
 
 use Test::More;
 use FindBin;
@@ -6,6 +8,8 @@ use File::Basename qw/dirname/;
 
 my $top = dirname $FindBin::Bin;
 my $base = "$top/lib/System";
+### top: $top
+### base: $base
 
 print "flush sqlite3 DB\n";
 unlink "$base/DataSource/Disk.sqlite3";

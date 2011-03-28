@@ -1,6 +1,7 @@
 #! /usr/bin/perl
 
 use Test::More;
+use Test::Output;
 use FindBin;
 use IPC::Cmd;
 use File::Basename qw/dirname/;
@@ -12,8 +13,12 @@ my $base = "$top/lib/System";
 my $perl = "$^X -I " . join(" -I ",@INC);
 my $system = IPC::Cmd::can_run("system");
 unless ($system) {
-    if (-e "../system/bin/system") {
-        $system = "../system/bin/system"
+    if (-e "./system-disk/system/bin/system") {
+        $system = "./system-disk/system/bin/system";
+    } elsif (-e "./system/bin/system") {
+        $system = "./system/bin/system";
+    } elsif (-e "../system/bin/system") {
+        $system = "../system/bin/system";
     } else {
         die "Can't find 'system' executable";
     }
@@ -38,20 +43,29 @@ sub runcmd {
 
 runcmd("disk group add --name SYSTEMS");
 runcmd("disk group add --name INFO_APIPE");
+runcmd("disk group add --name SYSTEMSDEL");
+stdout_like { runcmd("disk group list --noheaders --show name --filter name=SYSTEMSDEL"); } qr/SYSTEMSDEL/, "ok: group list works";
+$ENV{SYSTEM_NO_REQUIRE_USER_VERIFY}=1;
+runcmd("disk group delete SYSTEMSDEL");
 
 runcmd("disk filer add --name gpfs");
 runcmd("disk filer add --name gpfs2");
+runcmd("disk filer add --name gpfsdel");
+stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfsdel"); } qr/gpfsdel/, "ok: filer list works";
+runcmd("disk filer delete gpfsdel");
 
 runcmd("disk host add --hostname linuscs103");
 runcmd("disk host add --hostname linuscs104");
 runcmd("disk host add --hostname linuscs105");
 runcmd("disk host add --hostname linuscs106");
-
 runcmd("disk host add --hostname linuscs110");
 runcmd("disk host add --hostname linuscs111");
 runcmd("disk host add --hostname linuscs112");
 runcmd("disk host add --hostname linuscs113");
 runcmd("disk host add --hostname linuscs114");
+runcmd("disk host add --hostname linuscs103del");
+stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103del"); } qr/linuscs103del/, "ok: host list works";
+runcmd("disk host delete linuscs103del");
 
 runcmd("disk array add --name nsams2k1");
 runcmd("disk array add --name nsams2k2");
@@ -59,12 +73,31 @@ runcmd("disk array add --name nsams2k3");
 runcmd("disk array add --name nsams2k4");
 runcmd("disk array add --name nsams2k5");
 runcmd("disk array add --name nsams2k6");
+runcmd("disk array add --name nsams2k1del");
+stdout_like { runcmd("disk array list --noheaders --show name --filter name=nsams2k1del"); } qr/nsams2k1del/, "ok: array list works";
+runcmd("disk array delete nsams2k1del");
 
-runcmd("disk volume add --mount-path=/gscmnt/ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername gpfs --disk-group=SYSTEMS");
+runcmd("disk array assign nsams2k1 linuscs103");
+runcmd("disk array detach nsams2k1 linuscs103");
+runcmd("disk array assign nsams2k1 linuscs103");
+runcmd("disk host assign linuscs103 gpfs");
+runcmd("disk host detach linuscs103 gpfs");
+runcmd("disk host assign linuscs103 gpfs");
+
+runcmd("disk array assign nsams2k1 linuscs103");
+runcmd("disk array assign nsams2k1 linuscs104");
+runcmd("disk array assign nsams2k1 linuscs105");
+runcmd("disk array assign nsams2k1 linuscs106");
+runcmd("disk array assign nsams2k4 linuscs103");
+runcmd("disk array assign nsams2k4 linuscs104");
+runcmd("disk array assign nsams2k4 linuscs105");
+runcmd("disk array assign nsams2k4 linuscs106");
+
+runcmd("disk volume add --mount-path=/gscmnt/ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
 # Note mixed case group name which is fixed in Volume.pm
-runcmd("disk volume add --mount-path=/gscmnt/ams1101 --physical-path=/vol/ams1101 --total-kb=18438990688 --used-kb=7722964896 --filername gpfs --disk-group=SYSTems");
+runcmd("disk volume add --mount-path=/gscmnt/ams1101 --physical-path=/vol/ams1101 --total-kb=18438990688 --used-kb=7722964896 --filername=gpfs --disk-group=SYSTems");
 
-runcmd("disk volume add --mount-path=/gscmnt/gc2100 --physical-path=/vol/gc2100 --total-kb=6438990688 --used-kb=5722964896 --filername gpfs2 --disk-group=INFO_APIPE");
-runcmd("disk volume add --mount-path=/gscmnt/gc2101 --physical-path=/vol/gc2101 --total-kb=16438990688 --used-kb=11722964896 --filername gpfs2 --disk-group=INFO_APIPE");
+runcmd("disk volume add --mount-path=/gscmnt/gc2100 --physical-path=/vol/gc2100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs2 --disk-group=INFO_APIPE");
+runcmd("disk volume add --mount-path=/gscmnt/gc2101 --physical-path=/vol/gc2101 --total-kb=16438990688 --used-kb=11722964896 --filername=gpfs2 --disk-group=INFO_APIPE");
 
 done_testing();
