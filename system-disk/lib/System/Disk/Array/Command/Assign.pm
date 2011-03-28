@@ -10,7 +10,7 @@ class System::Disk::Array::Command::Assign {
         array => { is => 'System::Disk::Array', shell_args_position => 1 },
         host  => { is => 'System::Disk::Host',  shell_args_position => 2 },
     ],
-    doc => 'Assign an Array to a Host',
+    doc => 'assign an array to a host',
 };
 
 sub execute {
@@ -18,7 +18,7 @@ sub execute {
 
     my $res = System::Disk::HostArrayBridge->create( host => $self->host, array => $self->array );
     unless ($res) {
-        $self->error_message("Failed to assign Host '" . $self->host . "' to Array '" . $self->array);
+        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Array '" . $self->array->name);
         return;
     }
     return $res;
