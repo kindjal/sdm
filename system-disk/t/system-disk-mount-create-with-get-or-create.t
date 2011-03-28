@@ -17,8 +17,14 @@ my $e;
 my $v;
 my $m;
 
-system('bash t/00-disk-prep-test-database.sh');
-ok( $? >> 8 == 0, "flush db ok");
+# Start with a fresh database
+use File::Basename qw/dirname/;
+my $top = dirname $FindBin::Bin;
+my $base = "$top/lib/System";
+my $perl = "$^X -I " . join(" -I ",@INC);
+system("$perl $top/t/00-system-disk-prep-test-database.t");
+ok($? >> 8 == 0, "prep test db ok");
+
 ok( $v = System::Disk::Volume->get_or_create( filername => 'nfs11', mount_path => '/gscmnt/sata821', physical_path => '/vol/sata821' ), "get_or_create volume ok");
 ok( UR::Context->commit(), "commit ok");
 done_testing();

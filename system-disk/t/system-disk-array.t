@@ -17,7 +17,11 @@ my $res;
 my $params;
 
 # Start with a fresh database
-system('bash ./t/00-disk-prep-test-database.sh');
+use File::Basename qw/dirname/;
+my $top = dirname $FindBin::Bin;
+my $base = "$top/lib/System";
+my $perl = "$^X -I " . join(" -I ",@INC);
+system("$perl $top/t/00-system-disk-prep-test-database.t");
 ok($? >> 8 == 0, "prep test db ok");
 
 # Test insufficient creation params
