@@ -4,9 +4,8 @@ package System::Disk::Volume;
 use strict;
 use warnings;
 
-use Date::Manip;
 use System;
-
+use Date::Manip;
 use Smart::Comments -ENV;
 
 class System::Disk::Volume {
@@ -21,6 +20,7 @@ class System::Disk::Volume {
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
         mount         => { is => 'System::Disk::Mount', reverse_as => 'volume' },
         export        => { is => 'System::Disk::Export', reverse_as => 'volume', via => 'mount' },
+        physical_path => { via => 'export', to => 'physical_path' },
         filer         => { is => 'System::Disk::Filer', via => 'export' },
         filername     => { via => 'filer', to => 'name' },
         arrayname     => { via => 'filer', to => 'arrayname' },
@@ -28,8 +28,8 @@ class System::Disk::Volume {
     ],
     has_optional => [
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
-        total_kb      => { is => 'UnsignedInteger' },
-        used_kb       => { is => 'UnsignedInteger' },
+        total_kb      => { is => 'UnsignedInteger', default => 0 },
+        used_kb       => { is => 'UnsignedInteger', default => 0 },
         capacity      => { is => 'Number', is_calculated => 1 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
@@ -86,8 +86,8 @@ sub is_current {
     return 0;
 }
 
-=head2 validate_volumes
-Iterate through all volumes and apply is_current() reporting the result to STDOUT.
+=head2 validate
+Apply is_current() reporting the result to STDOUT.
 =cut
 sub validate {
     my $self = shift;
@@ -97,8 +97,21 @@ sub validate {
     }
 }
 
+=head2 is_orphan
+Determine if the volume has a filer.  If not, it's an orphan and should be removed.
+=cut
+sub is_orphan {
+    my $self = shift;
+    my $filer = $self->filer;
+    unless ($filer) {
+        $self->warning_message("Volume '" . $self->mount_path . "' has no Filers, it has been orphaned.");
+        return 1;
+    }
+    return 0;
+}
+
 =head2 purge
-Iterate through all volumes and apply is_current() and delete all those that fail that test.
+Apply is_current() and delete all those that fail that test.
 =cut
 sub purge {
     my $self = shift;
