@@ -21,13 +21,13 @@ class System::Disk::Host {
         last_modified   => { is => 'DATE' },
     ],
     has_many_optional => [
-        exports         => { is => 'System::Disk::Export', reverse_as => 'host' },
         arraymappings   => { is => 'System::Disk::HostArrayBridge', reverse_as => 'host' },
         array           => { is => 'System::Disk::Array', via => 'arraymappings' },
         arrayname       => { via => 'array', to => 'name' },
         filermappings   => { is => 'System::Disk::FilerHostBridge', reverse_as => 'host' },
         filer           => { is => 'System::Disk::Filer', via => 'filermappings', to => 'filer' },
         filername       => { via => 'filer', to => 'name' },
+        #exports         => { is => 'System::Disk::Export', reverse_as => 'host' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
@@ -83,6 +83,21 @@ sub create {
     }
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( %params );
+}
+
+=head2 delete
+Delete Hosts and relationships
+=cut
+sub delete {
+    my $self = shift;
+    # Before a Host can be deleted, remove entries from relationship tables.
+    foreach my $mapping ($self->arraymappings) {
+        $mapping->delete or die "Failed to remove Host-Array mapping " . $mapping->id;
+    }
+    foreach my $mapping ($self->filermappings) {
+        $mapping->delete or die "Failed to remove Host-Filer mapping " . $mapping->id;
+    }
+    return $self->SUPER::delete();
 }
 
 1;
