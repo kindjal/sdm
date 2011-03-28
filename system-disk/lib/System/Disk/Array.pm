@@ -37,4 +37,13 @@ sub create {
     return $self->SUPER::create( %params );
 }
 
+sub delete {
+    my $self = shift;
+    # Before we remove the Array, we must remove its connection to Hosts.
+    foreach my $mapping ($self->mappings) {
+        $mapping->delete() or die "Failed to remove host-array mapping: $!";
+    }
+    return $self->SUPER::delete();
+}
+
 1;
