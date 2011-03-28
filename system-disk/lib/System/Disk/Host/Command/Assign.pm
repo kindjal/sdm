@@ -18,7 +18,7 @@ sub execute {
 
     my $res = System::Disk::FilerHostBridge->create( host => $self->host, filer => $self->filer );
     unless ($res) {
-        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Filer '" . $self->filer->name);
+        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Filer '" . $self->filer->name . "'");
         return;
     }
     return $res;

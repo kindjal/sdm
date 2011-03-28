@@ -18,7 +18,7 @@ sub execute {
 
     my $res = System::Disk::HostArrayBridge->create( host => $self->host, array => $self->array );
     unless ($res) {
-        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Array '" . $self->array->name);
+        $self->error_message("Failed to assign Host '" . $self->host->hostname . "' to Array '" . $self->array->name . "'");
         return;
     }
     return $res;

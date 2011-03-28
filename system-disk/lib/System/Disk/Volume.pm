@@ -238,33 +238,14 @@ Delete a Volume and its Mounts, or delete the described Mounts.
 =cut
 sub delete {
     my $self = shift;
-    my (%param) = @_ if (scalar @_);
-    my @args;
-    ### Volume->delete: $self
-    ###   param: %param
-    # Remove the Export entries, then the Mount entries, then the Volume
-    #   - Export->filername + Export->physical_path
+    # Remove Mount entries, then the Volume
     #   - Volume->mount_path
     #   - Mount->volume_id + Mount->export_id
-    # If we gave arguments, find the subset of Mounts matching them:
-    if ($param{filername}) {
-        push @args, filername => $param{filername};
+    # Otherwise remove all mounts and this Volume
+    foreach my $m ($self->mount) {
+        ### remove mount for volume
+        $m->delete() or die "Failed to delete mount for volume: " . $self->id;
     }
-    if ($param{physical_path}) {
-        push @args, physical_path => $param{physical_path};
-    }
-    if (scalar @args) {
-        foreach my $m (System::Disk::Mount->get( @args )) {
-            ### Volume->delete mount: $m
-            $m->delete or die "Failed to delete mount for volume: " . $self->id;
-        }
-    } else {
-        # Otherwise remove all mounts and this Volume
-        foreach my $m (System::Disk::Mount->get( volume_id => $self->id )) {
-            ### Volume->delete mount: $m
-            $m->delete or die "Failed to delete mount for volume: " . $self->id;
-        }
-        return $self->SUPER::delete();
-    }
+    return $self->SUPER::delete();
 }
 
