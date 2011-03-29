@@ -1,5 +1,5 @@
 
-package System::Disk::Filer::Command::Usage;
+package System::Disk::Filer::Command::QuerySnmp;
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ local $| = 1;
 
 use Smart::Comments -ENV;
 
-class System::Disk::Filer::Command::Usage {
+class System::Disk::Filer::Command::QuerySnmp {
   is => 'System::Command::Base',
   has_optional => [
     force => {
@@ -108,7 +108,7 @@ sub update_volume {
     my $self = shift;
     my $filer = shift;
     my $volumedata = shift;
-    ### Usage update_volume for filer: $filer
+    ### QuerySnmp update_volume for filer: $filer
 
     unless ($filer) {
         $self->error_message("No filer given");
@@ -118,7 +118,7 @@ sub update_volume {
     $self->warning_message("Update filer " . $filer->name);
 
     unless ($self->physical_path) {
-        ### Usage First find and remove volumes in the DB that are not detected on this filer
+        ### QuerySnmp First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
         foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
@@ -128,10 +128,10 @@ sub update_volume {
             # FIXME: do we want to auto-remove like this?
             if ( ! grep /$path/, keys %$volumedata ) {
                 foreach my $m (System::Disk::Mount->get( $volume->id )) {
-                    ### Usage delete mount: $m
+                    ### QuerySnmp delete mount: $m
                     $m->delete;
                 }
-                ### Usage delete volume: $volume
+                ### QuerySnmp delete volume: $volume
                 $volume->delete;
                 $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
             }
@@ -140,7 +140,7 @@ sub update_volume {
     }
 
     foreach my $physical_path (keys %$volumedata) {
-        ### Usage update physical_path: $physical_path
+        ### QuerySnmp update physical_path: $physical_path
         # FIXME: How can we know the mount path aside from convention?
         my $mount_path = '/gscmnt/' . basename $physical_path;
         my $volume = System::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path );
@@ -153,26 +153,26 @@ sub update_volume {
                 $self->error_message("Failed to get_or_create group: $group_name");
                 return;
             }
-            ### Usage get_or_create group returned: $group
+            ### QuerySnmp get_or_create group returned: $group
         } else {
             $self->warning_message("No group found for $mount_path");
         }
 
-        ### Usage volume returned: $volume
+        ### QuerySnmp volume returned: $volume
         unless ($volume) {
             $self->error_message("Failed to get_or_create volume");
             return;
         }
-        ### Usage volume: $volume
-        ### Usage volumedata: $volumedata
+        ### QuerySnmp volume: $volume
+        ### QuerySnmp volumedata: $volumedata
 
         foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
            # FIXME: Don't update disk group from filesystem, only the reverse.
            #next if ($attr eq 'disk_group');
            my $p = $volume->__meta__->property($attr);
            # Primary keys are immutable, don't try to update them
-           ### Usage update volume attr: $attr
-           ### Usage p: $p
+           ### QuerySnmp update volume attr: $attr
+           ### QuerySnmp p: $p
            $volume->$attr($volumedata->{$physical_path}->{$attr})
              if (! $p->is_id and $p->is_mutable);
            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
@@ -187,7 +187,7 @@ Iterate over all Volumes associated with this Filer, check is_current() and warn
 =cut
 sub validate_volumes {
     my $self = shift;
-    ### S:D:V:C:Usage->validate_volumes
+    ### QuerySnmp->validate_volumes
     $self->error_message("max age has not been specified\n")
         if (! defined $self->vol_maxage);
     $self->error_message("max age makes no sense: $self->vol_maxage\n")
@@ -203,7 +203,7 @@ Iterate over all Volumes associated with this Filer, check is_current() and purg
 =cut
 sub purge_volumes {
     my $self = shift;
-    ### S:D:V:C:Usage->purge_volumes
+    ### QuerySnmp->purge_volumes
     $self->error_message("max age has not been specified\n")
         if (! defined $self->vol_maxage);
     $self->error_message("max age makes no sense: $self->vol_maxage\n")
@@ -215,10 +215,10 @@ sub purge_volumes {
 }
 
 =head2 execute
-Execute S:D:F:C:Usage() queries SNMP on a named Filer and stores disk usage information.
+Execute QuerySnmp() queries SNMP on a named Filer and stores disk usage information.
 =cut
 sub execute {
-    ### Usage execute Usage
+    ### QuerySnmp execute Usage
     my $self = shift;
 
     my @filers;
@@ -236,7 +236,7 @@ sub execute {
     }
 
     foreach my $filer (@filers) {
-        ### Usage foreach loop at: $filer
+        ### QuerySnmp foreach loop at: $filer
         # Just check is_current
         $self->warning_message("Query filer " . $filer->name);
         if ($self->is_current) {
@@ -271,7 +271,7 @@ sub execute {
             $self->update_volume( $filer, $result );
         }
     }
-    ### Usage execute Usage complete
+    ### QuerySnmp execute QuerySnmp complete
 }
 
 1;
