@@ -25,6 +25,7 @@ my $perl = "$^X -I " . join(" -I ",@INC);
 system("$perl $top/t/00-system-disk-prep-test-database.t");
 ok($? >> 8 == 0, "prep test db ok");
 
+ok( $f = System::Disk::Filer->create( name => 'nfs11'), "create filer ok");
 ok( $v = System::Disk::Volume->get_or_create( filername => 'nfs11', mount_path => '/gscmnt/sata821', physical_path => '/vol/sata821' ), "get_or_create volume ok");
 ok( UR::Context->commit(), "commit ok");
 done_testing();
