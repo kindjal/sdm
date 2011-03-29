@@ -172,9 +172,8 @@ sub create {
     }
     ### Volume->create volume->get: $volume
 
-    # FIXME: Is it ok to auto-create Filers?  I say no for now.
+    # Note: Is it ok to auto-create Filers?  I say no for now.
     # The exact volume doesn't exist, so make sure we have the Filer
-    #my $filer = System::Disk::Filer->get_or_create( name => $param{filername} );
     my $filer = System::Disk::Filer->get( name => $param{filername} );
     unless ($filer) {
         $self->error_message("Failed to identify filer: " . $param{filername});
@@ -182,7 +181,7 @@ sub create {
     }
     ### Volume->create filer->get: $filer
 
-    # FIXME: Is it ok to auto-create Exports?  I say yes for now, export and mount should be "under the hood"
+    # Note: Is it ok to auto-create Exports?  I say yes for now, export and mount should be "under the hood"
     # Now make sure the Filer has the Export
     my $export = System::Disk::Export->get_or_create( filername => $param{filername}, physical_path => $param{physical_path} );
     unless ($export) {
@@ -191,7 +190,7 @@ sub create {
     }
     ### Volume->create export->get_or_create: $export
 
-    # FIXME: Is it ok to auto-create Groups?  I say no for now, they shouldn't change often
+    # Note: Is it ok to auto-create Groups?  I say no for now, they shouldn't change often
     # and they represent real people, which we should be careful to not mess with.
     # If a group is specified, make sure we have that too
     my $group_name = uc($param{disk_group});
@@ -219,7 +218,7 @@ sub create {
     }
     ### Volume->create volume->SUPER::create: $volume
 
-    # FIXME: Is it ok to auto-create mounts?  I say yes for now, exports and mounts should be "under the hood".
+    # Note: Is it ok to auto-create mounts?  I say yes for now, exports and mounts should be "under the hood".
     # Now that we have a Volume, ensure there's a mount (bridge table)
     # Mount is a bridge table between Volume and Filer.
     my $mount  = System::Disk::Mount->get_or_create( volume_id => $volume->id, export_id => $export->id );
