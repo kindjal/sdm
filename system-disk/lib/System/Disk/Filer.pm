@@ -90,12 +90,12 @@ sub delete {
     my @volumes = System::Disk::Volume->get( filername => $self->name );
 
     # Before we remove the Filer, we must remove its exports and hostmappings
-    foreach my $export ( $self->export ) {
+    foreach my $export ( $self->exports ) {
         $self->warning_message("Remove Export " . $export->id . " for Filer " . $self->name);
         $export->delete() or
             die "Failed to remove Export for Filer: " . $self->name;
     }
-    foreach my $hm ( $self->hostmapping ) {
+    foreach my $hm ( $self->hostmappings ) {
         $self->warning_message("Remove Filer-Host mapping " . $hm->id . " for Filer " . $self->name);
         $hm->delete() or
             die "Failed to remove Filer-Host map for Filer: " . $self->name;
@@ -109,7 +109,8 @@ sub delete {
     # on this filer and see if they're now orphans.
     foreach my $volume (@volumes) {
         if ($volume->is_orphan()) {
-            $self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
+            # FIXME: can't use warning_message here or we silently abort
+            #$self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
             $volume->delete();
         }
     }
