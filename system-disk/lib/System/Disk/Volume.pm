@@ -19,9 +19,8 @@ class System::Disk::Volume {
     has_many_optional => [
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
         mount         => { is => 'System::Disk::Mount', reverse_as => 'volume' },
-        export        => { is => 'System::Disk::Export', reverse_as => 'volume', via => 'mount' },
-        physical_path => { via => 'export', to => 'physical_path' },
-        filer         => { is => 'System::Disk::Filer', via => 'export' },
+        filer         => { is => 'System::Disk::Filer', via => 'mount', to => 'filer' },
+        physical_path => { via => 'mount', to => 'physical_path' },
         filername     => { via => 'filer', to => 'name' },
         arrayname     => { via => 'filer', to => 'arrayname' },
         hostname      => { via => 'filer', to => 'hostname' },
@@ -193,7 +192,7 @@ sub create {
     # Note: Is it ok to auto-create Groups?  I say no for now, they shouldn't change often
     # and they represent real people, which we should be careful to not mess with.
     # If a group is specified, make sure we have that too
-    my $group_name = uc($param{disk_group});
+    my $group_name;
     if ($param{disk_group}) {
         $group_name = uc($param{disk_group});
         my $group = System::Disk::Group->get( name => $group_name );
@@ -237,14 +236,31 @@ Delete a Volume and its Mounts, or delete the described Mounts.
 =cut
 sub delete {
     my $self = shift;
-    # Remove Mount entries, then the Volume
-    #   - Volume->mount_path
-    #   - Mount->volume_id + Mount->export_id
-    # Otherwise remove all mounts and this Volume
-    foreach my $m ($self->mount) {
-        ### remove mount for volume
-        $m->delete() or die "Failed to delete mount for volume: " . $self->id;
+    my (%param) = @_;
+    ### Volume->delete mount: $self
+    ###  param: %param
+    # Remove the Export entries, then the Mount entries, then the Volume.
+    # If we gave arguments, we're specifying a filername.
+    if (defined $param{filername}) {
+        foreach my $m (System::Disk::Mount->get( filername => $param{filername} )) {
+            ### Volume->delete mount: $m
+            $m->delete() or die "Failed to delete mount for volume: " . $self->id;
+        }
+        my @mounts = $self->mount;
+        unless (scalar @mounts) {
+            # If we have no mounts left, remove the volume
+            ### Volume->delete: $self
+            return $self->SUPER::delete();
+        }
+    } else {
+        # Otherwise remove all mounts and this Volume
+        foreach my $m ($self->mount) {
+            ### Volume->delete mount: $m
+            $m->delete() or die "Failed to delete mount for volume: " . $self->id;
+        }
+        ### Volume->delete: $self
+        return $self->SUPER::delete();
     }
-    return $self->SUPER::delete();
 }
 
+1;
