@@ -30,7 +30,7 @@ sub help_detail {
 sub execute {
     my $self = shift;
 
-    $self->status_message('Add'.$self->_name_for_objects);
+    #$self->status_message('Add'.$self->_name_for_objects);
 
     my $class = $self->class;
     my @properties = grep { $_->class_name eq $class } $self->__meta__->property_metas;
@@ -47,16 +47,21 @@ sub execute {
             $attrs{$property_name} = $values[0];
         }
     }
-    $self->status_message(Dumper(\%attrs));
+    #$self->status_message(Dumper(\%attrs));
 
     my $target_class = $self->_target_class;
+    my $res = $target_class->get(%attrs);
+    if ($res) {
+        $self->error_message('Object already exists:\n' . Dumper(\%attrs));
+        return;
+    }
     my $obj = $target_class->create(%attrs);
     if ( not $obj ) {
         $self->error_message('Could not create '.$target_class);
         return;
     }
 
-    $self->status_message('Create: '.$obj->id);
+    $self->status_message('Created: '.$obj->id);
 
     return 1;
 }
