@@ -49,8 +49,7 @@ $ENV{SYSTEM_NO_REQUIRE_USER_VERIFY}=1;
 
 runcmd("disk filer add --name gpfs");
 runcmd("disk filer add --name gpfs2");
-runcmd("disk filer add --name gpfsdel");
-stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfsdel"); } qr/gpfsdel/, "ok: filer list works";
+stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfs"); } qr/gpfs/, "ok: filer list works";
 
 runcmd("disk host add --hostname linuscs103");
 runcmd("disk host add --hostname linuscs104");
@@ -61,8 +60,7 @@ runcmd("disk host add --hostname linuscs111");
 runcmd("disk host add --hostname linuscs112");
 runcmd("disk host add --hostname linuscs113");
 runcmd("disk host add --hostname linuscs114");
-runcmd("disk host add --hostname linuscs103del");
-stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103del"); } qr/linuscs103del/, "ok: host list works";
+stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103"); } qr/linuscs103/, "ok: host list works";
 
 runcmd("disk array add --name nsams2k1");
 runcmd("disk array add --name nsams2k2");
@@ -70,8 +68,7 @@ runcmd("disk array add --name nsams2k3");
 runcmd("disk array add --name nsams2k4");
 runcmd("disk array add --name nsams2k5");
 runcmd("disk array add --name nsams2k6");
-runcmd("disk array add --name nsams2k1del");
-stdout_like { runcmd("disk array list --noheaders --show name --filter name=nsams2k1del"); } qr/nsams2k1del/, "ok: array list works";
+stdout_like { runcmd("disk array list --noheaders --show name --filter name=nsams2k1"); } qr/nsams2k1/, "ok: array list works";
 
 runcmd("disk array assign nsams2k1 linuscs103");
 runcmd("disk array assign nsams2k1 linuscs104");
@@ -81,6 +78,29 @@ runcmd("disk array assign nsams2k4 linuscs103");
 runcmd("disk array assign nsams2k4 linuscs104");
 runcmd("disk array assign nsams2k4 linuscs105");
 runcmd("disk array assign nsams2k4 linuscs106");
+
+runcmd("disk array assign nsams2k2 linuscs110");
+runcmd("disk array assign nsams2k2 linuscs111");
+runcmd("disk array assign nsams2k2 linuscs112");
+runcmd("disk array assign nsams2k2 linuscs113");
+runcmd("disk array assign nsams2k2 linuscs114");
+
+runcmd("disk array assign nsams2k5 linuscs110");
+runcmd("disk array assign nsams2k5 linuscs111");
+runcmd("disk array assign nsams2k5 linuscs112");
+runcmd("disk array assign nsams2k5 linuscs113");
+runcmd("disk array assign nsams2k5 linuscs114");
+
+runcmd("disk host assign linuscs103 gpfs");
+runcmd("disk host assign linuscs104 gpfs");
+runcmd("disk host assign linuscs105 gpfs");
+runcmd("disk host assign linuscs106 gpfs");
+
+runcmd("disk host assign linuscs110 gpfs2");
+runcmd("disk host assign linuscs111 gpfs2");
+runcmd("disk host assign linuscs112 gpfs2");
+runcmd("disk host assign linuscs113 gpfs2");
+runcmd("disk host assign linuscs114 gpfs2");
 
 runcmd("disk volume add --mount-path=/gscmnt/ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
 # Note mixed case group name which is fixed in Volume.pm
