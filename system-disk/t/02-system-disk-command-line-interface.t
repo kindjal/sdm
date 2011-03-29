@@ -44,14 +44,14 @@ sub runcmd {
 
 # Simple add, update, list, delete for all objects.
 # array host filer group volume
-runcmd("disk group add --name SYSTEMS");
-stdout_like { runcmd("disk group list --noheaders --show name --filter name=SYSTEMS"); } qr/SYSTEMS/, "ok: group list works";
-runcmd("disk group update --permissions 755 SYSTEMS");
-
 runcmd("disk filer add --name gpfs");
 stdout_like { runcmd("disk filer list --noheaders --show name --filter name=gpfs"); } qr/gpfs/, "ok: filer list works";
 runcmd("disk filer update --comments Foo gpfs");
 runcmd("disk filer list --noheaders --show name --filter name=gpfs");
+
+runcmd("disk group add --name SYSTEMS");
+stdout_like { runcmd("disk group list --noheaders --show name --filter name=SYSTEMS"); } qr/SYSTEMS/, "ok: group list works";
+runcmd("disk group update --permissions 755 SYSTEMS");
 
 runcmd("disk host add --hostname linuscs103");
 stdout_like { runcmd("disk host list --noheaders --show hostname --filter hostname=linuscs103"); } qr/linuscs103/, "ok: host list works";
