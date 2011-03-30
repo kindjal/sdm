@@ -15,6 +15,43 @@ class System::Disk::Volume::Command::Assign {
     ],
 };
 
+sub _set_mode {
+    my $self = shift;
+    my ($path, $owner, $group, $mode) = @_;
+
+    if (!chown($owner, $group, $path)) {
+        $self->error_message("failed to chown $path $owner:$group");
+        rmdir($path);
+        return;
+    }
+
+    if (!chmod(oct($mode), $path)) {
+        $self->error_message("failed to chmod directory $path: $mode");
+        rmdir($path);
+        return;
+    }
+
+    return 1;
+}
+
+sub _create_dir {
+    my $self = shift;
+    my ($path) = @_;
+
+    if (-d $path) {
+        $self->error_message("directory already exists: $path");
+        return;
+    }
+
+    if (! mkdir($path)) {
+        $self->error_message("failed to create directory: $path");
+        return;
+    }
+
+    return 1;
+}
+
+
 sub _prep_filesystem {
     my $self = shift;
     my ($volume,$group) = @_;
@@ -23,16 +60,52 @@ sub _prep_filesystem {
     $self->error_message("Not yet implemented");
     return;
 
-    # Set up the filesystem.
-    unless (-w $volume->mount_path) {
-        $self->error_message("Mount path is not writable: " . $volume->mount_path);
+    my $path = $volume->mount_path;
+    unless (-w $path) {
+        $self->error_message("Mount path is not writable: " . $path);
         return;
     }
 
-    #open(FH,'>',$volume->mount_path) or die "Can't open touchfile " . $volume->mount_path;
-    #close();
-    #my $subdir = $volume->mount_path . "/" . 
-    #mkdir $volume->mount_path . "/info"
+    my @assignments = glob("$path/DISK_*");
+    if (@assignments) {
+        # FIXME: prompt for re-assignment here.
+        $self->error_message("directory is already assigned: @assignments");
+        return;
+    }
+
+    if (! $self->_set_mode($path, 0, 0, '0755')) {
+        $self->error_message("failed to set permissions on top level directory: $path");
+        return;
+    }
+
+    my $file = "$path/DISK_" . uc($group->name);
+    my $file_content = (split(' ', qx(who am i)))[0];
+    my $fh = IO::File->new(">$file");
+    if (!defined($fh)) {
+        $self->error_message("failed to create file: $file");
+        return;
+    }
+    $fh->print("$file_content\n");
+    $fh->close;
+
+    # FIXME: make subdirectory mandatory Group attribute
+    my $dir = $group->subdirectory;
+    $dir =~ s/_.*//;
+    $dir = "$path/$dir";
+    if (! $self->_create_dir($dir)) {
+        unlink($file);
+        return;
+    }
+    if (! $self->_set_mode($dir, $conf->{$group}{owner}, $conf->{$group}{gid}, $conf->{$group}{mode})) {
+        rmdir($dir);
+        unlink($file);
+        return;
+    }
+
+    # Create subgroup dirs
+    # FIXME
+
+    return 1;
 }
 
 sub execute {
@@ -51,7 +124,10 @@ sub execute {
         return;
     }
 
-    $self->_prep_filesystem( $volume, $group );
+    unless ($self->_prep_filesystem( $volume, $group )) {
+        $self->error_message("Error prepping group directory: " . $disk_group);
+        return;
+    }
 
     # FIXME: turn this on when prep_filesystem is done
     # Set the assignment in the Volume table after the filesystem is correct.
