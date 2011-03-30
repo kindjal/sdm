@@ -7,11 +7,11 @@ use warnings;
 use System;
 
 class System::Disk::Volume::Command::Assign {
-    is => 'System::Command::Base',
+    is  => 'System::Command::Base',
     doc => 'assign volumes to groups',
     has => [
-        mount_path    => { is => 'Text' },
-        disk_group    => { is => 'Text' },
+        volume => { is => 'System::Disk::Volume', shell_args_position => 1 },
+        group  => { is => 'System::Disk::Group',  shell_args_position => 2 },
     ],
 };
 
@@ -54,13 +54,14 @@ sub _create_dir {
 
 sub _prep_filesystem {
     my $self = shift;
-    my ($volume,$group) = @_;
+    my ($path,$group) = @_;
     ### Volume->_prep_filesystem: $self
-    $self->warning_message("Assign " . $volume->mount_path . " to " . $group->name);
+    ###   path: $path
+    ###   group: $group
+    $self->warning_message("Assign $path to " . $group->name);
     $self->error_message("Not yet implemented");
     return;
 
-    my $path = $volume->mount_path;
     unless (-w $path) {
         $self->error_message("Mount path is not writable: " . $path);
         return;
@@ -90,48 +91,45 @@ sub _prep_filesystem {
 
     # FIXME: make subdirectory mandatory Group attribute
     my $dir = $group->subdirectory;
+    unless ($dir) {
+        $self->error_message("Group $group has no subdirectory attribute");
+        return;
+    }
     $dir =~ s/_.*//;
     $dir = "$path/$dir";
     if (! $self->_create_dir($dir)) {
         unlink($file);
         return;
     }
-    if (! $self->_set_mode($dir, $conf->{$group}{owner}, $conf->{$group}{gid}, $conf->{$group}{mode})) {
+    if (! $self->_set_mode($dir, $$group->unix_uid, $group->unix_gid, $group->permissions)) {
         rmdir($dir);
         unlink($file);
         return;
     }
 
     # Create subgroup dirs
-    # FIXME
+    foreach my $subgroup ( System::Disk::Group->get( parent_group => $group->name ) ) {
+        unless ($self->_prep_filesystem( $group->subdirectory, $subgroup )) {
+            $self->error_message("Error prepping group directory: " . $group->name);
+            return;
+        }
+    }
 
     return 1;
 }
 
 sub execute {
     my $self = shift;
-    my $disk_group = uc($self->disk_group);
     ### Volume->assign: $self
 
-    my $volume = System::Disk::Volume->get( mount_path => $self->{mount_path} );
-    unless ($volume) {
-        $self->error_message("There is no Volume for mount path: " . $self->{mount_path});
-        return;
-    }
-    my $group = System::Disk::Group->get( name => $disk_group );
-    unless ($group) {
-        $self->error_message("There is no Group named: " . $disk_group);
-        return;
-    }
-
-    unless ($self->_prep_filesystem( $volume, $group )) {
-        $self->error_message("Error prepping group directory: " . $disk_group);
+    unless ($self->_prep_filesystem( $self->volume->mount_path, $self->group )) {
+        $self->error_message("Error prepping group directory: " . $self->group->name);
         return;
     }
 
     # FIXME: turn this on when prep_filesystem is done
     # Set the assignment in the Volume table after the filesystem is correct.
-    #$volume->disk_group($disk_group);
+    #$self->volume->disk_group($group->name);
 }
 
 1;
