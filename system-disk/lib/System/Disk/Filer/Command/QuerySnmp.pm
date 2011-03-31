@@ -15,7 +15,6 @@ use Pod::Usage;
 use Log::Log4perl qw(:easy);
 
 use File::Basename qw(basename);
-use System::Utility::RRD;
 use System::Utility::SNMP;
 
 # Autoflush
