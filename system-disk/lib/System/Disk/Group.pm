@@ -14,11 +14,9 @@ class System::Disk::Group {
         sticky          => { is => 'UnsignedInteger', default => 0 },
         unix_gid        => { is => 'UnsignedInteger', default => 0 },
         unix_uid        => { is => 'UnsignedInteger', default => 0 },
+        subdirectory    => { is => 'Text', default => 'info' },
     ],
     has_optional => [
-        parent_group    => { is => 'Text' },
-        subdirectory    => { is => 'Text', len => 255 },
-        username        => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
     ],
