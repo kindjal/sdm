@@ -12,7 +12,7 @@ class System::Disk::Array {
     ],
     has_optional => [
         model         => { is => 'Text', len => 255 },
-        size          => { is => 'UnsignedInteger' },
+        size          => { is => 'UnsignedInteger', default => 0 },
         type          => { is => 'Text', len => 255 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },

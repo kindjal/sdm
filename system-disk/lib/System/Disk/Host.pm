@@ -13,7 +13,7 @@ class System::Disk::Host {
         hostname        => { is => 'Text', len => 255 },
     ],
     has_optional => [
-        status          => { is => 'UnsignedInteger' },
+        status          => { is => 'UnsignedInteger', default => 0 },
         os              => { is => 'Text', len => 255 },
         comments        => { is => 'Text', len => 255 },
         location        => { is => 'Text', len => 255 },

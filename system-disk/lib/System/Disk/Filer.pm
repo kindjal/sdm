@@ -18,7 +18,7 @@ class System::Disk::Filer {
         filesystem      => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
-        status          => { is => 'UnsignedInteger' },
+        status          => { is => 'UnsignedInteger', default => 0 },
     ],
     has_many_optional => [
         hostmappings    => { is => 'System::Disk::FilerHostBridge', reverse_as => 'filer' },
