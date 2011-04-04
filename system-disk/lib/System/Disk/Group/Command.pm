@@ -14,7 +14,7 @@ use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
     target_class => 'System::Disk::Group',
     target_name => 'group',
-    list => { show => 'name,subdirectory,username,unix_uid,unix_gid' },
+    list => { show => 'name,subdirectory,unix_uid,unix_gid' },
 );
 
 1;
