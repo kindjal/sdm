@@ -26,7 +26,7 @@ class System::Disk::Volume {
         hostname      => { via => 'filer', to => 'hostname' },
     ],
     has_optional => [
-        group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'VOLUME_GROUP_FK' },
+        group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'DISK_VOLUME_FK' },
         total_kb      => { is => 'UnsignedInteger', default => 0 },
         used_kb       => { is => 'UnsignedInteger', default => 0 },
         capacity      => { is => 'Number', is_calculated => 1 },
