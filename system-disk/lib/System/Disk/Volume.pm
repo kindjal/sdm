@@ -15,6 +15,8 @@ class System::Disk::Volume {
     ],
     has => [
         mount_path    => { is => 'Text', len => 255 },
+        total_kb      => { is => 'Integer', default_value => 0 },
+        used_kb       => { is => 'Integer', default_value => 0 },
     ],
     has_many_optional => [
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
@@ -27,8 +29,6 @@ class System::Disk::Volume {
     ],
     has_optional => [
         group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'DISK_VOLUME_FK' },
-        total_kb      => { is => 'UnsignedInteger', default => 0 },
-        used_kb       => { is => 'UnsignedInteger', default => 0 },
         capacity      => { is => 'Number', is_calculated => 1 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
@@ -161,6 +161,12 @@ sub create {
         $self->error_message("mount path not specified in Volume->create()");
         return;
     }
+    unless ($param{total_kb}) {
+        $param{total_kb} = 0;
+    }
+    unless ($param{used_kb}) {
+        $param{used_kb} = 0;
+    }
 
     my $volume = System::Disk::Volume->get( mount_path => $param{mount_path}, filername => $param{filername}, physical_path => $param{physical_path} );
     if ($volume) {
@@ -201,6 +207,7 @@ sub create {
             $self->error_message("Failed to identify group: " . $group_name );
             return;
         }
+        $param{disk_group} = $group_name;
     }
 
     # Now that we're sure that a Filer and Export exist, and that we don't already
