@@ -7,10 +7,9 @@ use IPC::Cmd;
 use File::Basename qw/dirname/;
 
 my $top = dirname $FindBin::Bin;
-my $base = "$top/lib/System";
 
 # Preserve the -I args we used to run this script.
-my $perl = "$^X -I " . join(" -I ",@INC);
+my $perl = "$^X -I $top/lib -I $top/../system/lib";
 my $system = IPC::Cmd::can_run("system");
 unless ($system) {
     if (-e "./system-disk/system/bin/system") {
@@ -35,8 +34,17 @@ ok( $? >> 8 == 0, "ok: $command") or die "Cannot remake test DB";
 
 sub runcmd {
     my $command = shift;
-    print "$system $command\n";
+    $ENV{SYSTEM_NO_REQUIRE_USER_VERIFY}=1;
+    print("$perl $system $command\n");
     system("$perl $system $command");
+    if ($? == -1) {
+         print "failed to execute: $!\n";
+    } elsif ($? & 127) {
+         printf "child died with signal %d, %s coredump\n",
+             ($? & 127),  ($? & 128) ? 'with' : 'without';
+    } else {
+         printf "child exited with value %d\n", $? >> 8;
+    }
     ok( $? >> 8 == 0, "ok: $command") or die;
     UR::Context->commit() or die;
 }
