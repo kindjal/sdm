@@ -49,6 +49,8 @@ sub runcmd {
     UR::Context->commit() or die;
 }
 
+# The following create a few entries to build 2 filers the way we know they should look.
+
 runcmd("disk group add --name SYSTEMS");
 runcmd("disk group add --name INFO_APIPE");
 runcmd("disk group add --name SYSTEMSDEL");

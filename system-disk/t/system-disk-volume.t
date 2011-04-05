@@ -47,9 +47,10 @@ ok( defined System::Disk::Filer->create( name => 'nfs12' ), "created test filer 
 ok( defined System::Disk::Filer->create( name => 'nfs13' ), "created test filer ok");
 
 # Test creation
-@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
+@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
 $res = System::Disk::Volume->create( @params );
 ok( defined $res->id, "properly created new volume");
+
 @params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
 $res = System::Disk::Volume->get( @params );
 ok( defined $res->id, "properly got new volume");
