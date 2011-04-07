@@ -78,7 +78,7 @@ CREATE TABLE DISK_ARRAY (
   name          VARCHAR(255) PRIMARY KEY,
   model         VARCHAR(255),
   type          VARCHAR(255),
-  size          BIGINT DEFAULT 0 NOT NULL,
+  arraysize     BIGINT DEFAULT 0 NOT NULL,
   created       DATE,
   last_modified DATE,
   hostname      VARCHAR(255) CONSTRAINT DISK_ARRAY_HOST_FK REFERENCES DISK_HOST(hostname)
