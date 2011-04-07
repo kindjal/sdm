@@ -34,6 +34,7 @@ class System::Disk::Volume {
         last_modified => { is => 'DATE' },
     ],
     schema_name => 'Disk',
+    id_sequence_generator_name => 'DISK_VOLUME_ID',
     data_source => 'System::DataSource::Disk',
 };
 

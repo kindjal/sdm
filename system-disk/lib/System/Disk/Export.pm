@@ -22,6 +22,7 @@ class System::Disk::Export {
         last_modified   => { is => 'DATE' },
     ],
     schema_name => 'Disk',
+    id_sequence_generator_name => 'DISK_EXPORT_ID',
     data_source => 'System::DataSource::Disk',
 };
 
