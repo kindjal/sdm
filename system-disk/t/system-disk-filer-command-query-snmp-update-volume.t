@@ -37,6 +37,7 @@ lives_ok { $command->update_volume($filer,$result); } "usage->update_volume: run
 ok( UR::Context->commit(), "commit succeeds");
 #FIXME: remove this when bug is fixed.
 exit;
+
 my $volume = System::Disk::Volume->get( filername => 'nfs11', physical_path => '/vol/sata812' );
 ok( $volume->total_kb == 6438990688, "total_kb matches" );
 ok( $volume->used_kb == 5722964896, "used_kb matches" );

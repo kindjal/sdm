@@ -4,6 +4,8 @@ use Test::More;
 use FindBin;
 use File::Basename qw/dirname/;
 
+use Data::Dumper;
+
 my $top = dirname $FindBin::Bin;
 my $base = "$top/lib/System";
 
@@ -23,14 +25,39 @@ sub runcmd {
     ok( $? >> 8 == 0, "ok: $command") or die;
 }
 
-print "flush sqlite3 DB\n";
-unlink "$base/DataSource/Disk.sqlite3";
-unlink "$base/DataSource/Disk.sqlite3-dump";
-unlink "$base/DataSource/Disk.sqlite3n";
-unlink "$base/DataSource/Disk.sqlite3n-dump";
+use_ok( 'System', "ok: loaded System");
+use_ok( 'System::DataSource::Disk', "ok: loaded System::DataSource::Disk");
+my $ds = System::DataSource::Disk->get();
+my $driver = $ds->driver;
 
-print "flush and remake psql DB\n";
-runcmd("psql -w -d system -U system < $base/DataSource/Disk.psql-schema >/dev/null");
+if ($driver eq "SQLite") {
+    print "flush sqlite3 DB\n";
+    unlink "$base/DataSource/Disk.sqlite3";
+    unlink "$base/DataSource/Disk.sqlite3-dump";
+    unlink "$base/DataSource/Disk.sqlite3n";
+    unlink "$base/DataSource/Disk.sqlite3n-dump";
+    print "make new sqlite3 DB\n";
+    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n-schema");
+    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
+}
+
+if ($driver eq "Pg") {
+    print "flush and remake psql DB\n";
+    runcmd("psql -w -d system -U system < $base/DataSource/Disk.psql-schema >/dev/null");
+}
+
+if ($driver eq "Oracle") {
+    print "Use Oracle DB\n";
+    open FILE, "<$base/DataSource/Disk.oracle-schema";
+    my $sql = do { local $/; <FILE> };
+    close(FILE);
+    my $login = $ds->login;
+    my $auth = $ds->auth;
+    open ORA, "| sqlplus -s $login/$auth\@gcdev" or die "Can't pipe to sqlplus: $!";
+    print ORA $sql;
+    print ORA "exit";
+    close(ORA);
+}
 
 print "flush and remake Meta\n";
 unlink "$base/DataSource/Meta.sqlite3";
@@ -38,7 +65,4 @@ unlink "$base/DataSource/Meta.sqlite3n";
 unlink "$base/DataSource/Meta.sqlite3-dump";
 unlink "$base/DataSource/Meta.sqlite3n-dump";
 
-print "make new sqlite3 DB\n";
-runcmd("sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n-schema");
-runcmd("sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
 done_testing();
