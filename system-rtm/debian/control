@@ -2,13 +2,13 @@ Source: ur-system-rtm
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl, libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrd-oo-perl, rrdtool
+Build-Depends-Indep: perl, libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-system-rtm
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, perl/libjson-perl, librrds-perl, librrd-oo-perl, rrdtool
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool
 Description: A UR Object framework for RTM job data management
  A UR Object framework for RTM job data management.
