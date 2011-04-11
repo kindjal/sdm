@@ -2,16 +2,19 @@
 package System::Disk::Filer::Command::GpfsCrfs;
 
 use System;
-use IPC::Cmd qw/can_run/;
 use File::Basename qw/basename/;
+use Net::SSH qw/sshopen2/;
 
 class System::Disk::Filer::Command::GpfsCrfs {
     is => 'System::Command::Base',
     doc => 'Create a GPFS filesystem',
     has => [
-        volume => { is => 'System::Disk::Volume', doc => 'Volume identified by mount path' },
+        filer  => { is => 'System::Disk::Filer', doc => 'Filer identified by filer name' },
+        volume => { is => 'Text', doc => 'Volume identified by mount path' },
+        number => { is => 'Number', doc => 'The number of GPFS NSDs to apply to this filesystem', default => 1 },
+    ],
+    has_optional => [
         array  => { is => 'System::Disk::Array', doc => 'Array identified by array name' },
-        number => { is => 'Number', doc => 'The number of GPFS NSDs to apply to this filesystem' },
     ],
 };
 
@@ -32,45 +35,54 @@ EOS
 }
 
 sub execute {
-    my $mmls = can_run("mmlsnsd");
-    unless ($mmls) {
-        $self->error_message("cannot find mmlsnsd in PATH");
-        return;
-    }
-    my $mmcr = can_run("mmcrfs");
-    unless ($mmcr) {
-        $self->error_message("cannot find mmcrfs in PATH");
-        return;
-    }
-
+    my $self = shift;
     my @args;
-    open(CMD,"$mmls -F |") or die "error running mmlsnsd: $!";
-    while (<>) {
+    local (*READER,*WRITER);
+    sshopen2('root@' . $self->filer->name, *READER, *WRITER, "mmlsnsd -F") or die "Error calling ssh: $!";
+    while (<READER>) {
+        chomp;
         # Strip output header
         next until ($. > 3);
-        next unless (/\s+$self->array->name\s+/);
+        if ($self->array) {
+            next unless (/\s+$self->array->name\s+/);
+        }
         last if ($#args == $self->count - 1);
         my $nsd = @{ [ split(/\s+/) ] }[2];
         push @args, $nsd;
 
     }
-    close(CMD);
-
-    my $arg = join(";",@args);
-    my $vol = basename $volume->physical_path;
-    my $cmd = "$mmcr $volume->physical_path $vol $arg -A yes";
-    # FIXME:
-    my $response = $self->_ask_user_question("Ok to run [Y|n]: $cmd",'Y','n');
-    return unless ($response =~ /y/i);
-    system($cmd);
+    close(READER);
+    close(WRITER);
     if ($? == -1) {
          $self->error_message("failed to execute: $!");
+         return;
     } elsif ($? & 127) {
-         $self->error_message("child died with signal %d, %s coredump", ($? & 127),  ($? & 128) ? 'with' : 'without');
+         $self->error_message(sprintf("child died with signal %d, %s coredump", ($? & 127),  ($? & 128) ? 'with' : 'without'));
+         return;
     } else {
-         $self->warning_message("child exited with value %d\n", $? >> 8);
+         $self->warning_message(sprintf("child exited with value %d\n", $? >> 8));
+         return if ($? >> 8);
     }
-    return $? >> 8;
+
+    my $arg = join(";",@args);
+    # FIXME: Note hardcoded convention /vol + /name
+    my $cmd = "echo mmcrfs /vol/$self->volume $self->volume $arg -A yes";
+    #my $response = $self->_ask_user_question("Ok to run [Y|n]: $cmd",'Y','n');
+    #return unless ($response =~ /y/i);
+    sshopen2('root@' . $self->filer->name, *READER, *WRITER, $cmd) or die "Error calling ssh: $!";
+    close(READER);
+    close(WRITER);
+    if ($? == -1) {
+         $self->error_message("failed to execute: $!");
+         return;
+    } elsif ($? & 127) {
+         $self->error_message(sprintf("child died with signal %d, %s coredump", ($? & 127),  ($? & 128) ? 'with' : 'without'));
+         return;
+    } else {
+         $self->warning_message(sprintf("child exited with value %d\n", $? >> 8));
+         return;
+    }
+    return 1;
 }
 
 1;
