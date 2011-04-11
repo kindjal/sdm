@@ -26,9 +26,9 @@ class System::Disk::Filer::Command::QuerySnmp {
   is => 'System::Command::Base',
   has_optional => [
     force => {
-      is => 'Number',
+      is => 'Boolean',
       default => 0,
-      doc => 'Not yet implemented',
+      doc => 'Query all filers regardless of status',
     },
     timeout => {
       is => 'Number',
@@ -72,7 +72,7 @@ class System::Disk::Filer::Command::QuerySnmp {
     },
     filer => {
       # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
-      # If I use is => Text, then I can use get_or_create to add on the fly.
+      # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
       #is => 'System::Disk::Filer',
       is => 'Text',
       doc => 'SNMP query the named filer',
@@ -234,7 +234,12 @@ sub execute {
     if (defined $self->filer) {
         @filers = System::Disk::Filer->get_or_create( name => $self->filer );
     } else {
-        @filers = System::Disk::Filer->get( status => 1 );
+        # Query all filers that have status => 1...
+        if ($self->force) {
+            @filers = System::Disk::Filer->get();
+        } else {
+            @filers = System::Disk::Filer->get( status => 1 );
+        }
     }
 
     if (defined $self->physical_path) {
