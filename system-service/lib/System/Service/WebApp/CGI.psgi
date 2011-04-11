@@ -1,8 +1,8 @@
-#!/usr/bin/perl
-
-use Web::Simple 'System::Service::WebApp::CGI';
 
 package System::Service::WebApp::CGI;
+
+use Web::Simple 'System::Service::WebApp::CGI';
+use System;
 
 dispatch {
 
