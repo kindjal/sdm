@@ -1,10 +1,7 @@
 #!/usr/bin/make -f
 
-unexport PERL_MM_OPT
-unexport PERL_MB_OPT
-export PERL="/usr/bin/perl -I ../../system/lib"
-export INSTALLDIRS=vendor
-
 %:
 	PATH="/bin:/usr/bin"
 	dh $@
+
+override_dh_auto_test:
