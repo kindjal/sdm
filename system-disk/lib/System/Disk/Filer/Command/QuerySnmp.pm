@@ -60,6 +60,11 @@ class System::Disk::Filer::Command::QuerySnmp {
       default => 0,
       doc => 'Remove volumes from the DB that the Filer no longer exports',
     },
+    discover_groups => {
+      is => 'Boolean',
+      default => 0,
+      doc => 'Discover disk groups from touch files on volumes and create them on the fly',
+    },
     is_current => {
       is => 'Boolean',
       default => 0,
@@ -147,9 +152,14 @@ sub update_volume {
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
         if ($group_name) {
-            my $group = System::Disk::Group->get_or_create( name => $volumedata->{$physical_path}->{disk_group} );
+            my $group;
+            if ($self->discover_groups) {
+                $group = System::Disk::Group->get_or_create( name => $volumedata->{$physical_path}->{disk_group} );
+            } else {
+                $group = System::Disk::Group->get( name => $volumedata->{$physical_path}->{disk_group} );
+            }
             unless ($group) {
-                $self->error_message("Failed to get_or_create group: $group_name");
+                $self->error_message("Failed to identify disk group: $group_name");
                 return;
             }
             ### QuerySnmp get_or_create group returned: $group
