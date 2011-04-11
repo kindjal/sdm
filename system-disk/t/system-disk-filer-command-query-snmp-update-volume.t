@@ -7,6 +7,7 @@ use System;
 
 use Test::More;
 use Test::Exception;
+use Test::Output;
 
 BEGIN {
     $ENV{UR_DBI_NO_COMMIT} = 0;
@@ -16,32 +17,30 @@ BEGIN {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-my $base = "$top/lib/System";
-my $perl = "$^X -I " . join(" -I ",@INC);
+my $perl = "$^X -I $top/lib -I $top/../system/lib";
 system("$perl $top/t/00-system-disk-prep-test-database.t");
 ok($? >> 8 == 0, "prep test db ok");
 
 my $command = System::Disk::Filer::Command::QuerySnmp->create();
 my $filer = System::Disk::Filer->get_or_create( name => 'nfs11' );
-my $result = { '/vol/sata812' => {
-                        'total_kb' => 6438990688,
-                        'disk_group' => 'PRODUCTION_SOLID',
-                        'mount_path' => '/gscmnt/sata812',
-                        'used_kb' => 5722964896,
-                        'physical_path' => '/vol/sata812'
-                      },
+my $result = { '/vol/sata812' =>
+    {
+        'total_kb' => 6438990688,
+        'disk_group' => 'PRODUCTION_SOLID',
+        'mount_path' => '/gscmnt/sata812',
+        'used_kb' => 5722964896,
+        'physical_path' => '/vol/sata812'
+    },
 };
-print "here\n";
-my $group = System::Disk::Group->get_or_create( name => 'PRODUCTION_SOLID' );
-lives_ok { $command->update_volume($filer,$result); } "usage->update_volume: runs ok";
-ok( UR::Context->commit(), "commit succeeds");
-#FIXME: remove this when bug is fixed.
-exit;
-
+$command->discover_groups(0);
+stderr_like { $command->update_volume($filer,$result); } qr/ERROR/, "usage->update_volume: fails ok when discover_groups is 0";
+$command->discover_groups(1);
+lives_ok { $command->update_volume($filer,$result); } "usage->update_volume: lives ok when discover_groups is 1";
 my $volume = System::Disk::Volume->get( filername => 'nfs11', physical_path => '/vol/sata812' );
 ok( $volume->total_kb == 6438990688, "total_kb matches" );
 ok( $volume->used_kb == 5722964896, "used_kb matches" );
 ok( $volume->disk_group eq 'PRODUCTION_SOLID', "disk_group matches" );
 ok( $volume->mount_path eq '/gscmnt/sata812', "mount_path matches" );
 ok( $volume->physical_path eq '/vol/sata812', "physical_path matches" );
+UR::Context->commit();
 done_testing();
