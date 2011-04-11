@@ -26,4 +26,6 @@ my $build = Module::Build->new(
   },
 );
 
+$build->add_build_element('psgi');
 $build->create_build_script;
+
