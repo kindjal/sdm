@@ -1,5 +1,5 @@
 
-package System::Disk::Filer::Command::Gpfsmapper;
+package System::Disk::Filer::Command::GpfsMapper;
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use System;
 use IPC::Cmd qw(can_run);
 use Smart::Comments -ENV;
 
-class System::Disk::Filer::Command::Gpfsmapper {
+class System::Disk::Filer::Command::GpfsMapper {
     is => 'System::Command::Base',
     doc => 'map GPFS NSD to friendly name',
     has => [
