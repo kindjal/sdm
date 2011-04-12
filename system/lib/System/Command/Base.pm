@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Command::Base {
-    is => 'Command::V2',
+    is => 'Command::Tree',
     is_abstract => 1,
 };
 
