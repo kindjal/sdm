@@ -26,10 +26,11 @@ sub _fnColumnToField {
     my %dispatcher = (
             # column => 'rowname',
             0 => 'name',
-            1 => 'hostname',
-            2 => 'arrayname',
-            3 => 'created',
-            4 => 'last_modified',
+            1 => 'status',
+            2 => 'hostname',
+            3 => 'arrayname',
+            4 => 'created',
+            5 => 'last_modified',
             );
 
     die("No such row index defined: $i") unless exists $dispatcher{$i};
