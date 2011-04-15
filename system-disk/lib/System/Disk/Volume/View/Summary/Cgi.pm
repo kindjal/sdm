@@ -75,6 +75,14 @@ sub _build_where_param {
     return @where;
 }
 
+sub _build_group_param {
+    my ($self,@order) = @_;
+    # Use split to remove specification of order here (eg. DESC)
+    my @group = map { shift @{ [ split(/\s+/) ] } } @order;
+    push @group,'disk_group';
+    return @group;
+}
+
 sub _build_result_set {
     # This requires UR beyond 94fbaa5086fc252078d2c25f368468bc76605e14
     # to support the -or clause.
@@ -82,22 +90,23 @@ sub _build_result_set {
     my ($self,$q) = @_;
     my $param = {};
 
-    # FIXME: UR returns a list of Volumes instead of a Set if I include @where
     #my @where = $self->_build_where_param($q);
     #if (scalar @where) {
     #    $param->{ -or } = \@where;
     #}
 
-    # FIXME: UR order-by seems broken and doesn't do DESC
     #my @order = $self->_build_order_param($q);
     #if (scalar @order) {
     #    $param->{ -order_by } = \@order;
     #}
 
-    # FIXME: UR: Bug: order-by and group-by broken?
+    #my @group = $self->_build_group_param(@order);
+    #if (scalar @group) {
+    #    $param->{ -group_by } = \@group;
+    #}
+
     my $set = System::Disk::Volume->define_set( $param );
     my @result = $set->group_by( 'disk_group' );
-
     return @result;
 }
 
@@ -117,7 +126,7 @@ sub run {
         my $used_kb = 0;
         my $capacity = 0;
         foreach my $item ( $result->members ) {
-            my $name = $item->disk_group;
+            $name = $item->disk_group;
             $name = 'unknown' unless ($name);
             $disk_group->{$name} = {}
                 unless ($disk_group->{$name});
