@@ -126,21 +126,22 @@ sub update_volume {
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
         foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
-            my $path = $volume->physical_path;
-            next unless($path);
-            $path =~ s/\//\\\//g;
-            # FIXME: do we want to auto-remove like this?
-            if ( ! grep /$path/, keys %$volumedata ) {
-                foreach my $m (System::Disk::Mount->get( $volume->id )) {
-                    ### QuerySnmp delete mount: $m
-                    $m->delete;
+            foreach my $path ($volume->physical_path) {
+                next unless($path);
+                $path =~ s/\//\\\//g;
+                # FIXME: do we want to auto-remove like this?
+                if ( ! grep /$path/, keys %$volumedata ) {
+                    foreach my $m (System::Disk::Mount->get( $volume->id )) {
+                        ### QuerySnmp delete mount: $m
+                        $m->delete;
+                    }
+                    ### QuerySnmp delete volume: $volume
+                    $volume->delete;
+                    $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
                 }
-                ### QuerySnmp delete volume: $volume
-                $volume->delete;
-                $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
             }
         }
-        return if ($self->cleanonly);
+        return 1 if ($self->cleanonly);
     }
 
     foreach my $physical_path (keys %$volumedata) {
@@ -189,6 +190,7 @@ sub update_volume {
 
     }
     $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+    return 1;
 }
 
 =head2 purge_volumes
