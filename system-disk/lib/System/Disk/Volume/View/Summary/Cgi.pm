@@ -161,7 +161,8 @@ sub run {
     sub min ($$) { int($_[ $_[0] > $_[1] ]) };
     my $limit  = $query->query_param('iDisplayLength') || 10;
     my $offset = $query->query_param('iDisplayStart') || 0;
-    my @group_totals = @results[$offset..min($limit,$#results)];
+    my $ceiling = min($limit-1,$#results);
+    my @group_totals = @results[$offset..$ceiling];
 
     my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
     my $iTotal = scalar @results;

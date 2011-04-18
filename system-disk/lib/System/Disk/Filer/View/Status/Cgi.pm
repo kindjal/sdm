@@ -97,7 +97,8 @@ sub _build_result_set {
     sub min ($$) { int($_[ $_[0] > $_[1] ]) };
     my $limit  = $q->query_param('iDisplayLength') || 10;
     my $offset = $q->query_param('iDisplayStart') || 0;
-    @result = @result[$offset..min($limit,$#result)];
+    my $ceiling = min($limit - 1,$#result);
+    @result = @result[$offset..$ceiling];
     return @result;
 }
 
