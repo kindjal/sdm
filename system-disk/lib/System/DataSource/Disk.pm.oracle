@@ -10,6 +10,8 @@ class System::DataSource::Disk {
     is => [ 'UR::DataSource::Oracle' ],
 };
 
+sub table_and_column_names_are_upper_case { 1; }
+
 sub driver { "Oracle"; }
 sub server { "gcdev"; }
 
