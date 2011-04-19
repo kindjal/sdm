@@ -40,18 +40,18 @@ if ($driver eq "SQLite") {
     unlink "$base/DataSource/Disk.sqlite3n";
     unlink "$base/DataSource/Disk.sqlite3n-dump";
     print "make new sqlite3 DB\n";
-    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n-schema");
+    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n.schema");
     runcmd("sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
 }
 
 if ($driver eq "Pg") {
     print "flush and remake psql DB\n";
-    runcmd("/usr/bin/psql -w -d system -U system < $base/DataSource/Disk.psql-schema >/dev/null");
+    runcmd("/usr/bin/psql -w -d system -U system < $base/DataSource/Disk.psql.schema >/dev/null");
 }
 
 if ($driver eq "Oracle") {
     print "Use Oracle DB\n";
-    open FILE, "<$base/DataSource/Disk.oracle-schema";
+    open FILE, "<$base/DataSource/Disk.oracle.schema";
     my $sql = do { local $/; <FILE> };
     close(FILE);
     my $login = $ds->login;
