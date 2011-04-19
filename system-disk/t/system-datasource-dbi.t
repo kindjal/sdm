@@ -21,5 +21,5 @@ ok( System::Test::Lib->testinit == 0, "ok: init db");
 my @params = ( name => 'nsams2k1' );
 my $res = System::Disk::Array->create( @params );
 ok( $res->id eq 'nsams2k1', "properly created new array");
-stderr_unlike { UR::Context->commit; } qr|uninitialized value in subroutine entry at /gscuser/mcallawa/git/UR/lib/UR/DBI.pm line 833|, "APIPE-: issue in UR/DBI.pm";
+stderr_unlike { UR::Context->commit; } qr|uninitialized value in subroutine entry at /gscuser/mcallawa/git/UR/lib/UR/DBI.pm line 833|, "APIPE-754: issue in UR/DBI.pm";
 done_testing();
