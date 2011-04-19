@@ -26,10 +26,9 @@ my $uri;
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-my $base = "$top/lib/System";
-my $perl = "$^X -I " . join(" -I ",@INC);
-system("$perl $top/t/00-system-disk-prep-test-database.t");
-ok($? >> 8 == 0, "prep test db ok");
+require "$top/t/system-lib.t";
+ok( System::Test::Lib->testinit == 0, "ok: init db");
+
 ok( defined System::Disk::Filer->create( name => 'filer' ) );
 ok( defined System::Disk::Group->create( name => 'APIPE' ) );
 ok( defined System::Disk::Volume->create( filername => 'filer', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800', disk_group => 'APIPE' ) );

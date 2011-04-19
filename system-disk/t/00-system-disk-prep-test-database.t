@@ -3,11 +3,14 @@
 use Test::More;
 use FindBin;
 use File::Basename qw/dirname/;
-
+use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
 my $top = dirname $FindBin::Bin;
 my $base = "$top/lib/System";
+my $perl = "$^X -I $top/lib -I $top/../system/lib";
+my $system = can_run("system");
+ok( defined $system, "ok: system found in PATH");
 
 sub runcmd {
     my $command = shift;
@@ -43,7 +46,7 @@ if ($driver eq "SQLite") {
 
 if ($driver eq "Pg") {
     print "flush and remake psql DB\n";
-    runcmd("psql -w -d system -U system < $base/DataSource/Disk.psql-schema >/dev/null");
+    runcmd("/usr/bin/psql -w -d system -U system < $base/DataSource/Disk.psql-schema >/dev/null");
 }
 
 if ($driver eq "Oracle") {

@@ -17,9 +17,8 @@ BEGIN {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-my $perl = "$^X -I $top/lib -I $top/../system/lib";
-system("$perl $top/t/00-system-disk-prep-test-database.t");
-ok($? >> 8 == 0, "prep test db ok");
+require "$top/t/system-lib.t";
+ok( System::Test::Lib->testinit == 0, "ok: init db");
 
 my $command = System::Disk::Filer::Command::QuerySnmp->create();
 my $filer = System::Disk::Filer->get_or_create( name => 'nfs11' );

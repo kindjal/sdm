@@ -27,7 +27,7 @@ use_ok( 'System' ) or die "Run with -I to include system/lib";
 use_ok( 'System::Disk' ) or die "Run with -I to include system-disk/lib";
 
 # Use same perl invocation to run this
-system("$perl $top/t/00-system-disk-prep-test-database.t");
+system("$perl $top/t/00-system-disk-prep-test-database.t >/dev/null 2>&1");
 ok( $? >> 8 == 0, "ok: $command") or die "Cannot remake test DB";
 
 # -- Now we're prepped, run some commands
@@ -54,3 +54,4 @@ sub runcmd {
 runcmd("disk filer add --name gpfs");
 runcmd("disk group add --name INFO_GENOME_MODELS");
 runcmd('disk volume add --filername gpfs --used-kb 5359448320 --total-kb 6914310144 --physical-path "/vol/gc4005" --mount-path "/gscmnt/gc4005" --disk-group "INFO_GENOME_MODELS"');
+done_testing();
