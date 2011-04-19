@@ -10,8 +10,6 @@ lib/System/Command/Remove.pm
 lib/System/Command/Update.pm
 lib/System/Command.pm
 lib/System/Utility/Text.pm
-lib/System/reset.sh
-lib/System/adddata.sh
 lib/System/Search/Query.pm
 lib/System/Search/Query/View/Status/Html.pm
 lib/System/Search/Query/View/Status/Xml.pm
@@ -61,8 +59,6 @@ lib/System/View/Resource/Html/css/icons.css
 lib/System/View/Resource/Html/css/jquery-ui-overrides.css
 lib/System/View/Resource/Html/css/legacy.css
 lib/System/View/Resource/Html/css/master.css
-lib/System/View/Resource/Html/css/diskusage_page.css
-lib/System/View/Resource/Html/css/diskusage_table.css
 lib/System/View/Resource/Html/img/body_bg.jpg
 lib/System/View/Resource/Html/img/body_bg.png
 lib/System/View/Resource/Html/img/buttons/btn_download_svg.png
@@ -1126,8 +1122,6 @@ lib/System/View/Resource/Html/js/rrdFlot.js
 lib/System/View/Resource/Html/js/rrdFlotMatrix.js
 lib/System/View/Resource/Html/js/rrdFlotSupport.js
 lib/System/View/Resource/Html/js/rrdgraph.js
-lib/System/View/Resource/Html/html/volumetable.html
-lib/System/View/Resource/Html/html/diskusage.html
 lib/System/View/Resource/Html.pm
 lib/System.pm
 bin/system
