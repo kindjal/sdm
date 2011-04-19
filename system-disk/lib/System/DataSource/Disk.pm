@@ -1,1 +1,1 @@
-Disk.pm.oracle
+Disk.pm.psql
