@@ -24,7 +24,7 @@ sub help_brief {
 }
 
 sub help_detail {
-    return 'HELP IN PROGRESS';
+    return 'create '.$_[0]->_name_for_objects;
 }
 
 sub execute {

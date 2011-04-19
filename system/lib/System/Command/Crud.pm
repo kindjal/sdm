@@ -93,6 +93,9 @@ sub _build_add_sub_class {
 
     # define class
     my $sub_class = $config{namespace}.'::Add';
+    #my @obj_properties2 = map { $_->{property_name} => $_ } @properties;
+    # build list of properties taking care that the ID is shell_args_position 1
+    my @obj_properties = map { if ($_->{is_id}) { $_->{shell_args_position} = 1 }; $_->{property_name} => $_; } @properties;
     UR::Object::Type->define(
         class_name => $sub_class,
         is => 'System::Command::Add',
@@ -225,6 +228,7 @@ sub _command_properties_for_target_class {
             is_many => $target_property->is_many,
             is_optional => $target_property->is_optional,
             is_mutable => $target_property->is_mutable,
+            is_id => $target_property->is_id,
             valid_values => $target_property->valid_values,
             default_value => $target_property->default_value,
             doc => $target_property->doc,

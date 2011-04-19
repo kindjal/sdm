@@ -24,7 +24,7 @@ sub help_brief {
 }
 
 sub help_detail {
-    return 'HELP IN PROGRESS';
+    return 'delete '.$_[0]->_name_for_objects;
 }
 
 sub execute {
@@ -49,7 +49,7 @@ sub execute {
         }
     }
 
-    $self->display_summary_report(scalar(@objects), @errors);
+    #$self->display_summary_report(scalar(@objects), @errors);
 
     return 1; 
 }

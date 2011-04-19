@@ -20,11 +20,11 @@ sub _name_for_objects { Carp::confess('Please use CRUD or implement _name_for_ob
 sub sub_command_sort_position { .1 };
 
 sub help_brief {
-    return 'add '.$_[0]->_name_for_objects;
+    return 'add new '.$_[0]->_name_for_objects;
 }
 
 sub help_detail {
-    return 'HELP IN PROGRESS';
+    return 'add new '.$_[0]->_name_for_objects;
 }
 
 sub execute {
