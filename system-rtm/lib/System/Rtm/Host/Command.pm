@@ -6,9 +6,10 @@ use warnings;
 use System;
 
 class System::Rtm::Host::Command {
-    is          => 'System::Command::Base',
+    is          => 'Command::Tree',
     doc         => 'work with RTM hosts',
-    is_abstract => 1
+    # leave as abstract until we know how to use this class
+    is_abstract => 1,
 };
 
 use System::Command::Crud;
