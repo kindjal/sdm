@@ -75,7 +75,7 @@ sub init_sub_commands {
     Carp::confess('Unknown config for CRUD commands: '.Dumper(\%incoming_config)) if %incoming_config;
 
     # Overload sub command classes to return these in memory ones, plus ones in the directory
-    my @sub_command_classes = ( 
+    my @sub_command_classes = (
         @sub_classes,
         $config{namespace}->sub_command_classes,
     );
@@ -142,7 +142,7 @@ sub _build_update_sub_class {
     UR::Object::Type->define(
         class_name => $sub_class,
         is => 'System::Command::Update',
-        has => [ 
+        has => [
             $config{name_for_objects_ub} => {
                 is => $config{target_class},
                 is_many => 1,
@@ -182,7 +182,7 @@ sub _build_delete_sub_class {
     UR::Object::Type->define(
         class_name => $sub_class,
         is => 'System::Command::Delete',
-        has => [ 
+        has => [
             $config{name_for_objects_ub} => {
                 is => $config{target_class},
                 is_many => 1,
@@ -271,7 +271,7 @@ sub _update_command_properties_for_target_class {
             next;
         }
 
-        for my $function (qw/ add remove /) { 
+        for my $function (qw/ add remove /) {
             my $property_name = $property->{property_name};
             push @update_properties, {
                 property_name => $function.'_'.$property->{singular_name},
