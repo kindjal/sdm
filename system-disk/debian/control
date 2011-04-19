@@ -9,6 +9,6 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-system-disk
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libsmart-comments-perl, libnet-snmp-perl, libdbd-oracle-perl, libnet-ssh-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libsmart-comments-perl, libnet-snmp-perl, libdbd-oracle-perl, libdbd-pg-perl, libdbd-mysql-perl, libnet-ssh-perl
 Description: A UR Object framework for disk management
  A UR Object framework for disk management.
