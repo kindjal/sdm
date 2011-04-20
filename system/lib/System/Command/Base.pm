@@ -2,14 +2,56 @@ package System::Command::Base;
 
 use strict;
 use warnings;
-
 use System;
+use Log::Log4perl qw(:easy);
 
 class System::Command::Base {
-    is => 'Command::V2',
+    is          => 'Command::V2',
     is_abstract => 1,
+    has_optional => [
+        loglevel    => { is => 'Text', default => 'INFO' },
+        logfile     => { is => 'Text', default => 'STDERR' },
+    ],
 };
 
+=head2 _prepare_logger
+Turn on logging with Log::Log4perl
+=cut
+sub _prepare_logger {
+    my $self = shift;
+    Log::Log4perl->easy_init(
+        { level => $self->{loglevel}, category => __PACKAGE__, file => $self->{logfile} }
+    );
+    $self->{logger} = Log::Log4perl->get_logger();
+}
+
+=head2 create
+We override UR/lib/Command/V2.pm to trigger _prepare_logger
+=cut
+sub create {
+    my $class = shift;
+    my ($rule,%extra) = $class->define_boolexpr(@_);
+    my @params_list = $rule->params_list;
+    my $self = $class->SUPER::create(@params_list, %extra);
+    $self->_prepare_logger();
+    return unless $self;
+
+    # set non-optional boolean flags to false.
+    for my $property_meta ($self->_shell_args_property_meta) {
+        my $property_name = $property_meta->property_name;
+        if (!$property_meta->is_optional and !defined($self->$property_name)) {
+            if (defined $property_meta->data_type and $property_meta->data_type =~ /Boolean/i) {
+                $self->$property_name(0);
+            }
+        }
+    }
+
+    return $self;
+}
+
+=head2 _ask_user_question
+This should go back into UR/lib/Command/V2.pm
+=cut
 sub _ask_user_question {
     my $self = shift;
     my $question = shift;    my $timeout = shift;
@@ -44,6 +86,9 @@ sub _ask_user_question {
     }
 }
 
+=head2 _can_interact_with_user
+This should go back into UR/lib/Command/V2.pm
+=cut
 sub _can_interact_with_user {
     my $self = shift;
     if ( -t STDERR ) {
@@ -55,3 +100,4 @@ sub _can_interact_with_user {
 }
 
 1;
+

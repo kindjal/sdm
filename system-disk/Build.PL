@@ -17,11 +17,11 @@ my $build = Module::Build->new(
   dist_abstract => 'Modules for disk management',
   build_requires => {
     'Module::Build' => '',
-    'UR' => '0.29',
+    'UR' => '0.30',
     'System' => '',
   },
   requires => {
-    'UR' => '0.29',
+    'UR' => '0.30',
     'System' => '',
   },
 );

@@ -15,17 +15,21 @@ my $build = Module::Build->new(
   license => 'lgpl',
   dist_version => '0.01',
   dist_abstract => 'Modules for service management',
+  scripts => [ 'bin/system' ],
+  etc_files => { 'etc/system-web-app.conf' => 'etc/system-web-app.conf' },
+  install_path => { 'etc' => '/etc/init' },
   build_requires => {
     'Module::Build' => '',
-    'UR' => '0.29',
+    'UR' => '0.30',
     'System' => '',
   },
   requires => {
-    'UR' => '0.29',
+    'UR' => '0.30',
     'System' => '',
   },
 );
 
+$build->add_build_element('etc');
 $build->add_build_element('psgi');
 $build->create_build_script;
 
