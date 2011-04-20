@@ -14,7 +14,7 @@ BEGIN {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/system-lib.t";
+require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
 
 # Test creation

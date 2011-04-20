@@ -15,8 +15,8 @@ ok( defined $system, "ok: system found in PATH");
 sub runcmd {
     my $command = shift;
     $ENV{SYSTEM_NO_REQUIRE_USER_VERIFY}=1;
-    print("$perl $system $command\n");
-    system("$perl $system $command");
+    print("$command\n");
+    system("$command");
     if ($? == -1) {
          print "failed to execute: $!\n";
     } elsif ($? & 127) {
@@ -40,8 +40,8 @@ if ($driver eq "SQLite") {
     unlink "$base/DataSource/Disk.sqlite3n";
     unlink "$base/DataSource/Disk.sqlite3n-dump";
     print "make new sqlite3 DB\n";
-    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n.schema");
-    runcmd("sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
+    runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n.schema");
+    runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
 }
 
 if ($driver eq "Pg") {

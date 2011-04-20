@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use System;
+use IPC::Cmd qw/can_run/;
 use Test::More;
 use Test::Output;
 use Test::Exception;
@@ -14,10 +15,24 @@ BEGIN {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/system-lib.t";
+require "$top/t/system-lib.pm";
 
 ok( System::Test::Lib->testinit == 0, "ok: init db");
 
 my @params = ( name => 'foo' );
-stderr_unlike { System::Test::Lib->runcmd("disk filer delete gpfs"); } qr|WARNING:  nonstandard use of \' in a string literal|, "APIPE-755: issue in UR/DBI.pm";
+
+my $base = "$top/lib/System";
+my $perl = "$^X -I " . join(" -I ",@INC);
+my $system = can_run("system");
+unless ($system) {
+    if (-e "./system-disk/system/bin/system") {
+        $system = "./system-disk/system/bin/system";
+    } elsif (-e "./system/bin/system") {
+        $system = "./system/bin/system";
+    } elsif (-e "../system/bin/system") {        $system = "../system/bin/system";    } else {
+        die "Can't find 'system' executable";
+    }
+}
+
+stderr_unlike { system("$perl $system disk filer delete gpfs"); } qr|WARNING:  nonstandard use of \' in a string literal|, "APIPE-755: issue in UR/DBI.pm";
 done_testing();
