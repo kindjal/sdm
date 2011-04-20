@@ -6,7 +6,7 @@ use warnings;
 use System;
 class System::Disk::Array {
     type_name => 'disk array',
-    table_name => 'DISK_ARRAY',
+    table_name => 'disk_array',
     id_by => [
         name          => { is => 'Text', len => 255 },
     ],
@@ -25,6 +25,22 @@ class System::Disk::Array {
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };
+
+sub assign {
+    my $self = shift;
+    my $hostname = shift;
+    unless ($hostname) {
+        $self->error_message("specify a hostname to assign this array to");
+        return;
+    }
+    my $host = System::Disk::Host->get( hostname => $hostname );
+    unless ($host) {
+        $self->error_message("the host named '$hostname' is unknown");
+        return;
+    }
+    my $res = System::Disk::HostArrayBridge->get_or_create( host => $host, array => $self );
+    return $res;
+}
 
 sub create {
     my $self = shift;

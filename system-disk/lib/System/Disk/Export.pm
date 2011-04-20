@@ -6,8 +6,10 @@ use warnings;
 
 use System;
 
-class System::Disk::Export {
-    table_name => 'DISK_EXPORT',
+# This is strange and ugly use of class definition that I use to set
+# id_sequence_generator_name for Oracle only.
+my $hashdef = {
+    table_name => 'disk_export',
     id_by => [
         id              => { is => 'Number' },
     ],
@@ -22,9 +24,14 @@ class System::Disk::Export {
         last_modified   => { is => 'DATE' },
     ],
     schema_name => 'Disk',
-    id_sequence_generator_name => 'DISK_EXPORT_ID',
     data_source => 'System::DataSource::Disk',
 };
+
+# Only oracle needs this
+my $ds = System::DataSource::Disk->get();
+my $driver = $ds->driver;
+$hashdef->{id_sequence_generator_name} = 'disk_export_id' if ($driver eq "Oracle");
+class System::Disk::Export $hashdef;
 
 sub create {
     my $self = shift;

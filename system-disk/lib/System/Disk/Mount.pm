@@ -2,7 +2,7 @@
 package System::Disk::Mount;
 
 class System::Disk::Mount {
-    table_name => 'DISK_MOUNT',
+    table_name => 'disk_mount',
     id_by => [
         export_id => { is => 'Number' },
         volume_id => { is => 'Number' },

@@ -5,10 +5,10 @@ use warnings;
 use System;
 
 class System::Disk::Assignment {
-    table_name => 'DISK_VOLUME_GROUP',
+    table_name => 'disk_volume_group',
     id_by => [
-        group           => { is => 'System::Disk::Group', id_by => 'group_name', constraint_name => 'VOLUME_GROUP_GROUP_FK' },
-        volume          => { is => 'System::Disk::Volume', id_by => 'volume_id', constraint_name => 'VOLUME_GROUP_VOLUME_FK' },
+        group           => { is => 'System::Disk::Group', id_by => 'group_name' },
+        volume          => { is => 'System::Disk::Volume', id_by => 'volume_id' },
     ],
     has => [
         name            => { via => 'group' },

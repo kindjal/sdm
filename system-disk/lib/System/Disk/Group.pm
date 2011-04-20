@@ -6,7 +6,7 @@ use warnings;
 use System;
 
 class System::Disk::Group {
-    table_name => 'DISK_GROUP',
+    table_name => 'disk_group',
     id_by => [
         name => { is => 'Text' },
     ],

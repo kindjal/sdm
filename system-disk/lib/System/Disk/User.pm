@@ -5,7 +5,7 @@ use warnings;
 
 use System;
 class System::Disk::User {
-    table_name => 'DISK_USER',
+    table_name => 'disk_user',
     id_by => [
         email => { is => 'Text', len => 255 },
     ],

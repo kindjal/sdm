@@ -8,7 +8,7 @@ use System;
 use Date::Manip;
 
 class System::Disk::Host {
-    table_name => 'DISK_HOST',
+    table_name => 'disk_host',
     id_by => [
         hostname        => { is => 'Text', len => 255 },
     ],
@@ -32,6 +32,25 @@ class System::Disk::Host {
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
 };
+
+=head2 assign
+Assign the current host to a named filer.
+=cut
+sub assign {
+    my $self = shift;
+    my $filername = shift;
+    unless ($filername) {
+        $self->error_message("specify a filer name to assign this host to");
+        return;
+    }
+    my $filer = System::Disk::Filer->get( name => $filername );
+    unless ($filer) {
+        $self->error_message("the filer named '$filername' is unknown");
+        return;
+    }
+    my $res = System::Disk::FilerHostBridge->create( host => $self, filer => $filer );
+    return $res;
+}
 
 =head2 is_current
 Check the given Host's last_modified time and compare it to time().  If the difference is

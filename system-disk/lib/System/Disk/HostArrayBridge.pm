@@ -2,7 +2,7 @@
 package System::Disk::HostArrayBridge;
 
 class System::Disk::HostArrayBridge {
-    table_name => 'DISK_HOST_ARRAY',
+    table_name => 'disk_host_array',
     id_by => [
         hostname  => { is => 'Text' },
         arrayname => { is => 'Text' },

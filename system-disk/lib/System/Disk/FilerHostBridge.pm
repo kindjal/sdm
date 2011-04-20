@@ -2,7 +2,7 @@
 package System::Disk::FilerHostBridge;
 
 class System::Disk::FilerHostBridge {
-    table_name => 'DISK_FILER_HOST',
+    table_name => 'disk_filer_host',
     id_by => [
         filername => { is => 'Text' },
         hostname  => { is => 'Text' },

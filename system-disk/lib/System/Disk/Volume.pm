@@ -9,7 +9,7 @@ use Date::Manip;
 use Smart::Comments -ENV;
 
 class System::Disk::Volume {
-    table_name => 'DISK_VOLUME',
+    table_name => 'disk_volume',
     id_by => [
         id            => { is => 'Number' },
     ],
@@ -28,13 +28,14 @@ class System::Disk::Volume {
         hostname      => { via => 'filer', to => 'hostname' },
     ],
     has_optional => [
-        group         => { is => 'System::Disk::Group', id_by => 'disk_group', constraint_name => 'DISK_VOLUME_FK' },
+        group         => { is => 'System::Disk::Group', id_by => 'disk_group' },
         capacity      => { is => 'Number', is_calculated => 1 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
     schema_name => 'Disk',
-    id_sequence_generator_name => 'DISK_VOLUME_ID',
+# Only oracle needs this
+#    id_sequence_generator_name => 'disk_volume_id',
     data_source => 'System::DataSource::Disk',
 };
 

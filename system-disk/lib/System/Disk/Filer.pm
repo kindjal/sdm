@@ -9,7 +9,7 @@ use Date::Manip;
 use Smart::Comments -ENV;
 
 class System::Disk::Filer {
-    table_name => 'DISK_FILER',
+    table_name => 'disk_filer',
     id_by => [
         name            => { is => 'Text', len => 255 },
     ],
