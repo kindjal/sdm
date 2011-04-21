@@ -7,6 +7,8 @@ chmod 550 /usr/bin/system
 
 # The program updates a sqlite3 cache file here
 chgrp local-systems /usr/share/perl5/System/DataSource/
-chgrp local-systems /usr/share/perl5/System/DataSource/Meta.sqlite3n
 chmod 775 /usr/share/perl5/System/DataSource
-chmod 775 /usr/share/perl5/System/DataSource/Meta.sqlite3n
+if [ -e /usr/share/perl5/System/DataSource/Meta.sqlite3n ]; then
+  chgrp local-systems /usr/share/perl5/System/DataSource/Meta.sqlite3n
+  chmod 775 /usr/share/perl5/System/DataSource/Meta.sqlite3n
+fi
