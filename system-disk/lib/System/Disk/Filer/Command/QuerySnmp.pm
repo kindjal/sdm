@@ -276,11 +276,10 @@ sub execute {
         # Update any filers that are not current
         my $result = {};
         eval {
-            my @args;
+            my $snmp = System::Utility::SNMP->create();
             if ($self->discover_groups) {
-                push @args, [ allow_mount => $self->allow_mount ];
+                $snmp->allow_mount( $self->allow_mount );
             }
-            my $snmp = System::Utility::SNMP->create( @args );
             $result = $snmp->query_snmp( filer => $filer->name, physical_path => $self->physical_path );
             $filer->status(1);
         };
