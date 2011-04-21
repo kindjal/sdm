@@ -24,7 +24,12 @@ class System::Disk::Filer {
         hostmappings    => { is => 'System::Disk::FilerHostBridge', reverse_as => 'filer' },
         host            => { is => 'System::Disk::Host', via => 'hostmappings', to => 'host'  },
         hostname        => { via => 'host', to => 'hostname' },
-        arrayname       => { via => 'host', to => 'arrayname' },
+        # The obvious way to reference arraynames produces a list with duplicates
+        #arrayname       => { via => 'host', to => 'arrayname' },
+        # Use this calculation to produce a list of unique arraynames
+        arrayname      => {
+            calculate => q/ my %h; foreach my $h ($self->host) { map { $h{$_} = 1 } $h->arrayname }; return keys %h; /
+        },
         exports         => { is => 'System::Disk::Export', reverse_as => 'filer' },
     ],
     schema_name => 'Disk',
