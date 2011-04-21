@@ -46,24 +46,28 @@ sub execute {
 
     foreach my $filername (keys %$config) {
         # Create all hosts and arrays for each filer in the YAML
-        foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
-            $self->{logger}->debug("add host $hostname");
-            my $host = System::Disk::Host->get_or_create( hostname => $hostname );
-            unless ($host) {
-                $self->error_message("the host named '$hostname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
-                return;
+        if (defined $config->{$filername}->{hosts}) {
+            foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
+                $self->{logger}->debug("add host $hostname");
+                my $host = System::Disk::Host->get_or_create( hostname => $hostname );
+                unless ($host) {
+                    $self->error_message("the host named '$hostname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
+                    return;
+                }
             }
         }
-        foreach my $arrayname (split(/\s+/,$config->{$filername}->{arrays})) {
-            $self->{logger}->debug("add array $arrayname");
-            my $array = System::Disk::Array->get_or_create( name => $arrayname );
-            unless ($array) {
-                $self->error_message("the array named '$arrayname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
-                return;
-            }
-            foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
-                $self->{logger}->debug("assign array $arrayname to host $hostname");
-                $array->assign( $hostname );
+        if (defined $config->{$filername}->{arrays}) {
+            foreach my $arrayname (split(/\s+/,$config->{$filername}->{arrays})) {
+                $self->{logger}->debug("add array $arrayname");
+                my $array = System::Disk::Array->get_or_create( name => $arrayname );
+                unless ($array) {
+                    $self->error_message("the array named '$arrayname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
+                    return;
+                }
+                foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
+                    $self->{logger}->debug("assign array $arrayname to host $hostname");
+                    $array->assign( $hostname );
+                }
             }
         }
         $self->{logger}->debug("add filer $filername");
@@ -72,10 +76,12 @@ sub execute {
             $self->error_message("the filer named '$filername' does not exist in the DB and cannot be added: $!");
             return;
         }
-        foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
-            $self->{logger}->debug("assign host $hostname to filer $filername");
-            my $host = System::Disk::Host->get( hostname => $hostname );
-            $host->assign( $filername );
+        if (defined $config->{$filername}->{hosts}) {
+            foreach my $hostname (split(/\s+/,$config->{$filername}->{hosts})) {
+                $self->{logger}->debug("assign host $hostname to filer $filername");
+                my $host = System::Disk::Host->get( hostname => $hostname );
+                $host->assign( $filername );
+            }
         }
     }
     return 1;
