@@ -1,0 +1,4 @@
+#! /bin/sh
+
+chgrp local-systems /usr/bin/system
+chmod 550 /usr/bin/system
