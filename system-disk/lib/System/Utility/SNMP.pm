@@ -380,16 +380,19 @@ sub get_disk_group {
   ###   SNMP mount_path: $mount_path
 
   # Does the cache already have the disk group name?
-  my $res = System::Disk::Volume->get( mount_path => $mount_path );
+  my @results = System::Disk::Volume->get( mount_path => $mount_path );
+  if (scalar @results > 1) {
+    $self->warning_message("More than one Volume is associated with mount_path $mount_path");
+    return;
+  }
 
-  if (defined $res) {
-      $group_name = $res->disk_group;
-      if (defined $group_name) {
-          ### SNMP mount path X is cached for Y:
-          ###   SNMP mount_path: $mount_path
-          ###   SNMP group_name: $group_name
-          return $group_name;
-      }
+  my $volume = shift @results;
+  $group_name = $volume->disk_group;
+  if (defined $group_name) {
+      ### SNMP mount path X is cached for Y:
+      ###   SNMP mount_path: $mount_path
+      ###   SNMP group_name: $group_name
+      return $group_name;
   }
 
   ### SNMP no group currently known for: $mount_path
