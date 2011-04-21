@@ -1,4 +1,12 @@
 #! /bin/sh
 
+# users in local-systems group (including www-data)
+# can run the program
 chgrp local-systems /usr/bin/system
 chmod 550 /usr/bin/system
+
+# The program updates a sqlite3 cache file here
+chgrp local-systems /usr/share/perl5/System/DataSource/
+chgrp local-systems /usr/share/perl5/System/DataSource/Meta.sqlite3n
+chmod 775 /usr/share/perl5/System/DataSource
+chmod 775 /usr/share/perl5/System/DataSource/Meta.sqlite3n
