@@ -24,8 +24,10 @@ class System::Disk::Volume {
         filer         => { is => 'System::Disk::Filer', via => 'mount', to => 'filer' },
         physical_path => { via => 'mount', to => 'physical_path' },
         filername     => { via => 'filer', to => 'name' },
-        arrayname     => { via => 'filer', to => 'arrayname' },
         hostname      => { via => 'filer', to => 'hostname' },
+        arrayname     => {
+            calculate => q/ my %h; foreach my $f ($self->filer) { map { $h{$_} = 1 } $f->arrayname }; return keys %h; /
+        },
     ],
     has_optional => [
         group         => { is => 'System::Disk::Group', id_by => 'disk_group' },

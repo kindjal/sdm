@@ -15,7 +15,9 @@ class System::Disk::Mount {
         filer         => { is => 'System::Disk::Filer', via => 'export', to => 'filer' },
         filername     => { via => 'filer', to => 'name' },
         hostname      => { via => 'filer', to => 'hostname' },
-        arrayname     => { via => 'filer', to => 'arrayname' },
+        arrayname     => {
+            calculate => q/ my %h; foreach my $f ($self->filer) { map { $h{$_} = 1 } $f->arrayname }; return keys %h; /
+        },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
