@@ -15,7 +15,6 @@ my $build = Module::Build->new(
   license => 'lgpl',
   dist_version => '0.01',
   dist_abstract => 'Modules for service management',
-  scripts => [ 'bin/system' ],
   etc_files => { 'etc/system-web-app.conf' => 'etc/system-web-app.conf' },
   install_path => { 'etc' => '/etc/init' },
   build_requires => {
