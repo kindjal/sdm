@@ -14,7 +14,7 @@ use System::Command::Crud;
 System::Command::Crud->init_sub_commands(
     target_class => 'System::Disk::Filer',
     target_name => 'filer',
-    list => { show => 'name,status,comments,hostname,arrayname' }
+    list => { show => 'name,status,hostname,arrayname,comments' }
 );
 
 1;
