@@ -17,7 +17,7 @@ BEGIN {
     }
     # FIXME: This is harsh, but we need to override a user's profile removing the
     # use of the application server in perl's @INC, forcing the use of local perl.
-    @INC = map { $_ if (!/^\/(gapp|gsc)/) } @INC;
+    @INC = map { $_ if (!/^\/(gapp|gsc)\//) } @INC;
 };
 
 use above "System";
