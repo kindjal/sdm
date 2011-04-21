@@ -387,12 +387,14 @@ sub get_disk_group {
   }
 
   my $volume = shift @results;
-  $group_name = $volume->disk_group;
-  if (defined $group_name) {
-      ### SNMP mount path X is cached for Y:
-      ###   SNMP mount_path: $mount_path
-      ###   SNMP group_name: $group_name
-      return $group_name;
+  if ($volume) {
+    $group_name = $volume->disk_group;
+    if (defined $group_name) {
+        ### SNMP mount path X is cached for Y:
+        ###   SNMP mount_path: $mount_path
+        ###   SNMP group_name: $group_name
+        return $group_name;
+    }
   }
 
   ### SNMP no group currently known for: $mount_path
