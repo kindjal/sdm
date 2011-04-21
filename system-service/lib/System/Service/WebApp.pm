@@ -29,6 +29,11 @@ class System::Service::WebApp {
             is    => 'Number',
             default_value => '8090',
             doc   => 'tcp port for internal server to listen'
+        },
+        fixed_port => {
+            is    => 'Boolean',
+            default_value => 0,
+            doc   => 'force the use of the same port',
         }
     ],
 };
@@ -89,9 +94,9 @@ sub determine_port {
             $self->port($_);
             $self->status_message( sprintf( "Selected port: %d\n", $self->port ) );
             last;
-        } else {
-            $self->status_message( sprintf( "Port %d in use. Trying next choice.\n", $_) );
         }
+        last if ($self->fixed_port);
+        $self->status_message( sprintf( "Port %d in use. Trying next choice.\n", $_) );
     }
     die "None of the offered ports are available. Add more ports to System::Model::Command::Service::WebApp or specify a different port." unless ( $self->port );
 }
