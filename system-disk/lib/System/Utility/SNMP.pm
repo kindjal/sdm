@@ -13,6 +13,20 @@ use Data::Dumper;
 use Log::Log4perl qw/:levels/;
 use Smart::Comments -ENV;
 
+class System::Utility::SNMP {
+    is => 'System::Command::Base',
+    has_optional => [
+        snmp_session => { is => 'Object', default => undef },
+        no_snmp      => { is => 'Number', default => 0 },
+        timeout      => { is => 'Number', default => 15 },
+        hosttype     => { is => 'Text',   default => undef },
+        groups       => { is => 'List',   default => undef },
+        prefixes     => { is => 'List',   default => "/vol,/home,/gpfs" },
+        allow_mount  => { is => 'Boolean', default => 0 },
+    ],
+};
+
+
 # Autoflush
 local $| = 1;
 
@@ -47,17 +61,6 @@ my $oids = {
     'dfHighUsedKbytes'   => '1.3.6.1.4.1.789.1.5.4.1.16',
     'dfLowUsedKbytes'    => '1.3.6.1.4.1.789.1.5.4.1.17',
   },
-};
-
-class System::Utility::SNMP {
-    is => 'System::Command::Base',
-    has_optional => [
-      snmp_session => { is => 'Object', default => undef },
-      no_snmp      => { is => 'Number', default => 0 },
-      timeout      => { is => 'Number', default => 15 },
-      hosttype     => { is => 'Text', default => undef },
-      groups       => { is => 'List', default => undef },
-    ],
 };
 
 sub error {
@@ -405,10 +408,8 @@ sub get_disk_group {
     return $group_name if (defined $group_name and $group_name ne '');
   }
 
-  # FIXME: don't mount, just return.
-  return;
+  return unless ($self->allow_mount);
 
-  # FIXME: This should be optional or replaced or something
   ###: SNMP mount this path: $mount_path
 
   # This will actually mount a mount point via automounter.

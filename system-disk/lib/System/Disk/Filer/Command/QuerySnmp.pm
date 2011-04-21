@@ -30,6 +30,11 @@ class System::Disk::Filer::Command::QuerySnmp {
       default => 0,
       doc => 'Query all filers regardless of status',
     },
+    allow_mount => {
+      is => 'Boolean',
+      default => 0,
+      doc => 'Allow mounting of filesystems to discover disk groups',
+    },
     timeout => {
       is => 'Number',
       default => 15,
@@ -251,6 +256,10 @@ sub execute {
         }
     }
 
+    unless (scalar @filers) {
+        $self->warning_message("No filers to be scanned. Consider using --force.");
+    }
+
     foreach my $filer (@filers) {
         ### QuerySnmp foreach loop at: $filer
         # Just check is_current
@@ -267,7 +276,11 @@ sub execute {
         # Update any filers that are not current
         my $result = {};
         eval {
-            my $snmp = System::Utility::SNMP->create();
+            my @args;
+            if ($self->discover_groups) {
+                push @args, [ allow_mount => $self->allow_mount ];
+            }
+            my $snmp = System::Utility::SNMP->create( @args );
             $result = $snmp->query_snmp( filer => $filer->name, physical_path => $self->physical_path );
             $filer->status(1);
         };
@@ -288,6 +301,7 @@ sub execute {
         }
     }
     ### QuerySnmp execute QuerySnmp complete
+    return 1;
 }
 
 1;
