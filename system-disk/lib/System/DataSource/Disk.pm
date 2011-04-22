@@ -1,1 +1,1 @@
-Disk.pm.psql
+Disk.psql.pm
