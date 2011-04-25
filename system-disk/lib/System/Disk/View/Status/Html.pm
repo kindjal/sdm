@@ -15,7 +15,9 @@ sub new {
 # This is the full view of Disk Usage
 sub _generate_content {
     my $self = shift;
-    my $html = System->base_dir . "/View/Resource/Html/html/diskusage.html";
+    __FILE__ =~ /^(.*\/System\/).*/;
+    my $base = $1;
+    my $html = $base . "/View/Resource/Html/html/diskusage.html";
     open(FH,"<$html") or die "Failed to open $html: $!";
     my $content = do { local $/; <FH> };
     close(FH);
