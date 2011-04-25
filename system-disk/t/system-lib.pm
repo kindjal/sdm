@@ -17,7 +17,9 @@ unless ($system) {
         $system = "./system-disk/system/bin/system";
     } elsif (-e "./system/bin/system") {
         $system = "./system/bin/system";
-    } elsif (-e "../system/bin/system") {        $system = "../system/bin/system";    } else {
+    } elsif (-e "../system/bin/system") {
+        $system = "../system/bin/system";
+    } else {
         die "Can't find 'system' executable";
     }
 }
