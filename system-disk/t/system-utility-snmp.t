@@ -54,7 +54,7 @@ $host = "nfs24";
 $res = $obj->connect_snmp($host);
 $oid = '1.3.6.1.2.1.25.2.3.1.3';
 $res = $obj->snmp_get_serial_request( $oid );
-ok( scalar @{ [ keys %$res ] } == 98, "test_snmp_get_serial_request: ok");
+ok( scalar @{ [ keys %$res ] } > 90, "test_snmp_get_serial_request: ok");
 
 my $string = "This is an unrecognized sysDescr string";
 throws_ok { $obj->type_string_to_type($string); } qr/No such host/, "test_type_mapper: fails ok on bad host type";
