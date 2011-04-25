@@ -1,7 +1,10 @@
+
 package System;
+
 use warnings;
 use strict;
 
+use System::Site;
 use UR;
 
 class System {
@@ -38,7 +41,7 @@ with funding from the National Human Genome Research Institute.  Richard K. Wils
 
 The primary author(s) of the System suite are:
 EOS
-        'Matthew Callaway, M.S.',
+        'Matthew Callaway <mcallawa@genome.wustl.edu>',
     );
 }
 
