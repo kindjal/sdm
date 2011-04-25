@@ -6,6 +6,8 @@ use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
+$ENV{SYSTEM_DEPLOYMENT}='testing';
+
 my $top = dirname $FindBin::Bin;
 my $base = "$top/lib/System";
 my $perl = "$^X -I $top/lib -I $top/../system/lib";
