@@ -8,7 +8,7 @@ use System;
 
 # This is strange and ugly use of class definition that I use to set
 # id_sequence_generator_name for Oracle only.
-my $hashdef = {
+my $classdef = {
     table_name => 'disk_export',
     id_by => [
         id              => { is => 'Number' },
@@ -30,8 +30,8 @@ my $hashdef = {
 # Only oracle needs this
 my $ds = System::DataSource::Disk->get();
 my $driver = $ds->driver;
-$hashdef->{id_sequence_generator_name} = 'disk_export_id' if ($driver eq "Oracle");
-class System::Disk::Export $hashdef;
+$classdef->{id_sequence_generator_name} = 'disk_export_id' if ($driver eq "Oracle");
+class System::Disk::Export $classdef;
 
 sub create {
     my $self = shift;

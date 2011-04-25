@@ -8,7 +8,7 @@ use System;
 use Date::Manip;
 use Smart::Comments -ENV;
 
-class System::Disk::Volume {
+my $classdef = {
     table_name => 'disk_volume',
     id_by => [
         id            => { is => 'Number' },
@@ -36,10 +36,14 @@ class System::Disk::Volume {
         last_modified => { is => 'DATE' },
     ],
     schema_name => 'Disk',
-# Only oracle needs this
-#    id_sequence_generator_name => 'disk_volume_id',
     data_source => 'System::DataSource::Disk',
 };
+
+# Only oracle needs this
+my $ds = System::DataSource::Disk->get();
+my $driver = $ds->driver;
+$classdef->{id_sequence_generator_name} = 'disk_volume_id' if ($driver eq "Oracle");
+class System::Disk::Volume $classdef;
 
 =head2 _new
 This is a private method that is used so that the unit tests can call SUPER::create()
