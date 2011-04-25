@@ -2,6 +2,10 @@
 use strict;
 use warnings;
 
+BEGIN {
+    $ENV{SYSTEM_DEPLOYMENT} ||= 'testing';
+}
+
 use System;
 
 use Test::More;
@@ -21,6 +25,7 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
+warn "e $ENV{SYSTEM_DEPLOYMENT}";
 
 # Test insufficient creation params
 my @params = ();

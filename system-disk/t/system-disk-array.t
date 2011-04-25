@@ -1,7 +1,11 @@
 
 use strict;
 use warnings;
+
+$ENV{SYSTEM_DEPLOYMENT} = "testing";
 use System;
+exit;
+
 use Test::More;
 use Test::Output;
 use Test::Exception;
