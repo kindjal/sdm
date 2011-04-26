@@ -15,6 +15,7 @@ use Test::Output;
 use Test::Exception;
 
 my $res;
+my @res;
 my $params;
 
 # Start with a fresh database
@@ -50,8 +51,12 @@ ok( defined $res->id, "properly created new volume");
 $res = System::Disk::Volume->create( @params );
 ok( defined $res->id, "properly created new volume");
 
-my @res = System::Disk::Volume->get( -order_by => ['-total_kb'] );
-print Data::Dumper::Dumper @res;
+@res = System::Disk::Volume->get( -order_by => ['+total_kb'] );
+ok( $res[0]->mount_path eq "/gscmnt/sata803", "order by total_kb ok");
+@res = System::Disk::Volume->get( -order_by => ['+used_kb'] );
+ok( $res[0]->mount_path eq "/gscmnt/sata801", "order by used_kb ok");
+@res = System::Disk::Volume->get( -order_by => ['+disk_group'] );
+ok( $res[0]->mount_path eq "/gscmnt/sata802", "order by disk_group ok");
 
 done_testing();
 
