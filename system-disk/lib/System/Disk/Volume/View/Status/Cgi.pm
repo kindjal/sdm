@@ -41,7 +41,6 @@ sub _fnColumnToField {
 }
 
 sub _build_order_param {
-    # FIXME: UR does not have ASC and DESC, it's always ASC
     my ($self,$q) = @_;
     my @order;
     if( defined $q->query_param('iSortCol_0') ){
@@ -50,7 +49,12 @@ sub _build_order_param {
             # translate the index into a column name.
             my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
             my $direction = $q->query_param('sSortDir_'.$i);
-            push @order, "$column_name";
+            if ($direction eq 'desc') {
+                $column_name = "-$column_name";
+            } elsif ($direction eq 'asc') {
+                $column_name = "+$column_name";
+            }
+            push @order, $column_name;
         }
     }
     return @order;
