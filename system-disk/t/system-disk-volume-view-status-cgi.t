@@ -95,7 +95,6 @@ $o = System::Disk::Volume::View::Status::Cgi->new();
 $r = $o->run();
 my $json = JSON->new();
 $r = $json->decode($r);
-print Data::Dumper::Dumper $r;
 
 done_testing();
 
