@@ -39,7 +39,7 @@ sub short {
 
 sub commify {
     my $number = shift;
-    return unless (defined $number and $number =~ /^\d+$/);
+    return $number unless (defined $number and $number =~ /^\d+$/);
     # commify a number. Perl Cookbook, 2.17, p. 64
     my $text = reverse $number;
     $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
