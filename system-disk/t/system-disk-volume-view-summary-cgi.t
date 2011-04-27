@@ -33,7 +33,8 @@ require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
 ok( defined System::Disk::Filer->create( name => 'gpfs' ), "ok: gpfs made" );
 
-$o = System::Disk::Volume::View::Summary::Cgi->create( loglevel => 'DEBUG' );
+#$o = System::Disk::Volume::View::Summary::Cgi->create( loglevel => 'DEBUG' );
+$o = System::Disk::Volume::View::Summary::Cgi->create();
 ok( defined System::Disk::Filer->create( name => 'gpfs2' ), "ok: gpfs2 made" );
 ok( defined System::Disk::Group->create( name => 'INFO_APIPE' ), "ok: INFO_APIPE made" );
 ok( defined System::Disk::Group->create( name => 'INFO_GENOME_MODEL' ), "ok: INFO_GENOME_MODEL made" );

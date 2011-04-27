@@ -46,10 +46,8 @@ UR::Context->commit();
 # sSearch=
 # iSortCol_0=
 $uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
-$q = URI->new($uri);
-$ENV{QUERY_URI} = $uri;
 $o = System::Disk::Volume::View::Status::Cgi->create();
-$r = $o->run();
+$r = $o->run($uri);
 my $json = JSON->new();
 $r = $json->decode($r);
 my $expected =  {
@@ -84,17 +82,49 @@ my $expected =  {
                   'unknown'
                 ]
               ],
-  'sEcho' => 1
+  'sEcho' => 11
 };
 ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
 
 $uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=5&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
-$q = URI->new($uri);
-$ENV{QUERY_URI} = $uri;
 $o = System::Disk::Volume::View::Status::Cgi->create();
-$r = $o->run();
+$r = $o->run($uri);
 $json = JSON->new();
 $r = $json->decode($r);
-
+$expected = {
+    'iTotalRecords' => 3,
+    'iTotalDisplayRecords' => 3,
+    'aaData' => [
+                  [
+                    '/gscmnt/sata801',
+                    '150 (150 KB)',
+                    '20 (20 KB)',
+                    '13 %',
+                    'INFO_APIPE',
+                    'gpfs2',
+                    'unknown'
+                  ],
+                  [
+                    '/gscmnt/sata802',
+                    '200 (200 KB)',
+                    '30 (30 KB)',
+                    '15 %',
+                    'INFO_GENOME_MODEL',
+                    'gpfs2',
+                    'unknown'
+                  ],
+                  [
+                    '/gscmnt/sata800',
+                    '100 (100 KB)',
+                    '10 (10 KB)',
+                    '10 %',
+                    'INFO_APIPE',
+                    'gpfs,gpfs2',
+                    'unknown'
+                  ]
+                ],
+    'sEcho' => '11'
+};
+ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
 done_testing();
 
