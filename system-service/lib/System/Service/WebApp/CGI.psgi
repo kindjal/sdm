@@ -11,8 +11,8 @@ dispatch {
         my ($self,$args) = @_;
 
         # Find and load a class based on the requested cgi
-        # eg. /viewajax/system/disk/volume/table.html.cgi
-        # -> System::Disk::Volume::View::Table::Cgi
+        # eg. /viewajax/system/disk/volume/summary.html.cgi
+        # -> System::Disk::Volume::View::Summary::Cgi
         my $class = $args->{PATH_INFO};
         my @parts = split('/',$class);
         my $perspective = ucfirst($parts[$#parts]);
@@ -27,13 +27,13 @@ dispatch {
         my $loglevel = $ENV{SYSTEM_LOGLEVEL};
         my $app;
         if ($loglevel) {
-            $app = $class->create();
-        } else {
             $app = $class->create( loglevel => $loglevel );
+        } else {
+            $app = $class->create();
         }
         my $content;
         eval {
-            $content = $app->run($args);
+            $content = $app->run( $args->{REQUEST_URI} );
         };
         if ($@) {
             my $json = JSON->new();
