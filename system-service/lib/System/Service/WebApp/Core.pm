@@ -6,7 +6,6 @@ use File::Find;
 use System;
 
 our @error_classes;
-
 my $imported = 0;
 sub import {
     return 1 if $imported;

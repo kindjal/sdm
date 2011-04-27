@@ -3,6 +3,7 @@ package System::Service::WebApp::CGI;
 
 use Web::Simple 'System::Service::WebApp::CGI';
 use System;
+use JSON;
 
 dispatch {
 
@@ -23,14 +24,38 @@ dispatch {
         $class .= "::View::${perspective}::Cgi";
 
         eval "require $class";
-        my $app = $class->new();
-        my $content = $app->run($args);
+        my $loglevel = $ENV{SYSTEM_LOGLEVEL};
+        my $app;
+        if ($loglevel) {
+            $app = $class->create();
+        } else {
+            $app = $class->create( loglevel => $loglevel );
+        }
+        my $content;
+        eval {
+            $content = $app->run($args);
+        };
+        if ($@) {
+            my $json = JSON->new();
+            my $error = {
+                'iTotalRecords' => 1,
+                'iTotalDisplayRecords' => 1,
+                'aaData' => [ [ 'ERROR', $@, '', '' ], ],
+                'sEcho' => 1
+            };
+            $content = $json->encode($error);
+            return [
+                500,
+                [ 'Content-type', 'text/json' ],
+                [$content],
+               ];
+        }
 
         return [
                 200,
                 [ 'Content-type', 'text/json' ],
                 [$content],
-            ];
+               ];
         }
 
 };

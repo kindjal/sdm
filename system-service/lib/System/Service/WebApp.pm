@@ -42,13 +42,10 @@ sub execute {
     my $self = shift;
 
     $self->determine_port;
-
     $self->status_message( sprintf( "Using browser: %s", $self->browser ) );
     $self->status_message( sprintf( "Local server accessible at %s", $self->url ) );
-
     $self->fork_and_call_browser
       if ( $ENV{DISPLAY} && !( $ENV{SSH_CLIENT} || $ENV{SSH_CONNECTION} ) );
-
     $self->run_starman;
 }
 
@@ -69,7 +66,6 @@ sub fork_and_call_browser {
 sub psgi_path {
     my $module_path = __PACKAGE__->get_class_object->module_path;
     $module_path =~ s/\.pm$//g;
-
     return $module_path;
 }
 
@@ -111,8 +107,11 @@ sub run_starman {
 
     my $psgi_path = $self->psgi_path . '/Main.psgi';
 
-    $runner->parse_options( '--app', $psgi_path, '--port', $self->port,
-        '--workers', 4, '-R', System->base_dir . ',' . Workflow->base_dir );
+    $runner->parse_options(
+        '--app', $psgi_path,
+        '--port', $self->port,
+        '--workers', 1,
+        '-R', System->base_dir . ',' . Workflow->base_dir );
 
     $runner->run;
 }
