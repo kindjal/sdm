@@ -76,6 +76,8 @@ sub _build_aadata {
     $self->{logger}->debug("_build_aadata: convert a UR::Object::Set");
     my $query = shift;
     my @results = @_;
+    # @results must be a non-empty array of arrays of volumes
+    return unless (@results and $results[0]->isa( 'System::Disk::Volume::Set' ));
     my @data;
     foreach my $item ( @results ) {
         my $capacity = 0;
@@ -89,38 +91,8 @@ sub _build_aadata {
             $capacity,
         ];
     }
-    return @data unless @data;
-
-    # Implement Set ordering here, note that the Web UI (DataTables) supports
-    # multi column sort, which is nice with direct DB call, but here we must
-    # sort UR::Object::Sets which are by definition unordered.  Just do one column sort.
-    my @order = $self->_build_order_param($query);
-    my $order_col = $order[0][0];
-    my $order_dir = $order[0][1];
-
-    if ($order_dir and $order_col and $order_dir eq 'asc') {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
-            @data = sort { $a->[ $order_col ] <=> $b->[ $order_col ] } @data;
-        } else {
-            @data = sort { $a->[ $order_col ] cmp $b->[ $order_col ] } @data;
-        }
-    } elsif ($order_col) {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
-            @data = sort { $b->[ $order_col ] <=> $a->[ $order_col ] } @data;
-        } else {
-            @data = sort { $b->[ $order_col ] cmp $a->[ $order_col ] } @data;
-        }
-    }
-
-    # Implement limit and offset here to make up for lack of feature in get();
-    sub max ($$) { int($_[ $_[0] < $_[1] ]) };
-    sub min ($$) { int($_[ $_[0] > $_[1] ]) };
-    my $limit  = $query->query_param('iDisplayLength') || 10;
-    my $offset = $query->query_param('iDisplayStart') || 0;
-    my $ceiling = min($limit-1,$#data);
-    my @aaData = @data[$offset..$ceiling];
-
-    return @data;
+    my @sorted_data = $self->_sorter($query,@data);
+    return @sorted_data;
 }
 
 =head2 _prettify_aadata
@@ -130,7 +102,8 @@ sub _prettify_aadata {
     my $self = shift;
     $self->{logger}->debug("_prettify_aadata");
     my @data = @_;
-    return [] unless @data;
+    # @data must be a non-empty array of arrays of size 4
+    return unless (@data and scalar @{ $data[0] } );
     @data = map { [
          $_->[0],
          $self->_commify($_->[1]) . " (" . $self->_short($_->[1]) . ")",
@@ -138,33 +111,6 @@ sub _prettify_aadata {
          sprintf("%d %%", $_->[3]),
        ] } @data;
     return @data;
-}
-
-=head2 run
-Receive a URI string as an argument, fetch data, turn it into JSON and return it.
-=cut
-sub run {
-    my ($self,$uri) = @_;
-    $self->{logger}->debug(__PACKAGE__ . " run");
-    my $query = URI->new( $uri );
-
-    my @results = $self->_build_result_set( $query );
-    my @aaData = $self->_build_aadata( $query, @results );
-    @aaData = $self->_prettify_aadata( @aaData );
-
-    my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
-    my $iTotal = scalar @results;
-    my $iFilteredTotal = scalar @aaData;
-    my $sOutput = {
-        sEcho => $sEcho,
-        iTotalRecords => int($iTotal),
-        iTotalDisplayRecords => int($iFilteredTotal),
-        aaData => \@aaData,
-    };
-
-    my $json = new JSON;
-    my $result = $json->encode($sOutput);
-    return $result
 }
 
 1;
