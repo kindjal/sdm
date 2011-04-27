@@ -1,5 +1,3 @@
-/* PRAGMA foreign_keys = ON; */
-/* create database IF NOT EXISTS system; */
 DROP TABLE IF EXISTS disk_user;
 DROP TABLE IF EXISTS disk_host_array;
 DROP TABLE IF EXISTS disk_filer_host;
