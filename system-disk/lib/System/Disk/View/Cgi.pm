@@ -14,7 +14,7 @@ Convert a number of bytes to an abbreviated form: 1000 => 1 KB
 =cut
 sub _short {
     my $self = shift;
-    $self->{logger}->debug("_short: convert number to abbreviated form");
+    #$self->{logger}->debug("_short: convert number to abbreviated form");
     my $number = shift;
     return '' unless (defined $number);
     return $number unless ($number =~ /^\d+$/);
@@ -46,7 +46,7 @@ Add commas to a long number: 1000 => 1,000
 =cut
 sub _commify {
     my $self = shift;
-    $self->{logger}->debug("_commify: add commas to long number");
+    #$self->{logger}->debug("_commify: add commas to long number");
     my $number = shift;
     return '' unless (defined $number);
     return $number unless ($number =~ /^\d+$/);
