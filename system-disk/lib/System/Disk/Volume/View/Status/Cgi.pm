@@ -5,25 +5,20 @@ use strict;
 use warnings;
 
 use System;
-use System::Disk::View::Lib qw( short commify );
-
 use JSON;
 use URI;
 use URI::QueryParam;
 
 class System::Disk::Volume::View::Status::Cgi {
-    is => 'System::Command::Base'
+    is => 'System::Disk::View::Cgi'
 };
 
-#sub new {
-#    my ($class,@args) = @_;
-#    my $self = {};
-#    bless $self,$class;
-#    return $self;
-#}
-
+=head2 _fnColumnToField
+This maps a column in DataTables to a UR::Object attribute.
+=cut
 sub _fnColumnToField {
     my $self = shift;
+    $self->{logger}->debug("_fnColumnToField: map DataTable column to UR::Object attribute");
     my $i = shift;
 
     # Note: we could have used an array, but for dispatching purposes, this is
@@ -44,69 +39,13 @@ sub _fnColumnToField {
     return $dispatcher{$i};
 }
 
-sub _build_order_param0 {
-    my ($self,$q) = @_;
-    my @order;
-    if( defined $q->query_param('iSortCol_0') ){
-        for( my $i = 0; $i < $q->query_param('iSortingCols'); $i++ ) {
-            # We only get the column index (starting from 0), so we have to
-            # translate the index into a column name.
-            my $column_name = $self->_fnColumnToField( $q->query_param('iSortCol_'.$i) );
-            my $direction = $q->query_param('sSortDir_'.$i);
-            if ($direction eq 'desc') {
-                $column_name = "-$column_name";
-            } elsif ($direction eq 'asc') {
-                $column_name = "+$column_name";
-            }
-            push @order, $column_name;
-        }
-    }
-    return @order;
-}
-
-sub _build_order_param {
-    my ($self,$q) = @_;
-    $self->{logger}->debug("_build_order_param");
-    my @order;
-    if( defined $q->query_param('iSortCol_0') ){
-        for( my $i = 0; $i < $q->query_param('iSortingCols'); $i++ ) {
-            # We only get the column index (starting from 0), so we have to
-            # translate the index into a column name.
-            my $col = $q->query_param('iSortCol_'.$i);
-            my $dir = $q->query_param('sSortDir_'.$i);
-            push @order, [ $col => $dir ];
-        }
-    }
-    return @order;
-}
-
-sub _build_where_param {
-    my ($self,$q) = @_;
-    my @where;
-    if( defined $q->query_param('sSearch') ) {
-        my $search_string = $q->query_param('sSearch');
-        for( my $i = 0; $i < $q->query_param('iColumns'); $i++ ) {
-            # Iterate over each column and check if it is searchable.
-            # If so, add a constraint to the where clause restricting the given
-            # column. In the query, the column is identified by it's index, we
-            # need to translates the index to the column name.
-            my $searchable_ident = 'bSearchable_'.$i;
-            if( length $search_string > 0 and
-                    $q->query_param($searchable_ident) and
-                    $q->query_param($searchable_ident) eq 'true' ) {
-                my $column = $self->_fnColumnToField( $i );
-                push @where, [ { "$column like" => "%$search_string%" } ];
-            }
-        }
-    }
-    return @where;
-}
-
+=head2 _build_result_set
+Get the set of Volumes represented by a DataTables query.
+=cut
 sub _build_result_set {
-    # This requires UR beyond 94fbaa5086fc252078d2c25f368468bc76605e14
-    # to support the -or clause.
-    # FIXME: we still want LIMIT and OFFSET.
     my ($self,$q) = @_;
+    $self->{logger}->debug("_build_result_set: fetch UR::Objects and return a UR::Object::Set");
+
     my $param = {};
     my @where = $self->_build_where_param($q);
     if (scalar @where) {
@@ -117,8 +56,12 @@ sub _build_result_set {
     return @result;
 }
 
+=head2 _build_aadata
+Order and sort our UR::Object::Set as well as applying some modifiers and transformations.
+=cut
 sub _build_aadata {
     my $self = shift;
+    $self->{logger}->debug("_build_aadata: convert a UR::Object::Set");
     my $query = shift;
     my @results = @_;
     my @data;
@@ -149,13 +92,13 @@ sub _build_aadata {
     my $order_dir = $order[0][1];
 
     if ($order_dir and $order_col and $order_dir eq 'asc') {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
+        if ( $data[0][ $order_col ] =~ /^\d+$/ ) {
             @data = sort { $a->[ $order_col ] <=> $b->[ $order_col ] } @data;
         } else {
             @data = sort { $a->[ $order_col ] cmp $b->[ $order_col ] } @data;
         }
     } elsif ($order_col) {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
+        if ( $data[0][ $order_col ] =~ /^\d+$/ ) {
             @data = sort { $b->[ $order_col ] <=> $a->[ $order_col ] } @data;
         } else {
             @data = sort { $b->[ $order_col ] cmp $a->[ $order_col ] } @data;
@@ -173,13 +116,17 @@ sub _build_aadata {
     return @data;
 }
 
+=head2 _prettify_aadata
+Adds commas and readability stuff to our aaData.
+=cut
 sub _prettify_aadata {
     my $self = shift;
+    $self->{logger}->debug("_prettify_aadata");
     my @data = @_;
     @data = map { [
          $_->[0],
-         System::Disk::View::Lib::commify($_->[1]) . " (" . System::Disk::View::Lib::short($_->[1]) . ")",
-         System::Disk::View::Lib::commify($_->[2]) . " (" . System::Disk::View::Lib::short($_->[2]) . ")",
+         $self->_commify($_->[1]) . " (" . $self->_short($_->[1]) . ")",
+         $self->_commify($_->[2]) . " (" . $self->_short($_->[2]) . ")",
          sprintf("%d %%", $_->[3]),
          $_->[4],
          $_->[5],
@@ -188,11 +135,14 @@ sub _prettify_aadata {
     return @data;
 }
 
+=head2 run
+Receive a URI string as an argument, fetch data, turn it into JSON and return it.
+=cut
 sub run {
+    my ($self,$uri) = @_;
+    $self->{logger}->debug(__PACKAGE__ . " run");
+    my $query = URI->new( $uri );
 
-    my ($self,$args) = @_;
-
-    my $query = URI->new( $args->{REQUEST_URI} );
     my @results = $self->_build_result_set( $query );
     my @aaData = $self->_build_aadata( $query, @results );
     @aaData = $self->_prettify_aadata( @aaData );
