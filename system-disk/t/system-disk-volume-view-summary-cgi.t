@@ -23,6 +23,8 @@ my $q;
 my $o;
 my $r;
 my $uri;
+my $data;
+my $json;
 
 # Start with a fresh database
 use FindBin;
@@ -33,8 +35,21 @@ require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
 ok( defined System::Disk::Filer->create( name => 'gpfs' ), "ok: gpfs made" );
 
-#$o = System::Disk::Volume::View::Summary::Cgi->create( loglevel => 'DEBUG' );
-$o = System::Disk::Volume::View::Summary::Cgi->create();
+$o = System::Disk::Volume::View::Summary::Cgi->create( loglevel => 'DEBUG' );
+#$o = System::Disk::Volume::View::Summary::Cgi->create();
+
+$uri = '/site/system/disk/volume/summary.html.cgi?sEcho=1&iColumns=4&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&iSortingCols=1&iSortCol_0=1&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&rm=table_data HTTP/1.1" 200 90 "http://vm75.gsc.wustl.edu:8090/site/system/disk/status.html';
+$r = $o->run($uri);
+$json = JSON->new();
+$data = $json->decode($r);
+my $expected = {
+  'iTotalRecords' => 0,
+  'iTotalDisplayRecords' => 0,
+  'aaData' => [],
+  'sEcho' => '1'
+};
+ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
 ok( defined System::Disk::Filer->create( name => 'gpfs2' ), "ok: gpfs2 made" );
 ok( defined System::Disk::Group->create( name => 'INFO_APIPE' ), "ok: INFO_APIPE made" );
 ok( defined System::Disk::Group->create( name => 'INFO_GENOME_MODEL' ), "ok: INFO_GENOME_MODEL made" );
@@ -51,7 +66,7 @@ $uri = '/site/system/disk/volume/summary.html.cgi?sEcho=2&iColumns=4&sColumns=&i
 my @r;
 $q = URI->new($uri);
 my $p = $o->_build_query_param($q);
-my $expected = { '-group_by' => [ 'disk_group' ] };
+$expected = { '-group_by' => [ 'disk_group' ] };
 ok( is_deeply( [sort keys %$p], [sort keys %$expected], "ok: is_deeply"), "ok: param hash keys" );
 ok( is_deeply( [sort values %$p], [sort values %$expected], "ok: is_deeply"), "ok: param hash values" );
 
@@ -88,8 +103,8 @@ ok( is_deeply( @order, [ 0, 'asc' ], "ok: is_deeply" ), "ok: order by total_kb a
 ok( is_deeply( $r[0], [ 'INFO_APIPE', 300, 6, 2 ], "ok: sort by total_kb asc") );
 
 $r = $o->run($q);
-my $json = JSON->new();
-my $data = $json->decode($r);
+$json = JSON->new();
+$data = $json->decode($r);
 $expected = {
           'iTotalRecords' => 2,
           'iTotalDisplayRecords' => 2,

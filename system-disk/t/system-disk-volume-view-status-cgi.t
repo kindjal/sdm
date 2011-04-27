@@ -26,12 +26,26 @@ my $o;
 my $r;
 my @r;
 my $uri;
+my $json;
 
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
+
+$uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
+$o = System::Disk::Volume::View::Status::Cgi->create();
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+my $expected = {
+  'iTotalRecords' => 0,
+  'iTotalDisplayRecords' => 0,
+  'aaData' => [],
+  'sEcho' => '11'
+};
+ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
 
 ok( defined System::Disk::Filer->create( name => 'gpfs' ), "ok: add gpfs" );
 ok( defined System::Disk::Filer->create( name => 'gpfs2' ), "ok: add gpfs2" );
@@ -45,12 +59,11 @@ UR::Context->commit();
 
 # sSearch=
 # iSortCol_0=
-$uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
-$o = System::Disk::Volume::View::Status::Cgi->create();
+$uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=0&sSortDir_0=asc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
 $r = $o->run($uri);
-my $json = JSON->new();
+$json = JSON->new();
 $r = $json->decode($r);
-my $expected =  {
+$expected =  {
   'iTotalRecords' => 3,
   'iTotalDisplayRecords' => 3,
   'aaData' => [
@@ -126,5 +139,19 @@ $expected = {
     'sEcho' => '11'
 };
 ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
+
+$uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=1&sSortDir_0=asc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+print Data::Dumper::Dumper $r->{aaData}->[0];
+
+$uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=1&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+print Data::Dumper::Dumper $r->{aaData}->[0];
+
+
 done_testing();
 

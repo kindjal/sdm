@@ -52,7 +52,6 @@ my $expected = {
     'used_kb' => '20 (20 KB)',
     'capacity' => '5 %'
 };
-print Data::Dumper::Dumper $data;
 ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
 done_testing();
 
