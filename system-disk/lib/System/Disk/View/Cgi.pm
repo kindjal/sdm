@@ -16,7 +16,8 @@ sub _short {
     my $self = shift;
     $self->{logger}->debug("_short: convert number to abbreviated form");
     my $number = shift;
-    return unless (defined $number and $number =~ /^\d+$/);
+    return '' unless (defined $number);
+    return $number unless ($number =~ /^\d+$/);
 
     my $cn = $self->_commify($number);
     my $size = 0;
@@ -47,7 +48,8 @@ sub _commify {
     my $self = shift;
     $self->{logger}->debug("_commify: add commas to long number");
     my $number = shift;
-    return $number unless (defined $number and $number =~ /^\d+$/);
+    return '' unless (defined $number);
+    return $number unless ($number =~ /^\d+$/);
     # commify a number. Perl Cookbook, 2.17, p. 64
     my $text = reverse $number;
     $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
@@ -127,12 +129,11 @@ sub _build_aadata {
 }
 
 =head2 _prettify_aadata
-Adds commas and readability stuff to our aaData.
+Base prettify does nothing.  Define in a subclass to modify aadata.
 =cut
 sub _prettify_aadata {
     my $self = shift;
-    $self->{logger}->debug("_prettify: ERROR: must be provided by a subclass!");
-    return;
+    return @_;
 }
 
 =head2 _sorter
@@ -142,25 +143,34 @@ sub _sorter {
     my $self = shift;
     $self->{logger}->debug("_sorter: apply an 'order' clause to an array of arrays");
     my $query = shift;
+    return @_ unless @_;
     my @data = @_;
     # Implement Set ordering here, note that the Web UI (DataTables) supports
     # multi column sort, which is nice with direct DB call, but here we must
     # sort UR::Object::Sets which are by definition unordered.  Just do one column sort.
-    my @order = build_order_param($query);
-    my $order_col = $order[0][0];
-    my $order_dir = $order[0][1];
+    my @order = $self->_build_order_param($query);
+    return @data unless @order;
+    my ($order_col,$order_dir) = @{ $order[0] };
 
-    if ($order_dir and $order_col and $order_dir eq 'asc') {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
-            @data = sort { $a->[ $order_col ] <=> $b->[ $order_col ] } @data;
+    if (defined $order_dir and defined $order_col) {
+        if ($order_dir eq 'asc') {
+            # sort ascending
+            if ( $data[0][ $order_col ] =~ /^\d+$/ ) {
+                # numeric
+                @data = sort { $a->[ $order_col ] <=> $b->[ $order_col ] } @data;
+            } else {
+                # non-numeric
+                @data = sort { $a->[ $order_col ] cmp $b->[ $order_col ] } @data;
+            }
         } else {
-            @data = sort { $a->[ $order_col ] cmp $b->[ $order_col ] } @data;
-        }
-    } elsif ($order_col) {
-        if ( $data[0][ $order_col ] =~ /\d+/ ) {
-            @data = sort { $b->[ $order_col ] <=> $a->[ $order_col ] } @data;
-        } else {
-            @data = sort { $b->[ $order_col ] cmp $a->[ $order_col ] } @data;
+            # sort descending
+            if ( $data[0][ $order_col ] =~ /^\d+$/ ) {
+                # numeric
+                @data = sort { $b->[ $order_col ] <=> $a->[ $order_col ] } @data;
+            } else {
+                # non-numeric
+                @data = sort { $b->[ $order_col ] cmp $a->[ $order_col ] } @data;
+            }
         }
     }
 
