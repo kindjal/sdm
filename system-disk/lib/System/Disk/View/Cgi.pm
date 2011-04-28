@@ -3,6 +3,10 @@ package System::Disk::View::Cgi;
 
 use strict;
 use warnings;
+use System;
+use JSON;
+use URI;
+use URI::QueryParam;
 
 class System::Disk::View::Cgi {
     # Because we're a System::Command::Base we get logger for free
@@ -195,7 +199,11 @@ sub run {
 
     my @results = $self->_build_result_set( $query );
     my @aaData = $self->_build_aadata( $query, @results );
-    @aaData = $self->_prettify_aadata( @aaData );
+    unless ($query->query_form_hash->{_}) {
+        # This '_' char is an indicator that no server size processing is expected.
+        # In this case we expect the javascript on the client to prettify data.
+        @aaData = $self->_prettify_aadata( @aaData );
+    }
 
     my $sEcho = defined $query->query_param('sEcho') ? $query->query_param('sEcho') : 1;
     my $iTotal = scalar @results;
