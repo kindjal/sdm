@@ -1,3 +1,31 @@
+/*
+ *  File:         demo_table.css
+ *  CVS:          $Id$
+ *  Description:  CSS descriptions for DataTables demo pages
+ *  Author:       Allan Jardine
+ *  Created:      Tue May 12 06:47:22 BST 2009
+ *  Modified:     $Date$ by $Author$
+ *  Language:     CSS
+ *  Project:      DataTables
+ *
+ *  Copyright 2009 Allan Jardine. All Rights Reserved.
+ *
+ * ***************************************************************************
+ * DESCRIPTION
+ *
+ * The styles given here are suitable for the demos that are used with the standard DataTables
+ * distribution (see www.datatables.net). You will most likely wish to modify these styles to
+ * meet the layout requirements of your site.
+ *
+ * Common issues:
+ *   'full_numbers' pagination - I use an extra selector on the body tag to ensure that there is
+ *     no conflict between the two pagination types. If you want to use full_numbers pagination
+ *     ensure that you either have "example_alt_pagination" as a body class name, or better yet,
+ *     modify that selector.
+ *   Note that the path used for Images is relative. All images are by default located in
+ *     ../images/ - relative to this CSS file.
+ */
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables features
  */
@@ -7,7 +35,7 @@
 	min-height: 302px;
 	clear: both;
 	_height: 302px;
-	/* zoom: 1; *//* Feeling sorry for IE */
+	zoom: 1; /* Feeling sorry for IE */
 }
 
 .dataTables_processing {
@@ -44,7 +72,7 @@
 
 .dataTables_paginate {
 	width: 44px;
-	width: 50px;
+	* width: 50px;
 	float: right;
 	text-align: right;
 }
@@ -58,19 +86,19 @@
 }
 
 .paginate_disabled_previous {
-	background-image: url('/res/js/pkg/DataTables/media/images/back_disabled.jpg');
+	background-image: url('../images/back_disabled.jpg');
 }
 
 .paginate_enabled_previous {
-	background-image: url('/res/js/pkg/DataTables/media/images/back_enabled.jpg');
+	background-image: url('../images/back_enabled.jpg');
 }
 
 .paginate_disabled_next {
-	background-image: url('/res/js/pkg/DataTables/media/images/forward_disabled.jpg');
+	background-image: url('../images/forward_disabled.jpg');
 }
 
 .paginate_enabled_next {
-	background-image: url('/res/js/pkg/DataTables/media/images/forward_enabled.jpg');
+	background-image: url('../images/forward_enabled.jpg');
 }
 
 
@@ -80,8 +108,21 @@
  */
 table.display {
 	margin: 0 auto;
-	width: 100%;
 	clear: both;
+	width: 100%;
+	
+	/* Note Firefox 3.5 and before have a bug with border-collapse
+	 * ( https://bugzilla.mozilla.org/show%5Fbug.cgi?id=155955 ) 
+	 * border-spacing: 0; is one possible option. Conditional-css.com is
+	 * useful for this kind of thing
+	 *
+	 * Further note IE 6/7 has problems when calculating widths with border width.
+	 * It subtracts one px relative to the other browsers from the first column, and
+	 * adds one to the end...
+	 *
+	 * If you want that effect I'd suggest setting a border-top/left on th/td's and 
+	 * then filling in the gaps with other borders.
+	 */
 }
 
 table.display thead th {
@@ -89,11 +130,11 @@ table.display thead th {
 	border-bottom: 1px solid black;
 	font-weight: bold;
 	cursor: pointer;
-	/* cursor: hand; */
+	* cursor: hand;
 }
 
 table.display tfoot th {
-	padding: 3px 10px;
+	padding: 3px 18px 3px 10px;
 	border-top: 1px solid black;
 	font-weight: bold;
 }
@@ -106,17 +147,10 @@ table.display td {
 	padding: 3px 10px;
 }
 
-table.display td.right {
-	text-align: right;
-}
-
-table.display td.left {
-	text-align: left;
-}
-
 table.display td.center {
 	text-align: center;
 }
+
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -124,23 +158,23 @@ table.display td.center {
  */
 
 .sorting_asc {
-	background: url('/res/js/pkg/DataTables/media/images/sort_asc.png') no-repeat center right;
+	background: url('../images/sort_asc.png') no-repeat center right;
 }
 
 .sorting_desc {
-	background: url('/res/js/pkg/DataTables/media/images/sort_desc.png') no-repeat center right;
+	background: url('../images/sort_desc.png') no-repeat center right;
 }
 
 .sorting {
-	background: url('/res/js/pkg/DataTables/media/images/sort_both.png') no-repeat center right;
+	background: url('../images/sort_both.png') no-repeat center right;
 }
 
 .sorting_asc_disabled {
-	background: url('/res/js/pkg/DataTables/media/images/sort_asc_disabled.png') no-repeat center right;
+	background: url('../images/sort_asc_disabled.png') no-repeat center right;
 }
 
 .sorting_desc_disabled {
-	background: url('/res/js/pkg/DataTables/media/images/sort_desc_disabled.png') no-repeat center right;
+	background: url('../images/sort_desc_disabled.png') no-repeat center right;
 }
 
 
@@ -150,14 +184,6 @@ table.display td.center {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * DataTables row classes
  */
-table.display tr.odd.gradeA {
-	background-color: #ddffdd;
-}
-
-table.display tr.even.gradeA {
-	background-color: #eeffee;
-}
-
 table.display tr.odd.gradeA {
 	background-color: #ddffdd;
 }
@@ -206,17 +232,23 @@ tr.even {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Misc
  */
-/*
-.total, .bottom {
+.dataTables_scroll {
+	clear: both;
+}
+
+.dataTables_scrollBody {
+	*margin-top: -1px;
+}
+
+.top, .bottom {
 	padding: 15px;
 	background-color: #F5F5F5;
 	border: 1px solid #CCCCCC;
 }
 
-.total.dataTables_info {
+.top .dataTables_info {
 	float: none;
 }
-*/
 
 .clear {
 	clear: both;
@@ -259,14 +291,14 @@ td.details {
 }
 
 .paging_full_numbers span.paginate_button,
-	.paging_full_numbers span.paginate_active {
+ 	.paging_full_numbers span.paginate_active {
 	border: 1px solid #aaa;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	padding: 2px 5px;
 	margin: 0 3px;
 	cursor: pointer;
-	/* cursor: hand; */
+	*cursor: hand;
 }
 
 .paging_full_numbers span.paginate_button {
@@ -429,12 +461,44 @@ tr.even.gradeU td.sorting_3 {
 /*
  * Row highlighting example
  */
-.ex_highlight #main tbody tr.even:hover, #main tbody tr.even td.highlighted {
+.ex_highlight #example tbody tr.even:hover, #example tbody tr.even td.highlighted {
 	background-color: #ECFFB3;
 }
 
-.ex_highlight #main tbody tr.odd:hover, #main tbody tr.odd td.highlighted {
+.ex_highlight #example tbody tr.odd:hover, #example tbody tr.odd td.highlighted {
 	background-color: #E6FF99;
+}
+
+.ex_highlight_row #example tr.even:hover {
+	background-color: #ECFFB3;
+}
+
+.ex_highlight_row #example tr.even:hover td.sorting_1 {
+	background-color: #DDFF75;
+}
+
+.ex_highlight_row #example tr.even:hover td.sorting_2 {
+	background-color: #E7FF9E;
+}
+
+.ex_highlight_row #example tr.even:hover td.sorting_3 {
+	background-color: #E2FF89;
+}
+
+.ex_highlight_row #example tr.odd:hover {
+	background-color: #E6FF99;
+}
+
+.ex_highlight_row #example tr.odd:hover td.sorting_1 {
+	background-color: #D6FF5C;
+}
+
+.ex_highlight_row #example tr.odd:hover td.sorting_2 {
+	background-color: #E0FF84;
+}
+
+.ex_highlight_row #example tr.odd:hover td.sorting_3 {
+	background-color: #DBFF70;
 }
 
 
@@ -463,22 +527,6 @@ table.display tr.gradeX {
 
 table.display tr.gradeU {
 	background-color: #ddd;
-}
-
-table.display tr.odd td.warning {
-	background-color: #FF9999;
-}
-
-table.display tr.even td.warning {
-	background-color: #FF8080;
-}
-
-table.display tr.odd td.notice {
-	background-color: #FFCC66;
-}
-
-table.display tr.even td.notice {
-	background-color: #FFCC99;
 }
 
 div.box {
