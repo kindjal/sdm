@@ -17,6 +17,50 @@
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <script type="text/javascript" charset="utf-8">
+
+      var hTable;
+      var gTable;
+      var vTable;
+
+      /* This is a data tables extension to reload Ajax Data */
+      $.fn.dataTableExt.oApi.fnReloadAjax = function ( oSettings, sNewSource, fnCallback, bStandingRedraw ) {
+        if ( typeof sNewSource != 'undefined' && sNewSource != null )
+        {
+            oSettings.sAjaxSource = sNewSource;
+        }
+        this.oApi._fnProcessingDisplay( oSettings, true );
+        var that = this;
+        var iStart = oSettings._iDisplayStart;
+
+        oSettings.fnServerData( oSettings.sAjaxSource, [], function(json) {
+            /* Clear the old information from the table */
+            that.oApi._fnClearTable( oSettings );
+
+            /* Got the data - add it to the table */
+            for ( var i=0 ; i<json.aaData.length ; i++ )
+            {
+                that.oApi._fnAddData( oSettings, json.aaData[i] );
+            }
+
+            oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+            that.fnDraw( that );
+
+            if ( typeof bStandingRedraw != 'undefined' && bStandingRedraw === true )
+            {
+                oSettings._iDisplayStart = iStart;
+                that.fnDraw( false );
+            }
+
+            that.oApi._fnProcessingDisplay( oSettings, false );
+
+            /* Callback user function - for event handlers etc */
+            if ( typeof fnCallback == 'function' && fnCallback != null )
+            {
+                fnCallback( oSettings );
+            }
+        } );
+      } /* end fnReloadAjax */
+
       $(document).ready(function() {
         TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
@@ -37,8 +81,8 @@
         });
         /* end top */
 
-        /* filer table */
-        $('#hosts').dataTable( {
+        /* filers table */
+        hTable = $('#filers').dataTable( {
           "bProcessing": false,
           "bServerSide": false,
           "iDisplayLength": 10,
@@ -69,7 +113,7 @@
         /* end filer table */
 
         /* summary by disk group table */
-        $('#group').dataTable( {
+        gTable = $('#group').dataTable( {
           "sDom": 'T<"clear">lfrtip',
           "bProcessing": false,
           "bServerSide": false,
@@ -126,7 +170,7 @@
         /* end summary by disk group*/
 
         /* volume table */
-        $('#volume').dataTable( {
+        vTable = $('#volume').dataTable( {
           "sDom": 'T<"clear">lfrtip',
           "bProcessing": false,
           "bFilter": true,
@@ -232,7 +276,6 @@
           return x1 + x2;
         };
 
-
       } ); /* end document ready function */
     </script>
   </head>
@@ -254,8 +297,11 @@
       Hosts that reported no Volume data are orange.<br/>
       </div>
 
-      <div id="hosts_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="hosts">
+      <div id="filers_table">
+      <div id="reload_filers">
+        <input type="button" value="Reload Filers Table" onclick="hTable.fnReloadAjax()"/>
+      </div>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="filers">
       <thead>
       <tr>
       <th>Filer</th>
@@ -293,6 +339,9 @@
       </div>
 
       <div id="group_table">
+      <div id="reload_groups">
+        <input type="button" value="Reload Groups Table" onclick="gTable.fnReloadAjax()"/>
+      </div>
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="group">
       <thead>
       <tr>
@@ -327,6 +376,9 @@
       </div>
 
       <div id="volume_table">
+      <div id="reload_volumes">
+        <input type="button" value="Reload Volumes Table" onclick="vTable.fnReloadAjax()"/>
+      </div>
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="volume">
         <thead>
         <tr>
