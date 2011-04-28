@@ -9,122 +9,42 @@
           @import "/res/css/diskusage_table.css";
     </style>
     <link rel="shortcut icon" href="favicon.ico" />
-    <script type="text/javascript" language="javascript" src="/res/js/jquery.js"></script>
-    <script type="text/javascript" language="javascript" src="/res/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf-8" src="/res/js/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
-    <script type="text/javascript" charset="utf-8" src="/res/js/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/jquery.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
     <style type="text/css">
-      @import "/res/js/TableTools/media/css/TableTools.css";
+      @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <script type="text/javascript" charset="utf-8">
       $(document).ready(function() {
-        TableToolsInit.sSwfPath = "/res/js/TableTools/media/swf/ZeroClipboard.swf";
-        /* volume table */
-        $('#volume').dataTable( {
-          "sDom": 'T<"clear">lfrtip',
-          "bProcessing": true,
-          "bServerSide": true,
-          "bFilter": true,
-          "iDisplayLength": 25,
-          "sPaginationType": "full_numbers",
-          /* Sort by Total KB column by default */
-          "aaSorting": [ [1,'desc'] ],
-          "sAjaxSource": "/site/system/disk/volume/status.html.cgi",
-          "fnServerData": function ( sSource, aoData, fnCallback )
-          {
-                /* Add some extra data to the sender */
-                aoData.push( { "name": "rm", "value": "table_data" } );
-                $.getJSON( sSource, aoData, function (json) {
-                  /**
-                   * Insert an extra argument to the request: rm.
-                   * It's the the name of the CGI form parameter that
-                   * contains the run mode name. Its value is the
-                   * runmode, that produces the json output for
-                   * datatables.
-                   **/
-                  fnCallback(json)
-                } );
-          },
-          "fnRowCallback": function( nRow, aaData, iDisplayIndex )
-          {
-                /* append a css class based on cell content */
-                /* capacity > 95 is column 3*/
-                var $col = 3;
-                var $cell = $(nRow).children('td').eq($col);
-                if ( aaData[$col] > 95 )
-                {
-                  $cell.addClass('warning');
-                }
-                /* group is 'unknown' is column 4 */
-                var $col = 4;
-                var $cell = $(nRow).children('td').eq($col);
-                if ( aaData[$col] == 'unknown' )
-                {
-                  $cell.addClass('warning');
-                }
-              return nRow;
-          },
-        } );
-        /* end volume summary table */
+        TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
-        /* summary by disk group table */
-        $('#group').dataTable( {
-          "sDom": 'T<"clear">lfrtip',
-          "bProcessing": true,
-          "bServerSide": true,
-          "iDisplayLength": 25,
-          "sPaginationType": "full_numbers",
-          "sAjaxSource": "/site/system/disk/volume/summary.html.cgi",
-          "aaSorting": [ [1,'desc'] ],
-          "fnServerData": function ( sSource, aoData, fnCallback )
-          {
-            aoData.push( { "name": "rm", "value": "table_data" } );
-            $.getJSON( sSource, aoData, function (json) {
-              fnCallback(json)
-              } );
-          },
-          "aoColumns": [
-            null,
-            null,
-            null,
-            null,
-          ],
-          "fnRowCallback": function( nRow, aaData, iDisplayIndex )
-          {
-            /* append a css class based on cell content */
-            /* capacity > 95 */
-            var $col = 3;
-            var $cell = $(nRow).children('td').eq($col);
-            if ( aaData[$col] > 95 )
-            {
-              $cell.addClass('warning');
-            }
-            /* group is 'unknown' */
-            var $col = 0;
-            var $cell = $(nRow).children('td').eq($col);
-            if ( aaData[$col] == 'unknown' )
-            {
-              $cell.addClass('warning');
-            }
-            return nRow;
-          }
-        } );
-        /* end summary by disk group*/
+        /* Top of page total summary */
+        /* Note here we artificially mimic what datatables does below.
+           If we want client side formatting, query ?_=1.
+           If we want server side formatting, have no query */
+        $.getJSON('/site/system/disk/filer/summary.html.cgi?_=1', function(result) {
+          $("div#total").html(
+            '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
+            + '<h3>Disk usage added over all reporting NFS servers</h3>'
+            + 'Total KB: ' + commify(result.total_kb) + " " + sizeSuffix( result.total_kb ) + '<br/>'
+            + 'Used KB: ' + commify(result.used_kb) + " " + sizeSuffix( result.used_kb ) + '<br/>'
+            + 'Percentage Consumed: ' + result.capacity.toFixed(0) + ' %<br/>'
+            + 'Last Check: ' + result.last_modified + '<br/>'
+          );
+          $("div#total").addClass('emphasis');
+        });
+        /* end top */
 
         /* filer table */
-        $('#hosts_table').dataTable( {
-          "bProcessing": true,
-          "bServerSide": true,
+        $('#hosts').dataTable( {
+          "bProcessing": false,
+          "bServerSide": false,
           "iDisplayLength": 10,
           "sPaginationType": "full_numbers",
           "bAutoWidth": false,
           "sAjaxSource": "/site/system/disk/filer/status.html.cgi",
-          "fnServerData": function ( sSource, aoData, fnCallback ) {
-                aoData.push( { "name": "rm", "value": "table_data" } );
-                $.getJSON( sSource, aoData, function (json) {
-                  fnCallback(json)
-                } );
-              },
           "aoColumns": [
             null,
             /* snmp_ok */ { "bVisible":    true },
@@ -148,28 +68,177 @@
         } );
         /* end filer table */
 
-        /* Top of page total summary */
-        $.getJSON('/site/system/disk/filer/summary.html.cgi', function(result) {
-          $("div#total").html(
-            '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
-            + '<h3>Disk usage added over all reporting NFS servers</h3>'
-            + 'Total KB: ' + result.total_kb + '<br/>'
-            + 'Used KB: ' + result.used_kb + '<br/>'
-            + 'Percentage Consumed: ' + result.capacity + '<br/>'
-            + 'Last Check: ' + result.last_modified + '<br/>'
-          );
-          $("div#total").addClass('emphasis');
-        });
-        /* end top */
+        /* summary by disk group table */
+        $('#group').dataTable( {
+          "sDom": 'T<"clear">lfrtip',
+          "bProcessing": false,
+          "bServerSide": false,
+          "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
+          "sAjaxSource": "/site/system/disk/volume/summary.html.cgi",
+          "aaSorting": [ [1,'desc'] ],
+          "aoColumns": [
+            /* disk group column */
+            null,
+            /* total_kb column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.oSettings.fnFormatNumber( oObj.aData[1] ) + " " + sizeSuffix( oObj.aData[1] );
+               },
+            },
+            /* used_kb column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.oSettings.fnFormatNumber( oObj.aData[2] ) + " " + sizeSuffix( oObj.aData[2] );
+              },
+            },
+            /* capacity column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.aData[3].toFixed(0) + " %";
+              },
+            }
+          ],
+          "fnRowCallback": function( nRow, aaData, iDisplayIndex )
+          {
+            /* append a css class based on cell content */
+            /* capacity > 95 */
+            var $col = 3;
+            var $cell = $(nRow).children('td').eq($col);
+            if ( aaData[$col] > 95 )
+            {
+              $cell.addClass('warning');
+            }
+            /* group is 'unknown' */
+            var $col = 0;
+            var $cell = $(nRow).children('td').eq($col);
+            if ( aaData[$col] == 'unknown' )
+            {
+              $cell.addClass('warning');
+            }
 
-      } );
+            return nRow;
+          }
+        } );
+        /* end summary by disk group*/
+
+        /* volume table */
+        $('#volume').dataTable( {
+          "sDom": 'T<"clear">lfrtip',
+          "bProcessing": false,
+          "bFilter": true,
+          "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
+          "sAjaxSource": "/site/system/disk/volume/status.html.cgi",
+          /* Sort by Total KB column by default */
+          "aaSorting": [ [1,'desc'] ],
+          "aoColumns": [
+            null,
+            /* total_kb column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.oSettings.fnFormatNumber( oObj.aData[1] ) + " " + sizeSuffix( oObj.aData[1] );
+              },
+            },
+            /* used_kb column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.oSettings.fnFormatNumber( oObj.aData[2] ) + " " + sizeSuffix( oObj.aData[2] );
+              },
+            },
+            /* capacity column */
+            { "sType": "numeric",
+              "bUseRendered": false,
+              "fnRender": function ( oObj ) {
+                return oObj.aData[3].toFixed(0) + " %";
+              },
+            },
+            null,
+            null,
+            null,
+          ],
+          "fnRowCallback": function( nRow, aaData, iDisplayIndex )
+          {
+              /* append a css class based on cell content */
+              /* capacity > 95 is column 3*/
+              var $col = 3;
+              var $cell = $(nRow).children('td').eq($col);
+              if ( aaData[$col] > 95 )
+              {
+                $cell.addClass('warning');
+              }
+              /* group is 'unknown' is column 4 */
+              var $col = 4;
+              var $cell = $(nRow).children('td').eq($col);
+              if ( aaData[$col] == 'unknown' )
+              {
+                $cell.addClass('warning');
+              }
+              return nRow;
+          },
+        } );
+        /* end volume summary table */
+
+        /* take a big number of KB and make it pretty: 1,000 => (1 MB) */
+        function sizeSuffix ( n ) {
+          var size = String(n).length
+          var units
+          var divisor
+          switch(true) {
+            case size < 4:
+                units = 'KB'
+                divisor = 1
+                break
+            case (size >= 4 && size < 7):
+                units = 'MB'
+                divisor = 1000
+                break
+            case (size >= 7 && size < 10):
+                units = 'GB'
+                divisor = 1000000
+                break
+            case (size >= 10 && size < 13):
+                units = 'TB'
+                divisor = 1000000000
+                break
+            case (size >= 13 && size < 16):
+                units = 'PB'
+                divisor = 1000000000000
+                break
+            case (size >= 16 && size < 19):
+                units = 'EB'
+                divisor = 1000000000000000
+                break
+          }
+          var shortVal = n / divisor
+          return "(" + String( shortVal.toFixed(0) ) + " " + units + ")"
+        };
+
+        /* Add commas to a number */
+        function commify(n) {
+          nStr = String(n)
+          x = nStr.split('.')
+          x1 = x[0]
+          x2 = x.length > 1 ? '.' + x[1] : ''
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          return x1 + x2;
+        };
+
+
+      } ); /* end document ready function */
     </script>
   </head>
   <body id="dt_example">
     <div id="container">
       <h1>Disk Usage Report</h1>
-
-      <h2>Known Bugs:  Table ordering is not yet fully functional.</h2>
 
       <p>This table shows disk consumption information as reported by SNMP from NFS servers.</p>
 
@@ -186,7 +255,7 @@
       </div>
 
       <div id="hosts_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="hosts_table">
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="hosts">
       <thead>
       <tr>
       <th>Filer</th>
@@ -219,13 +288,11 @@
 
       <h1>Disk Usage by Disk Group</h1>
 
-      <h2>Known Bugs:  Search is disabled here.</h2>
-
       <div class="emphasis" id="narrow">
       Groups over 95% capacity are red, as is the 'unknown' group.<br/>
       </div>
 
-      <div id="group">
+      <div id="group_table">
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="group">
       <thead>
       <tr>
@@ -259,7 +326,7 @@
       Volumes over 95% capacity are colored red, as is the 'unkown' group.
       </div>
 
-      <div id="volume">
+      <div id="volume_table">
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="volume">
         <thead>
         <tr>
