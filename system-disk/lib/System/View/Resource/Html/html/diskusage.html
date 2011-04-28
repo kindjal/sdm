@@ -83,7 +83,7 @@
 
         /* filers table */
         hTable = $('#filers').dataTable( {
-          "bProcessing": false,
+          "bProcessing": true,
           "bServerSide": false,
           "iDisplayLength": 10,
           "sPaginationType": "full_numbers",
@@ -115,7 +115,7 @@
         /* summary by disk group table */
         gTable = $('#group').dataTable( {
           "sDom": 'T<"clear">lfrtip',
-          "bProcessing": false,
+          "bProcessing": true,
           "bServerSide": false,
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
@@ -172,7 +172,7 @@
         /* volume table */
         vTable = $('#volume').dataTable( {
           "sDom": 'T<"clear">lfrtip',
-          "bProcessing": false,
+          "bProcessing": true,
           "bFilter": true,
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
