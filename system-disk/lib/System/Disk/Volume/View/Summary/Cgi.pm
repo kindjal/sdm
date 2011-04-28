@@ -5,9 +5,6 @@ use strict;
 use warnings;
 
 use System;
-use JSON;
-use URI;
-use URI::QueryParam;
 
 class System::Disk::Volume::View::Summary::Cgi {
     is => 'System::Disk::View::Cgi'
