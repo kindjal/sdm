@@ -26,6 +26,8 @@ my $o;
 my $r;
 my @r;
 my $uri;
+my $json;
+my $expected;
 
 # Start with a fresh database
 use File::Basename qw/dirname/;
@@ -33,12 +35,68 @@ my $top = dirname $FindBin::Bin;
 require "$top/t/system-lib.pm";
 ok( System::Test::Lib->testinit == 0, "ok: init db");
 
+$o = System::Disk::Filer::View::Status::Cgi->create( loglevel => 'DEBUG' );
+
+# An empty view
+$uri = '/site/system/disk/volume/status.html.cgi?_=1';
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+$expected = {
+    'iTotalRecords' => 0,
+    'iTotalDisplayRecords' => 0,
+    'aaData' => [],
+    'sEcho' => 1
+};
+ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
+
 my $array = System::Disk::Array->create( name => 'nsams2k1' );
 ok( defined $array, "ok: add nsams2k1" );
 my $host = System::Disk::Host->create(  hostname => 'linuscs103' );
 ok( defined $host, "ok: add linuscs103" );
 $array->assign( $host->hostname );
 my $filer = System::Disk::Filer->create( name => 'gpfs' );
+ok( defined $filer, "ok: add gpfs" );
+$host->assign( $filer->name );
+
+$uri = '/site/system/disk/volume/status.html.cgi?_=1';
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+delete $r->{aaData}[0][4]; # kill the timestamp
+$expected = {
+    'iTotalRecords' => 1,
+    'iTotalDisplayRecords' => 1,
+    'aaData' => [
+                        [
+                          'gpfs',
+                          0,
+                          'linuscs103',
+                          'nsams2k1',
+                          undef,
+                          '0000-00-00 00:00:00'
+                        ]
+                      ],
+    'sEcho' => 1
+};
+ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
+
+# Test the view after deletion
+$filer->delete();
+$uri = '/site/system/disk/volume/status.html.cgi?_=1';
+$r = $o->run($uri);
+$json = JSON->new();
+$r = $json->decode($r);
+$expected = {
+    'iTotalRecords' => 0,
+    'iTotalDisplayRecords' => 0,
+    'aaData' => [],
+    'sEcho' => 1
+};
+ok( is_deeply( $r, $expected, "ok: is_deeply"), "ok: json match");
+
+# re-add
+$filer = System::Disk::Filer->create( name => 'gpfs' );
 ok( defined $filer, "ok: add gpfs" );
 $host->assign( $filer->name );
 
@@ -61,9 +119,8 @@ ok( defined System::Disk::Volume->create( filername => 'gpfs2', mount_path => '/
 # sSearch=
 # iSortCol_0=
 $uri = '/site/system/disk/volume/status.html.cgi?sEcho=11&iColumns=7&sColumns=&iDisplayStart=0&iDisplayLength=25&sSearch=&bEscapeRegex=true&sSearch_0=&bEscapeRegex_0=true&bSearchable_0=true&sSearch_1=&bEscapeRegex_1=true&bSearchable_1=true&sSearch_2=&bEscapeRegex_2=true&bSearchable_2=true&sSearch_3=&bEscapeRegex_3=true&bSearchable_3=true&sSearch_4=&bEscapeRegex_4=true&bSearchable_4=true&sSearch_5=&bEscapeRegex_5=true&bSearchable_5=true&iSortingCols=1&iSortCol_0=0&sSortDir_0=desc&bSortable_0=true&bSortable_1=true&bSortable_2=true&bSortable_3=true&bSortable_4=true&bSortable_5=true&rm=table_data HTTP/1.1';
-$o = System::Disk::Filer::View::Status::Cgi->create( loglevel => 'DEBUG' );
 $r = $o->run($uri);
-my $json = JSON->new();
+$json = JSON->new();
 $r = $json->decode($r);
 ok( $r->{aaData}->[0][0] eq 'gpfs2', "ok: json sorted desc");
 
