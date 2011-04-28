@@ -43,7 +43,8 @@ ok( defined System::Disk::Volume->create( filername => 'gpfs', mount_path => '/g
 ok( defined System::Disk::Volume->create( filername => 'gpfs', mount_path => '/gscmnt/sata803', physical_path => '/vol/sata803', disk_group => 'INFO_GENOME_MODEL', total_kb => 40, used_kb => 8 ), "ok: volume added" );
 UR::Context->commit();
 
-$r = $o->run($q);
+$uri = "/site/system/disk/filer/summary.html.cgi";
+$r = $o->run($uri);
 my $json = JSON->new();
 my $data = $json->decode($r);
 my $expected = {
@@ -53,5 +54,18 @@ my $expected = {
     'capacity' => '5 %'
 };
 ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
+$uri = "/site/system/disk/filer/summary.html.cgi?_=12345";
+$r = $o->run($uri);
+$json = JSON->new();
+$data = $json->decode($r);
+$expected = {
+    'total_kb' => '370',
+    'last_modified' => '0000:00:00:00:00:00',
+    'used_kb' => '20',
+    'capacity' => '5.40540540540541'
+};
+ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
 done_testing();
 

@@ -102,7 +102,7 @@ ok( is_deeply( @order, [ 0, 'asc' ], "ok: is_deeply" ), "ok: order by total_kb a
 @r = $o->_build_aadata($q,@set);
 ok( is_deeply( $r[0], [ 'INFO_APIPE', 300, 6, 2 ], "ok: sort by total_kb asc") );
 
-$r = $o->run($q);
+$r = $o->run($uri);
 $json = JSON->new();
 $data = $json->decode($r);
 $expected = {
@@ -125,5 +125,33 @@ $expected = {
           'sEcho' => 2
 };
 ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
+# This is a query that does not request server side processing.
+# Should produce non-prettified data.
+$uri = "/site/system/disk/volume/status.html.cgi?_=1304004814083";
+$r = $o->run($uri);
+$json = JSON->new();
+$data = $json->decode($r);
+$expected = {
+  'iTotalRecords' => 2,
+  'iTotalDisplayRecords' => 2,
+  'aaData' => [
+                [
+                  'INFO_APIPE',
+                  300,
+                  6,
+                  2
+                ],
+                [
+                  'INFO_GENOME_MODEL',
+                  70,
+                  14,
+                  20
+                ]
+              ],
+  'sEcho' => 1
+};
+ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
 done_testing();
 
