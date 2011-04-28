@@ -34,7 +34,7 @@ CREATE TABLE disk_filer (
 );
 CREATE TABLE disk_export (
   id            BIGSERIAL PRIMARY KEY,
-  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer(name),
+  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer(name) ON DELETE CASCADE,
   physical_path VARCHAR(255) NOT NULL,
   created       DATE,
   last_modified DATE,
@@ -53,8 +53,8 @@ CREATE TABLE disk_mount (
   export_id     BIGINT,
   volume_id     BIGINT,
   PRIMARY KEY(export_id,volume_id),
-  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export(id),
-  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume(id)
+  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export(id) ON DELETE CASCADE,
+  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume(id) ON DELETE CASCADE
 );
 CREATE TABLE disk_host (
   hostname      VARCHAR(255) PRIMARY KEY,
@@ -69,8 +69,8 @@ CREATE TABLE disk_filer_host (
   filername     VARCHAR(255),
   hostname      VARCHAR(255),
   PRIMARY KEY(filername,hostname),
-  CONSTRAINT disk_filer_host_filename_fk FOREIGN KEY(filername) REFERENCES disk_filer(name),
-  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname)
+  CONSTRAINT disk_filer_host_filename_fk FOREIGN KEY(filername) REFERENCES disk_filer(name) ON DELETE CASCADE,
+  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) ON DELETE CASCADE
 );
 CREATE TABLE disk_array (
   name          VARCHAR(255) PRIMARY KEY,
@@ -85,6 +85,6 @@ CREATE TABLE disk_host_array (
   hostname      VARCHAR(255),
   arrayname     VARCHAR(255),
   PRIMARY KEY(hostname,arrayname),
-  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname),
-  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array(name)
+  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) ON DELETE CASCADE,
+  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array(name) ON DELETE CASCADE
 );
