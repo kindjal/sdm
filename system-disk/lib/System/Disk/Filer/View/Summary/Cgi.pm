@@ -23,7 +23,9 @@ sub run {
     my $query = URI->new( $uri );
 
     my $result = { total_kb => 0, used_kb => 0, last_modified => '0000:00:00:00:00:00' };
-    foreach my $r ( System::Disk::Volume->get() ) {
+    # Note this reload() op is the same as a get() but ensures we don't query the cache,
+    # but get fresh results every time.  This is because we're sometimes run as an FCGI app.
+    foreach my $r ( UR::Context->current->reload('System::Disk::Volume' ) ) {
         $result->{total_kb} += $r->{total_kb};
         $result->{used_kb} += $r->{used_kb};
         $result->{last_modified} = $r->{last_modified} ? $r->{last_modified} : $result->{last_modified};

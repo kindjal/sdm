@@ -61,7 +61,9 @@ sub _build_result_set {
     my ($self,$q) = @_;
     $self->{logger}->debug("_build_result_set: fetch UR::Objects and return a UR::Object::Set");
     my $param = $self->_build_query_param($q);
-    my @results = System::Disk::Volume->get( $param );
+    # Note this reload() op is the same as a get() but ensures we don't query the cache,
+    # but get fresh results every time.  This is because we're sometimes run as an FCGI app.
+    my @result = UR::Context->current->reload( 'System::Disk::Volume', $param );
     return @results;
 }
 
