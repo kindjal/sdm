@@ -23,13 +23,15 @@ sub run {
     my $query = URI->new( $uri );
 
     my $result = { total_kb => 0, used_kb => 0, last_modified => '0000:00:00:00:00:00' };
-    # Note this reload() op is the same as a get() but ensures we don't query the cache,
-    # but get fresh results every time.  This is because we're sometimes run as an FCGI app.
-    foreach my $r ( UR::Context->current->reload('System::Disk::Volume' ) ) {
-        $result->{total_kb} += $r->{total_kb};
-        $result->{used_kb} += $r->{used_kb};
-        $result->{last_modified} = $r->{last_modified} ? $r->{last_modified} : $result->{last_modified};
-    }
+
+    my $set = System::Disk::Volume->define_set();
+    $result->{total_kb} = $set->sum('total_kb');
+    $result->{used_kb} = $set->sum('used_kb');
+
+    $set = System::Disk::Volume->define_set( -group_by => [ 'last_modified' ], -order_by => [ 'last_modified' ] );
+    my $r = pop @{ [ $set->members ] };
+    $result->{last_modified} = $r->{last_modified} ? $r->{last_modified} : $result->{last_modified};
+
     $result->{capacity} = 0;
     if ($result->{total_kb}) {
         $result->{capacity} = $result->{used_kb} / $result->{total_kb} * 100;
@@ -41,6 +43,9 @@ sub run {
         $result->{used_kb}  = $self->_commify($result->{used_kb}) . " ("  . $self->_short($result->{used_kb}) . ")";
         $result->{capacity} = sprintf "%d %%", $result->{capacity};
     }
+
+    # Unload so we get fresh data at the next request.
+    System::Disk::Volume->unload();
 
     my $json = new JSON;
     return $json->encode($result);

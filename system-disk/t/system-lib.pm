@@ -6,6 +6,7 @@ use warnings;
 
 use Test::More;
 use FindBin;
+use Cwd qw/abs_path/;
 use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
@@ -17,7 +18,7 @@ use_ok( 'System', "ok: loaded System");
 use_ok( 'System::DataSource::Disk', "ok: loaded System::DataSource::Disk");
 my $ds = System::DataSource::Disk->get();
 my $driver = $ds->driver;
-my $top = dirname $FindBin::Bin;
+my $top = dirname dirname abs_path(__FILE__);
 my $base = "$top/lib/System";
 my $perl = "$^X -I $top/lib -I $top/../system/lib";
 my $system = can_run("system");

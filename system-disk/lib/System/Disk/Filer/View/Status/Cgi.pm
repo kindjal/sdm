@@ -48,10 +48,7 @@ sub _build_result_set {
         $param->{ -or } = \@where;
     }
 
-    # Note this reload() op is the same as a get() but ensures we don't query the cache,
-    # but get fresh results every time.  This is because we're sometimes run as an FCGI app.
-    my @result = UR::Context->current->reload('System::Disk::Filer', $param );
-
+    my @result = System::Disk::Filer->get( $param );
     return @result;
 }
 
@@ -88,6 +85,11 @@ sub _build_aadata {
     }
 
     my @sorted_data = $self->_sorter($query,@data);
+
+    # Now that we have the data, unload it from memory so that we are
+    # forced to fetch a fresh copy the next time a request is made.
+    System::Disk::Filer->unload();
+
     return @sorted_data;
 }
 

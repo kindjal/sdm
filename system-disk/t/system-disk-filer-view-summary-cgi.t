@@ -23,6 +23,9 @@ my $q;
 my $o;
 my $r;
 my $uri;
+my $json;
+my $data;
+my $expected;
 
 # Start with a fresh database
 use FindBin;
@@ -31,9 +34,23 @@ my $top = dirname $FindBin::Bin;
 require "$top/t/system-lib.pm";
 
 ok( System::Test::Lib->testinit == 0, "ok: init db");
-ok( defined System::Disk::Filer->create( name => 'gpfs' ), "ok: gpfs made" );
 
 $o = System::Disk::Filer::View::Summary::Cgi->create( loglevel => 'DEBUG' );
+
+# An empty view to begin
+$uri = "/site/system/disk/filer/summary.html.cgi?_=1";
+$r = $o->run($uri);
+$json = JSON->new();
+$data = $json->decode($r);
+$expected = {
+    'total_kb' => '0',
+    'last_modified' => '0000:00:00:00:00:00',
+    'used_kb' => '0',
+    'capacity' => '0'
+};
+ok( is_deeply( $data, $expected, "ok: is_deeply" ), "ok: json output");
+
+ok( defined System::Disk::Filer->create( name => 'gpfs' ), "ok: gpfs made" );
 ok( defined System::Disk::Filer->create( name => 'gpfs2' ), "ok: gpfs2 made" );
 ok( defined System::Disk::Group->create( name => 'INFO_APIPE' ), "ok: INFO_APIPE made" );
 ok( defined System::Disk::Group->create( name => 'INFO_GENOME_MODEL' ), "ok: INFO_GENOME_MODEL made" );
@@ -45,9 +62,9 @@ UR::Context->commit();
 
 $uri = "/site/system/disk/filer/summary.html.cgi";
 $r = $o->run($uri);
-my $json = JSON->new();
-my $data = $json->decode($r);
-my $expected = {
+$json = JSON->new();
+$data = $json->decode($r);
+$expected = {
     'total_kb' => '370 (370 KB)',
     'last_modified' => '0000:00:00:00:00:00',
     'used_kb' => '20 (20 KB)',
