@@ -5,9 +5,6 @@ use strict;
 use warnings;
 
 use System;
-use JSON;
-use URI;
-use URI::QueryParam;
 
 class System::Disk::Filer::View::Status::Cgi {
     is => 'System::Disk::View::Cgi'

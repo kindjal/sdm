@@ -28,13 +28,17 @@ sub run {
         $result->{used_kb} += $r->{used_kb};
         $result->{last_modified} = $r->{last_modified} ? $r->{last_modified} : $result->{last_modified};
     }
-
     $result->{capacity} = 0;
     if ($result->{total_kb}) {
-        $result->{capacity} = sprintf "%d %%", $result->{used_kb} / $result->{total_kb} * 100;
+        $result->{capacity} = $result->{used_kb} / $result->{total_kb} * 100;
     }
-    $result->{total_kb} = $self->_commify($result->{total_kb}) . " (" . $self->_short($result->{total_kb}) . ")",
-    $result->{used_kb}  = $self->_commify($result->{used_kb}) . " ("  . $self->_short($result->{used_kb}) . ")",
+
+    # Prettify if desired by server side processing query
+    unless ($query->query_form_hash->{_}) {
+        $result->{total_kb} = $self->_commify($result->{total_kb}) . " (" . $self->_short($result->{total_kb}) . ")";
+        $result->{used_kb}  = $self->_commify($result->{used_kb}) . " ("  . $self->_short($result->{used_kb}) . ")";
+        $result->{capacity} = sprintf "%d %%", $result->{capacity};
+    }
 
     my $json = new JSON;
     return $json->encode($result);
