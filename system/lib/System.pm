@@ -11,6 +11,25 @@ class System {
     is => [ 'UR::Namespace' ],
 };
 
+# System supports several environment variables, found under System/ENV
+# Any SYSTEM_* variable which is set but does NOT corresponde to a module found will cause an exit
+# (a hedge against typos such as SYSTEM_DATABASE_DDDRIVER=1 leading to unexpected behavior)
+for my $e (keys %ENV) {
+    next unless substr($e,0,7) eq 'SYSTEM_';
+    eval "use System::Env::$e";
+    if ($@) {
+        my $path = __FILE__;
+        $path =~ s/.pm$//;
+        my @files = glob($path . '/Env/*');
+        my @vars = map { /System\/Env\/(.*).pm/; $1 } @files; 
+        print STDERR "Environment variable $e set to $ENV{$e} but there were errors using System::Env::$e:\n"
+        . "Available variables:\n\t" 
+        . join("\n\t",@vars)
+        . "\n";
+        exit 1;
+    }
+}
+
 sub _doc_manual_body {
     return <<EOS
 The System suite is a UR Namespace and includes tools to manage and model Linux systems.
