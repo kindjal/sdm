@@ -13,7 +13,7 @@ BEGIN { $INC{"System/Config.pm"} = 'no' };
 # Default production DB settings
 $ENV{SYSTEM_DEPLOYMENT} ||= 'testing';
 $ENV{SYSTEM_DATABASE_DRIVER} ||= 'SQLite';
-$ENV{SYSTEM_DATABASE_HOST} ||= 'localhost';
+$ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
 
 1;
 

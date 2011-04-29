@@ -11,10 +11,10 @@ $ENV{SYSTEM_DEPLOYMENT} ||= 'production';
 
 if ($ENV{SYSTEM_DEPLOYMENT} eq 'testing') {
     $ENV{SYSTEM_DATABASE_DRIVER} ||= 'SQLite';
-    $ENV{SYSTEM_DATABASE_HOST} ||= 'localhost';
+    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
 } elsif ($ENV{SYSTEM_DEPLOYMENT} eq 'production') {
     $ENV{SYSTEM_DATABASE_DRIVER} ||= 'Pg';
-    $ENV{SYSTEM_DATABASE_HOST} ||= 'sysmgr.gsc.wustl.edu';
+    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'sysmgr.gsc.wustl.edu';
 }
 
 1;
