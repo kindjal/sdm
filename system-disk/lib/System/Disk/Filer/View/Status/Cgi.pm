@@ -85,11 +85,6 @@ sub _build_aadata {
     }
 
     my @sorted_data = $self->_sorter($query,@data);
-
-    # Now that we have the data, unload it from memory so that we are
-    # forced to fetch a fresh copy the next time a request is made.
-    System::Disk::Filer->unload();
-
     return @sorted_data;
 }
 
