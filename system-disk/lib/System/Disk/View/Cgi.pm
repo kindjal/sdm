@@ -84,7 +84,7 @@ Convert a DataTables URI to a 'where' clause
 =cut
 sub _build_where_param {
     my ($self,$q) = @_;
-    $self->{logger}->debug("_build_order_param: convert DataTables URI to a 'where' clause");
+    $self->{logger}->debug("_build_where_param: convert DataTables URI to a 'where' clause");
     my @where;
     if( defined $q->query_param('sSearch') ) {
         my $search_string = $q->query_param('sSearch');
@@ -194,7 +194,7 @@ Receive a URI string as an argument, fetch data, turn it into JSON and return it
 =cut
 sub run {
     my ($self,$uri) = @_;
-    $self->{logger}->debug(__PACKAGE__ . " run");
+    $self->{logger}->debug(__PACKAGE__ . " run: $uri");
     my $query = URI->new( $uri );
 
     my @results = $self->_build_result_set( $query );
