@@ -44,9 +44,6 @@ sub run {
         $result->{capacity} = sprintf "%d %%", $result->{capacity};
     }
 
-    # Unload so we get fresh data at the next request.
-    System::Disk::Volume->unload();
-
     my $json = new JSON;
     return $json->encode($result);
 }
