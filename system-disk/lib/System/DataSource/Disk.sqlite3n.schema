@@ -21,12 +21,32 @@ CREATE TABLE IF NOT EXISTS disk_filer (
   created       DATE,
   last_modified DATE
 );
+CREATE TABLE IF NOT EXISTS disk_host (
+  hostname      VARCHAR(255) NOT NULL PRIMARY KEY,
+  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE IF NOT EXISTS disk_group (
+  name          VARCHAR(255) NOT NULL PRIMARY KEY,
+  permissions   UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  sticky        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  subdirectory  VARCHAR(255) NOT NULL,
+  unix_uid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  unix_gid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  username      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
 CREATE TABLE IF NOT EXISTS disk_filer_host (
   filername     VARCHAR(255),
   hostname      VARCHAR(255),
   PRIMARY KEY(filername,hostname),
-  CONSTRAINT disk_filer_host_filename_fk FOREIGN KEY(filername) REFERENCES disk_filer(name) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) DEFERRABLE INITIALLY DEFERRED
+  CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_export (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,15 +72,6 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   last_modified DATE,
   disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group(name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
 );
-CREATE TABLE IF NOT EXISTS disk_host (
-  hostname      VARCHAR(255) NOT NULL PRIMARY KEY,
-  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  os            VARCHAR(255),
-  location      VARCHAR(255),
-  comments      VARCHAR(255),
-  created       DATE,
-  last_modified DATE
-);
 CREATE TABLE IF NOT EXISTS disk_array (
   name          VARCHAR(255) NOT NULL PRIMARY KEY,
   model         VARCHAR(255),
@@ -76,15 +87,4 @@ CREATE TABLE IF NOT EXISTS disk_host_array (
   PRIMARY KEY(hostname,arrayname),
   CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array(name) DEFERRABLE INITIALLY DEFERRED
-);
-CREATE TABLE IF NOT EXISTS disk_group (
-  name          VARCHAR(255) NOT NULL PRIMARY KEY,
-  permissions   UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  sticky        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  subdirectory  VARCHAR(255) NOT NULL,
-  unix_uid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  unix_gid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  username      VARCHAR(255),
-  created       DATE,
-  last_modified DATE
 );
