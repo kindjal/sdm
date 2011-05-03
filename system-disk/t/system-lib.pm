@@ -11,11 +11,9 @@ use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
-# Set deployment to testing before we load System/Site
-$ENV{SYSTEM_DEPLOYMENT} ||= 'testing';
-
 use_ok( 'System', "ok: loaded System");
 use_ok( 'System::DataSource::Disk', "ok: loaded System::DataSource::Disk");
+
 my $ds = System::DataSource::Disk->get();
 my $driver = $ds->driver;
 my $top = dirname dirname abs_path(__FILE__);
@@ -101,4 +99,22 @@ sub testinit {
     return 0;
 }
 
+sub testdata {
+    my $self = shift;
+    #my $perl = $self->{'perl'};
+    #my $system = $self->{'system'};
+    my $filer = System::Disk::Filer->create(name => "gpfs", status => 1, comments => "This is a comment");
+    System::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment");
+    my $host = System::Disk::Host->create(hostname => "linuscs103");
+    my $array = System::Disk::Array->create(name => "nsams2k1");
+    UR::Context->commit();
+    #$array->assign("linuscs103");
+    $host->assign("gpfs");
+    UR::Context->commit();
+    #System::Disk::Group->create(name => "SYSTEMS_DEVELOPMENT");
+    #System::Disk::Volume->create( mount_path=>"/gscmnt/gc2111", physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs");
+    return 0;
+}
+
 1;
+
