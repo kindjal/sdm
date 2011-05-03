@@ -102,7 +102,11 @@ sub testinit {
 sub testdata {
     my $self = shift;
     my $filer = System::Disk::Filer->create(name => "gpfs", status => 1, comments => "This is a comment");
-    System::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment");
+    $filer->created("0000-00-00 00:00:00");
+    $filer->last_modified("0000-00-00 00:00:00");
+    $filer = System::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment");
+    $filer->created("0000-00-00 00:00:00");
+    $filer->last_modified("0000-00-00 00:00:00");
     my $host = System::Disk::Host->create(hostname => "linuscs103");
     my $array = System::Disk::Array->create(name => "nsams2k1");
     $array->assign("linuscs103");
