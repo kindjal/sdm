@@ -157,19 +157,6 @@ dispatch {
             $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
         }
 
-        # This looks to see if we have a class to generate HTML directly rather than using
-        # an XSL transform.  Is this an acceptible feature?
-        my $view_class = UR::Object::View->_resolve_view_class_for_params(
-            subject_class_name => $class,
-            perspective        => $perspective,
-            toolkit            => $toolkit
-        );
-
-        if ($view_class and $toolkit eq 'html' and $view_class->can('_generate_content')) {
-            my $content = $view_class->_generate_content();
-            return [ 200, [ 'Content-type', "text/$toolkit" ], [$content] ];
-        }
-
         my @matches;
         if ($class->isa("UR::Object::Set")) {
             $class =~ s/::Set$//;
