@@ -55,6 +55,11 @@ ok( $res->type eq "AMS", "Type set to AMS");
 $res->created( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time()) );
 $res->last_modified( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() - 87000 ) );
 
+# Test assign
+my $host = System::Disk::Host->create( hostname => "linuscs103" );
+my $hrb = $res->assign( $host->hostname );
+isa_ok( $hrb, 'System::Disk::HostArrayBridge' );
+
 # Now test 'delete'
 $res = System::Disk::Array->get();
 $res->delete();
