@@ -69,7 +69,7 @@ CREATE TABLE disk_filer_host (
   filername     VARCHAR(255),
   hostname      VARCHAR(255),
   PRIMARY KEY(filername,hostname),
-  CONSTRAINT disk_filer_host_filename_fk FOREIGN KEY(filername) REFERENCES disk_filer(name) ON DELETE CASCADE,
+  CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY(filername) REFERENCES disk_filer(name) ON DELETE CASCADE,
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) ON DELETE CASCADE
 );
 CREATE TABLE disk_array (
