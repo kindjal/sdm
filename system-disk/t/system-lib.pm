@@ -101,18 +101,15 @@ sub testinit {
 
 sub testdata {
     my $self = shift;
-    #my $perl = $self->{'perl'};
-    #my $system = $self->{'system'};
     my $filer = System::Disk::Filer->create(name => "gpfs", status => 1, comments => "This is a comment");
     System::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment");
     my $host = System::Disk::Host->create(hostname => "linuscs103");
     my $array = System::Disk::Array->create(name => "nsams2k1");
-    UR::Context->commit();
-    #$array->assign("linuscs103");
+    $array->assign("linuscs103");
     $host->assign("gpfs");
+    System::Disk::Group->create(name => "SYSTEMS_DEVELOPMENT");
+    System::Disk::Volume->create( mount_path=>"/gscmnt/gc2111", physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs");
     UR::Context->commit();
-    #System::Disk::Group->create(name => "SYSTEMS_DEVELOPMENT");
-    #System::Disk::Volume->create( mount_path=>"/gscmnt/gc2111", physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs");
     return 0;
 }
 
