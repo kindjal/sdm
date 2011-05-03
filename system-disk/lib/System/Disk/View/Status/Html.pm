@@ -1,18 +1,17 @@
+
+package System::Disk::View::Status::Html;
+
 use strict;
 use warnings;
 
 use System;
 
-package System::Disk::View::Status::Html;
-
-sub new {
-    my ($class,$args) = @_;
-    my $self = {};
-    bless $self,$class;
-    return $self;
-}
+class System::Disk::View::Status::Html {
+    is => 'UR::Object::View::Default::Html'
+};
 
 # This is the full view of Disk Usage
+# FIXME: This returns an HTML page we store in a file elsewhere.
 sub _generate_content {
     my $self = shift;
     __FILE__ =~ /^(.*\/System\/).*/;
