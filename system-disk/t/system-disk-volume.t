@@ -44,6 +44,13 @@ ok( defined System::Disk::Filer->create( name => 'nfs11' ), "created test filer 
 ok( defined System::Disk::Filer->create( name => 'nfs12' ), "created test filer ok");
 ok( defined System::Disk::Filer->create( name => 'nfs13' ), "created test filer ok");
 
+ok( my $array = System::Disk::Array->create( name => 'nsams2k1' ), "created test array ok");
+ok( my $host = System::Disk::Host->create( hostname => 'linuscs103' ), "created test host ok");
+my $r = $array->assign( "linuscs103" );
+isa_ok( $r, "System::Disk::HostArrayBridge" );
+$r = $host->assign( "nfs11" );
+isa_ok( $r, "System::Disk::FilerHostBridge" );
+
 # Create test group to test with
 ok( defined System::Disk::Group->create( name => 'INFO_GENOME_MODELS' ), "created test group ok");
 
