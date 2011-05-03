@@ -12,7 +12,7 @@
           @import "/res/css/diskusage_page.css";
           @import "/res/css/diskusage_table.css";
     </style>
-    <link rel="shortcut icon" href="/res/images/gc_favicon.png" />
+    <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
@@ -92,7 +92,11 @@
           "iDisplayLength": 10,
           "sPaginationType": "full_numbers",
           "bAutoWidth": false,
-          "sAjaxSource": "/site/system/disk/filer/status.html.cgi",
+          /* This is the server-side processing version. Use "bServerSide": true, */
+          /* "sAjaxSource": "/site/system/disk/filer/status.html.cgi", */
+          /* This is the client-side processing version */
+          /* This is the server-side processing version. Use "bServerSide": false, */
+          "sAjaxSource": "/view/system/disk/filer/set/status.json",
           "aoColumns": [
             null,
             /* snmp_ok */ { "bVisible":    true },
@@ -301,7 +305,7 @@
       Hosts that reported no Volume data are orange.<br/>
       </div>
 
-      <div id="filers_table">
+      <div id="filer_table">
       <div id="reload_filers">
         <input type="button" value="Reload Filers Table" onclick="hTable.fnReloadAjax()"/>
       </div>
