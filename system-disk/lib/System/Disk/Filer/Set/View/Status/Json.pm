@@ -1,7 +1,7 @@
 
 package System::Disk::Filer::Set::View::Status::Json;
 
-=head2 System::Disk::Filer::Set::View::Status::Json
+=head2 System::Disk::Filer::Set::View::Status::Json;
 This class' job is to redefine JSON output.  Our diskusage.html
 page uses DataTables that wants JSON with aaData and other attributes.
 =cut
@@ -11,43 +11,59 @@ use warnings;
 
 use System;
 
-
 class System::Disk::Filer::Set::View::Status::Json {
     is => 'UR::Object::Set::View::Default::Json',
-    has_constant => [
-        default_aspects => {
-            is => 'ARRAY',
-            value => [
-                { name => 'aaData', },
-                { name => 'iTotalRecords' },
-                { name => 'iTotalDisplayRecords' },
-                { name => 'sEcho' },
-            ]
-        }
-    ]
 };
 
-=head2 _generate_content_for_aspect
-Override the base class method so that we can properly handle the aaData list attribute
-we need.  We return an array ref if is_many, which aaData is.
-See System::Disk::Filer::Set for that.
-=cut
-sub _generate_content_for_aspect {
+sub aaData {
     my $self = shift;
-    my $aspect = shift;
+    my @data;
 
-    my $subject = $self->subject;
-    my $aspect_name = $aspect->name;
-    my $aspect_meta = $self->subject_class_name->__meta__->property($aspect_name);
+    my $subject = $self->subject();
+    return '' unless ($subject);
 
-    my @value;
-    @value = $subject->$aspect_name;
+    foreach my $item ( $subject->members ) {
+        my $hostname = 'unknown';
+        my @hosts = $item->hostname;
+        if (@hosts) {
+            $hostname = join(",",@hosts);
+        }
+        my $arrayname = 'unknown';
+        my @arrays = $item->arrayname;
+        if (@arrays) {
+            $arrayname = join(",",@arrays);
+        }
 
-    if ($aspect_meta->is_many) {
-        return \@value;
-    } else {
-        return shift @value;
+        push @data, [
+            $item->{name},
+            $item->{status},
+            $hostname,
+            $arrayname,
+            $item->{created} ? $item->{created} : "0000-00-00 00:00:00",
+            $item->{last_modified} ? $item->{last_modified} : "0000-00-00 00:00:00",
+        ];
     }
+    return @data;
+}
+
+=head2 _jsobj
+Override the normal JSON object with one suitable for jQuery DataTables.
+We do this because we're bypassing the XSL layer expected by UR.
+=cut
+sub _jsobj {
+    my $self = shift;
+
+    my $subject = $self->subject();
+    return '' unless $subject;
+
+    my $jsobj = {
+        aaData => [ $self->aaData ],
+        iTotalRecords => $subject->count,
+        iTotalDisplayRecords => $subject->count,
+        sEcho => 1,
+    };
+
+    return $jsobj;
 }
 
 1;
