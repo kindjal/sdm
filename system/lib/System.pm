@@ -7,6 +7,8 @@ use strict;
 use System::Site;
 use UR;
 
+our $VERSION = "0.02";
+
 class System {
     is => [ 'UR::Namespace' ],
 };
