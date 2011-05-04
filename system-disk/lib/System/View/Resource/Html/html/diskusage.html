@@ -69,10 +69,7 @@
         TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
         /* Top of page total summary */
-        /* Note here we artificially mimic what datatables does below.
-           If we want client side formatting, query ?_=1.
-           If we want server side formatting, have no query */
-        $.getJSON('/site/system/disk/filer/summary.html.cgi?_=1', function(result) {
+        $.getJSON('/view/system/disk/volume/set/summary.json', function(result) {
           $("div#total").html(
             '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
             + '<h3>Disk usage added over all reporting NFS servers</h3>'
@@ -92,10 +89,6 @@
           "iDisplayLength": 10,
           "sPaginationType": "full_numbers",
           "bAutoWidth": false,
-          /* This is the server-side processing version. Use "bServerSide": true, */
-          /* "sAjaxSource": "/site/system/disk/filer/status.html.cgi", */
-          /* This is the client-side processing version */
-          /* This is the server-side processing version. Use "bServerSide": false, */
           "sAjaxSource": "/view/system/disk/filer/set/status.json",
           "aoColumns": [
             null,
@@ -127,7 +120,7 @@
           "bServerSide": false,
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
-          "sAjaxSource": "/site/system/disk/volume/summary.html.cgi",
+          "sAjaxSource": "/view/system/disk/volume/set/group.json",
           "aaSorting": [ [1,'desc'] ],
           "aoColumns": [
             /* disk group column */
@@ -184,7 +177,7 @@
           "bFilter": true,
           "iDisplayLength": 25,
           "sPaginationType": "full_numbers",
-          "sAjaxSource": "/site/system/disk/volume/status.html.cgi",
+          "sAjaxSource": "/view/system/disk/volume/set/status.json",
           /* Sort by Total KB column by default */
           "aaSorting": [ [1,'desc'] ],
           "aoColumns": [
