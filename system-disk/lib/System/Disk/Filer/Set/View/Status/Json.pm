@@ -38,12 +38,12 @@ sub aaData {
         }
 
         push @data, [
-            $item->{name},
-            $item->{status},
+            $item->name,
+            $item->status,
             $hostname,
             $arrayname,
-            $item->{created} ? $item->{created} : "0000-00-00 00:00:00",
-            $item->{last_modified} ? $item->{last_modified} : "0000-00-00 00:00:00",
+            $item->created ? $item->created : "0000-00-00 00:00:00",
+            $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",
         ];
     }
     return @data;

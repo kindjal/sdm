@@ -37,7 +37,7 @@ sub _jsobj {
 
     my $r = pop @{ [ $ordered_set->members ] };
     my $last_modified = "0000:00:00:00:00:00";
-    $last_modified = $r->{last_modified} ? $r->{last_modified} : $last_modified;
+    $last_modified = $r->last_modified ? $r->last_modified : $last_modified;
 
     my $jsobj = {
         total_kb => $subject->sum('total_kb'),

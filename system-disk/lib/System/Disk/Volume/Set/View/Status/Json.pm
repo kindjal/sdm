@@ -26,18 +26,21 @@ sub aaData {
     return [] unless ($subject);
 
     foreach my $item ( $subject->members ) {
+
+    use Data::Dumper;
+
         my $capacity = 0;
-        if ( $item->{total_kb} ) {
-            $capacity = $item->{used_kb} / $item->{total_kb} * 100;
+        if ( $item->total_kb ) {
+            $capacity = $item->used_kb / $item->total_kb * 100;
         }
         push @data, [
-            $item->{mount_path},
-            $item->{total_kb},
-            $item->{used_kb},
+            $item->mount_path,
+            $item->total_kb,
+            $item->used_kb,
             $capacity,
-            $item->{disk_group} ? $item->{disk_group} : "unknown",
-            $item->{filername} ? $item->{filername} : "unknown",
-            $item->{last_modified} ? $item->{last_modified} : "0000-00-00 00:00:00",
+            $item->disk_group ? $item->disk_group : "unknown",
+            $item->filername ? $item->filername : "unknown",
+            $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",
         ];
     }
     return @data;
