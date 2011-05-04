@@ -11,7 +11,6 @@ sub load_modules {
     return if $loaded;
     eval "
         use above 'System';
-        use Workflow;
         use Plack::MIME;
         use Plack::Util;
         use Cwd;
@@ -157,6 +156,9 @@ dispatch {
             $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
         }
 
+        # Clear object cache so we always get fresh results.
+        UR::Context->clear_cache();
+
         my @matches;
         if ($class->isa("UR::Object::Set")) {
             $class =~ s/::Set$//;
@@ -211,9 +213,6 @@ dispatch {
         die 'no_view' unless ($view);
 
         my $content = $view->content();
-
-        # Clear object cache so we always get fresh results.
-        UR::Context->clear_cache();
 
         # the 'cacheon' cookie is handled by the javascript /View/Resource/Html/js/app/ui-init.js to tell the browser it's a
         # cached page and show the timer.  

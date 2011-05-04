@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 use System;
+# I don't see Workflow used anywhere, but if we don't use it, we get:
+# Failed during execute(): Can't locate object method "get_class_object" via package "System::Service::WebApp" (perhaps you forgot to load "System::Service::WebApp"?) at /gscuser/mcallawa/git/system-namespace/deploy/lib/System/Service/WebApp.pm line 66
+use Workflow;
 use Sys::Hostname;
 use AnyEvent;
 use AnyEvent::Util;
@@ -108,7 +111,7 @@ sub run_starman {
     $runner->parse_options(
         '--app', $psgi_path,
         '--port', $self->port,
-        '--workers', 1,
+        '--workers', 4,
         '-R', System->base_dir );
 
     $runner->run;
