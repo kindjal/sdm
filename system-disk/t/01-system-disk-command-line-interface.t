@@ -5,6 +5,12 @@ use Test::Output;
 use FindBin;
 use IPC::Cmd;
 use File::Basename qw/dirname/;
+
+BEGIN {
+    $ENV{SYSTEM_DEPLOYMENT} ||= "testing";
+    $ENV{SYSTEM_NO_REQUIRE_USER_VERIFY} = 1;
+};
+
 my $top = dirname __FILE__;
 require "$top/system-lib.pm";
 my $t = System::Test::Lib->new();
