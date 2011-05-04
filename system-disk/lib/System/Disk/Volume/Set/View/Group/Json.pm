@@ -25,18 +25,21 @@ sub aaData {
     my $subject = $self->subject;
     return unless ($subject);
 
-    my $disk_groups = $subject->members( -group_by => [ 'disk_group' ], -order_by => [ 'disk_group' ] );
-    return unless ($disk_groups);
+    my @disk_groups = $subject->members( -group_by => [ 'disk_group' ], -order_by => [ 'disk_group' ] );
+    return unless (@disk_groups);
 
-    foreach my $item ( $disk_groups->members ) {
+    foreach my $item ( @disk_groups ) {
+        my $group = $item->disk_group ? $item->disk_group : "unknown",
         my $capacity = 0;
-        if ( $item->{total_kb} ) {
-            $capacity = $item->{used_kb} / $item->{total_kb} * 100;
+        my $total_kb = $item->sum('total_kb');
+        my $used_kb = $item->sum('used_kb');
+        if ( $total_kb ) {
+            $capacity = $used_kb / $total_kb * 100;
         }
         push @data, [
-            $item->{disk_group},
-            $item->{total_kb},
-            $item->{used_kb},
+            $group,
+            $total_kb,
+            $used_kb,
             $capacity,
         ];
     }
