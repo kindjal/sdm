@@ -212,6 +212,9 @@ dispatch {
 
         my $content = $view->content();
 
+        # Clear object cache so we always get fresh results.
+        UR::Context->clear_cache();
+
         # the 'cacheon' cookie is handled by the javascript /View/Resource/Html/js/app/ui-init.js to tell the browser it's a
         # cached page and show the timer.  
         #this cookie has an expiration date in the past, so it tells the browser to expire it right now...
