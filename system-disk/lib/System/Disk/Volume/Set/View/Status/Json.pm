@@ -32,13 +32,11 @@ sub aaData {
         }
         push @data, [
             $item->{mount_path},
-            $item->{physical_path},
             $item->{total_kb},
             $item->{used_kb},
-            $item->{status},
             $capacity,
-            $item->{filername},
-            $item->{disk_group},
+            $item->{disk_group} ? $item->{disk_group} : "unknown",
+            $item->{filername} ? $item->{filername} : "unknown",
             $item->{last_modified} ? $item->{last_modified} : "0000-00-00 00:00:00",
         ];
     }
