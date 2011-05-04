@@ -23,9 +23,10 @@ sub aaData {
     my $self = shift;
     my @data;
     my $subject = $self->subject;
-    return '' unless ($subject);
+    return unless ($subject);
 
     my $disk_groups = $subject->members( -group_by => [ 'disk_group' ], -order_by => [ 'disk_group' ] );
+    return unless ($disk_groups);
 
     foreach my $item ( $disk_groups->members ) {
         my $capacity = 0;

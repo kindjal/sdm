@@ -23,7 +23,7 @@ sub _jsobj {
     my $self = shift;
 
     my $subject = $self->subject();
-    return '' unless $subject;
+    return {} unless $subject;
 
     my $total_kb = $subject->sum('total_kb');
     my $used_kb = $subject->sum('used_kb');
@@ -33,6 +33,8 @@ sub _jsobj {
     }
 
     my $ordered_set = $subject->members( -group_by => [ 'last_modified' ], -order_by => [ 'last_modified' ] );
+    return {} unless ($ordered_set);
+
     my $r = pop @{ [ $ordered_set->members ] };
     my $last_modified = "0000:00:00:00:00:00";
     $last_modified = $r->{last_modified} ? $r->{last_modified} : $last_modified;
