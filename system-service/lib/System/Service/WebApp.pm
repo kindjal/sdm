@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use System;
-use Workflow;
 use Sys::Hostname;
 use AnyEvent;
 use AnyEvent::Util;
@@ -40,7 +39,6 @@ class System::Service::WebApp {
 
 sub execute {
     my $self = shift;
-
     $self->determine_port;
     $self->status_message( sprintf( "Using browser: %s", $self->browser ) );
     $self->status_message( sprintf( "Local server accessible at %s", $self->url ) );
@@ -111,7 +109,7 @@ sub run_starman {
         '--app', $psgi_path,
         '--port', $self->port,
         '--workers', 1,
-        '-R', System->base_dir . ',' . Workflow->base_dir );
+        '-R', System->base_dir );
 
     $runner->run;
 }
@@ -140,7 +138,6 @@ sub is_sub_command_delegator {
 }
 
 sub url {
-    $DB::single = 1;
     my $self = shift;
     my $hostname = Sys::Hostname::hostname;
     my $url = sprintf ( "http://%s:%d/", $hostname, $self->port );
