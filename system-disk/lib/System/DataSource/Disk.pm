@@ -32,7 +32,7 @@ if ($ENV{SYSTEM_DATABASE_DRIVER} eq "SQLite") {
             server => { default_value => "dbname=system;host=$hostname" },
             owner  => { default_value => 'public' },
             login  => { default_value => 'system' },
-            auth   => { default_value => 'test' },
+            auth   => { default_value => 'pYKVikFf' },
         ]
     };
 } elsif ($ENV{SYSTEM_DATABASE_DRIVER} eq "Oracle") {
