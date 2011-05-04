@@ -1,3 +1,11 @@
+ur-system-service (0.02-1) unstable; urgency=low
+
+  * This version updates the web-app such that it uses UR Object Set Views in
+    its Ajax calls, as well as client side search/sort operations.
+  * In addition various changes improve stability and scalability.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 22 Mar 2011 13:10:03 -0500
+
 ur-system-service (0.01-1) unstable; urgency=low
 
   * Initial Release.
