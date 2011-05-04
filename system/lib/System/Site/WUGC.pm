@@ -14,7 +14,8 @@ if ($ENV{SYSTEM_DEPLOYMENT} eq 'testing') {
     $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
 } elsif ($ENV{SYSTEM_DEPLOYMENT} eq 'production') {
     $ENV{SYSTEM_DATABASE_DRIVER} ||= 'Pg';
-    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'sysmgr.gsc.wustl.edu';
+    #$ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'sysmgr.gsc.wustl.edu';
+    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
 }
 
 1;
