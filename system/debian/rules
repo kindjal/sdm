@@ -8,5 +8,5 @@ PACKAGE=$(shell dh_listpackages)
 
 override_dh_auto_install:
 	dh_auto_install
-	install -d ./debian/$(PACKAGE)/usr/share/perl5/System/View/Resource/Html
-	cp -ap lib/System/View/Resource/Html/* ./debian/$(PACKAGE)/usr/share/perl5/System/View/Resource/Html
+	install -d ./debian/$(PACKAGE)/usr/share/perl5/System/View/Resource
+	cp -ap lib/System/View/Resource/Html ./debian/$(PACKAGE)/usr/share/perl5/System/View/Resource/Html
