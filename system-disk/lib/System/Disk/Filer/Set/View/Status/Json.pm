@@ -15,6 +15,9 @@ class System::Disk::Filer::Set::View::Status::Json {
     is => 'UR::Object::Set::View::Default::Json',
 };
 
+=head2 aaData
+Build the aaData for jQuery DataTables.  This is a list of table row data.
+=cut
 sub aaData {
     my $self = shift;
     my @data;
