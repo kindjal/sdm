@@ -4,13 +4,15 @@ use strict;
 use warnings;
 
 use System;
+use System::Service::WebApp::Runner;
+use System::Service::WebApp::Loader;
+
 # I don't see Workflow used anywhere, but if we don't use it, we get:
 # Failed during execute(): Can't locate object method "get_class_object" via package "System::Service::WebApp" (perhaps you forgot to load "System::Service::WebApp"?) at /gscuser/mcallawa/git/system-namespace/deploy/lib/System/Service/WebApp.pm line 66
 use Workflow;
 use Sys::Hostname;
 use AnyEvent;
 use AnyEvent::Util;
-use Plack::Runner;
 use IO::Socket;
 
 # "Unassigned" ports from iana.org
@@ -101,9 +103,10 @@ sub determine_port {
 sub run_starman {
     my ($self) = @_;
 
-    my $runner = Plack::Runner->new(
-        server => 'Starman',
-        env    => 'development'
+    my $runner = System::Service::WebApp::Runner->new(
+        server => 'System::Service::WebApp::Starman',
+        loader => 'System::Service::WebApp::Loader',
+        env    => 'development',
     );
 
     my $psgi_path = $self->psgi_path . '/Main.psgi';
@@ -112,6 +115,7 @@ sub run_starman {
         '--app', $psgi_path,
         '--port', $self->port,
         '--workers', 4,
+        '--single_request', 1,
         '-R', System->base_dir );
 
     $runner->run;
