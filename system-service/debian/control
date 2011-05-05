@@ -2,14 +2,14 @@ Source: ur-system-service
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl, libur-perl (>= 0.29), ur-system-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libtest-simple-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl
+Build-Depends-Indep: perl,ur-system-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libtest-simple-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-system-service
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.29), ur-system-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl,libstarman-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),ur-system-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl,libstarman-perl
 Description: A UR Object framework for running system services data management
  UR Object framework for running system services data management, currently just
  includes a development web server.
