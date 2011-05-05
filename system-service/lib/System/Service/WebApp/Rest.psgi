@@ -156,9 +156,6 @@ dispatch {
             $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
         }
 
-        # Clear object cache so we always get fresh results.
-        UR::Context->current->query_underlying_context(1);
-
         my @matches;
         if ($class->isa("UR::Object::Set")) {
             $class =~ s/::Set$//;
