@@ -27,19 +27,20 @@ sub aaData {
 
     foreach my $item ( $subject->members ) {
 
-    use Data::Dumper;
-
         my $capacity = 0;
         if ( $item->total_kb ) {
             $capacity = $item->used_kb / $item->total_kb * 100;
         }
+        my @filernames = $item->filername;
+        @filernames = [] unless (@filernames);
+        my $filername = join(",",$item->filername);
         push @data, [
             $item->mount_path,
             $item->total_kb,
             $item->used_kb,
             $capacity,
             $item->disk_group ? $item->disk_group : "unknown",
-            $item->filername ? $item->filername : "unknown",
+            $filername,
             $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",
         ];
     }

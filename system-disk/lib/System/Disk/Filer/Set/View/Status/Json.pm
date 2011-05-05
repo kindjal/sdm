@@ -23,7 +23,7 @@ sub aaData {
     my @data;
 
     my $subject = $self->subject();
-    return '' unless ($subject);
+    return [] unless ($subject);
 
     foreach my $item ( $subject->members ) {
         my $hostname = 'unknown';
