@@ -2,7 +2,7 @@
 package System::Service::WebApp::Starman::Server;
 
 use base qw( Starman::Server );
-use Socket qw(IPPROTO_TCP TCP_NODELAY);
+use Socket qw(IPPROTO_TCP TCP_NODELAY SOL_SOCKET SO_REUSEADDR);
 
 sub process_request {
     my $self = shift;
@@ -10,6 +10,8 @@ sub process_request {
 
     if ($conn->NS_proto eq 'TCP') {
         setsockopt($conn, IPPROTO_TCP, TCP_NODELAY, 1)
+            or die $!;
+        setsockopt($conn, SOL_SOCKET, SO_REUSEADDR, 1)
             or die $!;
     }
 
