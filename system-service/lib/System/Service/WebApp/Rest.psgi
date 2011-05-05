@@ -157,7 +157,7 @@ dispatch {
         }
 
         # Clear object cache so we always get fresh results.
-        UR::Context->clear_cache();
+        UR::Context->current->query_underlying_context(1);
 
         my @matches;
         if ($class->isa("UR::Object::Set")) {
