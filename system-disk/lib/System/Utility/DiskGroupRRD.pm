@@ -88,6 +88,7 @@ sub create_rrd {
 sub create_or_update {
     my ($self,$group,$total,$used) = @_;
     $self->logger->debug(__PACKAGE__ . " create_or_update($group,$total,$used)");
+    return unless (defined $group and defined $total and defined $used);
 
     my $rrdpath = $self->rrdpath;
     die "RRD path is unset" if (! defined $rrdpath);
