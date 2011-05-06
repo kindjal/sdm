@@ -13,6 +13,14 @@ class System {
     is => [ 'UR::Namespace' ],
 };
 
+for my $dir (@INC) {
+    if (-d "$dir/System/Env" ) {
+        foreach my $mod ( glob($dir . '/System/Env/*') ) {
+            require $mod;
+        }
+    }
+}
+
 # System supports several environment variables, found under System/ENV
 # Any SYSTEM_* variable which is set but does NOT corresponde to a module found will cause an exit
 # (a hedge against typos such as SYSTEM_DATABASE_DDDRIVER=1 leading to unexpected behavior)
@@ -24,7 +32,7 @@ for my $e (keys %ENV) {
         $path =~ s/.pm$//;
         my @files = glob($path . '/Env/*');
         my @vars = map { /System\/Env\/(.*).pm/; $1 } @files; 
-        print STDERR "Environment variable $e set to $ENV{$e} but there were errors using System::Env::$e:\n"
+        print STDERR "Environment variable $e set to $ENV{$e} but there were errors using System::Env::$e:\n$@"
         . "Available variables:\n\t" 
         . join("\n\t",@vars)
         . "\n";

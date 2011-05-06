@@ -25,6 +25,11 @@ sub _prepare_logger {
     $self->{logger} = Log::Log4perl->get_logger();
 }
 
+sub logger {
+    my $self = shift;
+    return $self->{logger};
+}
+
 =head2 create
 We override UR/lib/Command/V2.pm to trigger _prepare_logger
 =cut
