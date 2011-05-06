@@ -126,7 +126,13 @@ $(document).ready(function() {
     ],
     "fnRowCallback": function( nRow, aaData, iDisplayIndex )
     {
-      /* append a css class based on cell content */
+      /* make disk group an href */
+      // <a href=\"rrd.html?$a[0]\">$a[0]</a>
+      var $col = 0;
+      var $cell = $(nRow).children('td').eq($col);
+      $('td:eq(0)', nRow).html( "<a href=\"rrd.html?" + aaData[0] + "\">" + aaData[0] + "</a>" );
+
+      /* append a css color class based on cell content */
       /* capacity > 95 */
       var $col = 3;
       var $cell = $(nRow).children('td').eq($col);

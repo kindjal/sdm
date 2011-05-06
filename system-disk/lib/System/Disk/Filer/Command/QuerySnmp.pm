@@ -12,10 +12,8 @@ use Date::Manip::Date;
 # Usage function
 use Pod::Find qw(pod_where);
 use Pod::Usage;
-use Log::Log4perl qw(:easy);
 
 use File::Basename qw(basename);
-use System::Utility::SNMP;
 
 # Autoflush
 local $| = 1;
@@ -52,7 +50,7 @@ class System::Disk::Filer::Command::QuerySnmp {
     },
     rrdpath => {
       is => 'Text',
-      default => "/var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/rrd",
+      default => $ENV{SYSTEM_DISK_RRDPATH} ||= "/var/cache/sdm/rrd",
       doc => 'Path to rrd file storage (not yet implemented)',
     },
     purge => {
@@ -299,6 +297,11 @@ sub execute {
             $self->update_volume( $filer, $result );
         }
     }
+
+    # Now update disk group RRD files.
+    my $rrd = System::Utility::DiskGroupRRD->create();
+    $rrd->run();
+
     ### QuerySnmp execute QuerySnmp complete
     return 1;
 }
