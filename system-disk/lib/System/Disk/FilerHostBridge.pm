@@ -15,3 +15,4 @@ class System::Disk::FilerHostBridge {
     data_source => 'System::DataSource::Disk',
 };
 
+1;
