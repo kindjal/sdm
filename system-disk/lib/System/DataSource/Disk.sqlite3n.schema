@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS disk_volume;
 DROP TABLE IF EXISTS disk_export;
 DROP TABLE IF EXISTS disk_filer_host;
 DROP TABLE IF EXISTS disk_filer;
+DROP TABLE IF EXISTS disk_gpfs_node;
+DROP TABLE IF EXISTS disk_gpfs_fs;
 CREATE TABLE IF NOT EXISTS disk_user (
   email         VARCHAR(255) NOT NULL PRIMARY KEY,
   created       DATE,
@@ -50,18 +52,11 @@ CREATE TABLE IF NOT EXISTS disk_filer_host (
 );
 CREATE TABLE IF NOT EXISTS disk_export (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer(name) DEFERRABLE INITIALLY DEFERRED,
+  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
   physical_path VARCHAR(255) NOT NULL,
   created       DATE,
   last_modified DATE,
   CONSTRAINT disk_export_uq UNIQUE (filername,physical_path)
-);
-CREATE TABLE IF NOT EXISTS disk_mount (
-  export_id     INTEGER,
-  volume_id     INTEGER,
-  PRIMARY KEY(export_id,volume_id),
-  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export(id) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume(id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_volume (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,7 +65,14 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE,
-  disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group(name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
+  disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE IF NOT EXISTS disk_mount (
+  export_id     INTEGER,
+  volume_id     INTEGER,
+  PRIMARY KEY(export_id,volume_id),
+  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export (id) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (
   name          VARCHAR(255) NOT NULL PRIMARY KEY,
@@ -79,12 +81,54 @@ CREATE TABLE IF NOT EXISTS disk_array (
   arraysize     UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE,
-  hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host(hostname) DEFERRABLE INITIALLY DEFERRED
+  hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_host_array (
   hostname      VARCHAR(255),
   arrayname     VARCHAR(255),
   PRIMARY KEY(hostname,arrayname),
-  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host(hostname) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array(name) DEFERRABLE INITIALLY DEFERRED
+  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE IF NOT EXISTS disk_gpfs_node (
+  gpfsNodeName          VARCHAR(255) PRIMARY KEY,
+  gpfsNodeIP            VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodePlatform      VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeStatus        VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeFailureCount  VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeThreadWait    VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeHealthy       VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeDiagnosis     VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsNodeVersion       VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  created               DATE,
+  last_modified         DATE,
+  CONSTRAINT disk_gpfs_node_hostname_fk FOREIGN KEY (gpfsNodeName) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE IF NOT EXISTS disk_gpfs_fs (
+  id                            INTEGER PRIMARY KEY AUTOINCREMENT,
+  volume_id                     INTEGER NOT NULL,
+  gpfsFileSystemPerfName        VARCHAR(255) NOT NULL,
+  gpfsFileSystemBytesReadL      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesReadH      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesCacheL     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesCacheH     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesWrittenL   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesWrittenH   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReads           INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemCaches          INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemWrites          INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemOpenCalls       INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemCloseCalls      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReadCalls       INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemWriteCalls      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReaddirCalls    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesWritten   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesRead      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesDeleted   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesCreated   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemStatCacheHit    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemStatCacheMiss   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT disk_gpfs_fs_perfname_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
 );
