@@ -23,3 +23,4 @@ class System::Disk::Mount {
     data_source => 'System::DataSource::Disk',
 };
 
+1;
