@@ -13,6 +13,7 @@ class System::Disk::GpfsFs {
     ],
     has => [
         volume_id                    => { is => 'Number' },
+        volume                       => { is => 'System::Disk::Volume', id_by => 'volume_id' },
         gpfsFileSystemPerfName       => { is => 'Text' },
         gpfsFileSystemBytesReadL     => { is => 'Number', default_value => 0 },
         gpfsFileSystemBytesReadH     => { is => 'Number', default_value => 0 },
@@ -50,14 +51,14 @@ sub create {
     my $self = shift;
     my (%params) = @_;
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-    my $mount_path = $params{gpfsFileSystemPerfName};
-    unless ($mount_path) {
+    my $physical_path = $params{gpfsFileSystemPerfName};
+    unless ($physical_path) {
         $self->error_message("parameters missing required attribute: gpfsFileSystemPerfName");
         return;
     }
-    my $volume = System::Disk::Volume->get( mount_path => $mount_path );
+    my $volume = System::Disk::Volume->get( physical_path => $physical_path );
     unless ($volume) {
-        $self->error_message("can't find a volume with mount_path '$mount_path'" );
+        $self->error_message("can't find a volume with physical_path '$physical_path'" );
         return;
     }
     $params{id} = $volume->id;
