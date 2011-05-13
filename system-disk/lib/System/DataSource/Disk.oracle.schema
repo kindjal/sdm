@@ -1,4 +1,25 @@
 BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_DISK_PERF';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_FS_PERF';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_NODE';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
     EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_USER';
     EXCEPTION WHEN OTHERS THEN
         DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
@@ -188,4 +209,60 @@ CREATE TABLE INFOSYS.DISK_HOST_ARRAY (
   PRIMARY KEY(hostname,arrayname),
   CONSTRAINT DISK_HOST_ARRAY_HOSTNAME_FK FOREIGN KEY(hostname) REFERENCES INFOSYS.DISK_HOST(hostname) ON DELETE CASCADE,
   CONSTRAINT DISK_HOST_ARRAY_ARRAYNME_FK FOREIGN KEY(arrayname) REFERENCES INFOSYS.DISK_ARRAY(name) ON DELETE CASCADE
+);
+CREATE TABLE disk_gpfs_disk_perf (
+  id                            NUMBER PRIMARY KEY,
+  volume_id                     NUMBER NOT NULL,
+  gpfsDiskPerfName              VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsDiskPerfFSName            VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsDiskPerfStgPoolName       VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsDiskReadTimeL             NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskReadTimeH             NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskWriteTimeL            NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskWriteTimeH            NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskLongestReadTimeL      NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskLongestReadTimeH      NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskLongestWriteTimeL     NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskLongestWriteTimeH     NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskShortestReadTimeL     NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskShortestReadTimeH     NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskShortestWriteTimeL    NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskShortestWriteTimeH    NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskReadBytesL            NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskReadBytesH            NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskWriteBytesL           NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskWriteBytesH           NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskReadOps               NUMBER DEFAULT 0 NOT NULL,
+  gpfsDiskWriteOps              NUMBER DEFAULT 0 NOT NULL,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT DISK_GPFS_DISK_PERF_FK FOREIGN KEY(volume_id) REFERENCES INFOSYS.DISK_VOLUME(id)
+);
+CREATE TABLE disk_gpfs_fs_perf (
+  id                            NUMBER PRIMARY KEY,
+  volume_id                     NUMBER NOT NULL,
+  gpfsFileSystemPerfName        VARCHAR(255) NOT NULL,
+  gpfsFileSystemBytesReadL      NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemBytesReadH      NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemBytesCacheL     NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemBytesCacheH     NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemBytesWrittenL   NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemBytesWrittenH   NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemReads           NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemCaches          NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemWrites          NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemOpenCalls       NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemCloseCalls      NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemReadCalls       NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemWriteCalls      NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemReaddirCalls    NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemInodesWritten   NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemInodesRead      NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemInodesDeleted   NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemInodesCreated   NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemStatCacheHit    NUMBER DEFAULT 0 NOT NULL,
+  gpfsFileSystemStatCacheMiss   NUMBER DEFAULT 0 NOT NULL,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT DISK_GPFS_FS_PERF_FK FOREIGN KEY(volume_id) REFERENCES INFOSYS.DISK_VOLUME(id)
 );

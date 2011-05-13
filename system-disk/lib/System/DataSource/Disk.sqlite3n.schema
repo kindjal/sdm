@@ -1,4 +1,7 @@
 PRAGMA foreign_keys = ON;
+DROP TABLE IF EXISTS disk_gpfs_node;
+DROP TABLE IF EXISTS disk_gpfs_fs_perf;
+DROP TABLE IF EXISTS disk_gpfs_disk_perf;
 DROP TABLE IF EXISTS disk_user;
 DROP TABLE IF EXISTS disk_group;
 DROP TABLE IF EXISTS disk_array;
@@ -8,8 +11,6 @@ DROP TABLE IF EXISTS disk_volume;
 DROP TABLE IF EXISTS disk_export;
 DROP TABLE IF EXISTS disk_filer_host;
 DROP TABLE IF EXISTS disk_filer;
-DROP TABLE IF EXISTS disk_gpfs_node;
-DROP TABLE IF EXISTS disk_gpfs_fs;
 CREATE TABLE IF NOT EXISTS disk_user (
   email         VARCHAR(255) NOT NULL PRIMARY KEY,
   created       DATE,
