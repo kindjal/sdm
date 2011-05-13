@@ -9,17 +9,17 @@ use System;
 class System::Disk::GpfsNode{
     table_name => 'disk_gpfs_node',
     id_by => [
-        gpfsNodeName => { is => 'Text' }
+        gpfsNodeName => { is => 'Text', column_name => 'gpfsnodename' }
     ],
     has => [
-        gpfsNodeIP            => { is => 'Text', default_value => '' },
-        gpfsNodePlatform      => { is => 'Text', default_value => '' },
-        gpfsNodeStatus        => { is => 'Text', default_value => '' },
-        gpfsNodeFailureCount  => { is => 'Text', default_value => '' },
-        gpfsNodeThreadWait    => { is => 'Text', default_value => '' },
-        gpfsNodeHealthy       => { is => 'Text', default_value => '' },
-        gpfsNodeDiagnosis     => { is => 'Text', default_value => '' },
-        gpfsNodeVersion       => { is => 'Text', default_value => '' },
+        gpfsNodeIP            => { is => 'Text', default_value => '', column_name => 'gpfsnodeip' },
+        gpfsNodePlatform      => { is => 'Text', default_value => '', column_name => 'gpfsnodeplatform' },
+        gpfsNodeStatus        => { is => 'Text', default_value => '', column_name => 'gpfsnodestatus' },
+        gpfsNodeFailureCount  => { is => 'Text', default_value => '', column_name => 'gpfsnodefailurecount' },
+        gpfsNodeThreadWait    => { is => 'Text', default_value => '', column_name => 'gpfsnodethreadwait' },
+        gpfsNodeHealthy       => { is => 'Text', default_value => '', column_name => 'gpfsnodehealthy' },
+        gpfsNodeDiagnosis     => { is => 'Text', default_value => '', column_name => 'gpfsnodediagnosis' },
+        gpfsNodeVersion       => { is => 'Text', default_value => '', column_name => 'gpfsnodeversion' },
     ],
     has_optional => [
         created         => { is => 'Date' },

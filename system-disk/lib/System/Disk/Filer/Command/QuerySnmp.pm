@@ -136,11 +136,11 @@ sub update_volumes {
                 # FIXME: do we want to auto-remove like this?
                 if ( ! grep /$path/, keys %$volumedata ) {
                     foreach my $m (System::Disk::Mount->get( $volume->id )) {
-                        $self->logger->warn(__PACKAGE__ . " delete stale mount for volume " . $volume->physical_path);
+                        $self->logger->warn(__PACKAGE__ . " delete stale mount for volume " . $volume->id);
                         $m->delete;
                     }
                     # FIXME, check if there are other filers that export it?
-                    $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->physical_path);
+                    $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->id);
                     $volume->delete;
                 }
             }
@@ -413,7 +413,7 @@ sub _query_snmp {
             # For a GPFS cluster, determine which host is the master in the cluster, and
             # query it for GPFS cluster data.
             $is_gpfs = $snmp->detect_gpfs;
-            if ($ENV{SYSTEM_GPFS_PRESENT} and $is_gpfs) {
+            if ($ENV{SYSTEM_DISK_GPFS_PRESENT} and $is_gpfs) {
                 foreach my $host ( $filer->host) {
                     if ($host->master) {
                         $self->logger->debug(__PACKAGE__ . " query gpfs master node " . $host->hostname);
@@ -443,7 +443,7 @@ sub _query_snmp {
     # Generic Volume data
     $self->update_volumes( $volumedata, $filer->name );
 
-    if ($ENV{SYSTEM_GPFS_PRESENT} and $is_gpfs) {
+    if ($ENV{SYSTEM_DISK_GPFS_PRESENT} and $is_gpfs) {
         # Updating GPFS node data must come after update_volumes
         $self->update_gpfs_node( $gpfsnodedata );
         $self->update_gpfs_fs_perf( $gpfsfsdata );
