@@ -22,18 +22,21 @@ my $classdef = {
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
         mount         => { is => 'System::Disk::Mount', reverse_as => 'volume' },
         filer         => { is => 'System::Disk::Filer', via => 'mount', to => 'filer' },
+        # physical_path is analogous to hrStorageDescr in SNMP speak.
         physical_path => { via => 'mount', to => 'physical_path' },
         filername     => { via => 'filer', to => 'name' },
         hostname      => { via => 'filer', to => 'hostname' },
         arrayname     => {
             calculate => q/ my %h; foreach my $f ($self->filer) { map { $h{$_} = 1 } $f->arrayname }; return keys %h; /
         },
+        gpfs_disk_perf  => { is => 'System::Disk::GpfsDiskPerf', reverse_as => 'volume' },
     ],
     has_optional => [
-        group         => { is => 'System::Disk::Group', id_by => 'disk_group' },
-        capacity      => { is => 'Number', is_calculated => 1 },
-        created       => { is => 'DATE' },
-        last_modified => { is => 'DATE' },
+        gpfs_fs_perf    => { is => 'System::Disk::GpfsFsPerf', id_by => 'id' },
+        group           => { is => 'System::Disk::Group', id_by => 'disk_group' },
+        capacity        => { is => 'Number', is_calculated => 1 },
+        created         => { is => 'DATE' },
+        last_modified   => { is => 'DATE' },
     ],
     schema_name => 'Disk',
     data_source => 'System::DataSource::Disk',
