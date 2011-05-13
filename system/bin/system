@@ -20,7 +20,7 @@ BEGIN {
     @INC = map { $_ if (!/^\/(gapp|gsc)\//) } @INC;
 };
 
-use System;
+use above "System";
 
 use System::Command;
 System::Command->execute_with_shell_params_and_exit();
