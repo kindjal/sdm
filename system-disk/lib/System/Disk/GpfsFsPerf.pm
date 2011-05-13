@@ -1,13 +1,13 @@
 
-package System::Disk::GpfsFs;
+package System::Disk::GpfsFsPerf;
 
 use strict;
 use warnings;
 
 use System;
 
-class System::Disk::GpfsFs {
-    table_name => 'disk_gpfs_fs',
+class System::Disk::GpfsFsPerf {
+    table_name => 'disk_gpfs_fs_perf',
     id_by => [
         id => { is => 'Number' },
     ],
@@ -45,7 +45,7 @@ class System::Disk::GpfsFs {
 };
 
 =head2 create
-Create method for gpfsFs entry sets created attribute.
+Create method for gpfsFsPef entry sets created attribute.
 =cut
 sub create {
     my $self = shift;

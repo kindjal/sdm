@@ -14,7 +14,7 @@ use Test::Output;
 use Test::Exception;
 
 use_ok( "System" );
-use_ok( "System::Disk::GpfsFs" );
+use_ok( "System::Disk::GpfsFsPerf" );
 
 # Start with a fresh database
 use File::Basename qw/dirname/;
@@ -24,10 +24,10 @@ ok( System::Test::Lib->testinit == 0, "ok: init db");
 
 # Test insufficient creation params
 my @params = ();
-ok( ! defined System::Disk::GpfsFs->create( @params ), "ok: create fails on empty params");
+ok( ! defined System::Disk::GpfsFsPerf->create( @params ), "ok: create fails on empty params");
 
 @params = ( gpfsFileSystemPerfName => "/gscmnt/gc2111" );
-ok( ! defined System::Disk::GpfsFs->create( @params ), "ok: create fails on insufficient params");
+ok( ! defined System::Disk::GpfsFsPerf->create( @params ), "ok: create fails on insufficient params");
 
 @params = (
     gpfsFileSystemPerfName       => "/gscmnt/gc2111",
@@ -52,14 +52,14 @@ ok( ! defined System::Disk::GpfsFs->create( @params ), "ok: create fails on insu
     gpfsFileSystemStatCacheHit   => 19,
     gpfsFileSystemStatCacheMiss  => 20,
 );
-ok( ! defined System::Disk::GpfsFs->create( @params ), "ok: create fails on insufficient params");
+ok( ! defined System::Disk::GpfsFsPerf->create( @params ), "ok: create fails on insufficient params");
 
 ok( System::Test::Lib->testdata == 0, "ok: add data to db");
 
-my $ref = System::Disk::GpfsFs->create( @params );
+my $ref = System::Disk::GpfsFsPerf->create( @params );
 ok( defined UR::Context->commit, "ok: commit succeeds" );
 
-foreach my $ref ( System::Disk::GpfsFs->get() ) {
+foreach my $ref ( System::Disk::GpfsFsPerf->get() ) {
     $ref->delete();
     isa_ok( $ref, 'UR::DeletedRef' );
 }
