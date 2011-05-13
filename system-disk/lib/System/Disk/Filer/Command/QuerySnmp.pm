@@ -115,7 +115,11 @@ sub update_volumes {
     my $filername = shift;
 
     unless ($filername) {
-        $self->logger->error(__PACKAGE__ . " no filer given");
+        $self->logger->error(__PACKAGE__ . " update_volumes(): no filer given");
+        return;
+    }
+    unless ($volumedata) {
+        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer " . $filername . " returned empty SNMP volumedata");
         return;
     }
 
@@ -203,9 +207,12 @@ sub update_gpfs_node {
     my $self = shift;
     my $hostdata = shift;
 
-    return unless ($hostdata);
-
     $self->logger->debug(__PACKAGE__ . " update_gpfs_node " . scalar(keys %$hostdata) . " nodes");
+
+    unless ($hostdata) {
+        $self->logger->warn(__PACKAGE__ . " empty GPFS node data");
+        return;
+    }
 
     foreach my $hostname (keys %$hostdata) {
 
@@ -373,7 +380,7 @@ sub _query_snmp {
     my $filer = shift;
 
     # Just check if Filer is_current
-    $self->logger->warn(__PACKAGE__ . " query filer " . $filer->name);
+    $self->logger->warn(__PACKAGE__ . " running SNMP query on filer " . $filer->name);
     if ($self->is_current) {
         if ($filer->is_current($self->host_maxage)) {
             $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is current");
@@ -384,6 +391,7 @@ sub _query_snmp {
     }
 
     # Update Filer data that are not current
+    my $is_gpfs;
     my $volumedata = {};
     my $gpfsfsdata = {};
     my $gpfsdiskdata = {};
@@ -397,14 +405,15 @@ sub _query_snmp {
         }
         my $snmp = System::Utility::SNMP::DiskUsage->create( @params );
 
-        # Query SNMP for df stats
+        # Query SNMP for disk usage numbers
         $volumedata = $snmp->acquire_volume_data();
 
         # If Linux and GPFS, get GPFS tables too.
         if ($snmp->hosttype eq 'linux') {
             # For a GPFS cluster, determine which host is the master in the cluster, and
             # query it for GPFS cluster data.
-            if ($snmp->_is_gpfs) {
+            $is_gpfs = $snmp->detect_gpfs;
+            if ($ENV{SYSTEM_GPFS_PRESENT} and $is_gpfs) {
                 foreach my $host ( $filer->host) {
                     if ($host->master) {
                         $self->logger->debug(__PACKAGE__ . " query gpfs master node " . $host->hostname);
@@ -421,7 +430,6 @@ sub _query_snmp {
             }
         }
 
-        # Done with SNMP here
         $snmp->delete();
         $filer->status(1);
         $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
@@ -430,27 +438,16 @@ sub _query_snmp {
         # log here, but not high priority, it's common
         $self->logger->warn(__PACKAGE__ . "error with SNMP query: $@");
         $filer->status(0);
-        next;
     }
 
     # Generic Volume data
-    if (! scalar keys %$volumedata) {
-        $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " returned empty SNMP volumedata");
-        if ($self->physical_path) {
-            $self->logger->error(__PACKAGE__ . " filer " . $filer->name . " does not export " . $self->physical_path);
-        }
-    } else {
-        $self->update_volumes( $volumedata, $filer->name );
+    $self->update_volumes( $volumedata, $filer->name );
+
+    if ($ENV{SYSTEM_GPFS_PRESENT} and $is_gpfs) {
         # Updating GPFS node data must come after update_volumes
+        $self->update_gpfs_node( $gpfsnodedata );
         $self->update_gpfs_fs_perf( $gpfsfsdata );
         $self->update_gpfs_disk_perf( $gpfsdiskdata );
-    }
-
-    # GPFS host data
-    if (! scalar keys %$gpfsnodedata) {
-        $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " returned empty SNMP gpfsnodedata");
-    } else {
-        $self->update_gpfs_node( $gpfsnodedata );
     }
 }
 
