@@ -6,8 +6,6 @@ use warnings;
 
 use System;
 
-use SNMP;
-use Net::SNMP qw/:snmp/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
