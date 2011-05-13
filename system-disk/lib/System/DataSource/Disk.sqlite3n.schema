@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS disk_gpfs_disk_perf (
   gpfsDiskReadOps               INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   gpfsDiskWriteOps              INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created                       DATE,
-  last_modified                 DATE
+  last_modified                 DATE,
   CONSTRAINT disk_gpfs_disk_perf_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_gpfs_fs_perf (
