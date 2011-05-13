@@ -19,6 +19,7 @@ class System::Disk::Host {
         location        => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
+        master          => { is => 'Boolean', default => 0  },
     ],
     has_many_optional => [
         arraymappings   => { is => 'System::Disk::HostArrayBridge', reverse_as => 'host' },
