@@ -34,8 +34,8 @@ my $json = $v->_jsobj();
 
 # This must match the data used in System::Test::Lib->testdata
 my $expected = {
-    'iTotalDisplayRecords' => '2',
-    'iTotalRecords' => '2',
+    'iTotalDisplayRecords' => '3',
+    'iTotalRecords' => '3',
     'aaData' => [
         [
         'gpfs',
