@@ -117,10 +117,14 @@ sub testdata {
     $filer = System::Disk::Filer->create(name => "gpfs-dev", status => 1, comments => "This is another comment");
     $filer->created("0000-00-00 00:00:00");
     $filer->last_modified("0000-00-00 00:00:00");
-    my $host = System::Disk::Host->create(hostname => "linuscs107", master => 1);
-    my $array = System::Disk::Array->create(name => "nsams2k1");
-    $array->assign("linuscs107");
+    my $host = System::Disk::Host->create(hostname => "linuscs103", master => 0);
+    $host->assign("gpfs");
+    $host = System::Disk::Host->create(hostname => "linuscs107", master => 1);
     $host->assign("gpfs-dev");
+    my $array = System::Disk::Array->create(name => "nsams2k1");
+    $array->assign("linuscs103");
+    $array = System::Disk::Array->create(name => "nsams2k2");
+    $array->assign("linuscs107");
     System::Disk::Group->create(name => "SYSTEMS_DEVELOPMENT");
     System::Disk::Volume->create( mount_path=>"/gscmnt/gc2111", physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
     UR::Context->commit();

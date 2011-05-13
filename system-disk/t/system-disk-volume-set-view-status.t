@@ -44,7 +44,7 @@ my $expected = {
                   50,
                   '50',
                   'SYSTEMS_DEVELOPMENT',
-                  'unknown',
+                  'gpfs-dev',
                   '0000-00-00 00:00:00'
                 ]
               ],

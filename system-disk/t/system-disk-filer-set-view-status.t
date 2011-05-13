@@ -34,27 +34,35 @@ my $json = $v->_jsobj();
 
 # This must match the data used in System::Test::Lib->testdata
 my $expected = {
-  'iTotalDisplayRecords' => '2',
-  'iTotalRecords' => '2',
-  'aaData' => [
-                [
-                  'gpfs',
-                  1,
-                  'linuscs103',
-                  'nsams2k1',
-                  '0000-00-00 00:00:00',
-                  '0000-00-00 00:00:00'
-                ],
-                [
-                  'gpfs2',
-                  1,
-                  'unknown',
-                  'unknown',
-                  '0000-00-00 00:00:00',
-                  '0000-00-00 00:00:00'
-                ]
-              ],
-  'sEcho' => 1
+    'iTotalDisplayRecords' => '2',
+    'iTotalRecords' => '2',
+    'aaData' => [
+        [
+        'gpfs',
+    1,
+    'linuscs103',
+    'nsams2k1',
+    '0000-00-00 00:00:00',
+    '0000-00-00 00:00:00'
+        ],
+    [
+        'gpfs-dev',
+    1,
+    'linuscs107',
+    'nsams2k2',
+    '0000-00-00 00:00:00',
+    '0000-00-00 00:00:00'
+        ],
+    [
+        'gpfs2',
+    1,
+    'unknown',
+    'unknown',
+    '0000-00-00 00:00:00',
+    '0000-00-00 00:00:00'
+        ]
+        ],
+    'sEcho' => 1
 };
 
 ok( is_deeply( $json, $expected, "ok: is_deeply" ), "ok: json match");

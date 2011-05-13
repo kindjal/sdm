@@ -11,6 +11,7 @@ BEGIN {
 use System;
 
 use Test::More;
+use Test::Output;
 use Test::Exception;
 
 my $f;
