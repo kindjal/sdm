@@ -61,7 +61,7 @@ sub create {
         $self->error_message("can't find a volume with physical_path '$physical_path'" );
         return;
     }
-    $params{id} = $volume->id;
+    $params{volume_id} = $volume->id;
     return $self->SUPER::create( %params );
 }
 
