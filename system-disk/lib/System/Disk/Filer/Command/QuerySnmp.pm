@@ -18,8 +18,6 @@ use File::Basename qw(basename);
 # Autoflush
 local $| = 1;
 
-use Smart::Comments -ENV;
-
 class System::Disk::Filer::Command::QuerySnmp {
   is => 'System::Command::Base',
   has_optional => [
@@ -73,7 +71,7 @@ class System::Disk::Filer::Command::QuerySnmp {
       default => 0,
       doc => 'Check currency status',
     },
-    filer => {
+    filername => {
       # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
       # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
       #is => 'System::Disk::Filer',
@@ -108,50 +106,59 @@ Updates volume usage information. Blah blah blah details blah.
 EOS
 }
 
-=head2 update_volume
+=head2 update_volumes
 Update SNMP data for all Volumes associated with this Filer.
 =cut
-sub update_volume {
+sub update_volumes {
     my $self = shift;
-    my $filer = shift;
     my $volumedata = shift;
-    ### QuerySnmp update_volume for filer: $filer
+    my $filername = shift;
 
-    unless ($filer) {
-        $self->error_message("No filer given");
+    unless ($filername) {
+        $self->logger->error(__PACKAGE__ . " no filer given");
         return;
     }
 
-    $self->warning_message("Update filer " . $filer->name);
+    $self->logger->warn(__PACKAGE__ . " update_volumes($filername)");
 
     unless ($self->physical_path) {
-        ### QuerySnmp First find and remove volumes in the DB that are not detected on this filer
+        # QuerySnmp First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
-        foreach my $volume ( System::Disk::Volume->get( filername => $filer->name ) ) {
+        foreach my $volume ( System::Disk::Volume->get( filername => $filername ) ) {
             foreach my $path ($volume->physical_path) {
                 next unless($path);
                 $path =~ s/\//\\\//g;
                 # FIXME: do we want to auto-remove like this?
                 if ( ! grep /$path/, keys %$volumedata ) {
                     foreach my $m (System::Disk::Mount->get( $volume->id )) {
-                        ### QuerySnmp delete mount: $m
+                        $self->logger->warn(__PACKAGE__ . " delete stale mount for volume " . $volume->physical_path);
                         $m->delete;
                     }
-                    ### QuerySnmp delete volume: $volume
+                    # FIXME, check if there are other filers that export it?
+                    $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->physical_path);
                     $volume->delete;
-                    $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
                 }
             }
         }
         return 1 if ($self->cleanonly);
     }
 
+    $self->logger->error(__PACKAGE__ . " updating " . scalar(keys %$volumedata) . " volumes");
     foreach my $physical_path (keys %$volumedata) {
-        ### QuerySnmp update physical_path: $physical_path
-        # FIXME: How can we know the mount path aside from convention?
-        my $mount_path = '/gscmnt/' . basename $physical_path;
-        my $volume = System::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, mount_path => $mount_path );
+
+        my $mount_path = $volumedata->{$physical_path}->{mount_path};
+        if (! defined $mount_path or $mount_path eq '') {
+            $self->logger->error(__PACKAGE__ . " skipping volume with incomplete parameters: $physical_path");
+            next;
+        }
+
+        my $volume = System::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, mount_path => $mount_path );
+        unless ($volume) {
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $mount_path");
+            next;
+        }
+        $self->logger->debug(__PACKAGE__ . " found volume: $filername, $physical_path, $mount_path");
 
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
@@ -163,48 +170,179 @@ sub update_volume {
                 $group = System::Disk::Group->get( name => $volumedata->{$physical_path}->{disk_group} );
             }
             unless ($group) {
-                $self->error_message("Failed to identify disk group: $group_name");
-                return;
+                $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
+                next;
             }
-            ### QuerySnmp get_or_create group returned: $group
         } else {
-            $self->warning_message("No group found for $mount_path");
+            $self->logger->warn(__PACKAGE__ . " no group found for $mount_path");
         }
 
-        ### QuerySnmp volume returned: $volume
         unless ($volume) {
-            $self->error_message("Failed to get_or_create volume");
-            return;
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume");
+            next;
         }
-        ### QuerySnmp volume: $volume
-        ### QuerySnmp volumedata: $volumedata
 
         foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
            # FIXME: Don't update disk group from filesystem, only the reverse.
            #next if ($attr eq 'disk_group');
            my $p = $volume->__meta__->property($attr);
            # Primary keys are immutable, don't try to update them
-           ### QuerySnmp update volume attr: $attr
-           ### QuerySnmp p: $p
            $volume->$attr($volumedata->{$physical_path}->{$attr})
              if (! $p->is_id and $p->is_mutable);
            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
 
     }
-    $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
     return 1;
 }
+
+=head2 update_gpfs_node
+Update SNMP data for all GPFS Hosts associated with this Filer.
+=cut
+sub update_gpfs_node {
+    my $self = shift;
+    my $hostdata = shift;
+
+    return unless ($hostdata);
+
+    $self->logger->debug(__PACKAGE__ . " update_gpfs_node " . scalar(keys %$hostdata) . " nodes");
+
+    foreach my $hostname (keys %$hostdata) {
+
+        my $toss;
+        ($hostname,$toss) = split(/\./,$hostname,2);
+
+        my $host = System::Disk::Host->get( hostname => $hostname );
+        unless ($host) {
+            $self->logger->warn(__PACKAGE__ . " ignoring GPFS node data for unknown host $hostname");
+            next;
+        }
+        my $node = System::Disk::GpfsNode->get_or_create( gpfsNodeName => $hostname );
+
+        unless ($node) {
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsNode entry");
+            return;
+        }
+
+        foreach my $attr (keys %{ $hostdata->{$hostname} }) {
+           my $p = $node->__meta__->property($attr);
+           # Primary keys are immutable, don't try to update them
+           $node->$attr($hostdata->{$hostname}->{$attr})
+             if (! $p->is_id and $p->is_mutable);
+           $node->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+
+    }
+    return 1;
+}
+
+=head2 update_gpfs_fs_perf
+Update SNMP data for all GPFS Hosts associated with this Filer.
+=cut
+sub update_gpfs_fs_perf {
+    my $self = shift;
+    my $gpfsfsdata = shift;
+
+    return unless ($gpfsfsdata);
+
+    $self->logger->debug(__PACKAGE__ . " update_gpfs_fs_perf ". scalar(keys %$gpfsfsdata) . " items");
+
+    foreach my $fsname (keys %$gpfsfsdata) {
+        # FIXME: GPFS subAgent reports volumes bare, where hrStorageDescr has /vol prepended.
+        # Prepend here so they match.
+        $fsname = "/vol/$fsname";
+
+        my $volume = System::Disk::Volume->get( physical_path => $fsname );
+        unless ($volume) {
+            $self->logger->warn(__PACKAGE__ . " ignoring GPFS fsperf data for unknown volume $fsname");
+            next;
+        }
+        my $fs = System::Disk::GpfsFsPerf->get_or_create( gpfsFileSystemPerfName => $fsname, volume_id => $volume->id );
+        unless ($fs) {
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsFileSystemPerfName entry");
+            next;
+        }
+
+        foreach my $attr (keys %{ $gpfsfsdata->{$fsname} }) {
+            my $p = $fs->__meta__->property($attr);
+            # Primary keys are immutable, don't try to update them
+            $fs->$attr($gpfsfsdata->{$fsname}->{$attr})
+                if (! $p->is_id and $p->is_mutable);
+            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+        $self->logger->debug(__PACKAGE__ . " updated $fsname");
+
+    }
+    return 1;
+}
+
+=head2 update_gpfs_disk_perf
+Update SNMP data for all GPFS Hosts associated with this Filer.
+=cut
+sub update_gpfs_disk_perf {
+    my $self = shift;
+    my $gpfsdiskdata = shift;
+
+    return unless ($gpfsdiskdata);
+
+    $self->logger->warn(__PACKAGE__ . " update_gpfs_disk_perf " . scalar(keys %$gpfsdiskdata) . " items");
+
+    while (my ($lun,$hashdata) =  each %$gpfsdiskdata) {
+        # Keys here have several components we can chop off.
+        # Remake the hash table with the shorter keys.
+        while (my ($k,$v) = each %$hashdata) {
+            my ($oid,$toss) = split(/\./,$k,2);
+            $hashdata->{$oid} = $v;
+            delete $hashdata->{$k};
+        }
+        $gpfsdiskdata->{$lun} = $hashdata;
+    }
+
+    while (my ($lun,$hashdata) =  each %$gpfsdiskdata) {
+        my $fsname = $gpfsdiskdata->{$lun}->{'gpfsDiskPerfFSName'};
+        # FIXME: GPFS subAgent reports volumes bare, where hrStorageDescr has /vol prepended.
+        # Prepend here so they match.
+        unless ($fsname) {
+            $self->logger->error(__PACKAGE__ . " no gpfsDiskPerfFSName (Volume) for $lun");
+            next;
+        }
+        $fsname = "/vol/$fsname";
+
+        my $volume = System::Disk::Volume->get( physical_path => $fsname );
+        unless ($volume) {
+            $self->logger->warn(__PACKAGE__ . " ignoring GPFS disk perf data for $lun using unknown volume $fsname");
+            next;
+        }
+        my $fs = System::Disk::GpfsDiskPerf->get_or_create( gpfsDiskPerfFSName => $fsname, volume_id => $volume->id );
+        unless ($fs) {
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsDiskPerfFSName entry");
+            next;
+        }
+
+        while (my ($attr,$value) = each %$hashdata) {
+            my $p = $fs->__meta__->property($attr);
+            unless ($p) {
+                $self->logger->error(__PACKAGE__ . " failed to find $attr for GpfsDiskPerf object");
+                next;
+            }
+            # Primary keys are immutable, don't try to update them
+            $fs->$attr($value)
+                if (! $p->is_id and $p->is_mutable);
+            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+        $self->logger->debug(__PACKAGE__ . " updated $fsname using $lun");
+    }
+}
+
 
 =head2 purge_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and warn on all stale volumes.
 =cut
 sub validate_volumes {
     my $self = shift;
-    ### QuerySnmp->validate_volumes
-    $self->error_message("max age has not been specified\n")
+    $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
-    $self->error_message("max age makes no sense: $self->vol_maxage\n")
+    $self->logger->error(__PACKAGE__ . " max age makes no sense: $self->vol_maxage\n")
         if ($self->vol_maxage < 0 or $self->vol_maxage !~ /\d+/);
 
     foreach my $volume (System::Disk::Volume->get( filername => $self->name )) {
@@ -217,10 +355,9 @@ Iterate over all Volumes associated with this Filer, check is_current() and purg
 =cut
 sub purge_volumes {
     my $self = shift;
-    ### QuerySnmp->purge_volumes
-    $self->error_message("max age has not been specified\n")
+    $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
-    $self->error_message("max age makes no sense: $self->vol_maxage\n")
+    $self->logger->error(__PACKAGE__ . " max age makes no sense: $self->vol_maxage\n")
         if ($self->vol_maxage < 0 or $self->vol_maxage !~ /\d+/);
 
     foreach my $volume (System::Disk::Volume->get( filername => $self->name )) {
@@ -228,81 +365,138 @@ sub purge_volumes {
     }
 }
 
+=head2 _query_snmp
+The SNMP bits of execute()
+=cut
+sub _query_snmp {
+    my $self = shift;
+    my $filer = shift;
+
+    # Just check if Filer is_current
+    $self->logger->warn(__PACKAGE__ . " query filer " . $filer->name);
+    if ($self->is_current) {
+        if ($filer->is_current($self->host_maxage)) {
+            $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is current");
+        } else {
+            $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is NOT current, last check: " . $filer->last_modified);
+        }
+        next;
+    }
+
+    # Update Filer data that are not current
+    my $volumedata = {};
+    my $gpfsfsdata = {};
+    my $gpfsdiskdata = {};
+    my $gpfsnodedata = {};
+    eval {
+        my @params = ( loglevel => $self->loglevel, hostname => $filer->name );
+        if ($self->discover_groups) {
+            # Tell the snmp utility it's ok to mount to look for disk groups
+            # FIXME: site specific for nfs automounter
+            push @params, ( allow_mount => $self->allow_mount );
+        }
+        my $snmp = System::Utility::SNMP::DiskUsage->create( @params );
+
+        # Query SNMP for df stats
+        $volumedata = $snmp->acquire_volume_data();
+
+        # If Linux and GPFS, get GPFS tables too.
+        if ($snmp->hosttype eq 'linux') {
+            # For a GPFS cluster, determine which host is the master in the cluster, and
+            # query it for GPFS cluster data.
+            if ($snmp->_is_gpfs) {
+                foreach my $host ( $filer->host) {
+                    if ($host->master) {
+                        $self->logger->debug(__PACKAGE__ . " query gpfs master node " . $host->hostname);
+                        $snmp->hostname($host->hostname);
+                        $snmp->command('snmpwalk');
+                        $gpfsnodedata = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
+                        $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
+                        $gpfsdiskdata = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
+                        last;
+                    } else {
+                        $self->logger->debug(__PACKAGE__ . " gpfs node " . $host->hostname . " is not a master");
+                    }
+                }
+            }
+        }
+
+        # Done with SNMP here
+        $snmp->delete();
+        $filer->status(1);
+        $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+    };
+    if ($@) {
+        # log here, but not high priority, it's common
+        $self->logger->warn(__PACKAGE__ . "error with SNMP query: $@");
+        $filer->status(0);
+        next;
+    }
+
+    # Generic Volume data
+    if (! scalar keys %$volumedata) {
+        $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " returned empty SNMP volumedata");
+        if ($self->physical_path) {
+            $self->logger->error(__PACKAGE__ . " filer " . $filer->name . " does not export " . $self->physical_path);
+        }
+    } else {
+        $self->update_volumes( $volumedata, $filer->name );
+        # Updating GPFS node data must come after update_volumes
+        $self->update_gpfs_fs_perf( $gpfsfsdata );
+        $self->update_gpfs_disk_perf( $gpfsdiskdata );
+    }
+
+    # GPFS host data
+    if (! scalar keys %$gpfsnodedata) {
+        $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " returned empty SNMP gpfsnodedata");
+    } else {
+        $self->update_gpfs_node( $gpfsnodedata );
+    }
+}
+
 =head2 execute
 Execute QuerySnmp() queries SNMP on a named Filer and stores disk usage information.
 =cut
 sub execute {
-    ### QuerySnmp execute Usage
     my $self = shift;
+    $self->logger->debug(__PACKAGE__ . " execute");
 
     my @filers;
-    if (defined $self->filer) {
-        @filers = System::Disk::Filer->get_or_create( name => $self->filer );
+    if (defined $self->filername) {
+        # FIXME: should this be a get(), do we want to allow transparently adding Filers?
+        #@filers = System::Disk::Filer->get_or_create( name => $self->filername );
+        @filers = System::Disk::Filer->get( name => $self->filername );
     } else {
-        # Query all filers that have status => 1...
         if ($self->force) {
+            # If "force", get all Filers and query them even if status is 0.
             @filers = System::Disk::Filer->get();
         } else {
+            # Query all filers that have status => 1...
+            # This is what we use for a cron job.
             @filers = System::Disk::Filer->get( status => 1 );
         }
     }
 
+    # Allow the ability to update a single physical_path on a filer.
     if (defined $self->physical_path) {
-        unless ($self->filer) {
-            $self->error_message("Specify a filer to query for physical_path: " . $self->physical_path);
+        unless ($self->filername) {
+            $self->logger->error(__PACKAGE__ . " specify a filer to query for physical_path: " . $self->physical_path);
             return;
         }
     }
 
     unless (scalar @filers) {
-        $self->warning_message("No filers to be scanned. Consider using --force.");
+        $self->logger->warn(__PACKAGE__ . " no filers to be scanned. Consider using --force.");
     }
 
     foreach my $filer (@filers) {
-        ### QuerySnmp foreach loop at: $filer
-        # Just check is_current
-        $self->warning_message("Query filer " . $filer->name);
-        if ($self->is_current) {
-            if ($filer->is_current($self->host_maxage)) {
-                $self->warning_message("Filer " . $filer->name . " is current");
-            } else {
-                $self->warning_message("Filer " . $filer->name . " is NOT current, last check: " . $filer->last_modified);
-            }
-            next;
-        }
-
-        # Update any filers that are not current
-        my $result = {};
-        eval {
-            my $snmp = System::Utility::SNMP->create();
-            if ($self->discover_groups) {
-                $snmp->allow_mount( $self->allow_mount );
-            }
-            $result = $snmp->query_snmp( filer => $filer->name, physical_path => $self->physical_path );
-            $filer->status(1);
-        };
-        if ($@) {
-            # log here, but not high priority, it's common
-            $self->warning_message("Error with SNMP query: $@");
-            $filer->status(0);
-            next;
-        }
-
-        if (! scalar keys %$result) {
-            $self->warning_message("Filer " . $filer->name . " returned an empty SNMP result");
-            if ($self->physical_path) {
-                $self->error_message("Filer " . $filer->name . " does not export " . $self->physical_path);
-            }
-        } else {
-            $self->update_volume( $filer, $result );
-        }
+        $self->_query_snmp($filer);
     }
 
     # Now update disk group RRD files.
-    my $rrd = System::Utility::DiskGroupRRD->create();
-    $rrd->run();
+    #my $rrd = System::Utility::DiskGroupRRD->create( loglevel => $self->loglevel );
+    #$rrd->run();
 
-    ### QuerySnmp execute QuerySnmp complete
     return 1;
 }
 
