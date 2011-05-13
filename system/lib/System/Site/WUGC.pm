@@ -8,6 +8,7 @@ BEGIN { $INC{"System/Config.pm"} = 'no' };
 
 # Default production DB settings
 $ENV{SYSTEM_DEPLOYMENT} ||= 'production';
+$ENV{SYSTEM_GENOME_INSTITUTE_NETWORKS} = 1;
 
 if ($ENV{SYSTEM_DEPLOYMENT} eq 'testing') {
     $ENV{SYSTEM_DATABASE_DRIVER} ||= 'SQLite';
