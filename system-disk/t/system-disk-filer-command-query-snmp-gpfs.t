@@ -26,11 +26,18 @@ my $filername = "gpfs-dev";
 my $hostname = "linuscs107";
 my $obj = System::Disk::Filer::Command::QuerySnmp->create();
 my $snmp = System::Utility::SNMP::DiskUsage->create( loglevel => "DEBUG", hostname => $hostname );
+
 my $volumedata = $snmp->acquire_volume_data();
+my $gpfsnodedata = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
 my $gpfsdiskdata = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
+my $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
+
 my $ref = $obj->update_volumes( $volumedata, $filername );
-print Data::Dumper::Dumper $gpfsdiskdata;
 $ref = $obj->update_gpfs_disk_perf( $gpfsdiskdata );
+$ref = $obj->update_gpfs_fs_perf( $gpfsfsdata );
+$ref = $obj->update_gpfs_node( $gpfsnodedata );
+
 #print Data::Dumper::Dumper $ref;
+UR::Context->commit();
 
 done_testing();

@@ -66,5 +66,5 @@ foreach my $ref ( System::Disk::GpfsDiskPerf->get() ) {
     $ref->delete();
     isa_ok( $ref, 'UR::DeletedRef' );
 }
-
+UR::Context->commit();
 done_testing();

@@ -254,7 +254,7 @@ sub update_gpfs_fs_perf {
 
         my $volume = System::Disk::Volume->get( physical_path => $fsname );
         unless ($volume) {
-            $self->logger->warn(__PACKAGE__ . " ignoring GPFS fsperf data for unknown volume $fsname");
+            $self->logger->warn(__PACKAGE__ . " ignoring GPFS filesystem perf data for unknown volume $fsname");
             next;
         }
         my $fs = System::Disk::GpfsFsPerf->get_or_create( gpfsFileSystemPerfName => $fsname, volume_id => $volume->id );
