@@ -11,10 +11,6 @@ use Net::SNMP qw/:snmp/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
-# FIXME: Move to Site or Env?
-# Need a check that these are present.
-$ENV{MIBS} .= ":GPFS-MIB:NETAPP-MIB:HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES";
-
 class System::Utility::SNMP {
     is => 'System::Command::Base',
     has => [
@@ -63,8 +59,8 @@ sub _get_host_type {
         $typestr = [ split(/\s+/,$typestr) ]->[0];
         $typestr =~ s/"//g;
     }
-
-    return lc($typestr);
+    $self->hosttype( lc($typestr) );
+    return $self->hosttype;
 }
 
 =head2 _parse_result
