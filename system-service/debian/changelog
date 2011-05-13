@@ -1,3 +1,9 @@
+ur-system-service (0.03-1) unstable; urgency=low
+
+  * This version adds support for some GPFS performance tables.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Fri, 13 May 2011 13:46:09 -0500
+
 ur-system-service (0.02-1) unstable; urgency=low
 
   * This version updates the web-app such that it uses UR Object Set Views in
