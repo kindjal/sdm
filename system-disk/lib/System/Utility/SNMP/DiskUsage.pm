@@ -14,6 +14,11 @@ class System::Utility::SNMP::DiskUsage {
             is => 'Boolean',
             default_value => 0,
             doc => 'Allow automounter to mount volumes to find disk groups',
+        },
+        gpfs => {
+            is => 'Boolean',
+            default_value => 0,
+            doc => 'Target SNMP host supports GPFS subagent',
         }
     ],
     has_constant => [
@@ -49,23 +54,6 @@ sub _netapp_int32 {
     if ($low < 0) {
         return ($high + 1) * 2**32 + $low;
     }
-}
-
-=head2 _is_gpfs
-Determine of the target Filer is GPFS by looking for gpfs package OID.
-=cut
-sub _is_gpfs {
-    my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " _is_gpfs(" . $self->hostname . ")");
-    $self->command('snmpwalk');
-    my $results = $self->run( 'hrSWInstalledName' );
-    foreach my $item (@$results) {
-        if ($item->{value} =~ /^"gpfs.base/) {
-            $self->logger->debug(__PACKAGE__ . " " . $self->hostname . " is gpfs");
-            return 1;
-        }
-    }
-    return 0;
 }
 
 =head2 _translate_mount_point
@@ -198,11 +186,11 @@ sub _convert_to_volume_data {
                 # Fix 32 bit integer stuff
                 my $low = $snmp_table->{$dfIndex}->{'dfLowTotalKBytes'};
                 my $high = $snmp_table->{$dfIndex}->{'dfHighTotalKBytes'};
-                $total = $self->netapp_int32($low,$high);
+                $total = $self->_netapp_int32($low,$high);
 
                 $low = $snmp_table->{$dfIndex}->{'dfLowUsedKBytes'};
                 $high = $snmp_table->{$dfIndex}->{'dfHighUsedKBytes'};
-                $used = $self->netapp_int32($low,$high);
+                $used = $self->_netapp_int32($low,$high);
             }
             $volume = $snmp_table->{$dfIndex}->{'dfFileSys'};
         } else {
@@ -240,6 +228,30 @@ sub acquire_volume_data {
     my $snmp_table = $self->read_snmp_into_table($oid);
     my $volume_table = $self->_convert_to_volume_data( $snmp_table );
     return $volume_table;
+}
+
+=head2 detect_gpfs
+Determine of the target Filer is GPFS by looking for gpfs package OID.
+=cut
+sub detect_gpfs {
+    my $self = shift;
+    $self->logger->debug(__PACKAGE__ . " detect_gpfs(" . $self->hostname . ")");
+
+    $self->command('snmpwalk');
+    my $results = $self->run( 'hrSWInstalledName' );
+    unless ($results) {
+        $self->logger->error(__PACKAGE__ . " target host " . $self->hostname . " returns nothing for hrSWInstalledName");
+        $self->gpfs(0);
+        return $self->gpfs;
+    }
+
+    foreach my $item (@$results) {
+        if ($item->{value} =~ /^"gpfs.base/) {
+            $self->logger->debug(__PACKAGE__ . " " . $self->hostname . " is gpfs");
+            $self->gpfs(1);
+        }
+    }
+    return $self->gpfs;
 }
 
 1;
