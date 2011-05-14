@@ -11,9 +11,9 @@ use warnings;
 BEGIN { $INC{"SDM/Config.pm"} = 'no' };
 
 # Default production DB settings
-$ENV{SYSTEM_DEPLOYMENT} ||= 'testing';
-$ENV{SYSTEM_DATABASE_DRIVER} ||= 'SQLite';
-$ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
+$ENV{SDM_DEPLOYMENT} ||= 'testing';
+$ENV{SDM_DATABASE_DRIVER} ||= 'SQLite';
+$ENV{SDM_DATABASE_HOSTNAME} ||= 'localhost';
 
 1;
 

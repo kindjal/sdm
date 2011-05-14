@@ -7,16 +7,16 @@ use warnings;
 BEGIN { $INC{"SDM/Config.pm"} = 'no' };
 
 # Default production DB settings
-$ENV{SYSTEM_DEPLOYMENT} ||= 'production';
-$ENV{SYSTEM_GENOME_INSTITUTE_NETWORKS} = 1;
+$ENV{SDM_DEPLOYMENT} ||= 'production';
+$ENV{SDM_GENOME_INSTITUTE_NETWORKS} = 1;
 
-if ($ENV{SYSTEM_DEPLOYMENT} eq 'testing') {
-    $ENV{SYSTEM_DATABASE_DRIVER} ||= 'SQLite';
-    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
-} elsif ($ENV{SYSTEM_DEPLOYMENT} eq 'production') {
-    $ENV{SYSTEM_DATABASE_DRIVER} ||= 'Pg';
-    #$ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'sysmgr.gsc.wustl.edu';
-    $ENV{SYSTEM_DATABASE_HOSTNAME} ||= 'localhost';
+if ($ENV{SDM_DEPLOYMENT} eq 'testing') {
+    $ENV{SDM_DATABASE_DRIVER} ||= 'SQLite';
+    $ENV{SDM_DATABASE_HOSTNAME} ||= 'localhost';
+} elsif ($ENV{SDM_DEPLOYMENT} eq 'production') {
+    $ENV{SDM_DATABASE_DRIVER} ||= 'Pg';
+    #$ENV{SDM_DATABASE_HOSTNAME} ||= 'sysmgr.gsc.wustl.edu';
+    $ENV{SDM_DATABASE_HOSTNAME} ||= 'localhost';
 }
 
 1;
