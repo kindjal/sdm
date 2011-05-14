@@ -1,0 +1,282 @@
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_DISK_PERF';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_FS_PERF';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GPFS_NODE';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_USER';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_HOST_ARRAY';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_FILER_HOST';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_MOUNT';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_ARRAY';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_HOST';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_VOLUME';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_EXPORT';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_FILER';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE INFOSYS.DISK_GROUP';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP SEQUENCE INFOSYS.DISK_EXPORT_ID';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+BEGIN
+    EXECUTE IMMEDIATE 'DROP SEQUENCE INFOSYS.DISK_VOLUME_ID';
+    EXCEPTION WHEN OTHERS THEN
+        DBMS_OUTPUT.put_line ('DROP TABLE ERROR: ' || DBMS_UTILITY.FORMAT_ERROR_STACK);
+    NULL;
+END;
+/
+-- Create tables
+CREATE TABLE INFOSYS.DISK_USER (
+  email         VARCHAR(255) PRIMARY KEY,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE INFOSYS.DISK_GROUP (
+  name          VARCHAR(255) PRIMARY KEY,
+  permissions   NUMBER DEFAULT 0 NOT NULL,
+  sticky        NUMBER DEFAULT 0 NOT NULL,
+  subdirectory  VARCHAR(255) NOT NULL,
+  unix_uid      NUMBER DEFAULT 0 NOT NULL,
+  unix_gid      NUMBER DEFAULT 0 NOT NULL,
+  username      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE INFOSYS.DISK_FILER (
+  name          VARCHAR(255) PRIMARY KEY,
+  status        NUMBER DEFAULT 0 NOT NULL,
+  filesystem    VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE INFOSYS.DISK_EXPORT (
+  id            NUMBER PRIMARY KEY,
+  filername     VARCHAR(255) NOT NULL CONSTRAINT DISK_EXPORT_FK REFERENCES INFOSYS.DISK_FILER(name),
+  physical_path VARCHAR(255) NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  CONSTRAINT DISK_EXPORT_UQ UNIQUE (filername,physical_path)
+);
+CREATE SEQUENCE INFOSYS.DISK_EXPORT_ID START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER INFOSYS.DISK_EXPORT_ID_TRIGGER
+BEFORE INSERT
+ON INFOSYS.DISK_EXPORT
+FOR EACH ROW
+WHEN (new.id IS NULL)
+BEGIN
+SELECT
+    INFOSYS.DISK_EXPORT_ID.nextval
+    INTO :new.id
+    FROM dual;
+END;
+/
+CREATE TABLE INFOSYS.DISK_VOLUME (
+  id            NUMBER PRIMARY KEY,
+  mount_path    VARCHAR(255) NOT NULL,
+  total_kb      NUMBER DEFAULT 0 NOT NULL,
+  used_kb       NUMBER DEFAULT 0 NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  disk_group    VARCHAR(255) CONSTRAINT DISK_VOLUME_FK REFERENCES INFOSYS.DISK_GROUP(name) ON DELETE SET NULL
+);
+CREATE SEQUENCE INFOSYS.DISK_VOLUME_ID START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER INFOSYS.DISK_VOLUME_ID_TRIGGER
+BEFORE INSERT
+ON INFOSYS.DISK_VOLUME
+FOR EACH ROW
+WHEN (new.id IS NULL)
+BEGIN
+SELECT
+    INFOSYS.DISK_VOLUME_ID.nextval
+    INTO :new.id
+    FROM dual;
+END;
+/
+CREATE TABLE INFOSYS.DISK_MOUNT (
+  export_id     NUMBER,
+  volume_id     NUMBER,
+  PRIMARY KEY(export_id,volume_id),
+  CONSTRAINT DISK_MOUNT_EXPORT_FK FOREIGN KEY(export_id) REFERENCES INFOSYS.DISK_EXPORT(id) ON DELETE CASCADE,
+  CONSTRAINT DISK_MOUNT_VOLUME_FK FOREIGN KEY(volume_id) REFERENCES INFOSYS.DISK_VOLUME(id) ON DELETE CASCADE
+);
+CREATE TABLE INFOSYS.DISK_HOST (
+  hostname      VARCHAR(255) PRIMARY KEY,
+  status        NUMBER DEFAULT 0 NOT NULL,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE INFOSYS.DISK_FILER_HOST (
+  filername     VARCHAR(255),
+  hostname      VARCHAR(255),
+  PRIMARY KEY(filername,hostname),
+  CONSTRAINT DISK_FILER_HOST_FILERNAME_FK FOREIGN KEY(filername) REFERENCES INFOSYS.DISK_FILER(name) ON DELETE CASCADE,
+  CONSTRAINT DISK_FILER_HOST_HOSTNAME_FK FOREIGN KEY(hostname) REFERENCES INFOSYS.DISK_HOST(hostname) ON DELETE CASCADE
+);
+CREATE TABLE INFOSYS.DISK_ARRAY (
+  name          VARCHAR(255) PRIMARY KEY,
+  model         VARCHAR(255),
+  type          VARCHAR(255),
+  arraysize     NUMBER DEFAULT 0 NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  hostname      VARCHAR(255) CONSTRAINT DISK_ARRAY_HOST_FK REFERENCES INFOSYS.DISK_HOST(hostname) ON DELETE SET NULL
+);
+CREATE TABLE INFOSYS.DISK_HOST_ARRAY (
+  hostname      VARCHAR(255),
+  arrayname     VARCHAR(255),
+  PRIMARY KEY(hostname,arrayname),
+  CONSTRAINT DISK_HOST_ARRAY_HOSTNAME_FK FOREIGN KEY(hostname) REFERENCES INFOSYS.DISK_HOST(hostname) ON DELETE CASCADE,
+  CONSTRAINT DISK_HOST_ARRAY_ARRAYNME_FK FOREIGN KEY(arrayname) REFERENCES INFOSYS.DISK_ARRAY(name) ON DELETE CASCADE
+);
+CREATE TABLE disk_gpfs_node (
+  gpfsnodename          VARCHAR(255) PRIMARY KEY,
+  gpfsnodeip            VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodeplatform      VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodestatus        VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodefailurecount  VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodethreadwait    VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodehealthy       VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodediagnosis     VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsnodeversion       VARCHAR(255) DEFAULT '' NOT NULL,
+  created               DATE,
+  last_modified         DATE,
+  CONSTRAINT disk_gpfs_node_hostname_fk FOREIGN KEY (gpfsnodename) REFERENCES disk_host (hostname)
+);
+CREATE TABLE disk_gpfs_disk_perf (
+  id                            NUMBER PRIMARY KEY,
+  volume_id                     NUMBER NOT NULL,
+  gpfsdiskperfname              VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsdiskperffsname            VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsdiskperfstgpoolname       VARCHAR(255) DEFAULT '' NOT NULL,
+  gpfsdiskreadtimel             NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskreadtimeh             NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskwritetimel            NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskwritetimeh            NUMBER DEFAULT 0 NOT NULL,
+  gpfsdisklongestreadtimel      NUMBER DEFAULT 0 NOT NULL,
+  gpfsdisklongestreadtimeh      NUMBER DEFAULT 0 NOT NULL,
+  gpfsdisklongestwritetimel     NUMBER DEFAULT 0 NOT NULL,
+  gpfsdisklongestwritetimeh     NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskshortestreadtimel     NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskshortestreadtimeh     NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskshortestwritetimel    NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskshortestwritetimeh    NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskreadbytesl            NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskreadbytesh            NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskwritebytesl           NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskwritebytesh           NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskreadops               NUMBER DEFAULT 0 NOT NULL,
+  gpfsdiskwriteops              NUMBER DEFAULT 0 NOT NULL,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT DISK_GPFS_DISK_PERF_FK FOREIGN KEY(volume_id) REFERENCES INFOSYS.DISK_VOLUME(id)
+);
+CREATE TABLE disk_gpfs_fs_perf (
+  id                            NUMBER PRIMARY KEY,
+  volume_id                     NUMBER NOT NULL,
+  gpfsfilesystemperfname        VARCHAR(255) NOT NULL,
+  gpfsfilesystembytesreadl      NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystembytesreadh      NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystembytescachel     NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystembytescacheh     NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystembyteswrittenl   NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystembyteswrittenh   NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemreads           NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemcaches          NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemwrites          NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemopencalls       NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemclosecalls      NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemreadcalls       NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemwritecalls      NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemreaddircalls    NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesysteminodeswritten   NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesysteminodesread      NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesysteminodesdeleted   NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesysteminodescreated   NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemstatcachehit    NUMBER DEFAULT 0 NOT NULL,
+  gpfsfilesystemstatcachemiss   NUMBER DEFAULT 0 NOT NULL,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT DISK_GPFS_FS_PERF_FK FOREIGN KEY(volume_id) REFERENCES INFOSYS.DISK_VOLUME(id)
+);
