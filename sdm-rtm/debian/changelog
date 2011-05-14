@@ -1,3 +1,9 @@
+ur-sdm-rtm (0.04-1) unstable; urgency=low
+
+  * Rename System to SDM.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Sat, 14 May 2011 14:06:44 -0500
+
 ur-system-rtm (0.03-1) unstable; urgency=low
 
   * This version adds support for some GPFS performance tables.

@@ -1,18 +1,18 @@
-package System::Rtm::Jobsfinished::Command;
+package SDM::Rtm::Jobsfinished::Command;
 
 use strict;
 use warnings;
 
-use System;
+use SDM;
 
-class System::Rtm::Jobsfinished::Command {
+class SDM::Rtm::Jobsfinished::Command {
     is          => 'Command::Tree',
     doc         => 'work with finished grid jobs',
 };
 
-use System::Command::Crud;
-System::Command::Crud->init_sub_commands(
-    target_class => 'System::Rtm::Jobsfinished',
+use SDM::Command::Crud;
+SDM::Command::Crud->init_sub_commands(
+    target_class => 'SDM::Rtm::Jobsfinished',
     target_name => 'jobsfinished',
     list => { show => 'jobid,stat' },
     delete => { do_not_init => 1, },

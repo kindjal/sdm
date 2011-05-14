@@ -4,10 +4,10 @@ use Module::Build;
 
 # With git repos, this should work.
 BEGIN {
-    push @INC, "../system/lib";
+    push @INC, "../sdm/lib";
 };
 
-# On a packaging system, we Build-Require ur-system-namespace, so this should work.
+# On a packaging system, we Build-Require ur-sdm-namespace, so this should work.
 use System;
 
 my $build = Module::Build->new(

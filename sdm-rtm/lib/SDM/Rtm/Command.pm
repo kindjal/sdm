@@ -1,10 +1,10 @@
-package System::Rtm::Command;
+package SDM::Rtm::Command;
 
-use System;
+use SDM;
 use strict;
 use warnings;
 
-class System::Rtm::Command {
+class SDM::Rtm::Command {
     is          => 'Command::Tree',
     doc         => 'Work with RTM',
 };

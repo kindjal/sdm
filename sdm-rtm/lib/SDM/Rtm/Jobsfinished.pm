@@ -1,30 +1,16 @@
 
-package System::Rtm::Jobs;
+package SDM::Rtm::Jobsfinished;
 
-class System::Rtm::Jobs{
-    table_name  => 'grid_jobs',
+class SDM::Rtm::Jobsfinished {
+    table_name  => 'grid_jobs_finished',
     schema_name => 'Rtm',
-    data_source => 'System::DataSource::Rtm',
-    doc         => 'work with grid jobs',
+    data_source => 'SDM::DataSource::Rtm',
+    doc         => 'work with finished grid jobs',
     id_by => [
         jobid       => { is => 'Number' },
         indexid     => { is => 'Number' },
         clusterid   => { is => 'Number' },
         submit_time => { is => 'Number' },
-    ],
-    has_optional => [
-        mount_path      => {
-            calculate_from => ['execCwd'],
-            calculate => sub { my ($execCwd) = shift; my @a = split('/',$execCwd); return join('/',$a[0],$a[1],$a[2]); },
-        },
-        volume          => { is => 'System::Disk::Volume',
-            calculate_from => 'mount_path',
-            calculate => q| return System::Disk::Volume->get(mount_path => $mount_path); |,
-        },
-        filername       => { is => 'Test',
-            calculate_from => 'volume',
-            calculate => q| return $volume->filername if (defined $volume); return 'unknown'; |,
-        },
     ],
     has => [
         options         => { is => 'Number' },

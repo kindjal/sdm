@@ -1,9 +1,9 @@
-package System::DataSource::Rtm;
+package SDM::DataSource::Rtm;
 use strict;
 use warnings;
-use System;
+use SDM;
 
-class System::DataSource::Rtm {
+class SDM::DataSource::Rtm {
     is => [ 'UR::DataSource::MySQL', 'UR::Singleton' ],
 };
 

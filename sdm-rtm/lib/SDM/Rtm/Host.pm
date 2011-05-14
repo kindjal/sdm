@@ -1,11 +1,11 @@
-package System::Rtm::Host;
+package SDM::Rtm::Host;
 
 use strict;
 use warnings;
 
-use System;
-class System::Rtm::Host {
-    is => [ 'System::Rtm' ],
+use SDM;
+class SDM::Rtm::Host {
+    is => [ 'SDM::Rtm' ],
     table_name => 'host',
     id_by => [
         id => { },
