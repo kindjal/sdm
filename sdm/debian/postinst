@@ -1,0 +1,15 @@
+#! /bin/sh
+
+# FIXME: This is site specific to the Genome Institute
+# users in local-systems group (including www-data)
+# can run the program
+chgrp local-systems /usr/bin/sdm
+chmod 550 /usr/bin/sdm
+
+# The program updates a sqlite3 cache file here
+chgrp local-systems /usr/share/perl5/SDM/DataSource/
+chmod 775 /usr/share/perl5/SDM/DataSource
+if [ -e /usr/share/perl5/SDM/DataSource/Meta.sqlite3n ]; then
+  chgrp local-systems /usr/share/perl5/SDM/DataSource/Meta.sqlite3n
+  chmod 775 /usr/share/perl5/SDM/DataSource/Meta.sqlite3n
+fi

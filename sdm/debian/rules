@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+PACKAGE=$(shell dh_listpackages)
+
+%:
+	PATH="/bin:/usr/bin" ; \
+	dh $@
+
+override_dh_auto_install:
+	dh_auto_install
+	install -d ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource
+	cp -ap lib/SDM/View/Resource/Html ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource/Html
+	cp -ap lib/SDM/xsl ./debian/$(PACKAGE)/usr/share/perl5/SDM/xsl
