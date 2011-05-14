@@ -1,11 +1,11 @@
-package System::Service::WebApp::Command;
+package SDM::Service::WebApp::Command;
 
 use strict;
 use warnings;
 
-use System;
+use SDM;
 
-class System::Service::WebApp::Command {
+class SDM::Service::WebApp::Command {
     is          => 'Command::Tree',
     doc         => 'run web app',
 };

@@ -1,5 +1,5 @@
 
-package System::Service::WebApp::Loader;
+package SDM::Service::WebApp::Loader;
 
 use base qw( Plack::Loader::Restarter );
 use Data::Dumper;

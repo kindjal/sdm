@@ -1,10 +1,10 @@
 
-package System::Service::WebApp::Resource;
+package SDM::Service::WebApp::Resource;
 
 use Plack::Builder;
-use above 'System';
+use above 'SDM';
 
-my $res_path = System::Service::WebApp->res_path;
+my $res_path = SDM::Service::WebApp->res_path;
 
 builder {
     enable "Plack::Middleware::Static",

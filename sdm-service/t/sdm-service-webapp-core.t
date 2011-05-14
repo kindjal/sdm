@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use DBI;
 
-use above 'System';
+use above 'SDM';
 
 our @dbi_classes = ();
 
@@ -14,7 +14,7 @@ sub my_connect {
     while (1) {
         my @caller = caller($i++);
         last unless @caller;
-        if ($caller[0] =~ /^System/) {
+        if ($caller[0] =~ /^SDM/) {
             push @dbi_classes, $caller[0];
             last;
         }
@@ -28,12 +28,12 @@ sub my_connect {
 
 0 && &DBI::real_connect; # prevents warning
 
-use_ok('System::Service::WebApp::Core');
+use_ok('SDM::Service::WebApp::Core');
 
-foreach my $c (@System::Service::WebApp::Core::error_classes) {
+foreach my $c (@SDM::Service::WebApp::Core::error_classes) {
     diag('Error loading: ' . $c);
 }
-ok(scalar @System::Service::WebApp::Core::error_classes == 0, 'no errors loading classes');
+ok(scalar @SDM::Service::WebApp::Core::error_classes == 0, 'no errors loading classes');
 
 foreach my $c (@dbi_classes) {
     diag('DBI->connect while loading: ' . $c);

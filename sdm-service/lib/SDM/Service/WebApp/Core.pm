@@ -1,9 +1,9 @@
-package System::Service::WebApp::Core;
+package SDM::Service::WebApp::Core;
 
 # loads the majority of the base system used (not tools)
 
 use File::Find;
-use System;
+use SDM;
 
 our @error_classes;
 my $imported = 0;
@@ -12,12 +12,12 @@ sub import {
     $imported = 1;
     my @classes = ();
 
-    my $base_dir = System->base_dir;
+    my $base_dir = SDM->base_dir;
     find(
         sub {
             return if (index($_,'Test.pm') == 0);
             return if (index($_,'.pm') < 0 || index($_,'.pm') != length($_) - 3);
-            my $name = 'System' . substr($File::Find::name,length($base_dir));
+            my $name = 'SDM' . substr($File::Find::name,length($base_dir));
 
             $name =~ s/\//::/g;
             substr($name,index($name,'.pm'),3,'');

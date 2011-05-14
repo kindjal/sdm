@@ -1,4 +1,4 @@
-package System::Service::WebApp::Cache;
+package SDM::Service::WebApp::Cache;
 
 use strict;
 use warnings;
@@ -8,8 +8,8 @@ use warnings;
 # if it becomes long, consider a redesign.
 our @never_cache = (
     qr{(?<!html)$},
-    qr{System::Search::Query}i,
-    qr{system/search/query}i
+    qr{SDM::Search::Query}i,
+    qr{sdm/search/query}i
 );
 
 use Data::Dumper;
@@ -56,14 +56,14 @@ sub cache_key_for_url {
     my $class = shift;
     my $url = shift;
 
-    return 'system_wac:' . $class->hash_url($url);
+    return 'sdm_wac:' . $class->hash_url($url);
 }
 
 sub lock_key_for_url {
     my $class = shift;
     my $url = shift;
 
-    return 'system_lock:' . $class->hash_url($url);
+    return 'sdm_lock:' . $class->hash_url($url);
 }
 
 sub get {
@@ -120,7 +120,7 @@ sub {
     }
 
     my $gen = sub {
-        my $rest_app = $System::Service::WebApp::Main::app{'Rest.psgi'};
+        my $rest_app = $SDM::Service::WebApp::Main::app{'Rest.psgi'};
         my $resp;
         if ($class->lock($url)) {
 
@@ -223,7 +223,7 @@ sub {
         }
 
         if ($skip_cache) {
-            my $rest_app = $System::Service::WebApp::Main::app{'Rest.psgi'};
+            my $rest_app = $SDM::Service::WebApp::Main::app{'Rest.psgi'};
             my $resp = Plack::Util::run_app $rest_app, $env;
 
             return $resp;

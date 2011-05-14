@@ -1,5 +1,5 @@
 
-package System::Service::WebApp::404Handler;
+package SDM::Service::WebApp::404Handler;
 
 use strict;
 use warnings;

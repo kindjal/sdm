@@ -1,8 +1,8 @@
 
-package System::Service::WebApp::Runner;
+package SDM::Service::WebApp::Runner;
 
 use base qw( Plack::Runner );
-use System::Service::WebApp::Starman;
+use SDM::Service::WebApp::Starman;
 
 sub load_server {
     my($self, $loader) = @_;

@@ -1,5 +1,5 @@
 
-package System::Service::WebApp::Starman::Server;
+package SDM::Service::WebApp::Starman::Server;
 
 use base qw( Starman::Server );
 use Socket qw(IPPROTO_TCP TCP_NODELAY SOL_SOCKET SO_REUSEADDR);

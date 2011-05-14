@@ -1,8 +1,8 @@
 
-package System::Service::WebApp::Command::Run;
+package SDM::Service::WebApp::Command::Run;
 
-class System::Service::WebApp::Command::Run {
-    is => 'System::Command::Base',
+class SDM::Service::WebApp::Command::Run {
+    is => 'SDM::Command::Base',
     has_optional => [
         fixed_port => {
             is => Boolean,
@@ -15,7 +15,7 @@ class System::Service::WebApp::Command::Run {
 sub execute {
   my $self = shift;
   eval {
-     $app = System::Service::WebApp->create( fixed_port => $self->fixed_port );
+     $app = SDM::Service::WebApp->create( fixed_port => $self->fixed_port );
      $app->execute();
   };
   if ($@) {

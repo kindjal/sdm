@@ -1,10 +1,10 @@
-package System::Service::Command;
+package SDM::Service::Command;
 
-use System;
+use SDM;
 use strict;
 use warnings;
 
-class System::Service::Command {
+class SDM::Service::Command {
     is          => 'Command::Tree',
     doc         => 'Work with services',
 };

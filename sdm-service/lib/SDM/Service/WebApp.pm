@@ -1,14 +1,14 @@
-package System::Service::WebApp;
+package SDM::Service::WebApp;
 
 use strict;
 use warnings;
 
-use System;
-use System::Service::WebApp::Runner;
-use System::Service::WebApp::Loader;
+use SDM;
+use SDM::Service::WebApp::Runner;
+use SDM::Service::WebApp::Loader;
 
 # I don't see Workflow used anywhere, but if we don't use it, we get:
-# Failed during execute(): Can't locate object method "get_class_object" via package "System::Service::WebApp" (perhaps you forgot to load "System::Service::WebApp"?) at /gscuser/mcallawa/git/system-namespace/deploy/lib/System/Service/WebApp.pm line 66
+# Failed during execute(): Can't locate object method "get_class_object" via package "SDM::Service::WebApp" (perhaps you forgot to load "SDM::Service::WebApp"?) at /gscuser/mcallawa/git/system-namespace/deploy/lib/SDM/Service/WebApp.pm line 66
 use Workflow;
 use Sys::Hostname;
 use AnyEvent;
@@ -21,8 +21,8 @@ my @AVAILABLE_PORTS = (8089, 8090, 8092, 8093, 8094, 8095,
                         8105, 8106, 8107, 8108, 8109, 8110, 
                         8111, 8112, 8113, 8114);
 
-class System::Service::WebApp {
-    #is  => 'System::Command::Base',
+class SDM::Service::WebApp {
+    #is  => 'SDM::Command::Base',
     has => [
         browser => {
             ## this property has its accessor overriden to provide defaults
@@ -96,15 +96,15 @@ sub determine_port {
         }
         $self->status_message( sprintf( "Port %d in use. Trying next choice.\n", $_) );
     }
-    die "None of the offered ports are available. Add more ports to System::Model::Command::Service::WebApp or specify a different port." unless ( $self->port );
+    die "None of the offered ports are available. Add more ports to SDM::Model::Command::Service::WebApp or specify a different port." unless ( $self->port );
 }
 
 sub run_starman {
     my ($self) = @_;
 
-    my $runner = System::Service::WebApp::Runner->new(
-        server => 'System::Service::WebApp::Starman',
-        loader => 'System::Service::WebApp::Loader',
+    my $runner = SDM::Service::WebApp::Runner->new(
+        server => 'SDM::Service::WebApp::Starman',
+        loader => 'SDM::Service::WebApp::Loader',
         env    => 'development',
     );
 
@@ -115,7 +115,7 @@ sub run_starman {
         '--port', $self->port,
         '--workers', 4,
         '--single_request', 1,
-        '-R', System->base_dir );
+        '-R', SDM->base_dir );
 
     $runner->run;
 }

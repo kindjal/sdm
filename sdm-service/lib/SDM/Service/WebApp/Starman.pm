@@ -1,10 +1,10 @@
 
-package System::Service::WebApp::Starman;
+package SDM::Service::WebApp::Starman;
 
 use strict;
 use warnings;
 
-use System::Service::WebApp::Starman::Server;
+use SDM::Service::WebApp::Starman::Server;
 
 sub new {
     my $class = shift;
@@ -19,7 +19,7 @@ sub run {
         @Starman::Server::ISA = qw(Net::Server::SS::PreFork); # Yikes.
     }
 
-    System::Service::WebApp::Starman::Server->new->run($app, {%$self});
+    SDM::Service::WebApp::Starman::Server->new->run($app, {%$self});
 }
 
 1;

@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 
-use Web::Simple 'System::Service::WebApp::Rest';
+use Web::Simple 'SDM::Service::WebApp::Rest';
 
-package System::Service::WebApp::Rest;
+package SDM::Service::WebApp::Rest;
 
-#my $res_path = System::Service::WebApp->res_path;
+#my $res_path = SDM::Service::WebApp->res_path;
 
 our $loaded = 0;
 sub load_modules {
     return if $loaded;
     eval "
-        use above 'System';
+        use above 'SDM';
         use Plack::MIME;
         use Plack::Util;
         use Cwd;
@@ -22,7 +22,7 @@ sub load_modules {
     }
 
     # search's callbacks are expensive, web server can't change anything anyway so don't waste the time
-    System::Search->unregister_callbacks('UR::Object');
+    SDM::Search->unregister_callbacks('UR::Object');
 }
 
 dispatch {
@@ -31,8 +31,8 @@ dispatch {
     # **/ = class name
     # */ = perspective.toolkit
     # * + .* = filename & extension
-    # matches urls like /view/System/Model/status.html/foo.jpg
-    # would map to System/Model/View/Status/Html/foo.jpg
+    # matches urls like /view/SDM/Model/status.html/foo.jpg
+    # would map to SDM/Model/View/Status/Html/foo.jpg
 
     sub (GET + /**/*/* + .*) {
         # these get passed in from the matcher as documented above!
@@ -178,14 +178,14 @@ dispatch {
 
         if ( $toolkit eq 'xsl' || $toolkit eq 'html' ) {
             $view_args{'xsl_root'} =
-              System->base_dir . '/xsl';    ## maybe move this to $res_path?
+              SDM->base_dir . '/xsl';    ## maybe move this to $res_path?
             $view_args{'xsl_path'} = '/static/xsl';
 
             #            $view_args{'rest_variable'} = '/view';
 
             $view_args{'xsl_variables'} = {
                 rest      => '/view',
-                resources => '/view/system/resource.html'
+                resources => '/view/sdm/resource.html'
             };
         }
 
@@ -218,4 +218,4 @@ dispatch {
       }
 };
 
-System::Service::WebApp::Rest->run_if_script;
+SDM::Service::WebApp::Rest->run_if_script;

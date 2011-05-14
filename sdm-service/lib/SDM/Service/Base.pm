@@ -1,10 +1,10 @@
-package System::Service::Base;
+package SDM::Service::Base;
 
 use strict;
 use warnings;
-use System;
+use SDM;
 
-class System::Service::Base {
+class SDM::Service::Base {
     is => ['Command::V2'],
     has_optional => [
          version => {
