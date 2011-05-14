@@ -82,7 +82,7 @@ sub testinit {
 
     if ($driver eq "Pg") {
         print "flush and remake psql DB\n";
-        $self->runcmd("/usr/bin/psql -w -d sdm -U sdm < $base/DataSource/Disk.psql.schema >/dev/null");
+        $self->runcmd("/usr/bin/psql -w -d system -U system < $base/DataSource/Disk.psql.schema >/dev/null");
     }
 
     if ($driver eq "Oracle") {
