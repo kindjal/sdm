@@ -42,6 +42,8 @@ Return the detected host type.
 sub _get_host_type {
     my $self = shift;
     # This optional arg allows us to call _get_host_type in create() below.
+    # FIXME: It feels wrong to support args or not args, like it obfuscates the intended use of this
+    # _get_host_type method.  Be more clear, single purpose.
     my $arg = shift;
     $self->hostname($arg) if ($arg);
 
@@ -162,6 +164,8 @@ sub create {
         return;
     }
     my $obj = $class->SUPER::create( %params );
+    # FIXME: This feels wrong, both to call SNMP at object creation time, and to use the _get_host_type method
+    # both with or without arguments.
     my $hosttype = $obj->_get_host_type($params{hostname});
     unless ($hosttype) {
         $class->error_message("failed to determine host type for $params{hostname}");
