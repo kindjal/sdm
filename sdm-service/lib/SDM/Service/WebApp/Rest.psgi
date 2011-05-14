@@ -62,6 +62,8 @@ dispatch {
         }
 
         $class = url_to_type($class);
+        # FIXME: what to do here?
+        $class =~ s/sdm/SDM/i;
 
         my ( $perspective, $toolkit ) = split( /\./, $perspective_toolkit );
         my $mime_type = Plack::MIME->mime_type(".$extension");
@@ -134,6 +136,9 @@ dispatch {
         load_modules();
 
         $class = url_to_type($class);
+        # FIXME: what to do here?
+        $class =~ s/sdm/SDM/i;
+
         $perspective =~ s/\.$toolkit$//g;
 
         my $mime_type = Plack::MIME->mime_type(".$toolkit");

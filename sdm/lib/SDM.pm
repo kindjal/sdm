@@ -22,10 +22,10 @@ for my $dir (@INC) {
 }
 
 # SDM supports several environment variables, found under SDM/ENV
-# Any SYSTEM_* variable which is set but does NOT corresponde to a module found will cause an exit
-# (a hedge against typos such as SYSTEM_DATABASE_DDDRIVER=1 leading to unexpected behavior)
+# Any SDM_* variable which is set but does NOT corresponde to a module found will cause an exit
+# (a hedge against typos such as SDM_DATABASE_DDDRIVER=1 leading to unexpected behavior)
 for my $e (keys %ENV) {
-    next unless substr($e,0,7) eq 'SYSTEM_';
+    next unless substr($e,0,7) eq 'SDM_';
     eval "use SDM::Env::$e";
     if ($@) {
         my $path = __FILE__;

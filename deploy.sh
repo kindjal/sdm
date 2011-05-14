@@ -1,8 +1,8 @@
 #! /bin/bash
 set -ex
 mkdir -p deploy/bin
-for dir in system system-disk/ system-rtm/ system-service/ ; do
+for dir in sdm sdm-disk/ sdm-rtm/ sdm-service/ ; do
     rsync -av $dir/lib/ deploy/lib/
     rsync -av $dir/t/ deploy/t/
 done
-cp system/bin/system deploy/bin/system
+cp sdm/bin/sdm deploy/bin/sdm

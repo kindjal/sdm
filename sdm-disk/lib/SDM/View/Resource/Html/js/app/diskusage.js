@@ -46,7 +46,7 @@ $(document).ready(function() {
   TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
   /* Top of page total summary */
-  $.getJSON('/view/system/disk/volume/set/summary.json', function(result) {
+  $.getJSON('/view/sdm/disk/volume/set/summary.json', function(result) {
     $("div#total").html(
       '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
       + '<h3>Disk usage added over all reporting NFS servers</h3>'
@@ -66,7 +66,7 @@ $(document).ready(function() {
     "iDisplayLength": 10,
     "sPaginationType": "full_numbers",
     "bAutoWidth": false,
-    "sAjaxSource": "/view/system/disk/filer/set/status.json",
+    "sAjaxSource": "/view/sdm/disk/filer/set/status.json",
     "aoColumns": [
       null,
       /* snmp_ok */ { "bVisible":    true },
@@ -97,7 +97,7 @@ $(document).ready(function() {
     "bServerSide": false,
     "iDisplayLength": 25,
     "sPaginationType": "full_numbers",
-    "sAjaxSource": "/view/system/disk/volume/set/group.json",
+    "sAjaxSource": "/view/sdm/disk/volume/set/group.json",
     "aaSorting": [ [1,'desc'] ],
     "aoColumns": [
       /* disk group column */
@@ -160,7 +160,7 @@ $(document).ready(function() {
     "bFilter": true,
     "iDisplayLength": 25,
     "sPaginationType": "full_numbers",
-    "sAjaxSource": "/view/system/disk/volume/set/status.json",
+    "sAjaxSource": "/view/sdm/disk/volume/set/status.json",
     /* Sort by Total KB column by default */
     "aaSorting": [ [1,'desc'] ],
     "aoColumns": [

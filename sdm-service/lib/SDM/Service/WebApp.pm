@@ -6,9 +6,6 @@ use warnings;
 use SDM;
 use SDM::Service::WebApp::Runner;
 use SDM::Service::WebApp::Loader;
-
-# I don't see Workflow used anywhere, but if we don't use it, we get:
-# Failed during execute(): Can't locate object method "get_class_object" via package "SDM::Service::WebApp" (perhaps you forgot to load "SDM::Service::WebApp"?) at /gscuser/mcallawa/git/system-namespace/deploy/lib/SDM/Service/WebApp.pm line 66
 use Workflow;
 use Sys::Hostname;
 use AnyEvent;

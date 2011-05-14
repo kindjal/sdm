@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    if (my $config = $ENV{SYSTEM_CONFIG}) {
+    if (my $config = $ENV{SDM_CONFIG}) {
         # call the specified configuration module;
         eval "use $config";
         die $@ if $@;
