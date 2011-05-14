@@ -14,17 +14,15 @@ class SDM::Rtm::Jobs{
     ],
     has_optional => [
         mount_path      => {
-            calculate_from => ['execCwd'],
-            calculate => sub { my ($execCwd) = shift; my @a = split('/',$execCwd); return join('/',$a[0],$a[1],$a[2]); },
+            calculate_from => 'cwd',
+            calculate => sub { my $cwd = shift; my @a = split('/',$cwd); return join('/',$a[0],$a[1],$a[2]); },
         },
-        volume          => { is => 'SDM::Disk::Volume',
+        volume_id       => { is => 'Number',
             calculate_from => 'mount_path',
-            calculate => q| return SDM::Disk::Volume->get(mount_path => $mount_path); |,
+            calculate => q| my @v = SDM::Disk::Volume->get(mount_path => $mount_path); return map { $_->id } @v; |,
         },
-        filername       => { is => 'Test',
-            calculate_from => 'volume',
-            calculate => q| return $volume->filername if (defined $volume); return 'unknown'; |,
-        },
+        volume          => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
+        filername       => { via => 'volume' },
     ],
     has => [
         options         => { is => 'Number' },
