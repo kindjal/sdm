@@ -264,9 +264,9 @@ sub update_gpfs_fs_perf {
             $self->logger->warn(__PACKAGE__ . " ignoring GPFS filesystem perf data for unknown volume $fsname");
             next;
         }
-        my $fs = SDM::Disk::GpfsFsPerf->get_or_create( gpfsFileSDMPerfName => $fsname, volume_id => $volume->id );
+        my $fs = SDM::Disk::GpfsFsPerf->get_or_create( gpfsFileSystemPerfName => $fsname, volume_id => $volume->id );
         unless ($fs) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsFileSDMPerfName entry");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsFileSystemPerfName entry");
             next;
         }
 
@@ -420,7 +420,7 @@ sub _query_snmp {
                         $snmp->hostname($host->hostname);
                         $snmp->command('snmpwalk');
                         $gpfsnodedata = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
-                        $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSDMPerfTable');
+                        $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
                         $gpfsdiskdata = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
                         last;
                     } else {
