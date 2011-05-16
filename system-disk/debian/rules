@@ -3,7 +3,7 @@
 PACKAGE=$(shell dh_listpackages)
 
 %:
-	PATH="/bin:/usr/bin"
+	PATH="/bin:/usr/bin" ; \
 	dh $@
 
 override_dh_strip:
