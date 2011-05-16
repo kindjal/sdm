@@ -1,2 +1,9 @@
-* Disk Assignment & Management
-* RTM Metrics
+
+System Data Miner
+
+This is a UR Namespace, SDM, and application for collecting and exploring Linux system data.
+Currently we focus on...
+
+* Storage Management: Filers, Arrays, Hosts, Disk Groups, etc.
+* Platform LSF job data via Platform RTM tables.
+
