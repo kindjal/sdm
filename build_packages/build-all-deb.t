@@ -54,13 +54,11 @@ sub build_deb_package {
     ok(-w "$deb_upload_spool", "$deb_upload_spool directory is writable") or return;
 
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
-    runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && popd\"");
-    my $rc = $? >> 8;
+    my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean && popd\"");
     ok($rc == 0, "built deb") or return;
 
     # Sign
-    runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_*.changes");
-    $rc = $? >> 8;
+    $rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_*.changes");
     ok($rc == 0, "signed sources") or return;
 
     # Put all files, source, binary, and meta into spool.
