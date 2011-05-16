@@ -25,7 +25,6 @@ my @src = File::Find::Rule->directory()
 print "Found packages: " . join(',', reverse sort @src) . ".\n";
 foreach my $pkg (reverse sort @src) {
     ok( build_deb_package(package_name => $pkg, deb_upload_spool => '/gscuser/codesigner/incoming/lucid' ) == 1, "built $pkg");
-    exit;
 }
 
 sub build_deb_package {
