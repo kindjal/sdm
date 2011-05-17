@@ -1,5 +1,7 @@
-debian/.*
-lib/System/DataSource/Disk.sqlite3n
-lib/System/DataSource/Disk.sqlite3n-bak
-lib/System/DataSource/Disk.sqlite3n-dump
-lib/System/DataSource/Disk.sqlite3n-dump-bak
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/SDM/DataSource/Disk.sqlite3n-bak
+lib/SDM/DataSource/Disk.sqlite3n-dump
