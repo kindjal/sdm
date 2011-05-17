@@ -2,8 +2,7 @@ MAILTO=storage@genome.wustl.edu
 #1 1 * * * root /usr/bin/disk_usage.pl -r /var/www/domains/gsc.wustl.edu/diskusage/htdocs/rrd -i /var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache -D /gsc/scripts/share/automount/gscmnt -H linuscs103,linuscs66,linuscs62,blade7-2-12,blade7-2-13,blade10-1-1,linuscs56,linuscs55,nbmaster -L WARN
 #1 1 * * 1 root /usr/bin/disk_usage.pl -fF -r /var/www/domains/gsc.wustl.edu/diskusage/htdocs/rrd -i /var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache -D /gsc/scripts/share/automount/gscmnt -H linuscs103,linuscs66,linuscs62,blade7-2-12,blade7-2-13,blade10-1-1,linuscs56,linuscs55,nbmaster -L WARN
 
-# FIXME: Do we discover groups?
 # nightly update of filer data
-1 1 * * * root /usr/bin/system disk filer query-snmp
+1 1 * * * root /usr/bin/sdm disk filer query-snmp --discover-groups
 # weekly purge of aged volumes
-1 1 * * 1 root /usr/bin/system disk filer query-snmp --purge
+1 1 * * 1 root /usr/bin/sdm disk filer query-snmp --discover-groups --force --purge
