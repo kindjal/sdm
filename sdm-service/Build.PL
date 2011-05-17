@@ -4,27 +4,27 @@ use Module::Build;
 
 # With git repos, this should work.
 BEGIN {
-    push @INC, "../system/lib";
+    push @INC, "../sdm/lib";
 };
 
-# On a packaging system, we Build-Require ur-system-namespace, so this should work.
-use System;
+# On a packaging system, we Build-Require ur-sdm-namespace, so this should work.
+use SDM;
 
 my $build = Module::Build->new(
-  module_name => 'System',
+  module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.01',
+  dist_version => '0.04',
   dist_abstract => 'Modules for service management',
-  etc_files => { 'etc/system-web-app.conf' => 'etc/system-web-app.conf' },
+  etc_files => { 'etc/sdm-web-app.conf' => 'etc/sdm-web-app.conf' },
   install_path => { 'etc' => '/etc/init' },
   build_requires => {
     'Module::Build' => '',
-    'UR' => '0.30',
-    'System' => '',
+    'UR' => '0.31',
+    'SDM' => '',
   },
   requires => {
-    'UR' => '0.30',
-    'System' => '',
+    'UR' => '0.31',
+    'SDM' => '',
   },
 );
 

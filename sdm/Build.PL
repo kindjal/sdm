@@ -5,15 +5,15 @@ use Module::Build;
 my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.01',
+  dist_version => '0.04',
   dist_abstract => 'Modules for system data miner',
   scripts => [ 'bin/sdm' ],
   build_requires => {
     'Module::Build' => '',
-    'UR' => '0.30',
+    'UR' => '0.31',
   },
   requires => {
-    'UR' => '0.30',
+    'UR' => '0.31',
   },
 );
 

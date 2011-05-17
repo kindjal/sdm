@@ -8,21 +8,21 @@ BEGIN {
 };
 
 # On a packaging system, we Build-Require ur-sdm-namespace, so this should work.
-use System;
+use SDM;
 
 my $build = Module::Build->new(
-  module_name => 'System',
+  module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.01',
+  dist_version => '0.04',
   dist_abstract => 'Modules for disk management',
   build_requires => {
     'Module::Build' => '',
-    'UR' => '0.30',
-    'System' => '',
+    'UR' => '0.31',
+    'SDM' => '',
   },
   requires => {
-    'UR' => '0.30',
-    'System' => '',
+    'UR' => '0.31',
+    'SDM' => '',
   },
 );
 
