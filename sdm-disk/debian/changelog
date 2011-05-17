@@ -1,3 +1,9 @@
+ur-sdm-disk (0.04-1) unstable; urgency=low
+
+  * Rename System to SDM.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 17 May 2011 10:45:12 -0500
+
 ur-system-disk (0.03-1) unstable; urgency=low
 
   * This version adds support for some GPFS performance tables.
