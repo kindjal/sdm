@@ -1,0 +1,175 @@
+BEGIN TRANSACTION;
+CREATE TABLE disk_user (
+  email         VARCHAR(255) NOT NULL PRIMARY KEY,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_filer (
+  name          VARCHAR(255) PRIMARY KEY,
+  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  filesystem    VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_filer" VALUES('gpfs-dev',1,NULL,'This is another comment','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO "disk_filer" VALUES('gpfs2',1,NULL,'This is another comment','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO "disk_filer" VALUES('gpfs',1,NULL,'This is a comment','0000-00-00 00:00:00','0000-00-00 00:00:00');
+CREATE TABLE disk_host (
+  hostname      VARCHAR(255) NOT NULL PRIMARY KEY,
+  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  master        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_host" VALUES('linuscs103',0,NULL,NULL,NULL,0,'2011-05-14 14:04:12',NULL);
+INSERT INTO "disk_host" VALUES('linuscs107',0,NULL,NULL,NULL,1,'2011-05-14 14:04:12',NULL);
+CREATE TABLE disk_group (
+  name          VARCHAR(255) NOT NULL PRIMARY KEY,
+  permissions   UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  sticky        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  subdirectory  VARCHAR(255) NOT NULL,
+  unix_uid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  unix_gid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  username      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_group" VALUES('SYSTEMS_DEVELOPMENT',0,0,'info',0,0,NULL,'2011-05-14 14:04:12',NULL);
+CREATE TABLE disk_filer_host (
+  filername     VARCHAR(255),
+  hostname      VARCHAR(255),
+  PRIMARY KEY(filername,hostname),
+  CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_filer_host" VALUES('gpfs','linuscs103');
+INSERT INTO "disk_filer_host" VALUES('gpfs-dev','linuscs107');
+CREATE TABLE disk_export (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  physical_path VARCHAR(255) NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  CONSTRAINT disk_export_uq UNIQUE (filername,physical_path)
+);
+INSERT INTO "disk_export" VALUES(1,'gpfs-dev','/vol/gc2111','2011-05-14 14:04:13',NULL);
+DELETE FROM sqlite_sequence;
+INSERT INTO "sqlite_sequence" VALUES('URMETA_disk_export_id_seq',1);
+INSERT INTO "sqlite_sequence" VALUES('URMETA_disk_volume_id_seq',1);
+INSERT INTO "sqlite_sequence" VALUES('disk_export',1);
+INSERT INTO "sqlite_sequence" VALUES('disk_volume',1);
+CREATE TABLE disk_volume (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  mount_path    VARCHAR(255) NOT NULL,
+  total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE,
+  disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_volume" VALUES(1,'/gscmnt/gc2111',100,50,'2011-05-14 14:04:13',NULL,'SYSTEMS_DEVELOPMENT');
+CREATE TABLE disk_mount (
+  export_id     INTEGER,
+  volume_id     INTEGER,
+  PRIMARY KEY(export_id,volume_id),
+  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export (id) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_mount" VALUES(1,1);
+CREATE TABLE disk_array (
+  name          VARCHAR(255) NOT NULL PRIMARY KEY,
+  model         VARCHAR(255),
+  type          VARCHAR(255),
+  arraysize     UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE,
+  hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_array" VALUES('nsams2k2',NULL,NULL,0,'2011-05-14 14:04:12',NULL,NULL);
+INSERT INTO "disk_array" VALUES('nsams2k1',NULL,NULL,0,'2011-05-14 14:04:12',NULL,NULL);
+CREATE TABLE disk_host_array (
+  hostname      VARCHAR(255),
+  arrayname     VARCHAR(255),
+  PRIMARY KEY(hostname,arrayname),
+  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_host_array" VALUES('linuscs107','nsams2k2');
+INSERT INTO "disk_host_array" VALUES('linuscs103','nsams2k1');
+CREATE TABLE disk_gpfs_node (
+  gpfsnodename          VARCHAR(255) PRIMARY KEY,
+  gpfsnodeip            VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodeplatform      VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodestatus        VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodefailurecount  VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodethreadwait    VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodehealthy       VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodediagnosis     VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsnodeversion       VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  created               DATE,
+  last_modified         DATE,
+  CONSTRAINT disk_gpfs_node_hostname_fk FOREIGN KEY (gpfsNodeName) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_gpfs_disk_perf (
+  id                            INTEGER PRIMARY KEY AUTOINCREMENT,
+  volume_id                     INTEGER NOT NULL,
+  gpfsdiskperfname              VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskperffsname            VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskperfstgpoolname       VARCHAR(255) DEFAULT '' NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskreadtimel             INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskreadtimeh             INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskwritetimel            INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskwritetimeh            INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdisklongestreadtimel      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdisklongestreadtimeh      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdisklongestwritetimel     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdisklongestwritetimeh     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskshortestreadtimel     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskshortestreadtimeh     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskshortestwritetimel    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskshortestwritetimeh    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskreadbytesl            INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskreadbytesh            INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskwritebytesl           INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskwritebytesh           INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskreadops               INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsdiskwriteops              INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT disk_gpfs_disk_perf_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_gpfs_fs_perf (
+  id                            INTEGER PRIMARY KEY AUTOINCREMENT,
+  volume_id                     INTEGER NOT NULL,
+  gpfsFileSystemPerfName        VARCHAR(255) NOT NULL,
+  gpfsFileSystemBytesReadL      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesReadH      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesCacheL     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesCacheH     INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesWrittenL   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemBytesWrittenH   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReads           INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemCaches          INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemWrites          INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemOpenCalls       INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemCloseCalls      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReadCalls       INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemWriteCalls      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemReaddirCalls    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesWritten   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesRead      INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesDeleted   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemInodesCreated   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemStatCacheHit    INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  gpfsFileSystemStatCacheMiss   INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created                       DATE,
+  last_modified                 DATE,
+  CONSTRAINT disk_gpfs_fs_perf_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE URMETA_disk_export_id_seq (next_value integer PRIMARY KEY AUTOINCREMENT);
+CREATE TABLE URMETA_disk_volume_id_seq (next_value integer PRIMARY KEY AUTOINCREMENT);
+COMMIT;

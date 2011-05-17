@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+BEGIN {
+    # This allows the sdm command to self-serve as a tab completer for the bash shell.
+    # When "sdm" is run by bash as a tab completer, the code below will service the
+    # tab-completion request and then exit before doing any real work.
+    # The code is in an eval to prevent problems on hosts which do not have Getopt::Complete
+    # installed.  The code is in a BEGIN block to ensure it still runs before anything else.
+    if ($ENV{COMP_LINE}) {
+        eval "use Getopt::Complete::Cache (class => 'SDM::Command', above => 1)";
+        if ($@) {
+            die "Error with tab completion: $@";
+        }
+    }
+    # FIXME: This is harsh, but we need to override a user's profile removing the
+    # use of the application server in perl's @INC, forcing the use of local perl.
+    @INC = map { $_ if (!/^\/(gapp|gsc)\//) } @INC;
+};
+
+use above "SDM";
+
+use SDM::Command;
+SDM::Command->execute_with_shell_params_and_exit();
