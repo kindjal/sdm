@@ -1,5 +1,0 @@
-t/sdm-service-webapp-core.t .. ok
-t/sdm-service-webapp-rest.t .. ok
-All tests successful.
-Files=2, Tests=4,  1 wallclock secs ( 0.05 usr  0.01 sys +  1.35 cusr  0.09 csys =  1.50 CPU)
-Result: PASS
