@@ -2,13 +2,13 @@ Source: ur-sdm-rtm
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl,ur-sdm-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
+Build-Depends-Indep: perl, libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-rtm
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),ur-sdm-namespace, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
 Description: A UR Object framework for RTM job data management
  A UR Object framework for RTM job data management.
