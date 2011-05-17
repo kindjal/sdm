@@ -1,3 +1,9 @@
+ur-sdm-service (0.04-1) unstable; urgency=low
+
+  * Change System to SDM.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 17 May 2011 12:33:35 -0500
+
 ur-system-service (0.03-1) unstable; urgency=low
 
   * This version adds support for some GPFS performance tables.
