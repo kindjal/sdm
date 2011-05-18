@@ -2,10 +2,8 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:rest="urn:rest">
-  <xsl:template name="ur_object_header" match="/object[1]" priority="10">
-    <xsl:comment>
-      name: ur_object_header  match: /object[1]
-    </xsl:comment>
+  <xsl:template name="ur_object_header" match="/object">
+    <xsl:comment>template: ur_object.xsl:ur_object_header  match: /object</xsl:comment>
     <div class="object">
       <div class="header_object">
         <div class="display_name">
