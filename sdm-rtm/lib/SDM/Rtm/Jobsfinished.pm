@@ -12,6 +12,18 @@ class SDM::Rtm::Jobsfinished {
         clusterid   => { is => 'Number' },
         submit_time => { is => 'Number' },
     ],
+    has_optional => [
+        mount_path      => {
+            calculate_from => 'cwd',
+            calculate => sub { my $cwd = shift; my @a = split('/',$cwd); return join('/',$a[0],$a[1],$a[2]); },
+        },
+        volume_id       => { is => 'Number',
+            calculate_from => 'mount_path',
+            calculate => q| my @v = SDM::Disk::Volume->get(mount_path => $mount_path); return map { $_->id } @v; |,
+        },
+        volume          => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
+        filername       => { via => 'volume' },
+    ],
     has => [
         options         => { is => 'Number' },
         options2        => { is => 'Number' },
