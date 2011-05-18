@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use SDM;
+use SDM::Service::WebApp::Starman;
 use SDM::Service::WebApp::Runner;
 use SDM::Service::WebApp::Loader;
 use Workflow;
@@ -13,10 +14,10 @@ use AnyEvent::Util;
 use IO::Socket;
 
 # "Unassigned" ports from iana.org
-my @AVAILABLE_PORTS = (8089, 8090, 8092, 8093, 8094, 8095, 
-                        9096, 8098, 8099, 8102, 8103, 8104, 
-                        8105, 8106, 8107, 8108, 8109, 8110, 
-                        8111, 8112, 8113, 8114);
+my @AVAILABLE_PORTS = (8089, 8090, 8092, 8093, 8094, 8095,
+                       9096, 8098, 8099, 8102, 8103, 8104,
+                       8105, 8106, 8107, 8108, 8109, 8110,
+                       8111, 8112, 8113, 8114);
 
 class SDM::Service::WebApp {
     #is  => 'SDM::Command::Base',
@@ -64,7 +65,8 @@ sub fork_and_call_browser {
 }
 
 sub psgi_path {
-    my $module_path = __PACKAGE__->get_class_object->module_path;
+    my $self = shift;
+    my $module_path = $self->__meta__->module_path;
     $module_path =~ s/\.pm$//g;
     return $module_path;
 }

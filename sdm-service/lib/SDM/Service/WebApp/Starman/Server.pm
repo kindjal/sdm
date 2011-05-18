@@ -2,6 +2,7 @@
 package SDM::Service::WebApp::Starman::Server;
 
 use base qw( Starman::Server );
+use constant DEBUG => $ENV{STARMAN_DEBUG} || 0;
 use Socket qw(IPPROTO_TCP TCP_NODELAY SOL_SOCKET SO_REUSEADDR);
 
 sub process_request {
@@ -115,7 +116,7 @@ sub process_request {
                 if ( $self->{client}->{inputbuf} =~ /^(?:GET|HEAD)/ ) {
                     if ( DEBUG ) {
                         warn "Pipelined GET/HEAD request in input buffer: " 
-                            . dump( $self->{client}->{inputbuf} ) . "\n";
+                            . CORE::dump( $self->{client}->{inputbuf} ) . "\n";
                     }
 
                     # Continue processing the input buffer
@@ -125,7 +126,7 @@ sub process_request {
                     # Input buffer just has junk, clear it
                     if ( DEBUG ) {
                         warn "Clearing junk from input buffer: "
-                            . dump( $self->{client}->{inputbuf} ) . "\n";
+                            . CORE::dump( $self->{client}->{inputbuf} ) . "\n";
                     }
 
                     $self->{client}->{inputbuf} = '';
