@@ -34,39 +34,17 @@
       <table width="100%" cellspacing="0" cellpadding="0" border="0" id="volumetable">
         <thead>
           <tr>
-            <th>mount_path</th>
-            <th>total_kb</th>
-            <th>used_kb</th>
-            <th>capacity</th>
-            <th>disk_group</th>
-            <th>filer</th>
-            <th>last_modified</th>
+            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
+            <th> <xsl:value-of select="@name"/> </th>
+            </xsl:for-each>
           </tr>
         </thead>
         <tbody>
           <xsl:for-each select="/object/aspect[@name='members']/object">
             <tr>
-              <td>
-                <xsl:value-of select="aspect[@name='mount_path']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='total_kb']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='used_kb']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='capacity']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='disk_group']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='filername']/value"/>
-              </td>
-              <td class="right">
-                <xsl:value-of select="aspect[@name='last_modified']/value"/>
-              </td>
+            <xsl:for-each select="aspect">
+              <td> <xsl:value-of select="value"/> </td>
+            </xsl:for-each>
             </tr>
           </xsl:for-each>
         </tbody>
