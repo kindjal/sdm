@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:template name="ur_object_set" match="object[./types[./isa[@type='UR::Object::Setx']]]">
+  <xsl:template name="ur_object_set" match="object[./types[./isa[@type='UR::Object::Set']]]">
 
 <!--
     <xsl:call-template name="control_bar_view"/>
