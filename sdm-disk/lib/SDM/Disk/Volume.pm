@@ -17,6 +17,10 @@ my $classdef = {
         mount_path    => { is => 'Text', len => 255 },
         total_kb      => { is => 'Integer', default_value => 0 },
         used_kb       => { is => 'Integer', default_value => 0 },
+        capacity        => {
+            is => 'Number',
+            calculate => q( my $u = $self->used_kb; my $t = $self->total_kb; my $c = 0; if ($t) { $c = $u/$t * 100 }; return $c; )
+        },
     ],
     has_many_optional => [
         # Mount is optional because "Mount" is a bridge entry that may not exist yet.
@@ -34,7 +38,6 @@ my $classdef = {
     has_optional => [
         gpfs_fs_perf    => { is => 'SDM::Disk::GpfsFsPerf', id_by => 'id' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
-        capacity        => { is => 'Number', is_calculated => 1 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
     ],
