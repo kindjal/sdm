@@ -48,8 +48,26 @@ ok( SDM::Test::Lib->testdata == 0, "ok: init db");
     gpfsNodePlatform => "Linux",
     gpfsNodeStatus => "up",
     gpfsNodeThreadWait => "1",
-    gpfsNodeVersion => "3.3.0.6"
+    gpfsNodeVersion => "3.3.0.6",
+    gpfsNodeFailureCount => 0,
+    gpfsNodeHealthy => "yes",
+    gpfsNodeType => "manager-quorum",
+    gpfsNodeAdmin => "yes",
+    gpfsNodePagePoolL => 2147483648,
+    gpfsNodePagePoolH => 0,
+    gpfsNodePrefetchThreads => 72,
+    gpfsNodeMaxMbps => 2480,
+    gpfsNodeMaxFilesToCache => 64000,
+    gpfsNodeMaxStatCache => 40000,
+    gpfsNodeWorker1Threads => 397,
+    gpfsNodeDmapiEventTimeout => 4294967295,
+    gpfsNodeDmapiMountTimeout => 60,
+    gpfsNodeDmapiSessFailureTimeout => 0,
+    gpfsNodeNsdServerWaitTimeWindowOnMount => 600,
+    gpfsNodeNsdServerWaitTimeForMount => 300,
+    gpfsNodeUnmountOnDiskFail => "false",
 );
+
 my $ref = SDM::Disk::GpfsNode->create( @params );
 lives_ok { UR::Context->commit; } "ok: commit succeeds";
 
