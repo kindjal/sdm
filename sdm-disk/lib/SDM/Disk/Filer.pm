@@ -19,6 +19,18 @@ class SDM::Disk::Filer {
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
         status          => { is => 'UnsignedInteger', default => 0 },
+        gpfs_cluster_status_id => {
+            is => 'Number',
+            calculate_from => 'name',
+            calculate => q| my @f = SDM::Disk::GpfsClusterStatus->get( filername => $name); return map { $_->id } @f; |,
+        },
+        gpfs_cluster_status => { is => 'SDM::Disk::GpfsClusterStatus', id_by => 'gpfs_cluster_status_id' },
+        gpfs_cluster_config_id => {
+            is => 'Number',
+            calculate_from => 'name',
+            calculate => q| my @f = SDM::Disk::GpfsClusterConfig->get( filername => $name); return map { $_->id } @f; |,
+        },
+        gpfs_cluster_config => { is => 'SDM::Disk::GpfsClusterConfig', id_by => 'gpfs_cluster_config_id' },
     ],
     has_many_optional => [
         hostmappings    => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'filer' },
