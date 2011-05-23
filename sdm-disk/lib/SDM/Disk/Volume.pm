@@ -16,6 +16,7 @@ my $classdef = {
     has => [
         mount_path    => { is => 'Text', len => 255 },
         total_kb      => { is => 'Integer', default_value => 0 },
+        #total_kb      => { is => 'KBytes', default_value => 0 },
         used_kb       => { is => 'Integer', default_value => 0 },
         capacity        => {
             is => 'Number',
@@ -36,7 +37,17 @@ my $classdef = {
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', reverse_as => 'volume' },
     ],
     has_optional => [
-        gpfs_fs_perf    => { is => 'SDM::Disk::GpfsFsPerf', id_by => 'id' },
+        gpfs_fsperf_id  => {
+            is => 'Number',
+            calculate_from => 'mount_path',
+            calculate   => q/
+                use File::Basename;
+                my $name = File::Basename::basename $mount_path;
+                my @f = SDM::Disk::GpfsFileSystemPerf->get( gpfsFileSystemPerfName => $name );
+                return map { $_->id } @f;
+            /,
+        },
+        gpfs_filesystem_perf => { is => 'SDM::Disk::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },

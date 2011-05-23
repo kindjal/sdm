@@ -200,6 +200,87 @@ sub update_volumes {
     return 1;
 }
 
+
+sub update_gpfs_object {
+    my $self = shift;
+    my $class = "SDM::Disk::" . shift;
+    my $key = shift;
+    my $data = shift;
+
+    $self->logger->debug(__PACKAGE__ . " update_gpfs_ojbect");
+
+    unless ($data) {
+        $self->logger->warn(__PACKAGE__ . " empty GPFS data");
+        return;
+    }
+
+    foreach my $item (keys %$data) {
+        #my $obj = $class->get_or_create( $key => $data->{$item}->{$key} );
+        my $obj = $class->get( $key => $data->{$item}->{$key} );
+        unless ($obj) {
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create $class entry");
+            return;
+        }
+
+        # $hash Should be a hash of hashes
+        foreach my $attr (keys %{ $data->{$item} }) {
+            my $p = $obj->__meta__->property($attr);
+            # Primary keys are immutable, don't try to update them
+            $obj->$attr($data->{$item}->{$attr})
+                if (! $p->is_id and $p->is_mutable);
+            $obj->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+    }
+
+    return 1;
+}
+
+=head2 update_gpfs_cluster_status
+Update SNMP data for the GPFS cluster status associated with this Filer.
+=cut
+sub update_gpfs_cluster_status {
+    my $self = shift;
+    my $data = shift;
+
+    $self->logger->debug(__PACKAGE__ . " update_gpfs_cluster_status ");
+
+    unless ($data) {
+        $self->logger->warn(__PACKAGE__ . " empty GPFS cluster status data");
+        return;
+    }
+
+    # The fact that the SNMP table keys on "clustername=$CLUSTERNAME" is almost the
+    # whole reason we need to break out each "update_gpfs_XXX" method.  Stupid little
+    # inconsistencies like that prevent us from generalizing to one update_gpfs_object method.
+
+    # Here $hash Should be a hash containing one hash
+    my $key = pop @{ [ keys %$data ] };
+    my ($toss,$filername) = split(/=/,$key,2);
+
+    my $filer = SDM::Disk::Filer->get( name => $filername );
+    unless ($filer) {
+        $self->logger->warn(__PACKAGE__ . " ignoring GPFS cluster status data for unknown Filer $filername");
+        next;
+    }
+    my $cluster = SDM::Disk::GpfsClusterStatus->get_or_create( gpfsClusterName => $filername );
+    unless ($cluster) {
+        $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsClusterStatus entry");
+        return;
+    }
+
+    # $hash Should be a hash containing one hash
+    $data = pop @{ [ values %$data ] };
+    foreach my $attr (keys %$data) {
+       my $p = $cluster->__meta__->property($attr);
+       # Primary keys are immutable, don't try to update them
+       $cluster->$attr($data->{$attr})
+         if (! $p->is_id and $p->is_mutable);
+       $cluster->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+    }
+
+    return 1;
+}
+
 =head2 update_gpfs_node
 Update SNMP data for all GPFS Hosts associated with this Filer.
 =cut
@@ -391,11 +472,6 @@ sub _query_snmp {
     }
 
     # Update Filer data that are not current
-    my $is_gpfs;
-    my $volumedata = {};
-    my $gpfsfsdata = {};
-    my $gpfsdiskdata = {};
-    my $gpfsnodedata = {};
     eval {
         my @params = ( loglevel => $self->loglevel, hostname => $filer->name );
         if ($self->discover_groups) {
@@ -406,22 +482,52 @@ sub _query_snmp {
         my $snmp = SDM::Utility::SNMP::DiskUsage->create( @params );
 
         # Query SNMP for disk usage numbers
-        $volumedata = $snmp->acquire_volume_data();
+        # This is different from read_snmp_into_table() because we have platform depenedent volume data
+        # that we need to parse and apply logic to.  See SNMP::DiskUsage for details.
+        my $table = $snmp->acquire_volume_data();
+        # Volume data must be updated before GPFS data is updated below.
+        $self->update_volumes( $table, $filer->name );
 
         # If Linux and GPFS, get GPFS tables too.
         if ($snmp->hosttype eq 'linux') {
             # For a GPFS cluster, determine which host is the master in the cluster, and
             # query it for GPFS cluster data.
-            $is_gpfs = $snmp->detect_gpfs;
-            if ($ENV{SDM_DISK_GPFS_PRESENT} and $is_gpfs) {
+            if ($ENV{SDM_DISK_GPFS_PRESENT} and $snmp->detect_gpfs) {
                 foreach my $host ( $filer->host) {
                     if ($host->master) {
                         $self->logger->debug(__PACKAGE__ . " query gpfs master node " . $host->hostname);
                         $snmp->hostname($host->hostname);
                         $snmp->command('snmpwalk');
-                        $gpfsnodedata = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
-                        $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
-                        $gpfsdiskdata = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
+
+                        # Each of these GPFS metrics tables connects to a different SDM::Disk object, so
+                        # we have a method to ensure proper behavior for each.
+                        $table = $snmp->read_snmp_into_table('gpfsClusterStatusTable');
+                        #$self->update_gpfs_cluster_status( $table );
+                        $self->update_gpfs_object('gpfsClusterStatus','gpfsClusterName',$table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsClusterConfigTable');
+                        $self->update_gpfs_cluster_config( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
+                        $self->update_gpfs_node_status( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsNodeConfigTable');
+                        $self->update_gpfs_node_config( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsFileSystemStatusTable');
+                        $self->update_gpfs_fs_status( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
+                        $self->update_gpfs_fs_perf( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsDiskStatusTable');
+                        $self->update_gpfs_disk_status( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsDiskConfigTable');
+                        $self->update_gpfs_disk_config( $table );
+
+                        $table = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
+                        $self->update_gpfs_disk_perf( $table );
                         last;
                     } else {
                         $self->logger->debug(__PACKAGE__ . " gpfs node " . $host->hostname . " is not a master");
@@ -440,15 +546,6 @@ sub _query_snmp {
         $filer->status(0);
     }
 
-    # Generic Volume data
-    $self->update_volumes( $volumedata, $filer->name );
-
-    if ($ENV{SDM_DISK_GPFS_PRESENT} and $is_gpfs) {
-        # Updating GPFS node data must come after update_volumes
-        $self->update_gpfs_node( $gpfsnodedata );
-        $self->update_gpfs_fs_perf( $gpfsfsdata );
-        $self->update_gpfs_disk_perf( $gpfsdiskdata );
-    }
 }
 
 =head2 execute
