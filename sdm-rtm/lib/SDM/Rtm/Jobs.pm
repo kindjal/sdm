@@ -1,7 +1,7 @@
 
 package SDM::Rtm::Jobs;
 
-class SDM::Rtm::Jobs{
+class SDM::Rtm::Jobs {
     table_name  => 'grid_jobs',
     schema_name => 'Rtm',
     data_source => 'SDM::DataSource::Rtm',
@@ -15,14 +15,23 @@ class SDM::Rtm::Jobs{
     has_optional => [
         mount_path      => {
             calculate_from => 'cwd',
-            calculate => sub { my $cwd = shift; my @a = split('/',$cwd); return join('/',$a[0],$a[1],$a[2]); },
+            calculate => sub { my $cwd = shift; return $cwd if ($cwd !~ /\//); my @a = split('/',$cwd); return join('/',$a[0],$a[1],$a[2]); },
         },
-        volume_id       => { is => 'Number',
+        volume_id       => {
+            is => 'Number',
             calculate_from => 'mount_path',
             calculate => q| my @v = SDM::Disk::Volume->get(mount_path => $mount_path); return map { $_->id } @v; |,
         },
         volume          => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
         filername       => { via => 'volume' },
+    #],
+    #has_many_optional => [
+        gpfs_disk_perf_id => {
+            is => 'Number',
+            calculate_from => ['mount_path','filername'],
+            calculate => q| my @g = SDM::Disk::GpfsDiskPerf->get( filername => $filername, mount_path => $mount_path ); return map { $_->id } @g; |,
+        },
+        gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', id_by => 'gpfs_disk_perf_id' },
     ],
     has => [
         options         => { is => 'Number' },
