@@ -39,7 +39,8 @@ class SDM::Disk::GpfsNodeConfig {
 sub __load__ {
     my ($class, $bx, $headers) = @_;
     my (%params) = $bx->_params_list;
-    my $filername = $params{filername};
+
+    my $hostname = shift @{ [ split(/\./,$params{gpfsNodeConfigName}) ] };
     my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
 
     # Make a header row from class properties.
@@ -49,11 +50,12 @@ sub __load__ {
 
     # Return an empty list if error.
     my @rows = [];
-    my $filer = SDM::Disk::Filer->get( name => $filername );
-    unless ($filer) {
-        $class->error_message(__PACKAGE__ . " no filer named $filername found");
+    my $host = SDM::Disk::Host->get( hostname => $hostname );
+    unless ($host) {
+        $class->error_message(__PACKAGE__ . " no host named $hostname found");
         return \@header, sub { shift @rows };
     }
+    my $filer = $host->filer;
 
     # Query master node of cluster for SNMP table.
     my $master;
@@ -66,7 +68,7 @@ sub __load__ {
     my $id;
     while (my ($key,$result) = each %$table ) {
         $result->{id} = $id++;
-        $result->{filername} = $filername;
+        $result->{filername} = $filer->name;
         # Ensure values are in the same order as the header row.
         my @row = map { $result->{$_} } @header;
         push @rows, [@row];
