@@ -93,7 +93,7 @@ sub __load__ {
         $class->error_message(__PACKAGE__ . " filer named $filername has no 'snmp master' set");
         return \@header, \@rows;
     }
-    my $snmp = SDM::Utility::SNMP->create( hostname => $master, loglevel => 'DEBUG' );
+    my $snmp = SDM::Utility::SNMP->create( hostname => $master );
     my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
     my $table = $snmp->read_snmp_into_table( $snmp_table );
 
