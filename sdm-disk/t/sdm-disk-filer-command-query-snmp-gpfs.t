@@ -27,15 +27,27 @@ my $hostname = "linuscs107";
 my $obj = SDM::Disk::Filer::Command::QuerySnmp->create();
 my $snmp = SDM::Utility::SNMP::DiskUsage->create( loglevel => "DEBUG", hostname => $hostname );
 
-my $volumedata = $snmp->acquire_volume_data();
-my $gpfsnodedata = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
-my $gpfsdiskdata = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
-my $gpfsfsdata = $snmp->read_snmp_into_table('gpfsFileSDMPerfTable');
+my $table;
+my $ref;
 
-my $ref = $obj->update_volumes( $volumedata, $filername );
-$ref = $obj->update_gpfs_disk_perf( $gpfsdiskdata );
-$ref = $obj->update_gpfs_fs_perf( $gpfsfsdata );
-$ref = $obj->update_gpfs_node( $gpfsnodedata );
+#$table = $snmp->acquire_volume_data();
+#$ref = $obj->update_volumes( $table, $filername );
+
+$table = $snmp->read_snmp_into_table('gpfsClusterStatusTable');
+print Data::Dumper::Dumper $table;
+#$ref = $obj->update_gpfs_cluster( $table );
+$ref = $obj->update_gpfs_object('GpfsClusterStatus','gpfsClusterName',$table );
+print Data::Dumper::Dumper $ref;
+exit;
+
+$table = $snmp->read_snmp_into_table('GpfsNodeStatusTable');
+$ref = $obj->update_gpfs_node( $table );
+
+$table = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
+$ref = $obj->update_gpfs_disk_perf( $table );
+
+$table = $snmp->read_snmp_into_table('gpfsFileSDMPerfTable');
+$ref = $obj->update_gpfs_fs_perf( $table );
 
 #print Data::Dumper::Dumper $ref;
 UR::Context->commit();
