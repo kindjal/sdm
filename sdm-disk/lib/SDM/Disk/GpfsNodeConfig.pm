@@ -62,6 +62,10 @@ sub __load__ {
     foreach my $host ( $filer->host ) {
         $master = $host->hostname if ($host->master);
     }
+    unless ($master) {
+        $class->error_message(__PACKAGE__ . " no host in filer " . $filer->name . " is marked 'master'");
+        return \@header, sub { shift @rows };
+    }
     my $snmp = SDM::Utility::SNMP->create( hostname => $master );
     my $table = $snmp->read_snmp_into_table( $snmp_table );
 
