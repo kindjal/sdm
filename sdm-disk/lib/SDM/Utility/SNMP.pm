@@ -15,6 +15,7 @@ class SDM::Utility::SNMP {
         community   => { is => 'Text', default => "gscpublic" },
         version     => { is => 'Text', default => "2c" },
         command     => { is => 'Text', default => "snmpget" },
+        args        => { is => 'Text', default => "-r10 -t10" },
         exec        => {
                         calculate_from => 'command',
                         calculate => q/
@@ -79,7 +80,7 @@ sub _parse_snmp_line {
     my $hash;
     return if ($line =~ /No Such Object/);
     my ($oid,$value) = split(/\s+=\s+/,$line);
-    $oid =~ /^(\S+)::(\S+)\.(\d+|"\S+")$/;
+    $oid =~ /^(\S+)::(\S+?)\.(\d+|"\S+")$/;
     $hash = {
         mib   => $1,
         oid   => $2,
@@ -139,8 +140,8 @@ sub run {
     my $oid = shift;
     return unless ($oid);
     my @results = ();
-    my $cmd = join(" ",$self->exec,$self->hostname,$oid);
-    $self->logger->debug(__PACKAGE__ . " run $cmd");
+    my $cmd = join(" ",$self->exec,$self->args,$self->hostname,$oid);
+    $self->logger->info(__PACKAGE__ . " run $cmd");
     open FH, "$cmd |" or die "failed to run $self->exec: $!";
     while (<FH>) {
         chomp;
