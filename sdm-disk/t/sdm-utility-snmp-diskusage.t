@@ -93,9 +93,7 @@ my $ref;
 ok( $obj->detect_gpfs() == 1, "ok: $host is gpfs");
 
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsMIBObjects') } "ok: lives";
-print Data::Dumper::Dumper $ref;
-exit;
-
+#print Data::Dumper::Dumper $ref;
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsFileSDMPerfTable') } "ok: lives";
 #print Data::Dumper::Dumper $ref;
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsDiskPerfTable') } "ok: lives";

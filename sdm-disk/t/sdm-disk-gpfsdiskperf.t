@@ -36,7 +36,7 @@ $res = shift @res;
 
 ok( ref $res eq "SDM::Disk::GpfsDiskPerf", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
-print Data::Dumper::Dumper $res;
+#print Data::Dumper::Dumper $res;
 
 ok( defined $res->filername, "attr set" );
 ok( defined $res->gpfsDiskPerfName, "attr set" );
@@ -60,8 +60,7 @@ ok( defined $res->gpfsDiskWriteBytesL, "attr set" );
 ok( defined $res->gpfsDiskWriteBytesH, "attr set" );
 ok( defined $res->gpfsDiskReadOps, "attr set" );
 ok( defined $res->gpfsDiskWriteOps, "attr set" );
-ok( defined $res->mount_path, "attr set" );
-ok( defined $res->filer, "attr set" );
+ok( defined $res->filer, "filer attr set" );
 #ok( defined $res->volume, "attr set" );
 
 done_testing();

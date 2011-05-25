@@ -28,11 +28,9 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 my $res;
 my @res;
 
-@res = SDM::Disk::GpfsNodeConfig->get( filername => 'fakefiler' );
-ok( ! @res, "fake filer returns undef" );
-
-@res = SDM::Disk::GpfsNodeConfig->get( filername => 'gpfs-dev' );
+@res = SDM::Disk::Host->get( hostname => 'linuscs107' );
 $res = shift @res;
+$res = $res->gpfs_node_config;
 
 ok( ref $res eq "SDM::Disk::GpfsNodeConfig", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");

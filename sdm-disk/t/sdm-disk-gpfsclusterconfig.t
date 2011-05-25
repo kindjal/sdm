@@ -28,7 +28,7 @@ ok( ! defined $res, "fake filer returns undef" );
 
 $res  = SDM::Disk::GpfsClusterConfig->get( filername => 'gpfs-dev' );
 ok( ref $res eq "SDM::Disk::GpfsClusterConfig", "object made correctly");
-ok( $res->id > 0, "non zero id");
+ok( defined $res->id, "non zero id");
 
 ok( $res->filername eq 'gpfs-dev', "filername set");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
