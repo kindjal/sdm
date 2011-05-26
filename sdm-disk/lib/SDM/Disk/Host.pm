@@ -23,13 +23,13 @@ class SDM::Disk::Host {
         gpfs_node_status_id => {
             is => 'Number',
             calculate_from => 'hostname',
-            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = SDM::Disk::GpfsNodeStatus->get( gpfsNodeName => "$hostname.$domain" ); return map { $_->id } @h;  |,
+            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = SDM::Disk::GpfsNodeStatus->get( gpfsNodeName => "$hostname.$domain" ); return $h[0]->id; |,
         },
         gpfs_node_status => { is => 'SDM::Disk::GpfsNodeStatus', id_by => 'gpfs_node_status_id' },
         gpfs_node_config_id => {
             is => 'Number',
             calculate_from => 'hostname',
-            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = SDM::Disk::GpfsNodeConfig->get( gpfsNodeConfigName => "$hostname.$domain" ); return map { $_->id } @h;  |,
+            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = SDM::Disk::GpfsNodeConfig->get( gpfsNodeConfigName => "$hostname.$domain" ); return $h[0]->id; |,
         },
         gpfs_node_config => { is => 'SDM::Disk::GpfsNodeConfig', id_by => 'gpfs_node_config_id' },
     ],
