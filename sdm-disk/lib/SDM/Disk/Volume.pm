@@ -31,9 +31,7 @@ my $classdef = {
         physical_path => { via => 'mount', to => 'physical_path' },
         filername     => { via => 'filer', to => 'name' },
         hostname      => { via => 'filer', to => 'hostname' },
-        arrayname     => {
-            calculate => q/ my %h; foreach my $f ($self->filer) { map { $h{$_} = 1 } $f->arrayname }; return keys %h; /
-        },
+        arrayname     => { via => 'filer', to => 'arrayname' },
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', reverse_as => 'volume' },
     ],
     has_optional => [
