@@ -1,6 +1,6 @@
-system-disk/lib/System/DataSource/Disk.sqlite3n
-system-disk/lib/System/DataSource/Disk.sqlite3n-bak
-system-disk/lib/System/DataSource/Disk.sqlite3n-dump
-system-disk/lib/System/DataSource/Disk.sqlite3n-dump-bak
-system/lib/System/DataSource/Meta.sqlite3n
-system/lib/System/DataSource/Meta.sqlite3n-dump
+sdm-disk/lib/SDM/DataSource/Disk.sqlite3n
+sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-bak
+sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-dump
+sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-dump-bak
+sdm/lib/SDM/DataSource/Meta.sqlite3n
+sdm/lib/SDM/DataSource/Meta.sqlite3n-dump
