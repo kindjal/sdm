@@ -15,8 +15,8 @@ my $classdef = {
     ],
     has => [
         mount_path    => { is => 'Text', len => 255 },
-        total_kb      => { is => 'Integer', default_value => 0 },
-        #total_kb      => { is => 'KBytes', default_value => 0 },
+        #total_kb      => { is => 'Integer', default_value => 0 },
+        total_kb      => { is => 'SDM::Value::KBytes', default_value => 0 },
         used_kb       => { is => 'Integer', default_value => 0 },
         capacity        => {
             is => 'Number',
@@ -28,10 +28,10 @@ my $classdef = {
         mount         => { is => 'SDM::Disk::Mount', reverse_as => 'volume' },
         filer         => { is => 'SDM::Disk::Filer', via => 'mount', to => 'filer' },
         # physical_path is analogous to hrStorageDescr in SNMP speak.
-        physical_path => { via => 'mount', to => 'physical_path' },
-        filername     => { via => 'filer', to => 'name' },
-        hostname      => { via => 'filer', to => 'hostname' },
-        arrayname     => { via => 'filer', to => 'arrayname' },
+        physical_path => { is => 'Text', via => 'mount', to => 'physical_path' },
+        filername     => { is => 'Text', via => 'filer', to => 'name' },
+        hostname      => { is => 'Text', via => 'filer', to => 'hostname' },
+        arrayname     => { is => 'Text', via => 'filer', to => 'arrayname' },
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', reverse_as => 'volume' },
     ],
     has_optional => [

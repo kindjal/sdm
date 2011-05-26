@@ -36,10 +36,10 @@ class SDM::Disk::Host {
     has_many_optional => [
         arraymappings   => { is => 'SDM::Disk::HostArrayBridge', reverse_as => 'host' },
         array           => { is => 'SDM::Disk::Array', via => 'arraymappings' },
-        arrayname       => { via => 'array', to => 'name' },
+        arrayname       => { is => 'Text', via => 'array', to => 'name' },
         filermappings   => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'host' },
         filer           => { is => 'SDM::Disk::Filer', via => 'filermappings', to => 'filer' },
-        filername       => { via => 'filer', to => 'name' },
+        filername       => { is => 'Text', via => 'filer', to => 'name' },
         #exports         => { is => 'SDM::Disk::Export', reverse_as => 'host' },
     ],
     schema_name => 'Disk',

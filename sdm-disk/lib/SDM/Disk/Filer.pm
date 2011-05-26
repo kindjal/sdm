@@ -35,11 +35,12 @@ class SDM::Disk::Filer {
     has_many_optional => [
         hostmappings    => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'filer' },
         host            => { is => 'SDM::Disk::Host', via => 'hostmappings', to => 'host'  },
-        hostname        => { via => 'host', to => 'hostname' },
+        hostname        => { is => 'Text', via => 'host', to => 'hostname' },
         # The obvious way to reference arraynames produces a list with duplicates
         #arrayname       => { via => 'host', to => 'arrayname' },
         # Use this calculation to produce a list of unique arraynames
         arrayname      => {
+            is => 'Text',
             calculate => q/ my %h; foreach my $h ($self->host) { map { $h{$_} = 1 } $h->arrayname }; return keys %h; /
         },
         exports         => { is => 'SDM::Disk::Export', reverse_as => 'filer' },

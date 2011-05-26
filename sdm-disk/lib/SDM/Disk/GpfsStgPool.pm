@@ -23,24 +23,24 @@ class SDM::Disk::GpfsStgPool {
         gpfsStgPoolNumDisks     => { is => 'Number' },
     ],
     has_constant => [
-        snmp_table              => { value => 'gpfsStgPoolTable' }
+        snmp_table              => { is => 'Text', value => 'gpfsStgPoolTable' }
     ],
     data_source => UR::DataSource::Default->create(),
 };
 
 sub __load__ {
     my ($class, $bx, $headers) = @_;
-    my (%params) = $bx->_params_list;
-    my $filername = $params{filername};
-    my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
 
     # Make a header row from class properties.
     my @properties = $class->__meta__->properties;
     my @header = map { $_->property_name } sort @properties;
     push @header, 'id';
-
-    # Return an empty list if error.
     my @rows = [];
+
+    my (%params) = $bx->_params_list;
+    my $filername = $params{filername};
+    my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
+
     my $filer = SDM::Disk::Filer->get( name => $filername );
     unless ($filer) {
         $class->error_message(__PACKAGE__ . " no filer named $filername found");

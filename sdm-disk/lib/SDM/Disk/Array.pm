@@ -20,7 +20,8 @@ class SDM::Disk::Array {
     has_many_optional => [
         mappings      => { is => 'SDM::Disk::HostArrayBridge', reverse_as => 'array' },
         host          => { is => 'SDM::Disk::Host', via => 'mappings', to => 'host' },
-        hostname      => { via => 'mappings', to => 'hostname' },
+        #hostname      => { via => 'mappings', to => 'hostname' },
+        hostname      => { is => 'Text', via => 'host', to => 'hostname' },
     ],
     schema_name => 'Disk',
     data_source => 'SDM::DataSource::Disk',

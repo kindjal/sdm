@@ -36,7 +36,7 @@ class SDM::Disk::GpfsDiskStatus {
         volume                      => { is => 'SDM::Disk::Volume', id_by => 'mount_path' }
     ],
     has_constant => [
-        snmp_table                  => { value => 'gpfsDiskStatusTable' }
+        snmp_table                  => { is => 'Text', value => 'gpfsDiskStatusTable' }
     ],
     data_source => UR::DataSource::Default->create(),
 };

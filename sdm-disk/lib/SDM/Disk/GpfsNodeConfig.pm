@@ -31,25 +31,25 @@ class SDM::Disk::GpfsNodeConfig {
         gpfsNodeUnmountOnDiskFail               => { is => 'Text' },
     ],
     has_constant => [
-        snmp_table  => { value => 'gpfsNodeConfigTable' }
+        snmp_table                              => { is => 'Text', value => 'gpfsNodeConfigTable' }
     ],
     data_source => UR::DataSource::Default->create(),
 };
 
 sub __load__ {
     my ($class, $bx, $headers) = @_;
-    my (%params) = $bx->_params_list;
-
-    my $hostname = shift @{ [ split(/\./,$params{gpfsNodeConfigName}) ] };
-    my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
 
     # Make a header row from class properties.
     my @properties = $class->__meta__->properties;
     my @header = map { $_->property_name } sort @properties;
     push @header, 'id';
-
-    # Return an empty list if error.
     my @rows = [];
+
+    my (%params) = $bx->_params_list;
+
+    my $hostname = shift @{ [ split(/\./,$params{gpfsNodeConfigName}) ] };
+    my $snmp_table = $bx->subject_class_name->__meta__->property_meta_for_name('snmp_table')->default_value;
+
     my $host = SDM::Disk::Host->get( hostname => $hostname );
     unless ($host) {
         $class->error_message(__PACKAGE__ . " no host named $hostname found");

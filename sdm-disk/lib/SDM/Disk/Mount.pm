@@ -9,13 +9,14 @@ class SDM::Disk::Mount {
     ],
     has => [
         volume        => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
-        mount_path    => { via => 'volume' },
+        mount_path    => { is => 'Text', via => 'volume' },
         export        => { is => 'SDM::Disk::Export', id_by => 'export_id' },
-        physical_path => { via => 'export' },
+        physical_path => { is => 'Text', via => 'export' },
         filer         => { is => 'SDM::Disk::Filer', via => 'export', to => 'filer' },
-        filername     => { via => 'filer', to => 'name' },
-        hostname      => { via => 'filer', to => 'hostname' },
+        filername     => { is => 'Text', via => 'filer', to => 'name' },
+        hostname      => { is => 'Text', via => 'filer', to => 'hostname' },
         arrayname     => {
+            is => 'Text',
             calculate => q/ my %h; foreach my $f ($self->filer) { map { $h{$_} = 1 } $f->arrayname }; return keys %h; /
         },
     ],

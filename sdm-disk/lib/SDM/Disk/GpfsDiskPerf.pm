@@ -40,7 +40,7 @@ class SDM::Disk::GpfsDiskPerf {
         volume                      => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
     ],
     has_constant => [
-        snmp_table                  => { value => 'gpfsDiskPerfTable' }
+        snmp_table                  => { is => 'Text', value => 'gpfsDiskPerfTable' }
     ],
     data_source => UR::DataSource::Default->create(),
 };
