@@ -14,7 +14,7 @@ class SDM::Disk::Volume::Set::View::Table::Xml {
             value => [
                 rule_display => {
                     name => 'members',
-                    perspective => 'default',
+                    perspective => 'table',
                     toolkit => 'xml',
                     subject_class_name => 'SDM::Disk::Volume',
                     aspects => [
@@ -32,3 +32,4 @@ class SDM::Disk::Volume::Set::View::Table::Xml {
     ]
 };
 
+1;
