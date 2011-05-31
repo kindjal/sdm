@@ -34,14 +34,14 @@ my $got = $v->_generate_content();
 my $expected = {
    "members" => [
       {
-         "total_kb"   => "100 (100 KB)",
+         "total_kb"   => "100",
          "disk_group" => "SYSTEMS_DEVELOPMENT",
          "filername"  => [
             "gpfs-dev"
          ],
          "mount_path" => "/gscmnt/gc2111",
-         "used_kb"    => "50 (50 KB)",
-         "capacity"   => "50 %"
+         "used_kb"    => "50",
+         "capacity"   => 50
       }
    ],
    "rule_display" => "UR::BoolExpr=(SDM::Disk::Volume:)"
