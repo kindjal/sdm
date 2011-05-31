@@ -23,6 +23,7 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"></script>
     <style type="text/css">
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";

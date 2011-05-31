@@ -23,7 +23,28 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/filertable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+    <xsl:text disable-output-escaping="yes">
+        <![CDATA[
+            $(document).ready(function() {
+              TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+
+              /* data table */
+              var dataTable = $('#filertable').dataTable( {
+                "sDom": 'T<"clear">lfrtip',
+                "bProcessing": true,
+                "bFilter": true,
+                "iDisplayLength": 25,
+                "sPaginationType": "full_numbers",
+                "aaSorting": [ [1,'desc'] ],
+              } );
+              /* end data table */
+
+            } ); /* end document ready function */
+        ]]>
+    </xsl:text>
+    </script>
+
     <style type="text/css">
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
