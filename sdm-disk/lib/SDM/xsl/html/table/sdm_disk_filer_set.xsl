@@ -43,8 +43,20 @@
           <xsl:for-each select="/object/aspect[@name='members']/object">
             <tr>
             <xsl:for-each select="aspect">
-              <td> <xsl:value-of select="value"/> </td>
-              <td> <fn:string-join( <xsl:value-of select="value"/>, "," )/> </td>
+              <xsl:variable name="jvalue" select="value" />
+              <xsl:choose>
+                <xsl:when test="count($jvalue) = 1">
+                    <td> <xsl:value-of select="value"/> </td>
+                </xsl:when>
+                <xsl:otherwise>
+                    <td>
+                    <xsl:call-template name="join">
+                      <xsl:with-param name="valueList" select="$jvalue"/>
+                      <xsl:with-param name="separator" select="','"/>
+                    </xsl:call-template>
+                    </td>
+                </xsl:otherwise>
+              </xsl:choose>
             </xsl:for-each>
             </tr>
           </xsl:for-each>
@@ -54,6 +66,21 @@
     </body> <!-- end body -->
     </html>
 
+  </xsl:template>
+
+   <xsl:template name="join" >
+    <xsl:param name="valueList" select="''"/>
+    <xsl:param name="separator" select="','"/>
+    <xsl:for-each select="$valueList">
+      <xsl:choose>
+        <xsl:when test="position() = 1">
+          <xsl:value-of select="."/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat($separator, .) "/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
   </xsl:template>
 
 </xsl:stylesheet>
