@@ -61,7 +61,8 @@ sub build_deb_package {
         my $version = $ENV{BUILDVERSION};
         my $release = $ENV{BUILDRELEASE};
         my $buildhash = $ENV{BUILDHASH};
-        my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -v $version-$release-$buildhash \"Continuous build testing\" && popd\"");
+        my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -D unstable -v $version-$release-$buildhash Jenkins build testing && popd\"");
+        ok($rc == 0, "updated changelog") or return;
     }
 
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
@@ -110,7 +111,8 @@ sub deploy {
 
 sub runcmd {
     my $command = shift;
-    system("$command");
+    printf "runcmd: $command\n";
+    system($command);
     if ($? == -1) {
         print "failed to execute: $!\n";
     } elsif ($? & 127) {
