@@ -54,6 +54,16 @@ sub build_deb_package {
     }
     ok(-w "$deb_upload_spool", "$deb_upload_spool directory is writable") or return;
 
+    # if BUILDHASH is set (by Jenkins) update changelog
+    if ((defined $ENV{BUILDVERSION} and length $ENV{BUILDVERSION}) and
+        (defined $ENV{BUILDRELEASE} and length $ENV{BUILDRELEASE}) and
+        (defined $ENV{BUILDHASH}    and length $ENV{BUILDHASH})) {
+        my $version = $ENV{BUILDVERSION};
+        my $release = $ENV{BUILDRELEASE};
+        my $buildhash = $ENV{BUILDHASH};
+        my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -v $version-$release-$buildhash \"Continuous build testing\" && popd\"");
+    }
+
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
     my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean && popd\"");
     ok($rc == 0, "built deb") or return;
