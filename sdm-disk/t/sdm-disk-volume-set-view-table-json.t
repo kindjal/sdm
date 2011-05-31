@@ -11,9 +11,8 @@ BEGIN {
 use Test::More;
 use Test::Output;
 use Test::Exception;
-use Data::Dumper;
 
-use HTML::TreeBuilder;
+use JSON;
 
 use_ok( 'SDM' );
 use_ok( 'SDM::Disk::Volume::Set::View::Table::Json' );
@@ -28,40 +27,28 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-# This is what Rest.psgi does
-my @s = SDM::Disk::Volume->define_set()->members();
-my $s = $s[0];
+my $s = SDM::Disk::Volume->define_set();
+my $v = $s->create_view( perspective => 'table', toolkit => 'json' );
+my $got = $v->_generate_content();
 
-# No view class found for UR::Value::Text if perspective is 'table'
-#my $v = $s->create_view( perspective => 'table', toolkit => 'json' );
-
-# Deep recursion generating view of aspect UR::Value::Text if perspective is 'default'
-# Deep recursion on subroutine "UR::Object::View::Default::Json::_jsobj" 
-my $v = $s->create_view( perspective => 'default', toolkit => 'json' );
-
-my $json = $v->_generate_content();
-
-print Data::Dumper::Dumper $json;
-__END__
-
-# This must match the data used in SDM::Test::Lib->testdata
 my $expected = {
-  'iTotalDisplayRecords' => 1,
-  'iTotalRecords' => 1,
-  'aaData' => [
-                [
-                  '/gscmnt/gc2111',
-                  100,
-                  50,
-                  '50',
-                  'SYSTEMS_DEVELOPMENT',
-                  'gpfs-dev',
-                  '0000-00-00 00:00:00'
-                ]
-              ],
-  'sEcho' => 1
+   "members" => [
+      {
+         "total_kb"   => "100 (100 KB)",
+         "disk_group" => "SYSTEMS_DEVELOPMENT",
+         "filername"  => [
+            "gpfs-dev"
+         ],
+         "mount_path" => "/gscmnt/gc2111",
+         "used_kb"    => "50 (50 KB)",
+         "capacity"   => "50 %"
+      }
+   ],
+   "rule_display" => "UR::BoolExpr=(SDM::Disk::Volume:)"
 };
+my $json = JSON->new->ascii->pretty->allow_nonref;
+$expected = $json->encode($expected);
 
-ok( is_deeply( $json, $expected, "ok: is_deeply" ), "ok: json match");
+ok( is_deeply( $got , $expected, "is_deeply" ), "json match");
 
 done_testing();

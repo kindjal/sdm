@@ -11,12 +11,10 @@ BEGIN {
 use Test::More;
 use Test::Output;
 use Test::Exception;
-use Data::Dumper;
 
-use HTML::TreeBuilder;
+use Test::XML::Simple;
 
 use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Volume::Set::View::Status::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -29,9 +27,11 @@ ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
 # This is what Rest.psgi does
-my @s = SDM::Disk::Volume->define_set()->members();
-my $v = $s[0]->create_view( perspective => 'default', toolkit => 'xml' );
-my $c = $v->_generate_content();
-print $c;
+my $s = SDM::Disk::Volume->define_set();
+my $v = $s->create_view( perspective => 'table', toolkit => 'xml' );
+my $xml = $v->_generate_content();
+
+xml_is $xml, '/object/aspect[@name="rule_display"]/value', 'UR::BoolExpr=(SDM::Disk::Volume:)', "aspect match";
+xml_is $xml, '/object/aspect[@name="members"]/object/aspect[@name="mount_path"]/value', '/gscmnt/gc2111', "aspect match";
 
 done_testing();
