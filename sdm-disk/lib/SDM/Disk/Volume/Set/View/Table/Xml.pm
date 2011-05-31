@@ -14,7 +14,7 @@ class SDM::Disk::Volume::Set::View::Table::Xml {
             value => [
                 rule_display => {
                     name => 'members',
-                    perspective => 'table',
+                    perspective => 'default',
                     toolkit => 'xml',
                     subject_class_name => 'SDM::Disk::Volume',
                     aspects => [
