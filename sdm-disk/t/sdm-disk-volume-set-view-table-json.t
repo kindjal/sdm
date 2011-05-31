@@ -41,7 +41,7 @@ my $expected = {
          ],
          "mount_path" => "/gscmnt/gc2111",
          "used_kb"    => "50",
-         "capacity"   => 50
+         "capacity"   => "50"
       }
    ],
    "rule_display" => "UR::BoolExpr=(SDM::Disk::Volume:)"
