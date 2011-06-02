@@ -128,7 +128,7 @@ sub delete {
     foreach my $volume (@volumes) {
         if ($volume->is_orphan()) {
             # FIXME: can't use warning_message here or we silently abort
-            #$self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
+            $self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
             $volume->delete();
         }
     }

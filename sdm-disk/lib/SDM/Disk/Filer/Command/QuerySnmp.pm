@@ -149,6 +149,7 @@ sub update_volumes {
     }
 
     $self->logger->error(__PACKAGE__ . " updating " . scalar(keys %$volumedata) . " volumes");
+
     foreach my $physical_path (keys %$volumedata) {
 
         my $mount_path = $volumedata->{$physical_path}->{mount_path};
@@ -187,241 +188,19 @@ sub update_volumes {
         }
 
         foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
-           # FIXME: Don't update disk group from filesystem, only the reverse.
-           #next if ($attr eq 'disk_group');
-           my $p = $volume->__meta__->property($attr);
-           # Primary keys are immutable, don't try to update them
-           $volume->$attr($volumedata->{$physical_path}->{$attr})
-             if (! $p->is_id and $p->is_mutable);
-           $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-        }
-
-    }
-    return 1;
-}
-
-
-sub update_gpfs_object {
-    my $self = shift;
-    my $class = "SDM::Disk::" . shift;
-    my $key = shift;
-    my $data = shift;
-
-    $self->logger->debug(__PACKAGE__ . " update_gpfs_ojbect");
-
-    unless ($data) {
-        $self->logger->warn(__PACKAGE__ . " empty GPFS data");
-        return;
-    }
-
-    foreach my $item (keys %$data) {
-        #my $obj = $class->get_or_create( $key => $data->{$item}->{$key} );
-        my $obj = $class->get( $key => $data->{$item}->{$key} );
-        unless ($obj) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create $class entry");
-            return;
-        }
-
-        # $hash Should be a hash of hashes
-        foreach my $attr (keys %{ $data->{$item} }) {
-            my $p = $obj->__meta__->property($attr);
+            next unless (defined $volumedata->{$physical_path}->{$attr});
+            # FIXME: Don't update disk group from filesystem, only the reverse.
+            #next if ($attr eq 'disk_group');
+            my $p = $volume->__meta__->property($attr);
             # Primary keys are immutable, don't try to update them
-            $obj->$attr($data->{$item}->{$attr})
+            $volume->$attr($volumedata->{$physical_path}->{$attr})
                 if (! $p->is_id and $p->is_mutable);
-            $obj->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-        }
-    }
-
-    return 1;
-}
-
-=head2 update_gpfs_cluster_status
-Update SNMP data for the GPFS cluster status associated with this Filer.
-=cut
-sub update_gpfs_cluster_status {
-    my $self = shift;
-    my $data = shift;
-
-    $self->logger->debug(__PACKAGE__ . " update_gpfs_cluster_status ");
-
-    unless ($data) {
-        $self->logger->warn(__PACKAGE__ . " empty GPFS cluster status data");
-        return;
-    }
-
-    # The fact that the SNMP table keys on "clustername=$CLUSTERNAME" is almost the
-    # whole reason we need to break out each "update_gpfs_XXX" method.  Stupid little
-    # inconsistencies like that prevent us from generalizing to one update_gpfs_object method.
-
-    # Here $hash Should be a hash containing one hash
-    my $key = pop @{ [ keys %$data ] };
-    my ($toss,$filername) = split(/=/,$key,2);
-
-    my $filer = SDM::Disk::Filer->get( name => $filername );
-    unless ($filer) {
-        $self->logger->warn(__PACKAGE__ . " ignoring GPFS cluster status data for unknown Filer $filername");
-        next;
-    }
-    my $cluster = SDM::Disk::GpfsClusterStatus->get_or_create( gpfsClusterName => $filername );
-    unless ($cluster) {
-        $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsClusterStatus entry");
-        return;
-    }
-
-    # $hash Should be a hash containing one hash
-    $data = pop @{ [ values %$data ] };
-    foreach my $attr (keys %$data) {
-       my $p = $cluster->__meta__->property($attr);
-       # Primary keys are immutable, don't try to update them
-       $cluster->$attr($data->{$attr})
-         if (! $p->is_id and $p->is_mutable);
-       $cluster->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-    }
-
-    return 1;
-}
-
-=head2 update_gpfs_node
-Update SNMP data for all GPFS Hosts associated with this Filer.
-=cut
-sub update_gpfs_node {
-    my $self = shift;
-    my $hostdata = shift;
-
-    $self->logger->debug(__PACKAGE__ . " update_gpfs_node " . scalar(keys %$hostdata) . " nodes");
-
-    unless ($hostdata) {
-        $self->logger->warn(__PACKAGE__ . " empty GPFS node data");
-        return;
-    }
-
-    foreach my $hostname (keys %$hostdata) {
-
-        my $toss;
-        ($hostname,$toss) = split(/\./,$hostname,2);
-
-        my $host = SDM::Disk::Host->get( hostname => $hostname );
-        unless ($host) {
-            $self->logger->warn(__PACKAGE__ . " ignoring GPFS node data for unknown host $hostname");
-            next;
-        }
-        my $node = SDM::Disk::GpfsNode->get_or_create( gpfsNodeName => $hostname );
-
-        unless ($node) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsNode entry");
-            return;
-        }
-
-        foreach my $attr (keys %{ $hostdata->{$hostname} }) {
-           my $p = $node->__meta__->property($attr);
-           # Primary keys are immutable, don't try to update them
-           $node->$attr($hostdata->{$hostname}->{$attr})
-             if (! $p->is_id and $p->is_mutable);
-           $node->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+            $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
 
     }
     return 1;
 }
-
-=head2 update_gpfs_fs_perf
-Update SNMP data for all GPFS Hosts associated with this Filer.
-=cut
-sub update_gpfs_fs_perf {
-    my $self = shift;
-    my $gpfsfsdata = shift;
-
-    return unless ($gpfsfsdata);
-
-    $self->logger->debug(__PACKAGE__ . " update_gpfs_fs_perf ". scalar(keys %$gpfsfsdata) . " items");
-
-    foreach my $fsname (keys %$gpfsfsdata) {
-        # FIXME: GPFS subAgent reports volumes bare, where hrStorageDescr has /vol prepended.
-        # Prepend here so they match.
-        $fsname = "/vol/$fsname";
-
-        my $volume = SDM::Disk::Volume->get( physical_path => $fsname );
-        unless ($volume) {
-            $self->logger->warn(__PACKAGE__ . " ignoring GPFS filesystem perf data for unknown volume $fsname");
-            next;
-        }
-        my $fs = SDM::Disk::GpfsFsPerf->get_or_create( gpfsFileSystemPerfName => $fsname, volume_id => $volume->id );
-        unless ($fs) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsFileSystemPerfName entry");
-            next;
-        }
-
-        foreach my $attr (keys %{ $gpfsfsdata->{$fsname} }) {
-            my $p = $fs->__meta__->property($attr);
-            # Primary keys are immutable, don't try to update them
-            $fs->$attr($gpfsfsdata->{$fsname}->{$attr})
-                if (! $p->is_id and $p->is_mutable);
-            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-        }
-        $self->logger->debug(__PACKAGE__ . " updated $fsname");
-
-    }
-    return 1;
-}
-
-=head2 update_gpfs_disk_perf
-Update SNMP data for all GPFS Hosts associated with this Filer.
-=cut
-sub update_gpfs_disk_perf {
-    my $self = shift;
-    my $gpfsdiskdata = shift;
-
-    return unless ($gpfsdiskdata);
-
-    $self->logger->warn(__PACKAGE__ . " update_gpfs_disk_perf " . scalar(keys %$gpfsdiskdata) . " items");
-
-    while (my ($lun,$hashdata) =  each %$gpfsdiskdata) {
-        # Keys here have several components we can chop off.
-        # Remake the hash table with the shorter keys.
-        while (my ($k,$v) = each %$hashdata) {
-            my ($oid,$toss) = split(/\./,$k,2);
-            $hashdata->{$oid} = $v;
-            delete $hashdata->{$k};
-        }
-        $gpfsdiskdata->{$lun} = $hashdata;
-    }
-
-    while (my ($lun,$hashdata) =  each %$gpfsdiskdata) {
-        my $fsname = $gpfsdiskdata->{$lun}->{'gpfsDiskPerfFSName'};
-        # FIXME: GPFS subAgent reports volumes bare, where hrStorageDescr has /vol prepended.
-        # Prepend here so they match.
-        unless ($fsname) {
-            $self->logger->error(__PACKAGE__ . " no gpfsDiskPerfFSName (Volume) for $lun");
-            next;
-        }
-        $fsname = "/vol/$fsname";
-
-        my $volume = SDM::Disk::Volume->get( physical_path => $fsname );
-        unless ($volume) {
-            $self->logger->warn(__PACKAGE__ . " ignoring GPFS disk perf data for $lun using unknown volume $fsname");
-            next;
-        }
-        my $fs = SDM::Disk::GpfsDiskPerf->get_or_create( gpfsDiskPerfFSName => $fsname, volume_id => $volume->id );
-        unless ($fs) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create gpfsDiskPerfFSName entry");
-            next;
-        }
-
-        while (my ($attr,$value) = each %$hashdata) {
-            my $p = $fs->__meta__->property($attr);
-            unless ($p) {
-                $self->logger->error(__PACKAGE__ . " failed to find $attr for GpfsDiskPerf object");
-                next;
-            }
-            # Primary keys are immutable, don't try to update them
-            $fs->$attr($value)
-                if (! $p->is_id and $p->is_mutable);
-            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-        }
-        $self->logger->debug(__PACKAGE__ . " updated $fsname using $lun");
-    }
-}
-
 
 =head2 purge_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and warn on all stale volumes.
@@ -488,54 +267,6 @@ sub _query_snmp {
         # Volume data must be updated before GPFS data is updated below.
         $self->update_volumes( $table, $filer->name );
 
-        # If Linux and GPFS, get GPFS tables too.
-        if ($snmp->hosttype eq 'linux') {
-            # For a GPFS cluster, determine which host is the master in the cluster, and
-            # query it for GPFS cluster data.
-            if ($ENV{SDM_DISK_GPFS_PRESENT} and $snmp->detect_gpfs) {
-                foreach my $host ( $filer->host) {
-                    if ($host->master) {
-                        $self->logger->debug(__PACKAGE__ . " query gpfs master node " . $host->hostname);
-                        $snmp->hostname($host->hostname);
-                        $snmp->command('snmpwalk');
-
-                        # Each of these GPFS metrics tables connects to a different SDM::Disk object, so
-                        # we have a method to ensure proper behavior for each.
-                        $table = $snmp->read_snmp_into_table('gpfsClusterStatusTable');
-                        #$self->update_gpfs_cluster_status( $table );
-                        $self->update_gpfs_object('gpfsClusterStatus','gpfsClusterName',$table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsClusterConfigTable');
-                        $self->update_gpfs_cluster_config( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsNodeStatusTable');
-                        $self->update_gpfs_node_status( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsNodeConfigTable');
-                        $self->update_gpfs_node_config( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsFileSystemStatusTable');
-                        $self->update_gpfs_fs_status( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsFileSystemPerfTable');
-                        $self->update_gpfs_fs_perf( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsDiskStatusTable');
-                        $self->update_gpfs_disk_status( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsDiskConfigTable');
-                        $self->update_gpfs_disk_config( $table );
-
-                        $table = $snmp->read_snmp_into_table('gpfsDiskPerfTable');
-                        $self->update_gpfs_disk_perf( $table );
-                        last;
-                    } else {
-                        $self->logger->debug(__PACKAGE__ . " gpfs node " . $host->hostname . " is not a master");
-                    }
-                }
-            }
-        }
-
         $snmp->delete();
         $filer->status(1);
         $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
@@ -580,16 +311,18 @@ sub execute {
     }
 
     unless (scalar @filers) {
-        $self->logger->warn(__PACKAGE__ . " no filers to be scanned. Consider using --force.");
+        $self->logger->warn(__PACKAGE__ . " no filers to be scanned. Add filers if there are none, or use --force to scan all filers.");
     }
 
     foreach my $filer (@filers) {
         $self->_query_snmp($filer);
     }
 
+    UR::Context->commit();
+
     # Now update disk group RRD files.
-    #my $rrd = SDM::Utility::DiskGroupRRD->create( loglevel => $self->loglevel );
-    #$rrd->run();
+    my $rrd = SDM::Utility::DiskGroupRRD->create( loglevel => $self->loglevel );
+    $rrd->run();
 
     return 1;
 }

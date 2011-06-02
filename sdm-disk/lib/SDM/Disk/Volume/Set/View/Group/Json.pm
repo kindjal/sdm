@@ -11,7 +11,6 @@ use warnings;
 
 use SDM;
 
-
 class SDM::Disk::Volume::Set::View::Group::Json {
     is => 'UR::Object::Set::View::Default::Json',
 };
@@ -22,8 +21,12 @@ Build the aaData for jQuery DataTables.  This is a list of table row data.
 sub aaData {
     my $self = shift;
     my @data;
+
     my $subject = $self->subject;
-    return unless ($subject);
+    if (not $subject or not $subject =~ /::Set/) {
+        $self->error_message(__PACKAGE__ . " illegally asked for aaData on an object that is not a UR::Object::Set");
+        return;
+    }
 
     my @disk_groups = $subject->members( -group_by => [ 'disk_group' ], -order_by => [ 'disk_group' ] );
     return unless (@disk_groups);
@@ -56,10 +59,11 @@ sub _jsobj {
     my $subject = $self->subject();
     return '' unless $subject;
 
+    my @aaData = $self->aaData;
     my $jsobj = {
-        aaData => [ $self->aaData ],
-        iTotalRecords => $subject->count,
-        iTotalDisplayRecords => $subject->count,
+        aaData => [ @aaData ],
+        iTotalRecords => $#aaData + 1,
+        iTotalDisplayRecords => $#aaData + 1,
         sEcho => 1,
     };
 

@@ -16,7 +16,9 @@ my $classdef = {
     has => [
         mount_path    => { is => 'Text', len => 255 },
         total_kb      => { is => 'Number', default_value => 0 },
+        #total_kb      => { is => 'SDM::Value::KBytes', default_value => 0 },
         used_kb       => { is => 'Number', default_value => 0 },
+        #used_kb       => { is => 'SDM::Value::KBytes', default_value => 0 },
         capacity        => {
             is => 'Number',
             calculate => q( my $u = $self->used_kb; my $t = $self->total_kb; my $c = 0; if ($t) { $c = $u/$t * 100 }; return $c; )
@@ -125,7 +127,6 @@ sub is_orphan {
     my $self = shift;
     my $filer = $self->filer;
     unless ($filer) {
-        $self->warning_message("Volume '" . $self->mount_path . "' has no Filers, it has been orphaned.");
         return 1;
     }
     return 0;
