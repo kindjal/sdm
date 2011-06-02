@@ -24,8 +24,7 @@ class SDM::Rtm::Jobs {
         },
         volume          => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
         filername       => { via => 'volume' },
-    #],
-    #has_many_optional => [
+        filer           => { is => 'SDM::Disk::Filer', via => 'volume' },
         gpfs_disk_perf_id => {
             is => 'Number',
             calculate_from => ['mount_path','filername'],
