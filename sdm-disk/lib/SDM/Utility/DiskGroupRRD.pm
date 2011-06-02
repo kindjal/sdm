@@ -23,7 +23,7 @@ class SDM::Utility::DiskGroupRRD {
 sub prep_fake_rrd {
   my $self = shift;
   my $rrd = shift;
-  $self->{logger}->debug("prep_fake_rrd\n");
+  $self->{logger}->debug(__PACKAGE__ . " prep_fake_rrd\n");
 
   my $total = 0;
   my $used  = 0;
@@ -46,7 +46,7 @@ sub create_rrd {
   my $self = shift;
   my $rrd = shift;
   my $start = shift;
-  $self->{logger}->debug("create_rrd\n");
+  $self->{logger}->debug(__PACKAGE__ . "create_rrd\n");
 
   if (! defined $start) {
     # beginning of today
@@ -87,9 +87,7 @@ sub create_rrd {
 
 sub create_or_update {
     my ($self,$group,$total,$used) = @_;
-    $self->logger->debug(__PACKAGE__ . " create_or_update($group,$total,$used)");
     return unless (defined $group and defined $total and defined $used);
-
     my $rrdpath = $self->rrdpath;
     die "RRD path is unset" if (! defined $rrdpath);
     if (! -d $rrdpath) {
@@ -97,6 +95,8 @@ sub create_or_update {
         $self->logger->warn(__PACKAGE__ . " created directory '$rrdpath'");
     }
     my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
+
+    $self->logger->debug(__PACKAGE__ . " create_or_update($rrdfile,$group,$total,$used)");
 
     my $rrd = RRDTool::OO->new(
         file => $rrdfile,
@@ -113,8 +113,8 @@ sub create_or_update {
 sub run {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " run");
-    my @sets = SDM::Disk::Volume->define_set();
-    my $view = $sets[0]->create_view( perspective => 'group', toolkit => 'json' );
+    my $set = SDM::Disk::Volume->define_set();
+    my $view = $set->create_view( perspective => 'group', toolkit => 'json' );
 
     foreach my $item ( $view->aaData ) {
         $self->create_or_update($item->[0],$item->[1],$item->[2]);
