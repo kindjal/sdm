@@ -90,8 +90,6 @@ $expected = {
 ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
 
 my $ref;
-ok( $obj->detect_gpfs() == 1, "ok: $host is gpfs");
-
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsMIBObjects') } "ok: lives";
 #print Data::Dumper::Dumper $ref;
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsFileSDMPerfTable') } "ok: lives";

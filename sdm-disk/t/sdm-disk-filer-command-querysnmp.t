@@ -13,7 +13,10 @@ use Test::Output;
 use Test::Exception;
 
 use_ok( 'SDM' );
-use_ok( 'SDM::Utility::DiskGroupRRD' );
+
+unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
+    plan skip_all => "Don't assume we can reach SNMP on named hosts for non GI networks";
+}
 
 # Start with a fresh database
 use FindBin;
@@ -25,13 +28,7 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $u = SDM::Utility::DiskGroupRRD->create( loglevel => "DEBUG" );
-lives_ok { $u->run(); } "run lived";
-
-my $rrdpath = SDM::Env::SDM_DISK_RRDPATH->value;
-my $group = "SYSTEMS_DEVELOPMENT"; # Set in sdm-lib->testdata
-my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
-ok( -f $rrdfile, "ok: rrd file made" );
-unlink $rrdfile;
+my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev" );
+lives_ok { $c->execute(); } "run lived";
 
 done_testing();

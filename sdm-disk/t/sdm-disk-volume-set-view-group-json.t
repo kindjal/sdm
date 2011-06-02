@@ -29,25 +29,30 @@ ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
 # This is what Rest.psgi does
-my @s = SDM::Disk::Volume->define_set();
-my $v = $s[0]->create_view( perspective => 'group', toolkit => 'json' );
-my $json = $v->_jsobj();
+my $s = SDM::Disk::Volume->define_set();
+my $v = $s->create_view( perspective => 'group', toolkit => 'json' );
+my $got = $v->_generate_content();
+print Data::Dumper::Dumper $got;
+__END__
 
 # This must match the data used in SDM::Test::Lib->testdata
 my $expected = {
-  'iTotalDisplayRecords' => 1,
-  'iTotalRecords' => 1,
   'aaData' => [
                 [
                   'SYSTEMS_DEVELOPMENT',
-                  100,
-                  50,
-                  '50'
+                  300,
+                  230,
+                  76.6666666666667
                 ]
               ],
+  'iTotalRecords' => 3,
+  'iTotalDisplayRecords' => 3,
   'sEcho' => 1
 };
+use JSON;
+my $json = JSON->new->ascii->pretty->allow_nonref;
+$expected = $json->encode($expected);
 
-ok( is_deeply( $json, $expected, "ok: is_deeply" ), "ok: json match");
+ok( is_deeply( $got, $expected, "ok: is_deeply" ), "ok: json match");
 
 done_testing();

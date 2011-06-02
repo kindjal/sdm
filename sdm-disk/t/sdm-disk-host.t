@@ -14,6 +14,10 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
+unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
+    plan skip_all => "Don't assume we can reach SNMP on named hosts for non GI networks";
+}
+
 my $res;
 my $params;
 
