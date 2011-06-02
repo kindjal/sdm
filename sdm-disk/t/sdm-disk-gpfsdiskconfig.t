@@ -25,7 +25,7 @@ my $res;
 my @res;
 
 @res = SDM::Disk::GpfsDiskConfig->get( filername => 'fakefiler' );
-ok( ! defined @res, "fake filer returns undef" );
+ok( ! @res, "fake filer returns undef" );
 
 @res = SDM::Disk::GpfsDiskConfig->get( filername => 'gpfs-dev' );
 $res = shift @res;

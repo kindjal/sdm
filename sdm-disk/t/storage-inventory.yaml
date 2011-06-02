@@ -1,0 +1,824 @@
+gpfs:
+  hosts:
+    linuscs103:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs104:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs105:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs106:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+  arrays:
+    nsams2k1:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87011188
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+    nsams2k4:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87012574
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+gpfs2:
+  hosts:
+    linuscs110:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs111:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs112:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs113:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+  arrays:
+    nsams2k2:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87040641
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+    nsams2k5:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87012574
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+'gpfs-dev':
+  hosts:
+    linuscs107:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs108:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+    linuscs109:
+      manufacturer: Dell
+      model: poweredge R710
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 2.11
+  arrays:
+    nsams2k6:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87041066
+      disk_type: sata
+      disk_num: 240
+      adv_arraysize: 1833
+nfs1:
+  hosts:
+    linuscs52:
+      manufacturer: Dell
+      model: poweredge 1950
+      os: RHEL 5.5
+      comments:
+      location: 222 ns rack 1.6
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+#nfs1:
+nfs2:
+  hosts:
+    linuscs56:
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+    GCEVA6:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KA
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA7:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K8
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA8:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KC
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA9:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KB
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA10:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K9
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA11:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KD
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+nfs10:
+  hosts:
+    linuscs62:
+    linuscs63:
+    linuscs64:
+    linuscs65:
+    linuscs78:
+    linuscs79:
+  arrays:
+    GCEVA1:
+      manufacturer: HP
+      model: EVA8100
+      serial: 2S183815WS
+      disk_type: fc
+      disk_num: 240
+      arraysize: 419
+      adv_arraysize: 450
+    GCEVA2:
+      manufacturer: HP
+      model: EVA8100
+      serial: 2S1840160V
+      disk_type: sata
+      disk_num: 240
+      arraysize: 931
+      adv_arraysize: 1024
+nfs11:
+  hosts:
+    linuscs66:
+    linuscs67:
+    linuscs68:
+    linuscs69:
+    linuscs70:
+    linuscs71:
+    linuscs72:
+    linuscs73:
+    linuscs74:
+    linuscs75:
+    linuscs76:
+    linuscs77:
+  arrays:
+    GCEVA3:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160T
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA4:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160W
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA5:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160X
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA6:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KA
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA7:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K8
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA8:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KC
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA9:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KB
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA10:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K9
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA11:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KD
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+nfs12:
+  hosts:
+    linuscs66:
+    linuscs67:
+    linuscs68:
+    linuscs69:
+    linuscs70:
+    linuscs71:
+    linuscs72:
+    linuscs73:
+    linuscs74:
+    linuscs75:
+    linuscs76:
+    linuscs77:
+  arrays:
+    GCEVA3:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160T
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA4:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160W
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA5:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160X
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA6:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KA
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA7:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K8
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA8:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KC
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA9:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KB
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA10:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K9
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA11:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KD
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+nfs14:
+  hosts:
+    linuscs66:
+    linuscs67:
+    linuscs68:
+    linuscs69:
+    linuscs70:
+    linuscs71:
+    linuscs72:
+    linuscs73:
+    linuscs74:
+    linuscs75:
+    linuscs76:
+    linuscs77:
+  arrays:
+    GCEVA3:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160T
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA4:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160W
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA5:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S1840160X
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA6:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KA
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA7:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K8
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA8:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KC
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA9:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KB
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA10:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616K9
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+    GCEVA11:
+      manufacturer: HP
+      model: EVA8400
+      serial: 2S191616KD
+      disk_type: sata
+      disk_num: 216
+      arraysize: 931
+      adv_arraysize: 1024
+nfs15:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs16:
+  hosts:
+    'blade7-2-13':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs17:
+  hosts:
+    linuscs84:
+  arrays:
+    gcxp1:
+nfs18:
+  hosts:
+    linuscs85:
+  arrays:
+    gcxp1:
+nfs19:
+  hosts:
+    linuscs86:
+  arrays:
+    gcxp2:
+nfs20:
+  hosts:
+    linuscs87:
+  arrays:
+    gcxp2:
+nfs21:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs22:
+  hosts:
+    linuscs88:
+  arrays:
+    gcxp3:
+nfs23:
+  hosts:
+    linuscs89:
+  arrays:
+    gcxp3:
+nfs24:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs25:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs26:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs27:
+  hosts:
+    'blade10-1-1':
+  arrays:
+    CX380:
+      manufacturer: EMC
+      model: CX380
+      serial: APM00081501149
+      disk_type: sata
+      disk_num: 480
+      arraysize: 917
+      adv_arraysize: 1024
+nfs90:
+  hosts:
+    linuscs90:
+  arrays:
+    nsams2k3:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87040684
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+nfs91:
+  hosts:
+    linuscs91:
+  arrays:
+    nsams2k3:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87040684
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+nfs117:
+  hosts:
+    linuscs117:
+  arrays:
+    nsams2k3:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87040684
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+nfs118:
+  hosts:
+    linuscs118:
+  arrays:
+    nsams2k3:
+      manufacturer: HDS
+      model: AMS2500
+      serial: 87040684
+      disk_type: sata
+      disk_num: 480
+      arraysize: 1833
+      adv_arraysize: 2048
+ntap1:
+  hosts:
+    ntap1:
+      manufacturer: NetApp
+      model: FAS980
+      location: 222 ns
+  arrays:
+    ntap1:
+ntap2:
+  hosts:
+    ntap2:
+      manufacturer: NetApp
+      model: FAS980
+      location: 5301 rack EE,8
+  arrays:
+    ntap2:
+ntap3:
+  hosts:
+    ntap3:
+      model: FAS980
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap3:
+ntap4:
+  hosts:
+    ntap4:
+      model: FAS980
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap4:
+ntap5:
+  hosts:
+    ntap5:
+      model: R200
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap5:
+ntap6:
+  hosts:
+    ntap6:
+      model: FAS270
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap6:
+ntap7:
+  hosts:
+    ntap7:
+      model: FAS270
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap7:
+ntap8:
+  hosts:
+    ntap8:
+      model: FAS270
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap8:
+ntap9:
+  hosts:
+    ntap9:
+      model: FAS270
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap9:
+ntap10:
+  hosts:
+    ntap10:
+      model: V3140
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap10:
+ntap11:
+  hosts:
+    ntap11:
+      model: V3140
+      manufacturer: NetApp
+      location: 5301 rack EE,8
+  arrays:
+    ntap11:
+xyratex1:
+  hosts:
+    xyratex1:
+  arrays:
+    xyratex1:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 96
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex2:
+  hosts:
+    xyratex2:
+  arrays:
+    xyratex2:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex3:
+  hosts:
+    xyratex3:
+  arrays:
+    xyratex3:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex4:
+  hosts:
+    xyratex4:
+  arrays:
+    xyratex4:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex5:
+  hosts:
+    xyratex5:
+  arrays:
+    xyratex5:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex6:
+  hosts:
+    xyratex6:
+  arrays:
+    xyratex6:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex7:
+  hosts:
+    xyratex7:
+  arrays:
+    xyratex7:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 48
+      arraysize: 931
+      adv_arraysize: 1024
+xyratex8:
+  hosts:
+    xyratex8:
+  arrays:
+    xyratex8:
+      manufacturer: Xyratex
+      model: F5404
+      serial:
+      disk_type: sata
+      disk_num: 96
+      arraysize: 1833
+      adv_arraysize: 2048
