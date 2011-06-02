@@ -1,3 +1,10 @@
+ur-sdm-rtm (0.05-1) unstable; urgency=low
+
+  * Fix RRD graphs.
+  * Add Array set view.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Thu, 02 Jun 2011 15:23:41 -0500
+
 ur-sdm-rtm (0.04-1) unstable; urgency=low
 
   * Rename System to SDM.

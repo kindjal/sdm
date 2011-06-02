@@ -13,7 +13,7 @@ use SDM;
 my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.04',
+  dist_version => '0.05',
   dist_abstract => 'Modules for service management',
   etc_files => { 'etc/sdm-web-app.conf' => 'etc/sdm-web-app.conf' },
   install_path => { 'etc' => '/etc/init' },
