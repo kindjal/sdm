@@ -59,6 +59,8 @@ CREATE TABLE disk_mount (
 CREATE TABLE disk_host (
   hostname      VARCHAR(255) PRIMARY KEY,
   status        SMALLINT NOT NULL DEFAULT 0,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
   os            VARCHAR(255),
   location      VARCHAR(255),
   comments      VARCHAR(255),
@@ -75,8 +77,12 @@ CREATE TABLE disk_filer_host (
 );
 CREATE TABLE disk_array (
   name          VARCHAR(255) PRIMARY KEY,
+  manufacturer  VARCHAR(255),
   model         VARCHAR(255),
-  type          VARCHAR(255),
+  serial        VARCHAR(255),
+  disk_type     VARCHAR(255),
+  disk_num      BIGINT DEFAULT 0,
+  adv_arraysize BIGINT DEFAULT 0,
   arraysize     BIGINT DEFAULT 0 NOT NULL,
   created       DATE,
   last_modified DATE,
