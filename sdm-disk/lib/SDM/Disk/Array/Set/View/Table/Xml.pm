@@ -1,12 +1,12 @@
 
-package SDM::Disk::Volume::Set::View::Table::Xml;
+package SDM::Disk::Array::Set::View::Table::Xml;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::Volume::Set::View::Table::Xml {
+class SDM::Disk::Array::Set::View::Table::Xml {
     is => 'UR::Object::Set::View::Default::Xml',
     has_constant => [
         default_aspects => {
@@ -16,7 +16,7 @@ class SDM::Disk::Volume::Set::View::Table::Xml {
                     name => 'members',
                     perspective => 'default',
                     toolkit => 'xml',
-                    subject_class_name => 'SDM::Disk::Volume',
+                    subject_class_name => 'SDM::Disk::Array',
                     aspects => [
                         'name',
                         'manufacturer',
@@ -24,8 +24,8 @@ class SDM::Disk::Volume::Set::View::Table::Xml {
                         'serial',
                         'disk_type',
                         'disk_num',
-                        'adv_arraysize',
                         'arraysize',
+                        'adv_arraysize',
                         'created',
                         'last_modified',
                         'hostname'
