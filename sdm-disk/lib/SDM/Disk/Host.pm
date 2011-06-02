@@ -14,6 +14,8 @@ class SDM::Disk::Host {
     ],
     has_optional => [
         status          => { is => 'UnsignedInteger', default => 0 },
+        manufacturer    => { is => 'Text', len => 255 },
+        model           => { is => 'Text', len => 255 },
         os              => { is => 'Text', len => 255 },
         comments        => { is => 'Text', len => 255 },
         location        => { is => 'Text', len => 255 },
