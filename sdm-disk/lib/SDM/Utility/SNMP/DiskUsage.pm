@@ -13,29 +13,10 @@ class SDM::Utility::SNMP::DiskUsage {
         allow_mount => {
             is => 'Boolean',
             default_value => 0,
-            doc => 'Allow automounter to mount volumes to find disk groups',
+            doc => 'Allow automounter to mount volumes to find disk groups'
         },
-        gpfs => {
-            is => 'Boolean',
-            default_value => 0,
-            doc => 'Target SNMP host supports GPFS subagent',
-        }
-    ],
-    has_constant => [
-        ignorable_linux_types => {
-            is => 'List',
-            value => [
-                "HOST-RESOURCES-TYPES::hrStorageOther",
-                "HOST-RESOURCES-TYPES::hrStorageRam",
-                "HOST-RESOURCES-TYPES::hrStorageVirtualMemory",
-            ]
-        },
-        ignorable_netapp_types => {
-            is => 'List',
-            value => [
-                "aggregate(3)",
-                "flexibleVolume(2)"
-            ]
+        disk_groups => {
+            is => 'HASH',
         }
     ]
 };
@@ -91,18 +72,26 @@ We can configure a Filer's snmpd to export a Table with disk group info.  This m
 =cut
 sub _get_disk_group_via_snmp {
     my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp");
     my $physical_path = shift;
 
-    #my $oid = 'nsExtendOutLine-group' => '1.3.6.1.4.1.8072.1.3.2.4.1.2.15.100.105.115.107.95.103.114.111.117.112.95.110.97.109.101',
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp($physical_path)");
     my $oid = '1.3.6.1.4.1.8072.1.3.2.4.1.2.15.100.105.115.107.95.103.114.111.117.112.95.110.97.109.101';
-    $self->command( 'snmpwalk' );
-    my $results = $self->run( $oid );
-    foreach my $hash (@$results) {
-        my $path = dirname $hash->{value};
-        my $group = basename $hash->{value};
-        return $group if ($path eq $physical_path);
+
+    unless ($self->disk_groups) {
+        $self->disk_groups( $self->read_snmp_into_table($oid) );
     }
+    while (my ($key,$hash) = each %{$self->disk_groups}) {
+        my $value = pop @{ [ values %$hash ] };
+        my $path = dirname $value;
+        my $group = basename $value;
+        $group =~ s/^DISK_//;
+        if ($path eq $physical_path) {
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns $group");
+            return $group;
+        }
+    }
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns undef");
+    return undef;
 }
 
 =head2 _get_disk_group
@@ -126,7 +115,10 @@ sub _get_disk_group {
         my $volume = shift @volumes;
         if ($volume) {
             $disk_group = $volume->disk_group;
-            return $disk_group if (defined $disk_group);
+            if (defined $disk_group) {
+                $self->logger->debug(__PACKAGE__ . " _get_disk_group returns existing group $disk_group");
+                return $disk_group if (defined $disk_group);
+            }
         }
     }
 
@@ -134,6 +126,7 @@ sub _get_disk_group {
     # Special case of '.snapshot' mounts
     my $base = basename $physical_path;
     if ($base eq ".snapshot") {
+        $self->logger->debug(__PACKAGE__ . " _get_disk_group special group SYSTEMS_SNAPSHOT");
         return 'SYSTEMS_SNAPSHOT';
     }
 
@@ -141,10 +134,16 @@ sub _get_disk_group {
     if ($self->hosttype eq 'linux') {
         my $disk_group = $self->_get_disk_group_via_snmp($physical_path);
         # If not defined or empty, go to mount point and look for touch file.
-        return $disk_group if (defined $disk_group and $disk_group ne '');
+        if (defined $disk_group and $disk_group ne '') {
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group returns $disk_group from snmp");
+            return $disk_group;
+        }
     }
 
-    return unless ($self->allow_mount);
+    unless ($self->allow_mount) {
+        $self->logger->debug(__PACKAGE__ . " _get_disk_group returns undef");
+        return;
+    }
 
     # FIXME: Site specific
     # This will actually mount a mount point via automounter.
@@ -157,6 +156,7 @@ sub _get_disk_group {
         $disk_group = undef;
     }
 
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group returns $disk_group from the filesystem");
     return $disk_group;
 }
 
@@ -177,7 +177,6 @@ sub _convert_to_volume_data {
         my $volume;
         if ($self->hosttype eq 'netapp') {
             # Skip volumes that are not fixed disks.
-            #next if (grep /$snmp_table->{$dfIndex}->{'hrStorageType'}/, @{ $self->ignorable_netapp_types } );
             next unless ($snmp_table->{$dfIndex}->{'hrStorageType'} eq 'flexibleVolume(2)');
             if (exists $snmp_table->{$dfIndex}->{'df64TotalKBytes'}) {
                 $total = $snmp_table->{$dfIndex}->{'df64TotalKBytes'};
@@ -195,7 +194,6 @@ sub _convert_to_volume_data {
             $volume = $snmp_table->{$dfIndex}->{'dfFileSys'};
         } else {
             # Skip volumes that are not fixed disks.
-            #next if (grep /$snmp_table->{$dfIndex}->{'hrStorageType'}/, @{ $self->ignorable_linux_types } );
             next unless ($snmp_table->{$dfIndex}->{'hrStorageType'} eq 'HOST-RESOURCES-TYPES::hrStorageFixedDisk');
             $volume = $snmp_table->{$dfIndex}->{'hrStorageDescr'};
             # Correct for block size
@@ -223,35 +221,11 @@ Run this subclass of SNMP to gather DiskUsage data.
 =cut
 sub acquire_volume_data {
     my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " acquire");
+    $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
     my $oid = $self->hosttype eq 'netapp' ?  'dfTable' : 'hrStorageTable';
     my $snmp_table = $self->read_snmp_into_table($oid);
     my $volume_table = $self->_convert_to_volume_data( $snmp_table );
     return $volume_table;
-}
-
-=head2 detect_gpfs
-Determine of the target Filer is GPFS by looking for gpfs package OID.
-=cut
-sub detect_gpfs {
-    my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " detect_gpfs(" . $self->hostname . ")");
-
-    $self->command('snmpwalk');
-    my $results = $self->run( 'hrSWInstalledName' );
-    unless ($results) {
-        $self->logger->error(__PACKAGE__ . " target host " . $self->hostname . " returns nothing for hrSWInstalledName");
-        $self->gpfs(0);
-        return $self->gpfs;
-    }
-
-    foreach my $item (@$results) {
-        if ($item->{value} =~ /^"gpfs.base/) {
-            $self->logger->debug(__PACKAGE__ . " " . $self->hostname . " is gpfs");
-            $self->gpfs(1);
-        }
-    }
-    return $self->gpfs;
 }
 
 1;
