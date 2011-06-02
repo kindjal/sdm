@@ -13,14 +13,14 @@ class SDM::Service::WebApp::Command::Run {
 };
 
 sub execute {
-  my $self = shift;
-  eval {
-     $app = SDM::Service::WebApp->create( fixed_port => $self->fixed_port );
-     $app->execute();
-  };
-  if ($@) {
-    die "Failed during execute(): $@";
-  }
+    my $self = shift;
+    eval {
+        $app = SDM::Service::WebApp->create( fixed_port => $self->fixed_port );
+        $app->execute();
+    };
+    if ($@) {
+        die "Failed during execute(): $@";
+    }
 }
 
 1;
