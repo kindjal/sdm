@@ -32,6 +32,6 @@ my $v = $s->create_view( perspective => 'table', toolkit => 'xml' );
 my $xml = $v->_generate_content();
 
 xml_is $xml, '/object/aspect[@name="rule_display"]/value', 'UR::BoolExpr=(SDM::Disk::Volume:)', "aspect match";
-xml_is $xml, '/object/aspect[@name="members"]/object/aspect[@name="mount_path"]/value', '/gscmnt/gc2111', "aspect match";
+xml_is $xml, '/object/aspect[@name="members"]/object[1]/aspect[@name="mount_path"]/value', '/gscmnt/gc2111', "aspect match";
 
 done_testing();
