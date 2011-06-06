@@ -48,8 +48,8 @@ isa_ok( $res, 'UR::DeletedRef', "properly delete array" );
 # Test update of value
 @params = ( name => 'nsams2k4' );
 $res = SDM::Disk::Array->get( @params );
-$res->type("AMS");
-ok( $res->type eq "AMS", "Type set to AMS");
+$res->disk_type("AMS");
+ok( $res->disk_type eq "AMS", "Type set to AMS");
 
 # Update created and last modified
 $res->created( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time()) );
