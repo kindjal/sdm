@@ -35,10 +35,10 @@ print Data::Dumper::Dumper $json;
 
 # This must match the data used in SDM::Test::Lib->testdata
 my $expected = {
-  'total_kb' => 100,
+  'total_kb' => 600,
   'last_modified' => '0000:00:00:00:00:00',
-  'used_kb' => 50,
-  'capacity' => '50'
+  'used_kb' => 500,
+  'capacity' => '83.3333333333333'
 };
 
 ok( is_deeply( $json, $expected, "ok: is_deeply" ), "ok: json match");
