@@ -32,22 +32,38 @@ ok( $t->testdata == 0, "ok: add data");
 my $s = SDM::Disk::Volume->define_set();
 my $v = $s->create_view( perspective => 'group', toolkit => 'json' );
 my $got = $v->_generate_content();
-print Data::Dumper::Dumper $got;
-__END__
 
 # This must match the data used in SDM::Test::Lib->testdata
 my $expected = {
-  'aaData' => [
-                [
-                  'SYSTEMS_DEVELOPMENT',
-                  300,
-                  230,
-                  76.6666666666667
-                ]
-              ],
-  'iTotalRecords' => 3,
-  'iTotalDisplayRecords' => 3,
-  'sEcho' => 1
+   "aaData" => [
+      [
+         "unknown",
+         100,
+         90,
+         90
+      ],
+      [
+         "INFO_APIPE",
+         100,
+         90,
+         90
+      ],
+      [
+         "SYSTEMS",
+         100,
+         90,
+         90
+      ],
+      [
+         "SYSTEMS_DEVELOPMENT",
+         300,
+         230,
+         76.6666666666667
+      ]
+   ],
+   "iTotalRecords" => 4,
+   "iTotalDisplayRecords" => 4,
+   "sEcho" => 1
 };
 use JSON;
 my $json = JSON->new->ascii->pretty->allow_nonref;
