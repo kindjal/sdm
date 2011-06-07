@@ -68,24 +68,33 @@ $(document).ready(function() {
     "bAutoWidth": false,
     "sAjaxSource": "/view/sdm/disk/filer/set/status.json",
     "aoColumns": [
-      null,
-      /* snmp_ok */ { "bVisible":    true },
-      null,
-      null,
-      { "sClass" : "center" },
-      { "sClass" : "center" },
+      /* name       */ { "sWidth": "15%" },
+      /* snmp_ok    */ { "sWidth": "5%"  },
+      /* hosts      */ { "sWidth": "20%" },
+      /* arrays     */ { "sWidth": "20%" },
+      /* added      */ { "sWidth": "20%", "sClass" : "center" },
+      /* last check */ { "sWidth": "20%", "sClass" : "center" },
     ],
     "aaSorting": [ [1,'asc'] ],
     "fnRowCallback": function( nRow, aaData, iDisplayIndex ) {
-          var $col = 1;
-          var $cell = $(nRow).children('td').eq(0);
-          if (aaData[1] == -1) {
-            $cell.addClass('warning');
-          }
-          if (aaData[1] == 0) {
-            $cell.addClass('notice');
-          }
-        return nRow;
+      /* Set class for color on column 0 */
+      var $cell = $(nRow).children('td').eq(0);
+      if (aaData[1] == -1) {
+        $cell.addClass('warning');
+      }
+      if (aaData[1] == 0) {
+        $cell.addClass('notice');
+      }
+      /* Set title of columns 2 and 3 */
+      var title = aaData[2];
+      var $cell = $(nRow).children('td').eq(2);
+      $cell.attr("title",title);
+
+      var title = aaData[3];
+      var $cell = $(nRow).children('td').eq(3);
+      $cell.attr("title",title);
+
+      return nRow;
     },
   } );
   /* end filer table */
