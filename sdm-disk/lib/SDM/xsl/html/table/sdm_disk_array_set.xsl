@@ -15,24 +15,22 @@
 
     <title>SDM::Disk::Array::Set</title>
     <style type="text/css" title="currentStyle">
-          @import "/res/css/diskusage_page.css";
-          @import "/res/css/diskusage_table.css";
-    </style>
-    <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/arraytable.js"></script>
-    <style type="text/css">
+      @import "/res/css/diskusage_page.css";
+      @import "/res/css/diskusage_table.css";
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
+    <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/arraytable.js"/>
     </head>
 
     <body id="dt_example">
     <div id="container">
-      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="arraytable">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="arraytable" class="display">
         <thead>
           <tr>
             <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">

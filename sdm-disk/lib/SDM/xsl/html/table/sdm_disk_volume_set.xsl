@@ -15,8 +15,9 @@
 
     <title>SDM::Disk::Volume::Set</title>
     <style type="text/css" title="currentStyle">
-          @import "/res/css/diskusage_page.css";
-          @import "/res/css/diskusage_table.css";
+      @import "/res/css/diskusage_page.css";
+      @import "/res/css/diskusage_table.css";
+      @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
@@ -25,14 +26,11 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"></script>
-    <style type="text/css">
-      @import "/res/js/pkg/TableTools/media/css/TableTools.css";
-    </style>
     </head>
 
     <body id="dt_example">
     <div id="container">
-      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="volumetable">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="volumetable" class="display">
         <thead>
           <tr>
             <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
