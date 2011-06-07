@@ -80,17 +80,18 @@ sub _get_disk_group_via_snmp {
     unless ($self->disk_groups) {
         $self->disk_groups( $self->read_snmp_into_table($oid) );
     }
-    while (my ($key,$hash) = each %{$self->disk_groups}) {
-        my $value = pop @{ [ values %$hash ] };
+    foreach my $key (sort {$a <=> $b} keys %{$self->disk_groups}) {
+        my $value = pop @{ [ values %{ $self->disk_groups->{$key} } ] };
         my $path = dirname $value;
         my $group = basename $value;
         $group =~ s/^DISK_//;
+        #$self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp has $key $value $path $physical_path $group");
         if ($path eq $physical_path) {
-            $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns $group");
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns $group for $physical_path");
             return $group;
         }
     }
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns undef");
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns undef for $physical_path");
     return undef;
 }
 
@@ -103,9 +104,9 @@ Try to determine the disk group:
 =cut
 sub _get_disk_group {
     my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group");
     my $physical_path = shift;
     my $mount_path = shift;
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group($physical_path,$mount_path)");
 
     my $disk_group;
 
