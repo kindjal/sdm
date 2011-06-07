@@ -49,6 +49,13 @@
             </tr>
           </xsl:for-each>
         </tbody>
+        <tfoot>
+          <tr>
+            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
+            <th> <xsl:value-of select="@name"/> </th>
+            </xsl:for-each>
+          </tr>
+        </tfoot>
       </table>
     </div> <!-- end div container -->
     </body> <!-- end body -->
