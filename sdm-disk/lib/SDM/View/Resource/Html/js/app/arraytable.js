@@ -3,35 +3,37 @@ $(document).ready(function() {
   TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
   /* data table */
-  var dataTable = $('#arraytable').dataTable( {
+  var aTable = $('#arraytable').dataTable( {
     "sDom": 'T<"clear">lfrtip',
     "bProcessing": true,
-    "bFilter": true,
     "iDisplayLength": 25,
     "sPaginationType": "full_numbers",
+    "bAutoWidth": false,
     "aaSorting": [ [1,'desc'] ],
     "aoColumns": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      { "sType": "numeric",
+      { "sWidth": "10%" },
+      { "sWidth": "6%" },
+      { "sWidth": "10%" },
+      { "sWidth": "10%" },
+      { "sWidth": "5%" },
+      { "sWidth": "5%" },
+      { "sWidth": "12%",
+        "sType": "numeric",
         "bUseRendered": false,
         "fnRender": function ( oObj ) {
           return oObj.oSettings.fnFormatNumber( oObj.aData[6] ) + " " + sizeSuffix( oObj.aData[6] );
         },
       },
-      { "sType": "numeric",
+      { "sWidth": "12%",
+        "sType": "numeric",
         "bUseRendered": false,
         "fnRender": function ( oObj ) {
           return oObj.oSettings.fnFormatNumber( oObj.aData[7] ) + " " + sizeSuffix( oObj.aData[7] );
         },
       },
-      null,
-      null,
-      null,
+      { "sWidth": "12%" },
+      { "sWidth": "12%" },
+      { "sWidth": "6%" },
     ],
   } );
   /* end data table */
