@@ -79,6 +79,7 @@
  * DataTables display
  */
 table.display {
+    table-layout: fixed;
     margin: 0 auto;
     width: 100%;
     clear: both;
@@ -104,6 +105,8 @@ table.display tr.heading2 td {
 
 table.display td {
     padding: 3px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 table.display td.right {
