@@ -129,6 +129,7 @@ sub testdata {
     SDM::Disk::Group->create(name => "SYSTEMS");
     SDM::Disk::Group->create(name => "INFO_APIPE");
 
+    # If you change these sample volumes, unit tests expected values will also change.
     SDM::Disk::Volume->create( mount_path=>"/gscmnt/gc2111", physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
     SDM::Disk::Volume->create( mount_path=>"/gscmnt/gc2112", physical_path=>"/vol/gc2112", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs");
     SDM::Disk::Volume->create( mount_path=>"/gscmnt/gc2113", physical_path=>"/vol/gc2113", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs2");
