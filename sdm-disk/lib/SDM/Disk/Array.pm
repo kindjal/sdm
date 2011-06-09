@@ -10,24 +10,19 @@ class SDM::Disk::Array {
     id_by => [
         name          => { is => 'Text', len => 255 },
     ],
+    has_many => [
+        disk_sets     => { is => 'SDM::Disk::ArrayDiskSet', reverse_as => 'array' },
+        disk_type     => { is => 'Text', via => 'disk_sets' },
+    ],
     has_optional => [
-        manufacturer  => { is => 'Text', len => 255 },
-        model         => { is => 'Text', len => 255 },
-        serial        => { is => 'Text', len => 255 },
-        arraysize     => { is => 'Number', default => 0 },
-        adv_arraysize => { is => 'Number', default => 0 },
-        capacity      => {
-            is => 'Number',
-            calculate_from => [ 'arraysize', 'disk_num' ],
-            calculate => q| return $arraysize * $disk_num |,
+        manufacturer  => { is => 'Text' },
+        model         => { is => 'Text' },
+        serial        => { is => 'Text' },
+        comments      => { is => 'Text' },
+        arraysize     => {
+            is => 'SDM::Value::KBytes',
+            calculate => q| my $s; for $b ($self->disk_sets) { $s+=$b->capacity; }; return SDM::Value::KBytes->get($s); |,
         },
-        adv_capacity      => {
-            is => 'Number',
-            calculate_from => [ 'adv_arraysize', 'disk_num' ],
-            calculate => q| return $adv_arraysize * $disk_num |,
-        },
-        disk_type     => { is => 'Text', len => 255 },
-        disk_num      => { is => 'UnsignedInteger', default => 0 },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
