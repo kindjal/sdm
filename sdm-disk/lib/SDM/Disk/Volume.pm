@@ -48,6 +48,7 @@ my $classdef = {
         },
         gpfs_filesystem_perf => { is => 'SDM::Disk::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
+        comments        => { is => 'Text' },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
     ],

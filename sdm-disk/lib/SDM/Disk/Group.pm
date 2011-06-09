@@ -18,6 +18,7 @@ class SDM::Disk::Group {
         subdirectory    => { is => 'Text', default => 'info' },
     ],
     has_optional => [
+        comments        => { is => 'Text' },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
     ],
