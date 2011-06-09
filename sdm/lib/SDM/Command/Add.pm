@@ -52,10 +52,12 @@ sub execute {
     # Find out if we already have an Object whose id matches that which we are about to create
     my $target_class = $self->_target_class;
     my $id = pop @{ [ grep { $_->is_id } $target_class->__meta__->property_metas ] };
-    my $res = $target_class->get( $id->attribute_name => $attrs{$id->attribute_name} );
-    if ($res) {
-        $self->error_message("'$target_class' object already exists with this id: " . $attrs{$id->attribute_name} );
-        return;
+    if ($id) {
+        my $res = $target_class->get( $id->attribute_name => $attrs{$id->attribute_name} );
+        if ($res) {
+            $self->error_message("'$target_class' object already exists with this id: " . $attrs{$id->attribute_name} );
+            return;
+        }
     }
     my $obj = $target_class->create(%attrs);
     if ( not $obj ) {
