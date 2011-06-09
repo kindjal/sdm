@@ -19,6 +19,10 @@ class SDM::Disk::Array {
         model         => { is => 'Text' },
         serial        => { is => 'Text' },
         comments      => { is => 'Text' },
+        disk_set_num  => {
+            is => 'Number',
+            calculate => q| my @s = $self->disk_sets; return scalar @s;|,
+        },
         arraysize     => {
             is => 'SDM::Value::KBytes',
             calculate => q| my $s; for $b ($self->disk_sets) { $s+=$b->capacity; }; return SDM::Value::KBytes->get($s); |,

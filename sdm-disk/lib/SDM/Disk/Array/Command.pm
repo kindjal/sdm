@@ -14,7 +14,7 @@ use SDM::Command::Crud;
 SDM::Command::Crud->init_sub_commands(
     target_class => 'SDM::Disk::Array',
     target_name => 'array',
-    list => { show => 'name,model,disk_type,disk_num,arraysize,adv_arraysize' }
+    list => { show => 'name,manufacturer,model,arraysize,comments,disk_set_num' }
 );
 
 1;
