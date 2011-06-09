@@ -2,6 +2,7 @@ PRAGMA foreign_keys = ON;
 DROP TABLE IF EXISTS disk_user;
 DROP TABLE IF EXISTS disk_group;
 DROP TABLE IF EXISTS disk_array;
+DROP TABLE IF EXISTS disk_array_disk_set;
 DROP TABLE IF EXISTS disk_host_array;
 DROP TABLE IF EXISTS disk_host;
 DROP TABLE IF EXISTS disk_volume;
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS disk_group (
   unix_uid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   unix_gid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   username      VARCHAR(255),
+  comments      VARCHAR(255),
   created       DATE,
   last_modified DATE
 );
@@ -66,6 +68,7 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE,
+  comments      VARCHAR(255),
   disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_mount (
@@ -76,17 +79,25 @@ CREATE TABLE IF NOT EXISTS disk_mount (
   CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (
-  name          VARCHAR(255) NOT NULL PRIMARY KEY,
+  name          VARCHAR(255) PRIMARY KEY,
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   serial        VARCHAR(255),
-  disk_type     VARCHAR(255),
-  disk_num      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  adv_arraysize UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   arraysize     UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE,
+  comments      VARCHAR(255),
   hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE IF NOT EXISTS disk_array_disk_set (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  disk_type     VARCHAR(255),
+  disk_num      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  disk_size     UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  comments      VARCHAR(255),
+  created       VARCHAR(255),
+  last_modified VARCHAR(255),
+  arrayname     VARCHAR(255) CONSTRAINT disk_array_name_fk REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_host_array (
   hostname      VARCHAR(255),
