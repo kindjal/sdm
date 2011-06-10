@@ -2,7 +2,7 @@
 package SDM::Value::KBytes;
 
 class SDM::Value::KBytes {
-    is => 'UR::Value::Integer',
+    is => 'UR::Value::Number',
 };
 
 sub __display_name__ {
@@ -17,7 +17,7 @@ sub _short_form {
     #$self->{logger}->debug("_short: convert number to abbreviated form");
     my $number = shift;
     return '' unless (defined $number);
-    return $number unless ($number =~ /^\d+$/);
+    return $number unless ($number =~ /^[\d\.]+$/);
 
     my $cn = $self->_commify($number);
     my $size = 0;
@@ -46,7 +46,7 @@ sub _commify {
     #$self->{logger}->debug("_commify: add commas to long number");
     my $number = shift;
     return '' unless (defined $number);
-    return $number unless ($number =~ /^\d+$/);
+    return $number unless ($number =~ /^[\d\.]+$/);
     # commify a number. Perl Cookbook, 2.17, p. 64
     my $text = reverse $number;
     $text =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g;
