@@ -22,10 +22,7 @@ class SDM::Disk::Array::Set::View::Table::Json {
                         'manufacturer',
                         'model',
                         'serial',
-                        'disk_type',
-                        'disk_num',
                         'arraysize',
-                        'adv_arraysize',
                         'created',
                         'last_modified',
                         'hostname'
