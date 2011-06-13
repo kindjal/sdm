@@ -22,10 +22,10 @@ class SDM::Disk::Array::Set::View::Table::Xml {
                         'manufacturer',
                         'model',
                         'serial',
+                        'hostname',
                         'arraysize',
                         'created',
-                        'last_modified',
-                        'hostname'
+                        'last_modified'
                     ]
                 }
             ]
