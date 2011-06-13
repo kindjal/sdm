@@ -13,9 +13,15 @@ class SDM::Rtm::Jobs {
         submit_time => { is => 'Number' },
     ],
     has_optional => [
+        allocation_path => {
+            is => 'Text',
+            calculate_from => 'errFile',
+            calculate => q| $errFile =~ /^(.*)\/logs/; return $1; |,
+        },
         mount_path      => {
-            calculate_from => 'cwd',
-            calculate => sub { my $cwd = shift; return $cwd if ($cwd !~ /\//); my @a = split('/',$cwd); return join('/',$a[0],$a[1],$a[2]); },
+            is => 'Text',
+            calculate_from => 'allocation_path',
+            calculate => q| return unless ($allocation_path); join("/",  @{ [ split("/", $allocation_path ) ] }[0..2] ); |,
         },
         volume_id       => {
             is => 'Number',
