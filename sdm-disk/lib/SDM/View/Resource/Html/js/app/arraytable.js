@@ -12,28 +12,13 @@ $(document).ready(function() {
     "aaSorting": [ [1,'desc'] ],
     "aoColumns": [
       { "sWidth": "10%" },
-      { "sWidth": "6%" },
+      { "sWidth": "6%"  },
       { "sWidth": "10%" },
       { "sWidth": "10%" },
-      { "sWidth": "5%" },
-      { "sWidth": "5%" },
-      { "sWidth": "12%",
-        "sType": "numeric",
-        "bUseRendered": false,
-        "fnRender": function ( oObj ) {
-          return oObj.oSettings.fnFormatNumber( oObj.aData[6] ) + " " + sizeSuffix( oObj.aData[6] );
-        },
-      },
-      { "sWidth": "12%",
-        "sType": "numeric",
-        "bUseRendered": false,
-        "fnRender": function ( oObj ) {
-          return oObj.oSettings.fnFormatNumber( oObj.aData[7] ) + " " + sizeSuffix( oObj.aData[7] );
-        },
-      },
+      { "sWidth": "6%"  },
       { "sWidth": "12%" },
       { "sWidth": "12%" },
-      { "sWidth": "6%" },
+      { "sWidth": "12%" }
     ],
   } );
   /* end data table */
