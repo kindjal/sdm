@@ -89,7 +89,7 @@ CREATE TABLE disk_array (
   comments      VARCHAR(255),
   hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname)
 );
-CREATE TABLE IF NOT EXISTS disk_array_disk_set (
+CREATE TABLE disk_array_disk_set (
   id            BIGSERIAL PRIMARY KEY,
   disk_type     VARCHAR(255),
   disk_num      BIGINT DEFAULT 0 NOT NULL,
