@@ -10,6 +10,15 @@ $(document).ready(function() {
     "sPaginationType": "full_numbers",
     "bAutoWidth": false,
     "aaSorting": [ [1,'desc'] ],
+    "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+        $('td',nRow).each( function (iPosition) {
+            if (this.title) {
+                console.log(this.title)
+                $('td:eq(' + iPosition + ')',nRow).html( this.title );
+            }
+        } );
+        return nRow;
+    },
     "aoColumns": [
       { "sWidth": "10%" },
       { "sWidth": "6%"  },
