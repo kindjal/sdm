@@ -2,7 +2,7 @@
 $(document).ready(function() {
   TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
-  $('#volume').dataTable( {
+  $('#volumetable').dataTable( {
     "sDom": 'T<"clear">lfrtip',
     "bProcessing": true,
     "bFilter": true,

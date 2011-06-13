@@ -20,12 +20,12 @@
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"/>
     </head>
 
     <body id="dt_example">
@@ -47,6 +47,13 @@
             </tr>
           </xsl:for-each>
         </tbody>
+        <tfoot>
+          <tr>
+            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
+            <th> <xsl:value-of select="@name"/> </th>
+            </xsl:for-each>
+          </tr>
+        </tfoot>
       </table>
     </div> <!-- end div container -->
     </body> <!-- end body -->
