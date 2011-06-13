@@ -2,6 +2,12 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+<xsl:attribute-set name="table-cell-attrs">
+  <xsl:attribute name="title">
+    <xsl:value-of select='display_value'/>
+  </xsl:attribute>
+</xsl:attribute-set>
+
 <xsl:template name="sdm_disk_array_set" match="/object[@type='SDM::Disk::Array::Set']">
   <xsl:comment>template: /html/table/sdm_disk_array_set.xsl match="object[@type='SDM::Disk::Array::Set']"</xsl:comment>
 
@@ -30,7 +36,7 @@
 
     <body id="dt_example">
     <div id="container">
-      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="arraytable" class="display">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="arraytable" class="display" use-attribute-sets="table-cell-attrs">
         <thead>
           <tr>
             <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
@@ -42,7 +48,7 @@
           <xsl:for-each select="/object/aspect[@name='members']/object">
             <tr>
             <xsl:for-each select="aspect">
-              <td> <xsl:value-of select="value"/> </td>
+              <xsl:call-template name="celltemplate"/>
             </xsl:for-each>
             </tr>
           </xsl:for-each>
@@ -60,4 +66,17 @@
     </html>
 
   </xsl:template>
+
+  <xsl:template name="celltemplate">
+  <xsl:variable name="output-element">
+    <xsl:choose>
+      <xsl:when test="local-name(.)='head'">th</xsl:when>
+      <xsl:otherwise>td</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:element name="{$output-element}" use-attribute-sets="table-cell-attrs">
+    <xsl:value-of select="value"/>
+  </xsl:element>
+  </xsl:template>
+
 </xsl:stylesheet>
