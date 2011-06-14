@@ -1,14 +1,14 @@
-DROP TABLE IF EXISTS disk_user;
-DROP TABLE IF EXISTS disk_host_array;
-DROP TABLE IF EXISTS disk_filer_host;
-DROP TABLE IF EXISTS disk_mount;
-DROP TABLE IF EXISTS disk_array;
-DROP TABLE IF EXISTS disk_array_disk_set;
-DROP TABLE IF EXISTS disk_host;
-DROP TABLE IF EXISTS disk_volume;
-DROP TABLE IF EXISTS disk_export;
-DROP TABLE IF EXISTS disk_filer;
-DROP TABLE IF EXISTS disk_group;
+DROP TABLE IF EXISTS disk_user cascade;
+DROP TABLE IF EXISTS disk_host_array cascade;
+DROP TABLE IF EXISTS disk_filer_host cascade;
+DROP TABLE IF EXISTS disk_mount cascade;
+DROP TABLE IF EXISTS disk_array cascade;
+DROP TABLE IF EXISTS disk_array_disk_set cascade;
+DROP TABLE IF EXISTS disk_host cascade;
+DROP TABLE IF EXISTS disk_volume cascade;
+DROP TABLE IF EXISTS disk_export cascade;
+DROP TABLE IF EXISTS disk_filer cascade;
+DROP TABLE IF EXISTS disk_group cascade;
 CREATE TABLE disk_user (
   email         VARCHAR(255) PRIMARY KEY,
   created       DATE,
@@ -83,7 +83,7 @@ CREATE TABLE disk_array (
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   serial        VARCHAR(255),
-  arraysize     BIGINT DEFAULT 0 NOT NULL,
+  arraysize     BIGINT DEFAULT 0,
   created       DATE,
   last_modified DATE,
   comments      VARCHAR(255),

@@ -20,7 +20,7 @@ class SDM::Disk::Array {
         serial        => { is => 'Text' },
         comments      => { is => 'Text' },
         disk_set_num  => {
-            is => 'Number',
+            is => 'Integer',
             calculate => q| my @s = $self->disk_sets; return scalar @s;|,
         },
         arraysize     => {

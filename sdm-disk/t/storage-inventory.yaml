@@ -29,18 +29,10 @@ gpfs:
       manufacturer: HDS
       model: AMS2500
       serial: 87011188
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
     nsams2k4:
       manufacturer: HDS
       model: AMS2500
       serial: 87012574
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 gpfs2:
   hosts:
     linuscs110:
@@ -72,18 +64,10 @@ gpfs2:
       manufacturer: HDS
       model: AMS2500
       serial: 87040641
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
     nsams2k5:
       manufacturer: HDS
       model: AMS2500
       serial: 87012574
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 'gpfs-dev':
   hosts:
     linuscs107:
@@ -109,10 +93,6 @@ gpfs2:
       manufacturer: HDS
       model: AMS2500
       serial: 87041066
-      disk_type: sata
-      disk_num: 240
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 nfs1:
   hosts:
     linuscs52:
@@ -126,10 +106,6 @@ nfs1:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 #nfs1:
 nfs2:
   hosts:
@@ -139,58 +115,30 @@ nfs2:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
     GCEVA6:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KA
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA7:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K8
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA8:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KC
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA9:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KB
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA10:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K9
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA11:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KD
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 nfs10:
   hosts:
     linuscs62:
@@ -204,18 +152,10 @@ nfs10:
       manufacturer: HP
       model: EVA8100
       serial: 2S183815WS
-      disk_type: fc
-      disk_num: 240
-      arraysize: 439353344
-      adv_arraysize: 471859200
     GCEVA2:
       manufacturer: HP
       model: EVA8100
       serial: 2S1840160V
-      disk_type: sata
-      disk_num: 240
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 nfs11:
   hosts:
     linuscs66:
@@ -235,74 +175,38 @@ nfs11:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160T
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA4:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160W
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA5:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160X
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA6:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KA
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA7:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K8
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA8:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KC
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA9:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KB
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA10:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K9
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA11:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KD
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 nfs12:
   hosts:
     linuscs66:
@@ -322,74 +226,38 @@ nfs12:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160T
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA4:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160W
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA5:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160X
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA6:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KA
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA7:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K8
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA8:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KC
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA9:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KB
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA10:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K9
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA11:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KD
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 nfs14:
   hosts:
     linuscs66:
@@ -409,74 +277,38 @@ nfs14:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160T
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA4:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160W
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA5:
       manufacturer: HP
       model: EVA8400
       serial: 2S1840160X
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA6:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KA
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA7:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K8
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA8:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KC
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA9:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KB
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA10:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616K9
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
     GCEVA11:
       manufacturer: HP
       model: EVA8400
       serial: 2S191616KD
-      disk_type: sata
-      disk_num: 216
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 nfs15:
   hosts:
     'blade10-1-1':
@@ -485,10 +317,6 @@ nfs15:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs16:
   hosts:
     'blade7-2-13':
@@ -497,10 +325,6 @@ nfs16:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs17:
   hosts:
     linuscs84:
@@ -509,10 +333,6 @@ nfs17:
       manufacturer: HP
       model: XP24000
       serial: 28871
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs18:
   hosts:
     linuscs85:
@@ -521,10 +341,6 @@ nfs18:
       manufacturer: HP
       model: XP24000
       serial: 28871
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs19:
   hosts:
     linuscs86:
@@ -533,10 +349,6 @@ nfs19:
       manufacturer: HP
       model: XP24000
       serial: 28885
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs20:
   hosts:
     linuscs87:
@@ -545,10 +357,6 @@ nfs20:
       manufacturer: HP
       model: XP24000
       serial: 28885
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs21:
   hosts:
     'blade10-1-1':
@@ -557,10 +365,6 @@ nfs21:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs22:
   hosts:
     linuscs88:
@@ -569,10 +373,6 @@ nfs22:
       manufacturer: HP
       model: XP24000
       serial: 28901
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs23:
   hosts:
     linuscs89:
@@ -581,10 +381,6 @@ nfs23:
       manufacturer: HP
       model: XP24000
       serial: 28901
-      disk_type: fc
-      disk_num: 1152
-      arraysize: 439353344
-      adv_arraysize: 471859200
 nfs24:
   hosts:
     'blade10-1-1':
@@ -593,10 +389,6 @@ nfs24:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs25:
   hosts:
     'blade10-1-1':
@@ -605,10 +397,6 @@ nfs25:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs26:
   hosts:
     'blade10-1-1':
@@ -617,10 +405,6 @@ nfs26:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs27:
   hosts:
     'blade10-1-1':
@@ -629,10 +413,6 @@ nfs27:
       manufacturer: EMC
       model: CX380
       serial: APM00081501149
-      disk_type: sata
-      disk_num: 480
-      arraysize: 961544192
-      adv_arraysize: 1073741824
 nfs90:
   hosts:
     linuscs90:
@@ -641,10 +421,6 @@ nfs90:
       manufacturer: HDS
       model: AMS2500
       serial: 87040684
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 nfs91:
   hosts:
     linuscs91:
@@ -653,10 +429,6 @@ nfs91:
       manufacturer: HDS
       model: AMS2500
       serial: 87040684
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 nfs117:
   hosts:
     linuscs117:
@@ -665,10 +437,6 @@ nfs117:
       manufacturer: HDS
       model: AMS2500
       serial: 87040684
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 nfs118:
   hosts:
     linuscs118:
@@ -677,10 +445,6 @@ nfs118:
       manufacturer: HDS
       model: AMS2500
       serial: 87040684
-      disk_type: sata
-      disk_num: 480
-      arraysize: 1922039808
-      adv_arraysize: 2147483648
 ntap1:
   hosts:
     ntap1:
@@ -697,10 +461,6 @@ ntap2:
       manufacturer: NetApp
       model: FAS980
       serial: 0101164117
-      disk_type: fc
-      disk_num: 104
-      arraysize: 139460608
-      adv_arraysize: 153092096
 ntap3:
   hosts:
     ntap3:
@@ -712,10 +472,6 @@ ntap3:
       manufacturer: NetApp
       model: FAS980
       serial: 0101164117
-      disk_type: fc
-      disk_num: 104
-      arraysize: 139460608
-      adv_arraysize: 153092096
 ntap4:
   hosts:
     ntap4:
@@ -727,10 +483,6 @@ ntap4:
       manufacturer: NetApp
       model: FAS980
       serial: 0101178001
-      disk_type: fc
-      disk_num: 153
-      arraysize: 281018368
-      adv_arraysize: 335544320
 ntap5:
   hosts:
     ntap5:
@@ -742,10 +494,6 @@ ntap5:
       manufacturer: NetApp
       model: R200
       serial: 0101183358
-      disk_type: sata
-      disk_num: 72
-      arraysize: 433061888
-      adv_arraysize: 524288000
 ntap6:
   hosts:
     ntap6:
@@ -803,10 +551,6 @@ xyratex1:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 96
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex2:
   hosts:
     linuscs62:
@@ -816,10 +560,6 @@ xyratex2:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex3:
   hosts:
     linuscs62:
@@ -829,10 +569,6 @@ xyratex3:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex4:
   hosts:
     linuscs62:
@@ -842,10 +578,6 @@ xyratex4:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex5:
   hosts:
     linuscs62:
@@ -855,10 +587,6 @@ xyratex5:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex6:
   hosts:
     linuscs62:
@@ -868,10 +596,6 @@ xyratex6:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex7:
   hosts:
     linuscs55:
@@ -880,10 +604,6 @@ xyratex7:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 48
-      arraysize: 976224256
-      adv_arraysize: 1073741824
 xyratex8:
   hosts:
     linuscs55:
@@ -892,7 +612,3 @@ xyratex8:
       manufacturer: Xyratex
       model: F5404
       serial:
-      disk_type: sata
-      disk_num: 96
-      arraysize: 1922039808
-      adv_arraysize: 2147483648

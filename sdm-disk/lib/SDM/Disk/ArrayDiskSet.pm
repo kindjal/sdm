@@ -15,12 +15,12 @@ class SDM::Disk::ArrayDiskSet {
         arrayname          => { is => 'Text' },
         array              => { is => 'SDM::Disk::Array', id_by => 'arrayname' },
         disk_type          => { is => 'Text' },
-        disk_num           => { is => 'Number' },
-        disk_size          => { is => 'Number' },
+        disk_num           => { is => 'Integer', default_value => 0 },
+        disk_size          => { is => 'Integer', default_value => 0 },
         capacity           => {
-            is => 'Number',
+            is => 'Integer',
             calculate_from => [ 'disk_num', 'disk_size' ],
-            calculate => q| return $disk_num * $disk_size; |,
+            calculate => q| return int( $disk_num * $disk_size ); |,
         },
     ],
     has_optional => [
