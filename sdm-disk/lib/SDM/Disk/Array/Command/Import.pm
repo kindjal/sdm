@@ -16,10 +16,12 @@ class SDM::Disk::Array::Command::Import {
     is => 'SDM::Command::Base',
     doc => 'Import filer data from CSV file',
     has => [
-        csv     => { is => 'Text', doc => 'CSV file name' },
-        commit  => { is => 'Boolean' },
-        flush   => { is => 'Boolean' },
-        verbose => { is => 'Boolean' },
+        csv     => { is => 'Text', doc => 'CSV file name' }
+    ],
+    has_optional => [
+        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV' },
+        flush   => { is => 'Boolean', doc => 'Flush DB before parsing CSV' },
+        verbose => { is => 'Boolean', doc => 'Be verbose' },
     ],
 };
 
