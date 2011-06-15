@@ -84,7 +84,7 @@ sub execute {
                     push @params, ( $k => $v );
                 }
             }
-            my $array = SDM::Disk::Array->get_or_create( @params );
+            my $array = SDM::Disk::Array->get_or_create( name => $arrayname );
             unless ($array) {
                 $self->error_message("the array named '$arrayname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
                 return;
