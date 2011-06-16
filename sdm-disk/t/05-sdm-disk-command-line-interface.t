@@ -11,7 +11,7 @@ BEGIN {
 };
 
 my $top = dirname __FILE__;
-require "$top/sdm-lib.pm";
+require "$top/sdm-disk-lib.pm";
 
 my $t = SDM::Test::Lib->new();
 my $perl = $t->{perl};

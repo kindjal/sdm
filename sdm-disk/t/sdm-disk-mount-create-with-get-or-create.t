@@ -22,7 +22,7 @@ my $m;
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/sdm-lib.pm";
+require "$top/t/sdm-disk-lib.pm";
 ok( SDM::Test::Lib->testinit == 0, "ok: init db");
 
 ok( $f = SDM::Disk::Filer->create( name => 'nfs11'), "create filer ok");

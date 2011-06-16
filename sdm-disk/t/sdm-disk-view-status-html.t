@@ -22,7 +22,7 @@ use_ok( 'SDM::View::Diskstatus::Html' );
 use FindBin;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/sdm-lib.pm";
+require "$top/t/sdm-disk-lib.pm";
 
 ok( SDM::Test::Lib->testinit == 0, "ok: init db");
 

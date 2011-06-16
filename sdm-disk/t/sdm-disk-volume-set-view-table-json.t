@@ -22,7 +22,7 @@ use_ok( 'SDM::Disk::Volume::Set::View::Table::Json' );
 use FindBin;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/sdm-lib.pm";
+require "$top/t/sdm-disk-lib.pm";
 
 my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");

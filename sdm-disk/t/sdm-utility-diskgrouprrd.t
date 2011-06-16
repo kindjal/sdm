@@ -19,7 +19,7 @@ use_ok( 'SDM::Utility::DiskGroupRRD' );
 use FindBin;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/sdm-lib.pm";
+require "$top/t/sdm-disk-lib.pm";
 
 my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
@@ -29,7 +29,7 @@ my $u = SDM::Utility::DiskGroupRRD->create( loglevel => "DEBUG" );
 lives_ok { $u->run(); } "run lived";
 
 my $rrdpath = SDM::Env::SDM_DISK_RRDPATH->value;
-my $group = "SYSTEMS_DEVELOPMENT"; # Set in sdm-lib->testdata
+my $group = "SYSTEMS_DEVELOPMENT"; # Set in sdm-disk-lib->testdata
 my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
 ok( -f $rrdfile, "ok: rrd file made" );
 unlink $rrdfile;
