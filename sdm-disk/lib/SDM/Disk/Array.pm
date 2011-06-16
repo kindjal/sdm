@@ -25,7 +25,7 @@ class SDM::Disk::Array {
         },
         arraysize     => {
             is => 'SDM::Value::KBytes',
-            calculate => q| my $s; for $b ($self->disk_sets) { $s+=$b->capacity; }; return SDM::Value::KBytes->get($s); |,
+            calculate => q| my $s = 0; for $b ($self->disk_sets) { my $c = $b->capacity; $s+=$c if ($c); }; return SDM::Value::KBytes->get($s); |,
         },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
