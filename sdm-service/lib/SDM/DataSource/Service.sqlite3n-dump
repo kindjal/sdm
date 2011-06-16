@@ -1,0 +1,14 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE service_lsof (
+  pid           UNSIGNED INTEGER PRIMARY KEY,
+  uid           UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  time          UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  timedelta     UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  user          VARCHAR(255) NOT NULL DEFAULT '',
+  name          VARCHAR(255) NOT NULL DEFAULT '',
+  command       VARCHAR(255) NOT NULL DEFAULT '',
+  created       DATE,
+  last_modified DATE
+);
+COMMIT;
