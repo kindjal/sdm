@@ -1,3 +1,4 @@
+
 package SDM::Service::Lsofd::Command;
 
 use strict;
@@ -7,7 +8,7 @@ use SDM;
 
 class SDM::Service::Lsofd::Command {
     is          => 'Command::Tree',
-    doc         => 'run lsof client',
+    doc         => 'run lsof daemon',
 };
 
 1;
