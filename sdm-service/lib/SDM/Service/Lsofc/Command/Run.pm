@@ -23,7 +23,7 @@ class SDM::Service::Lsofc::Command::Run {
             default_value => 'localhost',
             doc   => 'lsofd server host',
         },
-        port => {
+        server => {
             is    => 'Number',
             default_value => 10001,
             doc   => 'lsofd server port',
@@ -90,33 +90,31 @@ sub execute {
             if ($1 eq 'p') {
                 # -- Build a process/pid record of lsof open file item
                 # This record is keyed on PID of process with file open + hostname.
-                if (scalar keys %$hash == scalar keys %$lsofargs) {
-                    # we now have a complete record, remember it in a hash.
+                if (scalar keys %$hash) {
+                    # We matched on "p" and hash is not empty, so record it in lsofrecords.
                     my $process = delete $hash->{process};
                     my $key = Sys::Hostname::hostname() . "\t" . $process;
-
-                    if (defined $lsofrecords->{$key}) {
-                        # We've seen this process before. Add to its time seen.
-                        $hash->{'time'} = $lsofrecords->{$key}->{'time'};
-                        my $delta = time - $lsofrecords->{$key}->{'time'};
-                        $hash->{'timedelta'} = $lsofrecords->{$key}->{'timedelta'} + $delta;
-                    } else {
-                        $hash->{'time'} = time;
-                        $hash->{'timedelta'} = 0;
+                    if (defined $records->{$key}) {
+                        # We've seen this process before. Add to its time seen, keep time first seen.
+                        $hash->{'time'} = $records->{$key}->{'time'};
+                        my $delta = time - $records->{$key}->{'time'};
+                        $hash->{'timedelta'} = $records->{$key}->{'timedelta'} + $delta;
                     }
                     $lsofrecords->{$key} = $hash;
                 }
-                # Start a new record.
+                # Start a new record with the pid.
                 $hash = {};
-                $hash->{process} = $2;
+                $hash->{'process'} = $2;
+                $hash->{'time'} = time;
+                $hash->{'timedelta'} = 0;
+                # Name must be a list
+                $hash->{'name'} = [];
             }
             while (my ($key,$value) = each %$lsofargs) {
                 next if ($key eq 'p'); # p is handled above special
                 if ($1 eq $key) {
-                    if (defined $hash->{$value}) {
-                        # Some items occur more than once.
-                        my $item = $hash->{$value};
-                        $hash->{$value} = [$item];
+                    # This is an lsof element that we are prepared to store.
+                    if ($value eq 'name') {
                         push @{ $hash->{$value} }, $2;
                     } else {
                         $hash->{$value} = $2;
@@ -131,6 +129,7 @@ sub execute {
                 foreach my $key (keys %$records) {
                     # Remove previously seen pid no longer running
                     if (! exists $lsofrecords->{$key}) {
+                        #$self->logger->debug("Remove " . $key);
                         delete $records->{$key};
                         $count++;
                     }
@@ -140,29 +139,34 @@ sub execute {
                 # Add the new stuff, updating time
                 $count = 0;
                 foreach my $key (keys %$lsofrecords) {
-                    next if ($lsofrecords->{$key}->{name} =~ /^(\/proc|\[)/); # skip proc and kernel entries
-                    my $delta = $lsofrecords->{$key}->{'timedelta'};
-                    if (defined $delta and $delta > $self->report_time) {
-                        $records->{$key} = $lsofrecords->{$key};
-                        $count++;
+                    if (grep { /^(\/proc|\[)/ } @{ $lsofrecords->{$key}->{name} } ) {
+                        #$self->logger->debug("skipping " . Data::Dumper::Dumper $lsofrecords->{$key}->{name});
+                        next;
                     }
+                    #$self->logger->debug("Add " . Data::Dumper::Dumper $key);
+                    $records->{$key} = $lsofrecords->{$key};
+                    $count++;
                 }
+                $lsofrecords = {};
+
                 $self->logger->debug("Tracking $count pids in memory") if ($count);
 
-                # Report to server at end of record
+                # POST to server at end of record
                 my $data = $json->encode($records);
                 my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
-                my $response = $userAgent->request(POST "http://" . $self->host . ":" . $self->port,
-                    Content_Type => 'text/json',
-                    Content => $data
+                my $size = length($data);
+                my $response = $userAgent->request(POST "http://" . $self->host . ":" . $self->server. "/service/lsof",
+                    Content_Type => 'application/x-www-form-urlencoded',
+                    Content_Length => $size,
+                    Content => "data=$data"
                 );
                 #$self->logger->debug("send:  " . $data);
-                $self->logger->debug("server responds:  " . $response->code);
                 if ($response->code != 200) {
-                    $self->logger->error("server response with error:\n" . Data::Dumper::Dumper $response);
+                    $self->logger->debug("server responds:  " . $response->code . " " . $response->message);
+                } else {
+                    $self->logger->debug("server responds:  " . $response->code . " " . $response->content);
                 }
 
-                # reset timer
                 alarm $self->timeout;
             }
         }
