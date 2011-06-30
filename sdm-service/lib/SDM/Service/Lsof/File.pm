@@ -18,7 +18,7 @@ class SDM::Service::Lsof::File {
         filename     => { is => 'Text' },
         hostname     => { is => 'Text' },
         pid          => { is => 'Integer' },
-        #process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid' ] }
+        process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid'] }
     ],
 };
 
