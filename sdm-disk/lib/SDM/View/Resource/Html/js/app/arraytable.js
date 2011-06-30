@@ -13,7 +13,6 @@ $(document).ready(function() {
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
         $('td',nRow).each( function (iPosition) {
             if (this.title) {
-                console.log(this.title)
                 $('td:eq(' + iPosition + ')',nRow).html( this.title );
             }
         } );
