@@ -114,9 +114,12 @@ sub run_starman {
     $runner->parse_options(
         '--app', $psgi_path,
         '--port', $self->port,
-        '--workers', 4,
+        '--workers', 5,
         '--single_request', 1,
-        '-R', SDM->base_dir );
+        '-r',
+        '-R', $self->psgi_path,
+        # '-R', SDM->base_dir # watching base_dir makes servers restart whenever sqlite test db is updated
+        );
 
     $runner->run;
 }
