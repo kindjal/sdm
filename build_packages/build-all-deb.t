@@ -54,13 +54,16 @@ sub build_deb_package {
     }
     ok(-w "$deb_upload_spool", "$deb_upload_spool directory is writable") or return;
 
+    my $version;
+    my $release;
+    my $buildhash;
     # if BUILDHASH is set (by Jenkins) update changelog
     if ((defined $ENV{BUILDVERSION} and length $ENV{BUILDVERSION}) and
         (defined $ENV{BUILDRELEASE} and length $ENV{BUILDRELEASE}) and
         (defined $ENV{BUILDHASH}    and length $ENV{BUILDHASH})) {
-        my $version = $ENV{BUILDVERSION};
-        my $release = $ENV{BUILDRELEASE};
-        my $buildhash = $ENV{BUILDHASH};
+        $version = $ENV{BUILDVERSION};
+        $release = $ENV{BUILDRELEASE};
+        $buildhash = $ENV{BUILDHASH};
         my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -D unstable -v $version-$release-$buildhash Jenkins build testing && popd\"");
         ok($rc == 0, "updated changelog") or return;
     }
@@ -76,18 +79,24 @@ sub build_deb_package {
     # Put all files, source, binary, and meta into spool.
     my %pkgs;
     my @bfiles;
-    my @sfiles = glob("$resultdir/${source}_*");
+    my @sfiles = glob("$resultdir/${source}_${version}*");
     foreach my $package (@debs) {
         # Note that members of bfiles may also be in sfiles
-        push @bfiles, glob("$resultdir/${package}_*");
+        push @bfiles, glob("$resultdir/${package}_${version}*");
     }
     # uniqify
     map { $pkgs{$_} = 1 } @sfiles;
     map { $pkgs{$_} = 1 } @bfiles;
     my @pkgfiles = keys %pkgs;
 
-    deploy($deb_upload_spool, \@pkgfiles, remove_on_success => 1);
-    runcmd("/bin/ls -lh $deb_upload_spool");
+    if ($buildhash) {
+        # Only deploy tagged builds
+        foreach my $pkg (@pkgfiles) {
+            ok( unlink $pkg, "removed intermediate deb");
+        }
+    } else {
+        deploy($deb_upload_spool, \@pkgfiles, remove_on_success => 1);
+    }
 
     # Clean up
     ok(unlink "$resultdir/$source-build.log", "cleaned build log") or return;
