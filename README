@@ -1,10 +1,20 @@
 
-System Data Miner
+System Data Miner (SDM)
 
+SDM is a UR Namespace, an application for collecting and exploring Linux system data.
 
-This is a UR Namespace, SDM, and application for collecting and exploring Linux system data.
 Currently we focus on...
 
 * Storage Management: Filers, Arrays, Hosts, Disk Groups, etc.
 * Platform LSF job data via Platform RTM tables.
+
+Installation:
+
+* Build debian packages and install with dpkg or apt-get
+
+Upgrades:
+
+* Upgrade .deb packages.
+* Remake database schemas.
+* Preserve RRD files.
 
