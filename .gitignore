@@ -2,9 +2,11 @@ sdm-disk/lib/SDM/DataSource/Disk.sqlite3n
 sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-bak
 sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-dump
 sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-dump-bak
+sdm-disk/lib/SDM/DataSource/Disk.sqlite3n-journal
 sdm-service/lib/SDM/DataSource/Service.sqlite3n
 sdm-service/lib/SDM/DataSource/Service.sqlite3n-bak
 sdm-service/lib/SDM/DataSource/Service.sqlite3n-dump
 sdm-service/lib/SDM/DataSource/Service.sqlite3n-dump-bak
+sdm-service/lib/SDM/DataSource/Service.sqlite3n-journal
 sdm/lib/SDM/DataSource/Meta.sqlite3n
 sdm/lib/SDM/DataSource/Meta.sqlite3n-dump
