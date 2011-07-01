@@ -9,6 +9,6 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-rtm
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace, libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libdbd-mysql-perl
 Description: A UR Object framework for RTM job data management
  A UR Object framework for RTM job data management.

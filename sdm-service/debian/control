@@ -9,7 +9,7 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-service
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl,libstarman-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl,libstarman-perl
 Description: A UR Object framework for running SDM services data management
  UR Object framework for running SDM services data management, currently just
  includes a development web server.
