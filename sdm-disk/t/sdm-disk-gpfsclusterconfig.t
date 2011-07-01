@@ -14,10 +14,17 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
+unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
+    plan skip_all => "Test only valid on GI networks";
+}
+
+
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
+
+ok( SDM::Test::Lib->has_gpfs_snmp == 0, "has gpfs");
 ok( SDM::Test::Lib->testinit == 0, "init db");
 ok( SDM::Test::Lib->testdata == 0, "data db");
 
@@ -28,7 +35,7 @@ ok( ! defined $res, "fake filer returns undef" );
 
 $res  = SDM::Disk::GpfsClusterConfig->get( filername => 'gpfs-dev' );
 ok( ref $res eq "SDM::Disk::GpfsClusterConfig", "object made correctly");
-ok( defined $res->id, "non zero id");
+ok( defined $res->id, "object created ok");
 
 ok( $res->filername eq 'gpfs-dev', "filername set");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");

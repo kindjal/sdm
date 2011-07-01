@@ -18,8 +18,7 @@ use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
-use_ok( 'SDM', "ok: loaded SDM");
-use_ok( 'SDM::DataSource::Disk', "ok: loaded SDM::DataSource::Disk");
+use SDM;
 
 my $ds = SDM::DataSource::Disk->get();
 my $driver = $ds->driver;
@@ -38,7 +37,8 @@ unless ($sdm) {
         die "Can't find 'sdm' executable";
     }
 }
-ok( defined $sdm, "ok: sdm found in PATH");
+
+die "sdm not found in PATH" unless (defined $sdm);
 
 sub new {
     my $class = shift;
@@ -138,6 +138,19 @@ sub testdata {
     SDM::Disk::Volume->create( mount_path=>"/gscmnt/gc2116", physical_path=>"/vol/gc2116", total_kb=>100, used_kb=>90, filername=>"gpfs-dev");
     UR::Context->commit();
     return 0;
+}
+
+sub has_gpfs_snmp {
+    my $self = shift;
+    my $master = "linuscs107";
+    open(PROG, "/usr/bin/snmpwalk -v 2c -c gscpublic -r10 -t10 $master gpfsClusterConfigTable 2>&1 |");
+    my $output = <PROG>;
+    close(PROG);
+    if ($output =~ /No Such Object/i) {
+        plan skip_all => "gpfs snmp subagent not running";
+        return 0;
+    }
+    return 1;
 }
 
 1;

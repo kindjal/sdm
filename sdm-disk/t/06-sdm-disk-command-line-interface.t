@@ -35,7 +35,4 @@ $t->runcmd("$perl $sdm disk array assign nsams2k1 linuscs107");
 $t->runcmd("$perl $sdm disk host assign linuscs107 gpfs-dev");
 $t->runcmd("$perl $sdm disk host update --master linuscs107");
 
-# Delete a filer that has mappings to volumes hosts and arrays
-$t->runcmd("$perl $sdm disk host list --filter hostname=linuscs107 --show hostname,gpfs_node_config.gpfsNodeType,gpfs_node_config.gpfsNodeAdmin");
-
 done_testing();
