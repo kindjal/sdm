@@ -1,21 +1,20 @@
-PRAGMA foreign_keys = ON;
-DROP TABLE IF EXISTS service_lsof_process;
 DROP TABLE IF EXISTS service_lsof_file;
-CREATE TABLE IF NOT EXISTS service_lsof_process (
+DROP TABLE IF EXISTS service_lsof_process;
+CREATE TABLE EXISTS service_lsof_process (
   hostname      VARCHAR(255) NOT NULL DEFAULT '',
   pid           INTEGER NOT NULL DEFAULT 0,
   uid           INTEGER NOT NULL DEFAULT 0,
   time          INTEGER NOT NULL DEFAULT 0,
   timedelta     INTEGER NOT NULL DEFAULT 0,
-  user          VARCHAR(255) NOT NULL DEFAULT '',
+  username      VARCHAR(255) NOT NULL DEFAULT '',
   command       VARCHAR(255) NOT NULL DEFAULT '',
   created       DATE,
   last_modified DATE,
   PRIMARY KEY(hostname,pid)
 );
-CREATE TABLE IF NOT EXISTS service_lsof_file (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  pid           UNSIGNED INTEGER,
+CREATE TABLE EXISTS service_lsof_file (
+  id            INTEGER PRIMARY KEY,
+  pid           INTEGER,
   hostname      VARCHAR(255),
   filename      VARCHAR(255),
   CONSTRAINT    service_lsof_hostname_fk FOREIGN KEY (hostname,pid) REFERENCES service_lsof_process (hostname,pid) ON DELETE CASCADE
