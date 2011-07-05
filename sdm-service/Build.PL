@@ -30,5 +30,6 @@ my $build = Module::Build->new(
 
 $build->add_build_element('etc');
 $build->add_build_element('psgi');
+$build->add_build_element('schema');
 $build->create_build_script;
 
