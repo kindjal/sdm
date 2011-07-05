@@ -20,7 +20,7 @@ class SDM::Service::Lsof::Process {
         uid           => { is => 'Integer', default => 0 },
         time          => { is => 'Integer', default => 0 },
         timedelta     => { is => 'Integer', default => 0 },
-        user          => { is => 'Text', default => '' },
+        username      => { is => 'Text', default => '' },
         command       => { is => 'Text', default => '' },
     ],
     has_many_optional => [

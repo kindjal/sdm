@@ -21,7 +21,7 @@ class SDM::Service::Lsof::Process::Set::View::Table::Json {
                         'hostname',
                         'pid',
                         'command',
-                        'user',
+                        'username',
                         'uid',
                         'time',
                         'timedelta',
