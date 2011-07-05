@@ -29,9 +29,9 @@ if ($ENV{SDM_DATABASE_DRIVER} eq "SQLite") {
     class SDM::DataSource::Service {
         is => [ 'UR::DataSource::Pg' ],
         has_constant => [
-            server => { default_value => "dbname=system;host=$hostname" },
+            server => { default_value => "dbname=sdm;host=$hostname" },
             owner  => { default_value => 'public' },
-            login  => { default_value => 'system' },
+            login  => { default_value => 'sdm' },
             auth   => { default_value => 'pYKVikFf' },
         ]
     };
