@@ -18,15 +18,10 @@ $Data::Dumper::Indent = 1;
 class SDM::Service::Lsofc::Command::Run {
     is  => 'SDM::Command::Base',
     has => [
-        host => {
+        url => {
             is    => 'Text',
-            default_value => 'localhost',
-            doc   => 'lsofd server host',
-        },
-        server => {
-            is    => 'Number',
-            default_value => 10001,
-            doc   => 'lsofd server port',
+            default_value => 'http://localhost:8090/server/lsof',
+            doc   => 'lsofd server URL',
         },
         wait => {
             # Wait this many seconds between lsof calls.
@@ -65,7 +60,7 @@ sub execute {
         n => 'name',
         p => 'process',
         c => 'command',
-        L => 'user',
+        L => 'username',
         u => 'uid',
     };
 
@@ -155,7 +150,7 @@ sub execute {
                 my $data = $json->encode($records);
                 my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
                 my $size = length($data);
-                my $response = $userAgent->request(POST "http://" . $self->host . ":" . $self->server. "/service/lsof",
+                my $response = $userAgent->request(POST $self->url,
                     Content_Type => 'application/x-www-form-urlencoded',
                     Content_Length => $size,
                     Content => "data=$data"

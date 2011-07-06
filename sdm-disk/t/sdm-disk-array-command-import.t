@@ -23,7 +23,7 @@ require "$top/t/sdm-disk-lib.pm";
 my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 
-my $csvfile = "$top/t/storage-inventory.csv";
+my $csvfile = "$top/t/array-inventory.csv";
 my $c = SDM::Disk::Array::Command::Import->create( loglevel => "DEBUG", csv => $csvfile );
 lives_ok { $c->execute(); } "run lived";
 

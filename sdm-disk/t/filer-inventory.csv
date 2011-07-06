@@ -1,4 +1,4 @@
-filername,hosts
+name,hosts
 gpfs, linuscs103 linuscs104 linuscs105 linuscs106
 gpfs2, linuscs110 linuscs111 linuscs112 linuscs113
 gpfs-dev, linuscs107 linuscs108 linuscs109
