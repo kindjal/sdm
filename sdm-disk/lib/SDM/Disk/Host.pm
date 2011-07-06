@@ -12,8 +12,11 @@ class SDM::Disk::Host {
     id_by => [
         hostname        => { is => 'Text', len => 255 },
     ],
-    has_optional => [
+    has => [
         status          => { is => 'UnsignedInteger', default => 0 },
+        master          => { is => 'Boolean', default => 0  },
+    ],
+    has_optional => [
         manufacturer    => { is => 'Text', len => 255 },
         model           => { is => 'Text', len => 255 },
         os              => { is => 'Text', len => 255 },
@@ -21,7 +24,6 @@ class SDM::Disk::Host {
         location        => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
-        master          => { is => 'Boolean', default => 0  },
         gpfs_node_status_id => {
             is => 'Number',
             calculate_from => 'hostname',
@@ -115,7 +117,11 @@ sub create {
         $self->error_message("No hostname given for Host");
         return;
     }
-    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    # Don't overwrite existing created date, where we may want to
+    # recreate a previously existing object
+    unless ($params{created}) {
+        $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    }
     return $self->SUPER::create( %params );
 }
 
