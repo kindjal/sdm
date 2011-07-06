@@ -16,6 +16,16 @@ my $class = Module::Build->subclass (
     class => 'Pod::Builder',
     code => <<'EOS',
 
+      sub ACTION_clean {
+        # FIXME: is this safe?
+        use File::Path qw/rmtree/;
+        rmtree "./_build";
+        rmtree "./blib";
+        rmtree "./cmd-bindoc";
+        unlink "./Build";
+        unlink "./MYMETA.yml";
+      }
+
       sub ACTION_cmd_docs {
         use File::Copy qw/copy/;
         $ENV{ANSI_COLORS_DISABLED} = 1;
