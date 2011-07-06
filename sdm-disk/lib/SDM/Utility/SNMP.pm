@@ -15,7 +15,7 @@ class SDM::Utility::SNMP {
         community   => { is => 'Text', default => "gscpublic" },
         version     => { is => 'Text', default => "2c" },
         command     => { is => 'Text', default => "snmpget" },
-        args        => { is => 'Text', default => "-r10 -t10" },
+        args        => { is => 'Text', default => "-r5 -t1" },
         exec        => {
                         calculate_from => 'command',
                         calculate => q/

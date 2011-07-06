@@ -15,6 +15,8 @@ class SDM::Utility::SNMP::DiskUsage {
             default_value => 0,
             doc => 'Allow automounter to mount volumes to find disk groups'
         },
+    ],
+    has_transient => [
         disk_groups => {
             is => 'HASH',
         }
@@ -106,7 +108,7 @@ sub _get_disk_group {
     my $self = shift;
     my $physical_path = shift;
     my $mount_path = shift;
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group($physical_path,$mount_path)");
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group($physical_path)");
 
     my $disk_group;
 
@@ -225,6 +227,7 @@ sub acquire_volume_data {
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
     my $oid = $self->hosttype eq 'netapp' ?  'dfTable' : 'hrStorageTable';
     my $snmp_table = $self->read_snmp_into_table($oid);
+    return unless ($snmp_table);
     my $volume_table = $self->_convert_to_volume_data( $snmp_table );
     return $volume_table;
 }
