@@ -3,110 +3,111 @@ package SDM::Disk::Filer::Command::Import;
 
 use strict;
 use warnings;
+
 use SDM;
-use YAML::XS qw/Load/;
-use File::Slurp qw/read_file/;
+
+use Text::CSV;
+use Getopt::Std;
+use Data::Dumper;
+
+$| = 1;
 
 class SDM::Disk::Filer::Command::Import {
     is => 'SDM::Command::Base',
-    doc => 'Import filer data from YAML file',
+    doc => 'Import filer data from CSV file',
     has => [
-        yaml => { is => 'Text', doc => 'YAML file name' },
+        csv     => { is => 'Text', doc => 'CSV file name' }
+    ],
+    has_optional => [
+        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV' },
+        flush   => { is => 'Boolean', doc => 'Flush DB before parsing CSV' },
+        verbose => { is => 'Boolean', doc => 'Be verbose' },
     ],
 };
 
 sub help_brief {
-    return 'Import filer data from a YAML file';
+    return 'Import filer data from a CSV file';
 }
 
 sub help_synopsis {
     return <<EOS;
-Import filer data from a YAML file
+Import filer data from a CSV file
 EOS
 }
 
 sub help_detail {
     return <<EOS;
-Import filer data from a YAML file
+Import filer data from a CSV file
 EOS
+}
+
+sub _store ($$$) {
+    my $self = shift;
+    my ($hash,$key,$value) = @_;
+    return unless (defined $value and defined $key and length($value) > 0 and length($key) > 0);
+    $hash->{$key} = $value;
 }
 
 sub execute {
     my $self = shift;
-    my $configfile = $self->yaml;
 
-    unless (-f $configfile) {
-        $self->error_message("please specify a valid yaml file path: $!");
-        return;
+    my $csv = Text::CSV->new ( { binary => 1 } )  # should set binary attribute.
+        or die "Cannot use CSV: " . Text::CSV->error_diag();
+
+    my @header;
+    my @filers;
+
+    open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
+    while ( my $row = $csv->getline( $fh ) ) {
+        unless (@header) {
+            push @header, $row;
+            next;
+        }
+        my $filer = {};
+        # Build an object out of a row by hand because the column
+        # headers are useless as is, with unpredictable/unusable text.
+        $self->_store($filer, "name",         $row->[0]);
+        $self->_store($filer, "hosts",        $row->[1]);
+        next unless (scalar keys %$filer);
+        push @filers, $filer;
     }
 
-    my $config = Load scalar read_file($configfile) or
-        die "error loading config file '$configfile': $!";
+    $csv->eof or $csv->error_diag();
+    close $fh;
 
-    $self->logger->debug("loaded $configfile");
-
-    foreach my $filername (keys %$config) {
-
-        my $obj = $config->{$filername};
-
-        my @hosts;
-        if (defined $obj->{hosts} and ref $obj->{hosts} eq "HASH") {
-            @hosts = keys %{ $obj->{hosts} };
-        } else {
-            @hosts = split(/\s+/,$config->{$filername}->{hosts});
+    if ($self->flush) {
+        foreach my $filer (SDM::Disk::Filer->get()) {
+            $filer->delete();
         }
+    }
+
+    foreach my $filer (@filers) {
+        if (! defined $filer->{hosts} or ! defined $filer->{name}) {
+            $self->logger->error(__PACKAGE__ . " malformed filer entry: " . Data::Dumper::Dumper $filer);
+            next;
+        }
+        warn Data::Dumper::Dumper $filer if ($self->verbose);
+        my @hosts = split(/\s+/,$filer->{hosts});
+        @hosts = grep { /^\S+$/ } @hosts;
         foreach my $hostname (@hosts) {
-            $self->logger->debug("add host $hostname");
-            my @params = ( hostname => $hostname );
-            if (defined $obj->{hosts}->{$hostname}) {
-                while (my ($k,$v) = each %{ $obj->{hosts}->{$hostname} } ) {
-                    push @params, ( $k => $v );
-                }
-            }
-            my $host = SDM::Disk::Host->get_or_create( @params );
+            my $host = SDM::Disk::Host->get(hostname => $hostname);
             unless ($host) {
-                $self->logger->error("the host named '$hostname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
+                $self->logger->error(__PACKAGE__ . " filer " . $filer->{name} . " refers to unknown host $hostname");
                 return;
             }
         }
-
-        my @arrays;
-        if (defined $obj->{arrays} and ref $obj->{arrays} eq "HASH") {
-            @arrays = keys %{ $obj->{arrays} };
-        } else {
-            @arrays = split(/\s+/,$config->{$filername}->{arrays});
-        }
-        foreach my $arrayname (@arrays) {
-            $self->logger->debug("add array $arrayname");
-            my @params = ( name => $arrayname );
-            if (defined $obj->{arrays}->{$arrayname}) {
-                while (my ($k,$v) = each %{ $obj->{arrays}->{$arrayname} } ) {
-                    push @params, ( $k => $v );
-                }
-            }
-            my $array = SDM::Disk::Array->get_or_create( name => $arrayname );
-            unless ($array) {
-                $self->error_message("the array named '$arrayname' related to filer '$filername' does not exist in the DB and cannot be added: $!");
-                return;
-            }
-            foreach my $hostname (@hosts) {
-                $self->logger->debug("assign array $arrayname to host $hostname");
-                $array->assign( $hostname );
-            }
-        }
-
-        $self->logger->debug("add filer $filername");
-        my $filer = SDM::Disk::Filer->get_or_create( name => $filername, comments => $config->{$filername}->{comments} );
-        unless ($filer) {
-            $self->error_message("the filer named '$filername' does not exist in the DB and cannot be added: $!");
-            return;
+        my $result = SDM::Disk::Filer->get_or_create(name => $filer->{name});
+        unless ($result) {
+            $self->logger->error(__PACKAGE__ . " error creating filer: " . Data::Dumper::Dumper $filer . ": $!");
         }
         foreach my $hostname (@hosts) {
-            $self->logger->debug("assign host $hostname to filer $filername");
-            my $host = SDM::Disk::Host->get( hostname => $hostname );
-            $host->assign( $filername );
+            my $host = SDM::Disk::Host->get(hostname => $hostname);
+            $host->assign( $result->{name} );
         }
+
     }
+
+    UR::Context->commit() if ($self->commit);
     return 1;
 }
 
