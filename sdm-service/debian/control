@@ -2,7 +2,7 @@ Source: ur-sdm-service
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl,libur-perl,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libtest-simple-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl
+Build-Depends-Indep: perl,libur-perl,ur-sdm-namespace,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libtest-simple-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
@@ -13,3 +13,9 @@ Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-nam
 Description: A UR Object framework for running SDM services data management
  UR Object framework for running SDM services data management, currently just
  includes a development web server.
+
+Package: ur-sdm-service-lsofc
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace
+Description: An NSF open files monitoring client.
+ An NSF open files monitoring client.
