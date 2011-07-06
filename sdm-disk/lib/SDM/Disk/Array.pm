@@ -67,6 +67,21 @@ sub create {
     return $self->SUPER::create( %params );
 }
 
+=head2 update
+Update Arrays
+=cut
+sub update {
+    my $self = shift;
+    my (%params) = @_;
+    if ($params{name} and $self->name ne $params{name}) {
+        $self->logger->error(__PACKAGE__ . " name mismatch: " . $self->name . " vs. " . $params{name});
+        return;
+    }
+    foreach my $key (keys %params) {
+        $self->$key( $params{$key} );
+    }
+}
+
 sub delete {
     my $self = shift;
     # Before we remove the Array, we must remove its connection to Hosts.

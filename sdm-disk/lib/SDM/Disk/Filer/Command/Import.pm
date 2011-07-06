@@ -81,28 +81,28 @@ sub execute {
         }
     }
 
-    foreach my $filer (@filers) {
-        if (! defined $filer->{hosts} or ! defined $filer->{name}) {
-            $self->logger->error(__PACKAGE__ . " malformed filer entry: " . Data::Dumper::Dumper $filer);
+    foreach my $filerdata (@filers) {
+        if (! defined $filerdata->{hosts} or ! defined $filerdata->{name}) {
+            $self->logger->error(__PACKAGE__ . " malformed filer entry: " . Data::Dumper::Dumper $filerdata);
             next;
         }
-        warn Data::Dumper::Dumper $filer if ($self->verbose);
-        my @hosts = split(/\s+/,$filer->{hosts});
+        warn Data::Dumper::Dumper $filerdata if ($self->verbose);
+        my @hosts = split(/\s+/,$filerdata->{hosts});
         @hosts = grep { /^\S+$/ } @hosts;
         foreach my $hostname (@hosts) {
             my $host = SDM::Disk::Host->get(hostname => $hostname);
             unless ($host) {
-                $self->logger->error(__PACKAGE__ . " filer " . $filer->{name} . " refers to unknown host $hostname");
+                $self->logger->error(__PACKAGE__ . " filer " . $filerdata->{name} . " refers to unknown host $hostname");
                 return;
             }
         }
-        my $result = SDM::Disk::Filer->get_or_create(name => $filer->{name});
-        unless ($result) {
-            $self->logger->error(__PACKAGE__ . " error creating filer: " . Data::Dumper::Dumper $filer . ": $!");
+        my $filer = SDM::Disk::Filer->get_or_create(name => $filerdata->{name});
+        unless ($filer) {
+            $self->logger->error(__PACKAGE__ . " error creating filer: " . Data::Dumper::Dumper $filerdata . ": $!");
         }
         foreach my $hostname (@hosts) {
             my $host = SDM::Disk::Host->get(hostname => $hostname);
-            $host->assign( $result->{name} );
+            $host->assign( $filer->{name} );
         }
 
     }

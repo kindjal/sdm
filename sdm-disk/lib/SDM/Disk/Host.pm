@@ -125,6 +125,21 @@ sub create {
     return $self->SUPER::create( %params );
 }
 
+=head2 update
+Update Hosts and relationships
+=cut
+sub update {
+    my $self = shift;
+    my (%params) = @_;
+    if ($params{hostname} and $self->hostname ne $params{hostname}) {
+        $self->logger->error(__PACKAGE__ . " hostname mismatch: " . $self->hostname . " vs. " . $params{hostname});
+        return;
+    }
+    foreach my $key (keys %params) {
+        $self->$key( $params{$key} );
+    }
+}
+
 =head2 delete
 Delete Hosts and relationships
 =cut

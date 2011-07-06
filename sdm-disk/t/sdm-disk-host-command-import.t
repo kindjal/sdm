@@ -32,4 +32,8 @@ ok( $o->manufacturer eq "Dell", "mfr set" );
 ok( $o->os eq "RHEL 5.5", "os set" );
 ok( $o->location eq "222 ns rack 2.11", "location set" );
 
+# Try redundantly
+$c = SDM::Disk::Host::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, commit => 1 );
+lives_ok { $c->execute(); } "rerun lived";
+
 done_testing();

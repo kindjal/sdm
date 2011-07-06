@@ -97,9 +97,17 @@ sub execute {
         }
     }
 
-    foreach my $array (@arrays) {
-        print Data::Dumper::Dumper $array if ($self->verbose);
-        my @res = SDM::Disk::Array->get_or_create(%$array);
+    foreach my $arraydata (@arrays) {
+        print Data::Dumper::Dumper $arraydata if ($self->verbose);
+        my $array = SDM::Disk::Array->get($arraydata->{name});
+        if ($array) {
+            $array->update(%$arraydata);
+        } else {
+            $array = SDM::Disk::Array->create(%$arraydata);
+        }
+        unless ($array) {
+            $self->logger->error("failed to get or create array: " . Data::Dumper::Dumper $arraydata . ": $!");
+        }
     }
     foreach my $dset (@dsets) {
         print Data::Dumper::Dumper $dset if ($self->verbose);

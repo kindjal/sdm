@@ -87,13 +87,18 @@ sub execute {
         }
     }
 
-    foreach my $host (@hosts) {
+    foreach my $hostdata (@hosts) {
         if ($self->verbose) {
-            warn Data::Dumper::Dumper $host;
+            warn Data::Dumper::Dumper $hostdata;
         }
-        my $res = SDM::Disk::Host->get_or_create(%$host);
-        unless ($res) {
-            $self->logger->error("failed to get or create host: " . Data::Dumper::Dumper $host . ": $!");
+        my $host = SDM::Disk::Host->get($hostdata->{hostname});
+        if ($host) {
+            $host->update(%$hostdata);
+        } else {
+            $host = SDM::Disk::Host->create(%$hostdata);
+        }
+        unless ($host) {
+            $self->logger->error("failed to get or create host: " . Data::Dumper::Dumper $hostdata . ": $!");
         }
     }
 
