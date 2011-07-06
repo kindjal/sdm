@@ -25,12 +25,12 @@ CREATE TABLE IF NOT EXISTS disk_filer (
 CREATE TABLE IF NOT EXISTS disk_host (
   hostname      VARCHAR(255) NOT NULL PRIMARY KEY,
   status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  master        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   os            VARCHAR(255),
   location      VARCHAR(255),
   comments      VARCHAR(255),
-  master        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE
 );
