@@ -19,7 +19,7 @@ class SDM::Disk::Array::Command::Import {
         csv     => { is => 'Text', doc => 'CSV file name' }
     ],
     has_optional => [
-        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV' },
+        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV', default => 1 },
         flush   => { is => 'Boolean', doc => 'Flush DB before parsing CSV' },
         verbose => { is => 'Boolean', doc => 'Be verbose' },
     ],
@@ -62,6 +62,16 @@ sub execute {
     open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
+            if ("name" ne $row->[0]      or
+                "manufacturer" ne $row->[1] or
+                "model" ne $row->[2]     or
+                "serial" ne $row->[3]    or
+                "disk_type" ne $row->[4] or
+                "disk_num" ne $row->[5]
+                ) {
+                $self->logger->error(__PACKAGE__ . " CSV file  ne does not match what is expected for Filers: " . $self->csv);
+                return;
+            }
             push @header, $row;
             next;
         }
@@ -106,7 +116,7 @@ sub execute {
             $array = SDM::Disk::Array->create(%$arraydata);
         }
         unless ($array) {
-            $self->logger->error("failed to get or create array: " . Data::Dumper::Dumper $arraydata . ": $!");
+            $self->logger->error(__PACKAGE__ . " failed to get or create array: " . Data::Dumper::Dumper $arraydata . ": $!");
         }
     }
     foreach my $dset (@dsets) {
@@ -116,6 +126,8 @@ sub execute {
 
     UR::Context->commit() if ($self->commit);
 
+    $self->logger->info(__PACKAGE__ . " successfully imported " . scalar @arrays . " arrays");
+    return 1;
 }
 
 1;

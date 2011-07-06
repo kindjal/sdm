@@ -19,7 +19,7 @@ class SDM::Disk::Filer::Command::Import {
         csv     => { is => 'Text', doc => 'CSV file name' }
     ],
     has_optional => [
-        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV' },
+        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV', default => 1 },
         flush   => { is => 'Boolean', doc => 'Flush DB before parsing CSV' },
         verbose => { is => 'Boolean', doc => 'Be verbose' },
     ],
@@ -60,6 +60,11 @@ sub execute {
     open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
+            if ($row->[0] ne "name" or
+                $row->[1] ne "hosts") {
+                $self->logger->error(__PACKAGE__ . " CSV file header does not match what is expected for Filers: " . $self->csv);
+                return;
+            }
             push @header, $row;
             next;
         }
@@ -92,7 +97,7 @@ sub execute {
         foreach my $hostname (@hosts) {
             my $host = SDM::Disk::Host->get(hostname => $hostname);
             unless ($host) {
-                $self->logger->error(__PACKAGE__ . " filer " . $filerdata->{name} . " refers to unknown host $hostname");
+                $self->logger->error(__PACKAGE__ . " filer " . $filerdata->{name} . " refers to unknown host $hostname, perhaps import hosts first?");
                 return;
             }
         }
@@ -108,6 +113,8 @@ sub execute {
     }
 
     UR::Context->commit() if ($self->commit);
+    $self->logger->info(__PACKAGE__ . " successfully imported " . scalar @filers . " filers");
+
     return 1;
 }
 

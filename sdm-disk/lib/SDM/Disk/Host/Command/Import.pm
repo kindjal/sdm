@@ -19,7 +19,7 @@ class SDM::Disk::Host::Command::Import {
         csv     => { is => 'Text', doc => 'CSV file name' }
     ],
     has_optional => [
-        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV' },
+        commit  => { is => 'Boolean', doc => 'Commit after parsing CSV', default => 1 },
         flush   => { is => 'Boolean', doc => 'Flush DB before parsing CSV' },
         verbose => { is => 'Boolean', doc => 'Be verbose' },
     ],
@@ -60,6 +60,20 @@ sub execute {
     open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
+            if (
+                "hostname" ne $row->[0] or
+                "status" ne $row->[1] or
+                "manufacturer" ne $row->[2] or
+                "model" ne $row->[3] or
+                "os" ne $row->[4] or
+                "location" ne $row->[5] or
+                "comments" ne $row->[6] or
+                "master" ne $row->[7] or
+                "created" ne $row->[8] or
+                "last_modified" ne $row->[9]) {
+                $self->logger->error(__PACKAGE__ . " CSV file header doesn't match what is expected for Hosts: " . $self->csv);
+                return;
+            }
             push @header, $row;
             next;
         }
@@ -72,9 +86,10 @@ sub execute {
         $self->_store($host, "model",          $row->[3]);
         $self->_store($host, "os",             $row->[4]);
         $self->_store($host, "location",       $row->[5]);
-        $self->_store($host, "master",         $row->[6]);
-        $self->_store($host, "created",        $row->[7]);
-        $self->_store($host, "last_modified",  $row->[8]);
+        $self->_store($host, "comments",       $row->[6]);
+        $self->_store($host, "master",         $row->[7]);
+        $self->_store($host, "created",        $row->[8]);
+        $self->_store($host, "last_modified",  $row->[9]);
         push @hosts, $host;
     }
 
@@ -98,11 +113,12 @@ sub execute {
             $host = SDM::Disk::Host->create(%$hostdata);
         }
         unless ($host) {
-            $self->logger->error("failed to get or create host: " . Data::Dumper::Dumper $hostdata . ": $!");
+            $self->logger->error(__PACKAGE__ . " failed to get or create host: " . Data::Dumper::Dumper $hostdata . ": $!");
         }
     }
 
     UR::Context->commit() if ($self->commit);
+    $self->logger->info(__PACKAGE__ . " successfully imported " . scalar @hosts . " hosts");
     return 1;
 }
 
