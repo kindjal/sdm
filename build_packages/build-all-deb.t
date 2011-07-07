@@ -68,7 +68,7 @@ sub build_deb_package {
         my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -D unstable -v $version-$release-$buildhash Jenkins build testing && popd\"");
         ok($rc == 0, "updated changelog") or return;
     } else {
-        open(CMD,"dpkg-parsechangelog |") or die "Cannot execute dpkg-parsechangelog: $!";
+        open(CMD,"/bin/bash -c \"pushd $package_dir && /usr/bin/dpkg-parsechangelog && popd \" |") or die "Cannot execute dpkg-parsechangelog: $!";
         while(<CMD>) {
             m/^(\S+): (.*)$/;
             $version = $2 if ($1 eq "Version");
