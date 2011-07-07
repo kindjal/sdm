@@ -70,12 +70,15 @@ sub build_deb_package {
     } else {
         open(CMD,"/bin/bash -c \"pushd $package_dir && /usr/bin/dpkg-parsechangelog && popd \" |") or die "Cannot execute dpkg-parsechangelog: $!";
         while(<CMD>) {
-            m/^(\S+): (.*)$/;
-            $version = $2 if ($1 eq "Version");
+            if (/^(\S+): (.*)$/) {
+                $version = $2 if ($1 eq "Version");
+            }
         }
         close(CMD);
         if ($version) {
             ($version,$release) = split("-",$version,2);
+        } else {
+            die "cannot parse version from changelog";
         }
     }
 
