@@ -1,0 +1,8 @@
+lib/SDM/Gpfs/Command/README
+lib/SDM/Gpfs/Command/LunQuery.pm
+lib/SDM/Gpfs/Command/MountQuery.pm
+lib/SDM/Gpfs/Command.pm
+lib/SDM/Gpfs.pm
+t/README
+MANIFEST.SKIP
+MANIFEST

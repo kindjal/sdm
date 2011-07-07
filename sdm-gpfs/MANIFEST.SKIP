@@ -1,0 +1,7 @@
+debian/*.log
+debian/ur-sdm-gpfs*
+blib
+_build
+lib/SDM/DataSource/*-bak
+lib/SDM/DataSource/*-dump
+lib/SDM/DataSource/*-journal
