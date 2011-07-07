@@ -45,6 +45,7 @@ sub build_deb_package {
         }
     }
     close(FH);
+    die "Cannot determine package Source name" unless ($source);
 
     # .debs get signed and added to the apt repo via the codesigner role
     # Check that we can write there before we build.
@@ -66,6 +67,16 @@ sub build_deb_package {
         $buildhash = $ENV{BUILDHASH};
         my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -D unstable -v $version-$release-$buildhash Jenkins build testing && popd\"");
         ok($rc == 0, "updated changelog") or return;
+    } else {
+        open(CMD,"dpkg-parsechangelog |") or die "Cannot execute dpkg-parsechangelog: $!";
+        while(<CMD>) {
+            m/^(\S+): (.*)$/;
+            $version = $2 if ($1 eq "Version");
+        }
+        close(CMD);
+        if ($version) {
+            ($version,$release) = split("-",$version,2);
+        }
     }
 
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
