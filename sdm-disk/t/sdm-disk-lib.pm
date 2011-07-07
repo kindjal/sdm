@@ -12,7 +12,6 @@ BEGIN {
 };
 
 use Test::More;
-use FindBin;
 use Cwd qw/abs_path/;
 use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;

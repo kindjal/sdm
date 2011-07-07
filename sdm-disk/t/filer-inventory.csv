@@ -1,46 +1,46 @@
-name,hosts
-gpfs, linuscs103 linuscs104 linuscs105 linuscs106
-gpfs2, linuscs110 linuscs111 linuscs112 linuscs113
-gpfs-dev, linuscs107 linuscs108 linuscs109
-nfs1, linuscs52
-nfs2, linuscs56
-nfs10, linuscs62 linuscs63 linuscs64 linuscs65 linuscs78 linuscs79
-nfs11, linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77
-nfs12, linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77
-nfs14, linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77
-nfs15, blade10-1-1
-nfs16, blade7-2-13
-nfs17, linuscs84
-nfs18, linuscs85
-nfs19, linuscs86
-nfs20, linuscs87
-nfs21, blade10-1-1
-nfs22, linuscs88
-nfs23, linuscs89
-nfs24, blade10-1-1
-nfs25, blade10-1-1
-nfs26, blade10-1-1
-nfs27, blade10-1-1
-nfs90, linuscs90
-nfs91, linuscs91
-nfs117, linuscs117
-nfs118, linuscs118
-ntap1, ntap1
-ntap2, ntap2
-ntap3, ntap3
-ntap4, ntap4
-ntap5, ntap5
-ntap6, ntap6
-ntap7, ntap7
-ntap8, ntap8
-ntap9, ntap9
-ntap10, ntap10
-ntap11, ntap11
-xyratex1, linuscs62 linuscs66
-xyratex2, linuscs62 linuscs66
-xyratex3, linuscs62 linuscs66
-xyratex4, linuscs62 linuscs66
-xyratex5, linuscs62 linuscs66
-xyratex6, linuscs62 linuscs66
-xyratex7, linuscs55
-xyratex8, linuscs55
+name,hosts,comments
+gpfs,linuscs103 linuscs104 linuscs105 linuscs106,
+gpfs2,linuscs110 linuscs111 linuscs112 linuscs113,
+gpfs-dev,linuscs107 linuscs108 linuscs109,
+nfs1,linuscs52,
+nfs2,linuscs56,
+nfs10,linuscs62 linuscs63 linuscs64 linuscs65 linuscs78 linuscs79,
+nfs11,linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77,
+nfs12,linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77,
+nfs14,linuscs66 linuscs67 linuscs68 linuscs69 linuscs70 linuscs71 linuscs72 linuscs73 linuscs74 linuscs75 linuscs76 linuscs77,
+nfs15,blade10-1-1,
+nfs16,blade7-2-13,
+nfs17,linuscs84,
+nfs18,linuscs85,
+nfs19,linuscs86,
+nfs20,linuscs87,
+nfs21,blade10-1-1,
+nfs22,linuscs88,
+nfs23,linuscs89,
+nfs24,blade10-1-1,
+nfs25,blade10-1-1,
+nfs26,blade10-1-1,
+nfs27,blade10-1-1,
+nfs90,linuscs90,
+nfs91,linuscs91,
+nfs117,linuscs117,
+nfs118,linuscs118,
+ntap1,ntap1,
+ntap2,ntap2,
+ntap3,ntap3,
+ntap4,ntap4,
+ntap5,ntap5,
+ntap6,ntap6,
+ntap7,ntap7,
+ntap8,ntap8,
+ntap9,ntap9,
+ntap10,ntap10,
+ntap11,ntap11,
+xyratex1,linuscs62 linuscs66,
+xyratex2,linuscs62 linuscs66,
+xyratex3,linuscs62 linuscs66,
+xyratex4,linuscs62 linuscs66,
+xyratex5,linuscs62 linuscs66,
+xyratex6,linuscs62 linuscs66,
+xyratex7,linuscs55,
+xyratex8,linuscs55,

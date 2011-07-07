@@ -61,7 +61,8 @@ sub execute {
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
             if ($row->[0] ne "name" or
-                $row->[1] ne "hosts") {
+                $row->[1] ne "hosts" or
+                $row->[2] ne "comments") {
                 $self->logger->error(__PACKAGE__ . " CSV file header does not match what is expected for Filers: " . $self->csv);
                 return;
             }
@@ -73,6 +74,7 @@ sub execute {
         # headers are useless as is, with unpredictable/unusable text.
         $self->_store($filer, "name",         $row->[0]);
         $self->_store($filer, "hosts",        $row->[1]);
+        $self->_store($filer, "comments",     $row->[2]);
         next unless (scalar keys %$filer);
         push @filers, $filer;
     }
@@ -101,7 +103,7 @@ sub execute {
                 return;
             }
         }
-        my $filer = SDM::Disk::Filer->get_or_create(name => $filerdata->{name});
+        my $filer = SDM::Disk::Filer->get_or_create(name => $filerdata->{name}, comments => $filerdata->{comments});
         unless ($filer) {
             $self->logger->error(__PACKAGE__ . " error creating filer: " . Data::Dumper::Dumper $filerdata . ": $!");
         }
