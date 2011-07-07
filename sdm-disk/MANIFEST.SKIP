@@ -1,7 +1,8 @@
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/rules
-lib/SDM/DataSource/Disk.sqlite3n-bak
-lib/SDM/DataSource/Disk.sqlite3n-dump
+debian/*.log
+debian/ur-sdm-disk*
+blib
+_build
+lib/SDM/DataSource/Disk.sqlite3n
+lib/SDM/DataSource/*-bak
+lib/SDM/DataSource/*-dump
+lib/SDM/DataSource/*-journal
