@@ -1,5 +1,4 @@
 /etc/init/ur-sdm-service-webapp.conf
-/etc/init/ur-sdm-service-lsofc.conf
 /usr/share/man/man3/SDM::Service::Lsof::Process.3pm
 /usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm
 /usr/share/perl5/SDM/DataSource/Service.pm
