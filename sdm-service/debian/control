@@ -14,12 +14,6 @@ Description: A UR Object framework for running SDM services data management
  UR Object framework for running SDM services data management, currently just
  includes a development web server.
 
-Package: ur-sdm-service
-Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace
-Description: Base class for SDM::Service
- Base class for SDM::Service
-
 Package: ur-sdm-service-lsofc
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),ur-sdm-service
