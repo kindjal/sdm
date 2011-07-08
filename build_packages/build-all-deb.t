@@ -87,13 +87,23 @@ sub build_deb_package {
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
     my $pwd = $ENV{PWD};
     chdir $package_dir;
-    my $rc = runcmd("/usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean");
+    my $rc;
+    eval {
+        $rc = runcmd("/usr/bin/pdebuild --auto-debsign --debsign-k $ENV{MYGPGKEY} --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean");
+    };
+    my @errs;
+    open(LOG,"egrep \"( error| failure)\" $resultdir/$source-build.log |") or die "can't open log file: $!";
+    while (<LOG>) {
+        chomp;
+        push @errs, $_;
+    }
+    close(LOG);
     chdir $pwd;
-    ok($rc == 0, "built deb") or diag("failed to build deb: $!");
+    ok($rc == 0, "built deb") or diag("failed to build deb:\n" . join("\n",@errs));
 
     # Sign changes
-    $rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_${version}*.changes");
-    ok($rc == 0, "signed sources") or return 0;
+    #$rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_${version}*.changes");
+    #ok($rc == 0, "signed sources") or return 0;
 
     # Put all files, source, binary, and meta into spool.
     my %pkgs;
@@ -129,7 +139,7 @@ sub deploy {
         my $gid = getgrnam("codesigner");
         chmod 0664, $p;
         chown $UID, $gid, $p;
-        ok(runcmd("/bin/cp -a $p $dest") == 0, "deployed $p to $dest") or return;
+        ok(runcmd("/bin/cp $p $dest") == 0, "deployed $p to $dest") or return;
         if ($opts{remove_on_success}) {
             unlink($p) or die "failed to remove $p after deploying";
         }
