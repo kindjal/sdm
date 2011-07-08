@@ -12,14 +12,14 @@ delete $ENV{BUILDRESULT};
 
 my $resultdir = File::Basename::dirname File::Basename::dirname Cwd::abs_path __FILE__;
 
-ok( -w $resultdir, "pbuilder result dir appears ready");
-ok( defined $ENV{MYGPGKEY}, "MYGPGKEY is defined");
+ok( -w $resultdir, "pbuilder result dir appears ready") or diag("$resultdir not writable");
+ok( defined $ENV{MYGPGKEY}, "MYGPGKEY is defined") or diag("no gpg key in ENV");
 
 my @debs;
 my @src = File::Find::Rule->directory()
             ->mindepth(2)
             ->maxdepth(2)
-            ->name('debian')
+            ->name(qr/^debian$/)
             ->in('.');
 
 print "Found packages: " . join(',', reverse sort @src) . ".\n";
@@ -29,8 +29,8 @@ foreach my $pkg (reverse sort @src) {
 done_testing();
 
 sub build_deb_package {
-    my (%build_params) = @_;
-    my $package_name = $build_params{package_name};
+    my (%params) = @_;
+    my $package_name = $params{package_name};
     my $package_dir = File::Basename::dirname $package_name;
 
     # A single source tree may have multiple source and binary packages produced.
@@ -46,29 +46,31 @@ sub build_deb_package {
     }
     close(FH);
     die "Cannot determine package Source name" unless ($source);
+    die "Cannot determine target Package names" unless (@debs);
 
     # .debs get signed and added to the apt repo via the codesigner role
     # Check that we can write there before we build.
-    my $deb_upload_spool = "/gscuser/codesigner/incoming/lucid-genome-development/";
-    if ( defined $build_params{deb_upload_spool} ) {
-        $deb_upload_spool = $build_params{deb_upload_spool};
-    }
-    ok(-w "$deb_upload_spool", "$deb_upload_spool directory is writable") or return;
+    die "Upload spool unset" unless ( $params{deb_upload_spool} );
+    my $deb_upload_spool = $params{deb_upload_spool};
+
+    die "upload spool $deb_upload_spool is not writable" unless (-w "$deb_upload_spool");
 
     my $version;
     my $release;
     my $buildhash;
-    # if BUILDHASH is set (by Jenkins) update changelog
+
+    # if BUILDHASH is set (by Jenkins) update changelog, build but don't publish.
     if ((defined $ENV{BUILDVERSION} and length $ENV{BUILDVERSION}) and
         (defined $ENV{BUILDRELEASE} and length $ENV{BUILDRELEASE}) and
         (defined $ENV{BUILDHASH}    and length $ENV{BUILDHASH})) {
         $version = $ENV{BUILDVERSION};
         $release = $ENV{BUILDRELEASE};
         $buildhash = $ENV{BUILDHASH};
-        my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/debchange -D unstable -v $version-$release-$buildhash Jenkins build testing && popd\"");
-        ok($rc == 0, "updated changelog") or return;
+        my $rc = runcmd("/usr/bin/debchange -l$package_dir/debian/changelog -D unstable -v $version-$release-$buildhash Jenkins build testing");
+        ok($rc == 0, "updated changelog") or diag("failed to update changelog");
     } else {
-        open(CMD,"/bin/bash -c \"pushd $package_dir && /usr/bin/dpkg-parsechangelog && popd \" |") or die "Cannot execute dpkg-parsechangelog: $!";
+        # Else read changelog
+        open(CMD,"/usr/bin/dpkg-parsechangelog -l$package_dir/debian/changelog |") or die "Cannot execute dpkg-parsechangelog: $!";
         while(<CMD>) {
             if (/^(\S+): (.*)$/) {
                 $version = $2 if ($1 eq "Version");
@@ -78,17 +80,20 @@ sub build_deb_package {
         if ($version) {
             ($version,$release) = split("-",$version,2);
         } else {
-            die "cannot parse version from changelog";
+            die "cannot parse version from changelog $package_dir/debian/changelog";
         }
     }
 
     # .debs get built via pdebuild, must be run on a build host, probably a slave to jenkins
-    my $rc = runcmd("/bin/bash -c \"pushd $package_dir && /usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean && popd\"");
-    ok($rc == 0, "built deb") or return;
+    my $pwd = $ENV{PWD};
+    chdir $package_dir;
+    my $rc = runcmd("/usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean");
+    chdir $pwd;
+    ok($rc == 0, "built deb") or diag("failed to build deb: $!");
 
-    # Sign
-    $rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_*.changes");
-    ok($rc == 0, "signed sources") or return;
+    # Sign changes
+    $rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_${version}*.changes");
+    ok($rc == 0, "signed sources") or return 0;
 
     # Put all files, source, binary, and meta into spool.
     my %pkgs;
@@ -113,7 +118,7 @@ sub build_deb_package {
     }
 
     # Clean up
-    ok(unlink "$resultdir/$source-build.log", "cleaned build log") or return;
+    ok(unlink "$resultdir/$source-build.log", "cleaned build log") or return 0;
     return 1;
 }
 
@@ -137,13 +142,14 @@ sub runcmd {
     printf "runcmd: $command\n";
     system($command);
     if ($? == -1) {
-        print "failed to execute: $!\n";
+        die "failed to execute: $!";
     } elsif ($? & 127) {
-        printf "child died with signal %d, %s coredump\n",
+        my $msg = sprintf "child died with signal %d, %s coredump\n",
                ($? & 127),  ($? & 128) ? 'with' : 'without';
-    } else {
-        printf "child exited with value %d\n", $? >> 8;
+        die $msg;
     }
-    return $? >> 8;
+    my $rc = $? >> 8;
+    die "command exited $rc" if ($rc);
+    return 0;
 }
 
