@@ -7,9 +7,6 @@ BEGIN {
     push @INC, "../sdm/lib";
 };
 
-# On a packaging system, we Build-Require ur-sdm-namespace, so this should work.
-use SDM;
-
 my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
