@@ -39,9 +39,9 @@ sub process {
 
     # Get the hostname from the first key of first record
     my $firstkey = shift @{ [ keys %$records ] };
-    return unless ($firstkey);
+    return 0 unless ($firstkey);
     my $hostname = shift @{ [ split("\t",$firstkey) ] };
-    return unless ($hostname);
+    return 0 unless ($hostname);
 
     # Remove existing records not just returned in JSON.
     foreach my $existing (SDM::Service::Lsof::Process->get( hostname => $hostname )) {
