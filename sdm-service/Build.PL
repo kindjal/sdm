@@ -75,11 +75,9 @@ my $build = $class->new(
   build_requires => {
     'Module::Build' => '',
     'UR' => '0.31',
-    'SDM' => '',
   },
   requires => {
     'UR' => '0.31',
-    'SDM' => '',
   },
   bindoc_dirs => ['cmd-bindoc'],
 );
