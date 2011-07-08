@@ -52,7 +52,7 @@ my $class = Module::Build->subclass (
       sub ACTION_docs {
         my $self = shift;
         $self->depends_on('code');
-        $self->depends_on('cmd_docs');
+        #$self->depends_on('cmd_docs');
         $self->depends_on('manpages', 'html');
       }
 
