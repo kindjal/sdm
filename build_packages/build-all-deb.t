@@ -88,10 +88,14 @@ sub build_deb_package {
     my $pwd = $ENV{PWD};
     chdir $package_dir;
     my $rc;
-    eval {
-        $rc = runcmd("/usr/bin/pdebuild --auto-debsign --debsign-k $ENV{MYGPGKEY} --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean");
-    };
     my @errs;
+    eval {
+        $rc = runcmd("/usr/bin/pdebuild --use-pdebuild-internal --logfile $resultdir/$source-build.log && fakeroot debian/rules clean");
+    };
+    if ($@) {
+        push @errs,$@;
+        $rc = 1;
+    }
     open(LOG,"egrep \"( error| failure)\" $resultdir/$source-build.log |") or die "can't open log file: $!";
     while (<LOG>) {
         chomp;
@@ -99,11 +103,11 @@ sub build_deb_package {
     }
     close(LOG);
     chdir $pwd;
-    ok($rc == 0, "built deb") or diag("failed to build deb:\n" . join("\n",@errs));
+    ok($rc == 0, "built deb") or diag("failed to build deb: $package_name\n" . join("\n",@errs));
 
     # Sign changes
-    #$rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_${version}*.changes");
-    #ok($rc == 0, "signed sources") or return 0;
+    $rc = runcmd("/usr/bin/debsign -k$ENV{MYGPGKEY} $resultdir/${source}_${version}*.changes");
+    ok($rc == 0, "signed sources") or return 0;
 
     # Put all files, source, binary, and meta into spool.
     my %pkgs;
