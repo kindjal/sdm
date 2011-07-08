@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+PACKAGE=$(shell dh_listpackages)
+
+%:
+	PATH="/bin:/usr/bin" ; \
+	dh $@
+
+override_dh_auto_configure:
+override_dh_auto_build:
+override_dh_auto_install:
+	install -d ./debian/$(PACKAGE)/usr/share/snmp/mibs
+	install -m 644 mibs/GPFS-MIB.txt ./debian/$(PACKAGE)/usr/share/snmp/mibs
+	install -m 644 mibs/netapp-2.0.3.mib ./debian/$(PACKAGE)/usr/share/snmp/mibs
+	install -m 644 mibs/netapp-2.1.1.mib ./debian/$(PACKAGE)/usr/share/snmp/mibs

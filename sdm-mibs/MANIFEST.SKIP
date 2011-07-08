@@ -1,0 +1,5 @@
+debian/*.log
+debian/ur-sdm-mibs*
+blib
+_build
+build_deb_test_results/*

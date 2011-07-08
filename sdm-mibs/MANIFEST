@@ -1,0 +1,13 @@
+./Build.PL
+./MANIFEST
+./MANIFEST.SKIP
+./mibs/GPFS-MIB.txt
+./mibs/netapp-2.0.3.mib
+./mibs/netapp-2.1.1.mib
+./debian/changelog
+./debian/compat
+./debian/control
+./debian/copyright
+./debian/postinst
+./debian/rules
+./debian/preinst

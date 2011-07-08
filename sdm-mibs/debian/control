@@ -1,0 +1,13 @@
+Source: ur-sdm-mibs
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/Object-Accessor/
+
+Package: ur-sdm-mibs
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}
+Description: SNMP MIBS for ur-sdm-disk
+ SNMP MIBS for ur-sdm-disk
