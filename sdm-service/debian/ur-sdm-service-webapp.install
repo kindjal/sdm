@@ -1,6 +1,6 @@
 /etc/init/ur-sdm-service-webapp.conf
-/usr/share/man/man3/SDM::Service::Lsof::Process.3pm.gz
-/usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm.gz
+/usr/share/man/man3/SDM::Service::Lsof::Process.3pm
+/usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm
 /usr/share/perl5/SDM/Service/Lsof/Process/Set/View/Table/Json.pm
 /usr/share/perl5/SDM/Service/Lsof/Process/Set/View/Table/Xml.pm
 /usr/share/perl5/SDM/Service/Lsof/Process/Command.pm
