@@ -6,3 +6,4 @@ lib/SDM/DataSource/Service.sqlite3n
 lib/SDM/DataSource/*-bak
 lib/SDM/DataSource/*-dump
 lib/SDM/DataSource/*-journal
+build_deb_test_results/t/sdm-search.t
