@@ -57,6 +57,8 @@ lib/SDM/Disk/Host/Command.pm
 lib/SDM/Disk/Host/Command/Assign.pm
 lib/SDM/Disk/Host/Command/Detach.pm
 lib/SDM/Disk/Host/Command/Import.pm
+lib/SDM/Disk/Host/Set/View/Table/Json.pm
+lib/SDM/Disk/Host/Set/View/Table/Xml.pm
 lib/SDM/Disk/HostArrayBridge.pm
 lib/SDM/Disk/HostArrayBridge/Command.pm
 lib/SDM/Disk/HostArrayBridge/Command/README
@@ -94,9 +96,9 @@ lib/SDM/Utility/SNMP/DiskUsage.pm
 lib/SDM/Value/KBytes.pm
 lib/SDM/Value/Percentage.pm
 lib/SDM/View/Diskstatus/Html.pm
-lib/SDM/View/Resource/Html/css/diskusage_page.css
-lib/SDM/View/Resource/Html/css/diskusage_table.css
-lib/SDM/View/Resource/Html/html/diskusage.html
+lib/SDM/View/Resource/Html/css/diskstatus_page.css
+lib/SDM/View/Resource/Html/css/diskstatus_table.css
+lib/SDM/View/Resource/Html/html/diskstatus.html
 lib/SDM/View/Resource/Html/html/groupvolumetable.html
 lib/SDM/View/Resource/Html/html/rrd.html
 lib/SDM/View/Resource/Html/img/body_bg.png
@@ -108,7 +110,7 @@ lib/SDM/View/Resource/Html/img/gradient_header.png
 lib/SDM/View/Resource/Html/img/underconstruction-small.png
 lib/SDM/View/Resource/Html/js/app/arraytable.js
 lib/SDM/View/Resource/Html/js/app/common.js
-lib/SDM/View/Resource/Html/js/app/diskusage.js
+lib/SDM/View/Resource/Html/js/app/diskstatus.js
 lib/SDM/View/Resource/Html/js/app/filertable.js
 lib/SDM/View/Resource/Html/js/app/groupvolumetable.js
 lib/SDM/View/Resource/Html/js/app/rrdFlot.js

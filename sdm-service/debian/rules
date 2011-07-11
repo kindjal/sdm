@@ -10,5 +10,5 @@ unexport PERL_MB_OPT
 override_dh_auto_test:
 override_dh_auto_install:
 	dh_auto_install
-	install -d ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource
-	cp -ap lib/SDM/View/Resource/Html ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource/Html
+	install -d ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource
+	cp -ap lib/SDM/View/Resource/Html ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource/Html
