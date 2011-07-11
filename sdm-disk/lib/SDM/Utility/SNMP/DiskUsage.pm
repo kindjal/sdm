@@ -18,6 +18,7 @@ class SDM::Utility::SNMP::DiskUsage {
     ],
     has_transient => [
         disk_groups => {
+            default_value => {},
             is => 'HASH',
         }
     ]
@@ -225,6 +226,10 @@ Run this subclass of SNMP to gather DiskUsage data.
 sub acquire_volume_data {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
+    unless ($self->hosttype) {
+        $self->logger->error(__PACKAGE__ . " can't determine hosttype of host: " . $self->hostname);
+        return;
+    }
     my $oid = $self->hosttype eq 'netapp' ?  'dfTable' : 'hrStorageTable';
     my $snmp_table = $self->read_snmp_into_table($oid);
     return unless ($snmp_table);
