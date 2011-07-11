@@ -21,8 +21,8 @@
 
     <title>SDM::Disk::Array::Set</title>
     <style type="text/css" title="currentStyle">
-      @import "/res/css/diskusage_page.css";
-      @import "/res/css/diskusage_table.css";
+      @import "/res/css/diskstatus_page.css";
+      @import "/res/css/diskstatus_table.css";
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
