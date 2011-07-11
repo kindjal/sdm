@@ -15,4 +15,8 @@ id -G www-data 2>/dev/null |  \
     usermod -G local-systems www-data || \
     die "failed to add local-systems group to www-data"
 
-[ -d ~www-data ] && mkdir -p ~www-data
+[ -d ~www-data ] || \
+    mkdir -p ~www-data
+[ -f /var/log/ur-sdm-service/ur-sdm-service-webapp.log ] || \
+    touch /var/log/ur-sdm-service/ur-sdm-service-webapp.log
+chown www-data: /var/log/ur-sdm-service/ur-sdm-service-webapp.log
