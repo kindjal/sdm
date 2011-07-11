@@ -14,3 +14,4 @@ override_dh_auto_install:
 	echo "export TNS_ADMIN=/gsc/pkg/oracle/10gR2/db_1/network/admin" > ./debian/$(PACKAGE)/etc/profile.d/tnsnames.sh
 	install -d ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource
 	cp -ap lib/SDM/View/Resource/Html ./debian/$(PACKAGE)/usr/share/perl5/SDM/View/Resource/Html
+	cp -ap lib/SDM/xsl ./debian/$(PACKAGE)/usr/share/perl5/SDM/xsl

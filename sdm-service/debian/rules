@@ -12,3 +12,4 @@ override_dh_auto_install:
 	dh_auto_install
 	install -d ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource
 	cp -ap lib/SDM/View/Resource/Html ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource/Html
+	cp -ap lib/SDM/xsl ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/xsl
