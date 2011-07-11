@@ -260,7 +260,7 @@ sub _query_snmp {
         }
         my $snmp = SDM::Utility::SNMP::DiskUsage->create( @params );
         unless ($snmp) {
-            $self->logger->error(__PACKAGE__ . " unable to create QuerySnmp object for filer " . $filer->name . ": " . Data::Dumper::Dumper @params);
+            $self->logger->error(__PACKAGE__ . " unable to query SNMP on filer " . $filer->name);
             return;
         }
 
