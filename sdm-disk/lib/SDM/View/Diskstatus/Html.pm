@@ -24,7 +24,7 @@ sub _generate_content {
     my $self = shift;
     __FILE__ =~ /^(.*\/SDM\/).*/;
     my $base = $1;
-    my $html = $base . "/View/Resource/Html/html/diskusage.html";
+    my $html = $base . "/View/Resource/Html/html/diskstatus.html";
     open(FH,"<$html") or die "Failed to open $html: $!";
     my $content = do { local $/; <FH> };
     close(FH);

@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-  /* TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf"; */
+  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
   /* Top of page total summary */
   $.getJSON('/view/sdm/disk/volume/set/summary.json', function(result) {

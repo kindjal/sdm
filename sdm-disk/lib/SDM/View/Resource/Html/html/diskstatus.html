@@ -9,12 +9,15 @@
 
     <title>Disk Usage Information</title>
     <style type="text/css" title="currentStyle">
-      @import "/res/css/diskusage_page.css";
+      @import "/res/css/diskstatus_page.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/diskusage.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/diskstatus.js"></script>
   </head>
   <body id="dt_example">
     <div id="container">
@@ -178,21 +181,6 @@
         </tfoot>
       </table>
       </div> <!-- end of volume div -->
-
-      <h1>Frequently Asked Questions</h1>
-
-      <div class="emphasis">
-      <p>Q: What's the cumulative disk consumption?<br/>
-      A: See the <a href=#total>Totals section</a>.</p>
-      <p>Q: How much space is a specific group consuming?<br/>
-      A: See the <a href=#group>Disk Usage By Disk Group</a> table below.</p>
-      <p>Q: How much space has not yet been assigned to a group?<br/>
-      A: See the <a href=#volume>Disk Volumes</a> table, sort by group name and find <b>unknown</b>.</p>
-      <p>Q: How much space has not yet been made available?<br/>
-      A: That answer is not available from this page. We would have to query storage arrays directly, rather than the filesystems, and this isn't currently possible.</p>
-      <p>Q: How does a volume show up in these stats?<br/>
-      A: A host running nfsd and snmpd must be present in the configuration file used by the "diskusage" cron job on this host, and the Volumes that it serves must begin with a prefix path coded into disk_usage.pl (currently "/home" and "/vol").</p>
-      </div>
 
     </div> <!-- end of container -->
   </body>
