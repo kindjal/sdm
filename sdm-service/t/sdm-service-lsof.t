@@ -31,7 +31,7 @@ $params = {
   hostname => "vm73.gsc.wustl.edu",
   pid      => 12344,
   uid      => 500,
-  user     => 'luser',
+  username => 'luser',
   command  => 'perl',
   name     => 'foo',
 };
@@ -47,7 +47,7 @@ $params = {
   hostname => "vm75.gsc.wustl.edu",
   pid      => 12345,
   uid      => 500,
-  user     => 'luser',
+  username => 'luser',
   command  => 'perl',
   name     => \@files,
 };
@@ -58,7 +58,7 @@ $params = {
   hostname => "vm76.gsc.wustl.edu",
   pid      => 12346,
   uid      => 501,
-  user     => 'luser',
+  username => 'luser',
   command  => 'perl',
   name     => \@files,
 };
