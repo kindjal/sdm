@@ -28,7 +28,6 @@ sub execute {
     # FIXME: Rather "get" items where last_modified is > $self->age, but I
     # don't know how to do that.
     my @entries = SDM::Service::Lsof::Process->get();
-    return unless (@entries);
     foreach my $item (@entries) {
         my $lm = $item->last_modified;
         next unless ($lm);
