@@ -6,15 +6,9 @@ die () {
     exit 1
 }
 
+# We use the local-systems group to make our Sqlite databases
+# writable by a non-root user, a member of the local-systems group.
 grep -q local-systems /etc/group || \
     groupadd local-systems       || \
     die "failed to add local-systems group"
-
-id -u www-data 2>&1 >/dev/null || \
-    die "required user www-data doesn't exist"
-
-id -G www-data 2>/dev/null |  \
-    grep -q local-systems  || \
-    usermod -G local-systems www-data || \
-    die "failed to add local-systems group to www-data"
 
