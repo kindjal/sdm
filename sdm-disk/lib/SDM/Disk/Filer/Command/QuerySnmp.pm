@@ -259,6 +259,10 @@ sub _query_snmp {
             push @params, ( allow_mount => $self->allow_mount );
         }
         my $snmp = SDM::Utility::SNMP::DiskUsage->create( @params );
+        unless ($snmp) {
+            $self->logger->error(__PACKAGE__ . " unable to create QuerySnmp object for filer " . $filer->name . ": " . Data::Dumper::Dumper @params);
+            return;
+        }
 
         # Query SNMP for disk usage numbers
         # This is different from read_snmp_into_table() because we have platform depenedent volume data
@@ -273,7 +277,7 @@ sub _query_snmp {
     };
     if ($@) {
         # log here, but not high priority, it's common
-        $self->logger->warn(__PACKAGE__ . "error with SNMP query: $@");
+        $self->logger->warn(__PACKAGE__ . " error with SNMP query: $@");
         $filer->status(0);
     }
 
