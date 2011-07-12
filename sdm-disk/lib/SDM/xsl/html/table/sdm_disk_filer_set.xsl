@@ -26,67 +26,20 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/filertable.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+$(document).ready(function() {
+  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+  drawFilerTable();
+});
+    </script>
     </head>
 
     <body id="dt_example">
     <div id="container">
       <table width="100%" cellspacing="0" cellpadding="0" border="0" id="filertable" class="display">
-        <thead>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </thead>
-        <tbody>
-          <xsl:for-each select="/object/aspect[@name='members']/object">
-            <tr>
-            <xsl:for-each select="aspect">
-              <xsl:variable name="jvalue" select="value" />
-              <xsl:choose>
-                <xsl:when test="count($jvalue) = 1">
-                    <td> <xsl:value-of select="value"/> </td>
-                </xsl:when>
-                <xsl:otherwise>
-                    <td>
-                    <xsl:call-template name="join">
-                      <xsl:with-param name="valueList" select="$jvalue"/>
-                      <xsl:with-param name="separator" select="','"/>
-                    </xsl:call-template>
-                    </td>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-            </tr>
-          </xsl:for-each>
-        </tbody>
-        <tfoot>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </tfoot>
       </table>
-    </div> <!-- end div container -->
-    </body> <!-- end body -->
+    </div>
+    </body>
     </html>
-
   </xsl:template>
-
-   <xsl:template name="join" >
-    <xsl:param name="valueList" select="''"/>
-    <xsl:param name="separator" select="','"/>
-    <xsl:for-each select="$valueList">
-      <xsl:choose>
-        <xsl:when test="position() = 1">
-          <xsl:value-of select="."/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat($separator, .) "/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
-  </xsl:template>
-
 </xsl:stylesheet>

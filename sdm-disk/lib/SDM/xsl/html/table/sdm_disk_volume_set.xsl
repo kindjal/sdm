@@ -26,38 +26,20 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"/>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+$(document).ready(function() {
+  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+  drawVolumeTable();
+});
+    </script>
     </head>
 
     <body id="dt_example">
     <div id="container">
       <table width="100%" cellspacing="0" cellpadding="0" border="0" id="volumetable" class="display">
-        <thead>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </thead>
-        <tbody>
-          <xsl:for-each select="/object/aspect[@name='members']/object">
-            <tr>
-            <xsl:for-each select="aspect">
-              <td> <xsl:value-of select="value"/> </td>
-            </xsl:for-each>
-            </tr>
-          </xsl:for-each>
-        </tbody>
-        <tfoot>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </tfoot>
       </table>
-    </div> <!-- end div container -->
-    </body> <!-- end body -->
+    </div>
+    </body>
     </html>
-
   </xsl:template>
 </xsl:stylesheet>

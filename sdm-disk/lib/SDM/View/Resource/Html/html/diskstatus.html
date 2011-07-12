@@ -10,6 +10,8 @@
     <title>Disk Usage Information</title>
     <style type="text/css" title="currentStyle">
       @import "/res/css/diskstatus_page.css";
+      @import "/res/css/diskstatus_table.css";
+      @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jQuery/jquery.min.js"></script>
@@ -18,6 +20,11 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/diskstatus.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/arraytable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/hosttable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/filertable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/groupvolumetable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/volumetable.js"></script>
   </head>
   <body id="dt_example">
     <div id="container">
@@ -34,79 +41,15 @@
       Hosts that reported no Volume data are orange.<br/>
       </div>
 
-      <div id="filer_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="filers">
-      <thead>
-      <tr>
-      <th>Filer</th>
-      <th>SNMP Status</th>
-      <th>Hosts</th>
-      <th>Arrays</th>
-      <th>Added</th>
-      <th>Last Successful Check</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td colspan="6" class="dataTables_empty">Loading data from server</td>
-      </tr>
-      </tbody>
-      <tfoot>
-      <tr>
-      <th>Filer</th>
-      <th>SNMP Status</th>
-      <th>Hosts</th>
-      <th>Arrays</th>
-      <th>Added</th>
-      <th>Last Successful Check</th>
-      </tr>
-      </tfoot>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="filertable">
       </table>
-      </div> <!-- end of filer_table div -->
 
       <div class="clear"></div>
 
       <h1>Arrays Serving Storage Space</h1>
 
-      <div id="array_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="arrays">
-      <thead>
-      <tr>
-      <th>Array</th>
-      <th>Manufacturer</th>
-      <th>Model</th>
-      <th>Serial</th>
-      <th>Disk Type</th>
-      <th>Disk Num</th>
-      <th>Array Size</th>
-      <th>Advertised Array Size</th>
-      <th>Created</th>
-      <th>Last Modified</th>
-      <th>Hostname</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td colspan="6" class="dataTables_empty">Loading data from server</td>
-      </tr>
-      </tbody>
-      <tfoot>
-      <tr>
-      <th>Array</th>
-      <th>Manufacturer</th>
-      <th>Model</th>
-      <th>Serial</th>
-      <th>Disk Type</th>
-      <th>Disk Num</th>
-      <th>Array Size</th>
-      <th>Advertised Array Size</th>
-      <th>Created</th>
-      <th>Last Modified</th>
-      <th>Hostname</th>
-      </tr>
-      </tfoot>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="arraytable">
       </table>
-      </div> <!-- end of array_table div -->
 
       <div class="clear"></div>
 
@@ -116,31 +59,8 @@
       Groups over 95% capacity are red, as is the 'unknown' group.<br/>
       </div>
 
-      <div id="group_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="group">
-      <thead>
-      <tr>
-      <th>Disk Group Name</th>
-      <th>Total KB</th>
-      <th>Used KB</th>
-      <th width="1%">Capacity</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td colspan="4" class="dataTables_empty">Loading data from server</td>
-      </tr>
-      </tbody>
-      <tfoot>
-      <tr>
-      <th>Disk Group Name</th>
-      <th>Total KB</th>
-      <th>Used KB</th>
-      <th width="1%">Capacity</th>
-      </tr>
-      </tfoot>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="grouptable">
       </table>
-      </div> <!-- end of group_table div -->
 
       <div class="clear"></div>
 
@@ -150,39 +70,10 @@
       Volumes over 95% capacity are colored red, as is the 'unkown' group.
       </div>
 
-      <div id="volume_table">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="volume">
-        <thead>
-        <tr>
-        <th>Mount Path</th>
-        <th width="15%">Total KB</th>
-        <th width="15%">Used KB</th>
-        <th width="2%" align=center>Capacity</th>
-        <th>Disk Group</th>
-        <th>Filer</th>
-        <th>Last Checked</th>
-        </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="7" class="dataTables_empty">Loading data from server</td>
-          </tr>
-        </tbody>
-        <tfoot>
-        <tr>
-        <th>Mount Path</th>
-        <th width="15%">Total KB</th>
-        <th width="15%">Used KB</th>
-        <th width="2%" align=center>Capacity</th>
-        <th>Disk Group</th>
-        <th>Filer</th>
-        <th>Last Checked</th>
-        </tr>
-        </tfoot>
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="volumetable">
       </table>
-      </div> <!-- end of volume div -->
 
-    </div> <!-- end of container -->
+    </div>
   </body>
   <head>
     <meta http-equiv='Pragma' content='no-cache'>

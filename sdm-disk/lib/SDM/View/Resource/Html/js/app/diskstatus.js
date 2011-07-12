@@ -2,7 +2,6 @@
 $(document).ready(function() {
   TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
 
-  /* Top of page total summary */
   $.getJSON('/view/sdm/disk/volume/set/summary.json', function(result) {
     $("div#total").html(
       '<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
@@ -14,11 +13,10 @@ $(document).ready(function() {
     );
     $("div#total").addClass('emphasis');
   });
-  /* end top */
 
-  $('#filers').load("/view/sdm/disk/filer/set/table.html");
-  $('#arrays').load("/view/sdm/disk/array/set/table.html");
-  $('#group').load("/view/sdm/disk/volume/set/group.html");
-  $('#volume').load("/view/sdm/disk/volume/set/table.html");
+  drawFilerTable();
+  drawArrayTable();
+  drawGroupTable();
+  drawVolumeTable();
 
-} ); /* end document ready function */
+} );
