@@ -21,8 +21,8 @@
 
     <title>SDM::Service::Lsof::Process::Set</title>
     <style type="text/css" title="currentStyle">
-      @import "/res/css/diskusage_page.css";
-      @import "/res/css/diskusage_table.css";
+      @import "/res/css/diskstatus_page.css";
+      @import "/res/css/diskstatus_table.css";
       @import "/res/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/res/img/gc_favicon.png" />
@@ -37,47 +37,10 @@
 
     <body id="dt_example">
     <div id="container">
-      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="lsofprocesstable" class="display" use-attribute-sets="table-cell-attrs">
-        <thead>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </thead>
-        <tbody>
-          <xsl:for-each select="/object/aspect[@name='members']/object">
-            <tr>
-            <xsl:for-each select="aspect">
-              <xsl:call-template name="celltemplate"/>
-            </xsl:for-each>
-            </tr>
-          </xsl:for-each>
-        </tbody>
-        <tfoot>
-          <tr>
-            <xsl:for-each select="/object/aspect[@name='members']/object[1]/aspect">
-            <th> <xsl:value-of select="@name"/> </th>
-            </xsl:for-each>
-          </tr>
-        </tfoot>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="lsofprocesstable" class="display">
       </table>
-    </div> <!-- end div container -->
-    </body> <!-- end body -->
+    </div>
+    </body>
     </html>
-
   </xsl:template>
-
-  <xsl:template name="celltemplate">
-  <xsl:variable name="output-element">
-    <xsl:choose>
-      <xsl:when test="local-name(.)='head'">th</xsl:when>
-      <xsl:otherwise>td</xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-  <xsl:element name="{$output-element}" use-attribute-sets="table-cell-attrs">
-    <xsl:value-of select="value"/>
-  </xsl:element>
-  </xsl:template>
-
 </xsl:stylesheet>
