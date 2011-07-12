@@ -6,6 +6,8 @@ use warnings;
 
 use SDM;
 use File::Basename qw/basename dirname/;
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
 
 class SDM::Utility::SNMP::DiskUsage {
     is => 'SDM::Utility::SNMP',
@@ -139,7 +141,7 @@ sub _get_disk_group {
         my $disk_group = $self->_get_disk_group_via_snmp($physical_path);
         # If not defined or empty, go to mount point and look for touch file.
         if (defined $disk_group and $disk_group ne '') {
-            $self->logger->debug(__PACKAGE__ . " _get_disk_group returns $disk_group from snmp");
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group snmp returns: $disk_group");
             return $disk_group;
         }
     }
@@ -160,7 +162,7 @@ sub _get_disk_group {
         $disk_group = undef;
     }
 
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group returns $disk_group from the filesystem");
+    $self->logger->debug(__PACKAGE__ . " _get_disk_group filesystem mount returns: " . Data::Dumper::Dumper $disk_group);
     return $disk_group;
 }
 
