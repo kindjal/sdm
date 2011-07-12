@@ -1,15 +1,15 @@
 name,manufacturer,model,serial,disk_type,disk_num,Marketing Disk Size (GB),Actual Disk Size (GB),Marketing RAW Capacity (TB),Actual RAW Capacity (TB),RAW Usable After Parity (TB),Utilization (TB),Use,Needs to be retired
-GCEVA1,HP,EVA8100,2S183815WS,FC,240,450,419,105,98.20,71.69,,General,yes
-GCEVA2,HP,EVA8100,2S1840160V,sata,240,1024,931,240,218.20,159.29,,General,yes
-GCEVA3,HP,EVA8100,2S1840160T,sata,240,1024,931,240,218.20,159.29,,General,yes
-GCEVA4,HP,EVA8100,2S1840160W,sata,240,1024,931,240,218.20,159.29,,General,yes
-GCEVA5,HP,EVA8100,2S1840160X,sata,240,1024,931,240,218.20,159.29,,General,yes
-GCEVA6,HP,EVA8400,2S191616KA,sata,216,1024,931,216,196.38,143.36,,General
-GCEVA7,HP,EVA8400,2S191616K8,sata,216,1024,931,216,196.38,143.36,,General
-GCEVA8,HP,EVA8400,2S191616KC,sata,216,1024,931,216,196.38,143.36,,General
-GCEVA9,HP,EVA8400,2S191616KB,sata,216,1024,931,216,196.38,143.36,,General
-GCEVA10,HP,EVA8400,2S191616K9,sata,216,1024,931,216,196.38,143.36,,General
-GCEVA11,HP,EVA8400,2S191616KD,sata,216,1024,931,216,196.38,143.36,,General
+gceva1,HP,EVA8100,2S183815WS,FC,240,450,419,105,98.20,71.69,,General,yes
+gceva2,HP,EVA8100,2S1840160V,sata,240,1024,931,240,218.20,159.29,,General,yes
+gceva3,HP,EVA8100,2S1840160T,sata,240,1024,931,240,218.20,159.29,,General,yes
+gceva4,HP,EVA8100,2S1840160W,sata,240,1024,931,240,218.20,159.29,,General,yes
+gceva5,HP,EVA8100,2S1840160X,sata,240,1024,931,240,218.20,159.29,,General,yes
+gceva6,HP,EVA8400,2S191616KA,sata,216,1024,931,216,196.38,143.36,,General
+gceva7,HP,EVA8400,2S191616K8,sata,216,1024,931,216,196.38,143.36,,General
+gceva8,HP,EVA8400,2S191616KC,sata,216,1024,931,216,196.38,143.36,,General
+gceva9,HP,EVA8400,2S191616KB,sata,216,1024,931,216,196.38,143.36,,General
+gceva10,HP,EVA8400,2S191616K9,sata,216,1024,931,216,196.38,143.36,,General
+gceva11,HP,EVA8400,2S191616KD,sata,216,1024,931,216,196.38,143.36,,General
 ,,,,,,,Total:,"2,361","2,149.31","1,569.00"
 ntap2,Netapp,FAS980,0101164117,fc,104,146,133,15,13.51,10.50,,Oracle,yes
 ntap3,Netapp,R200,0050408448,sata,316,320,268,99,82.70,63.29,,Oracle backup,yes
@@ -37,24 +37,24 @@ nsams2k4,HDS,AMS2500,87012599,sata,480,2048,1832.95,960,859.20,633.21,,GPFS Alig
 nsams2k5,HDS,AMS2500,87012574,sata,480,2048,1832.95,960,859.20,633.21,,GPFS2 General Data
 nsams2k6,HDS,AMS2500,87041066,sata,240,2048,1832.95,480,429.60,0.00,,GPFS-Dev and General Data
 ,,,,,,,Total:,"5,280.00","5,188.55","3,556.48"
-GCXP1,HP GCXP1,XP24000,28871,fc,1152,450,419,506,471.38,399.49,,Production_solexa
-GCXP2,HP GCXP2,XP24000,28885,fc,1152,450,419,506,471.38,398.28,,Production_solexa
-GCXP3,HP GCXP3,XP24000,28901,fc,1152,450,419,506,471.38,399.49,,Repurpose
-GCXP4,HP GCXP4,XP24000,28870,fc,1152,450,419,506,471.38,378.83,,Oracle and Metadata
-GCXP5,HP GCXP5,XP24000,28959,fc,600,450,419,264,245.51,212.40,,"Home, Application, Mail, VMware, RTM, Zenoss"
+gcxp1,HP GCXP1,XP24000,28871,fc,1152,450,419,506,471.38,399.49,,Production_solexa
+gcxp2,HP GCXP2,XP24000,28885,fc,1152,450,419,506,471.38,398.28,,Production_solexa
+gcxp3,HP GCXP3,XP24000,28901,fc,1152,450,419,506,471.38,399.49,,Repurpose
+gcxp4,HP GCXP4,XP24000,28870,fc,1152,450,419,506,471.38,378.83,,Oracle and Metadata
+gcxp5,HP GCXP5,XP24000,28959,fc,600,450,419,264,245.51,212.40,,"Home, Application, Mail, VMware, RTM, Zenoss"
 ,,,,,,,Total:,"2,288.67","2,131.01","1,788.49"
-Xyratex1,xyratex1,F5404,,sata,96,1024,931,96,87.28,85.07,,D2d and Production Sequence _copy volumes
-Xyratex2,xyratex2,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
-Xyratex3,xyratex3,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
-Xyratex4,xyratex4,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
-Xyratex5,xyratex5,F5404,,sata,48,1024,931,48,43.64,34.80,,unused
-Xyratex6,xyratex6,F5404,,sata,48,1024,931,48,43.64,34.80,,unused
-Xyratex7,xyratex7,F5404,,sata,48,1024,931,48,43.64,,,Production Sequence _copy volumes
-Xyratex7,xyratex7,F5404,,sata,48,2048,1832.95,96,85.92
+xyratex1,xyratex1,F5404,,sata,96,1024,931,96,87.28,85.07,,D2d and Production Sequence _copy volumes
+xyratex2,xyratex2,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
+xyratex3,xyratex3,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
+xyratex4,xyratex4,F5404,,sata,48,1024,931,48,43.64,34.80,,disk to disk
+xyratex5,xyratex5,F5404,,sata,48,1024,931,48,43.64,34.80,,unused
+xyratex6,xyratex6,F5404,,sata,48,1024,931,48,43.64,34.80,,unused
+xyratex7,xyratex7,F5404,,sata,48,1024,931,48,43.64,,,Production Sequence _copy volumes
+xyratex8,xyratex8,F5404,,sata,48,2048,1832.95,96,85.92
 ,,,,,,,,,129.56,105.80
-Xyratex8,xyratex8,F5404,,sata,96,2048,1832.95,192,171.84,139.20,,Production Sequence _copy volumes
+xyratex8,xyratex8,F5404,,sata,96,2048,1832.95,192,171.84,139.20,,Production Sequence _copy volumes
 ,,,,,,,Total:,432.00,519.60,419.01
-Thumper1,Sun,x4500 thumper,,sata,48,750,683,35,31.99,31.99,,Backup and data restores,Yes
+thumper1,Sun,x4500 thumper,,sata,48,750,683,35,31.99,31.99,,Backup and data restores,Yes
 ,,,,,,,Total:,35.16,31.99,31.99
 
 

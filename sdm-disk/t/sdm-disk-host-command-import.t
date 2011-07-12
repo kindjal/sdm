@@ -21,8 +21,12 @@ require "$top/t/sdm-disk-lib.pm";
 my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 
-my $csvfile = "$top/t/host-inventory.csv";
-my $c = SDM::Disk::Host::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, commit => 1, flush => 1 );
+my $csvfile = "$top/t/array-inventory.csv";
+my $c = SDM::Disk::Array::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
+lives_ok { $c->execute(); } "host run lived";
+
+$csvfile = "$top/t/host-inventory.csv";
+$c = SDM::Disk::Host::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, commit => 1, flush => 1 );
 lives_ok { $c->execute(); } "run lived";
 
 my $o = SDM::Disk::Host->get( hostname => 'linuscs107' );

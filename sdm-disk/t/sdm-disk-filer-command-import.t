@@ -22,8 +22,12 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 
 # We need hosts to map to filers.
-my $csvfile = "$top/t/host-inventory.csv";
-my $c = SDM::Disk::Host::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
+my $csvfile = "$top/t/array-inventory.csv";
+my $c = SDM::Disk::Array::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
+lives_ok { $c->execute(); } "host run lived";
+
+$csvfile = "$top/t/host-inventory.csv";
+$c = SDM::Disk::Host::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "host run lived";
 
 # Now filers

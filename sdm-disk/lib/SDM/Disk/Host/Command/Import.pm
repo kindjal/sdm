@@ -62,15 +62,16 @@ sub execute {
         unless (@header) {
             if (
                 "hostname" ne $row->[0] or
-                "status" ne $row->[1] or
-                "manufacturer" ne $row->[2] or
-                "model" ne $row->[3] or
-                "os" ne $row->[4] or
-                "location" ne $row->[5] or
-                "comments" ne $row->[6] or
-                "master" ne $row->[7] or
-                "created" ne $row->[8] or
-                "last_modified" ne $row->[9]) {
+                "arrays" ne $row->[1] or
+                "status" ne $row->[2] or
+                "manufacturer" ne $row->[3] or
+                "model" ne $row->[4] or
+                "os" ne $row->[5] or
+                "location" ne $row->[6] or
+                "comments" ne $row->[7] or
+                "master" ne $row->[8] or
+                "created" ne $row->[9] or
+                "last_modified" ne $row->[10]) {
                 $self->logger->error(__PACKAGE__ . " CSV file header doesn't match what is expected for Hosts: " . $self->csv);
                 return;
             }
@@ -81,15 +82,16 @@ sub execute {
         # Build an object out of a row by hand because the column
         # headers are useless as is, with unpredictable/unusable text.
         $self->_store($host, "hostname",       $row->[0]);
-        $self->_store($host, "status",         $row->[1]);
-        $self->_store($host, "manufacturer",   $row->[2]);
-        $self->_store($host, "model",          $row->[3]);
-        $self->_store($host, "os",             $row->[4]);
-        $self->_store($host, "location",       $row->[5]);
-        $self->_store($host, "comments",       $row->[6]);
-        $self->_store($host, "master",         $row->[7]);
-        $self->_store($host, "created",        $row->[8]);
-        $self->_store($host, "last_modified",  $row->[9]);
+        $self->_store($host, "arrays",         $row->[1]);
+        $self->_store($host, "status",         $row->[2]);
+        $self->_store($host, "manufacturer",   $row->[3]);
+        $self->_store($host, "model",          $row->[4]);
+        $self->_store($host, "os",             $row->[5]);
+        $self->_store($host, "location",       $row->[6]);
+        $self->_store($host, "comments",       $row->[7]);
+        $self->_store($host, "master",         $row->[8]);
+        $self->_store($host, "created",        $row->[9]);
+        $self->_store($host, "last_modified",  $row->[10]);
         push @hosts, $host;
     }
 
@@ -107,6 +109,7 @@ sub execute {
             warn Data::Dumper::Dumper $hostdata;
         }
         my $host = SDM::Disk::Host->get($hostdata->{hostname});
+        my $arraylist = delete $hostdata->{arrays};
         if ($host) {
             $host->update(%$hostdata);
         } else {
@@ -114,6 +117,20 @@ sub execute {
         }
         unless ($host) {
             $self->logger->error(__PACKAGE__ . " failed to get or create host: " . Data::Dumper::Dumper $hostdata . ": $!");
+            return;
+        }
+        if ($arraylist) {
+            my $array;
+            my $arrayname;
+            my @arraynames = split(/\s+/,$arraylist);
+            foreach $arrayname (@arraynames) {
+                $array = SDM::Disk::Array->get(name => $arrayname);
+                unless ($array) {
+                    $self->logger->error(__PACKAGE__ . " failed to associate array $arrayname to host " . $host->hostname . ".  Perhaps import array data first.");
+                    return;
+                }
+                $array->assign( $host->hostname );
+            }
         }
     }
 
