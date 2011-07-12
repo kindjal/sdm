@@ -1,42 +1,32 @@
 
-var oTable;
-
-$(document).ready(function() {
-    TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
-
+function drawLsofProcessTable () {
     var oTable = $('#lsofprocesstable').dataTable( {
         "sDom": 'T<"clear">lfrtip',
-        //"bProcessing": false,
-        //"bFilter": false,
-        //"bServerSide": false,
+        "bProcessing": true,
+        "bServerSide": false,
         "iDisplayLength": 25,
         "sPaginationType": "full_numbers",
-        /* use json and includea  reload-every function in the table for periodic reloading */
-        //"sAjaxSource": "/view/sdm/service/lsof/process/set/status.json",
-        /* Sort by Total KB column by default */
+        "sAjaxSource": "/view/sdm/service/lsof/process/set/status.json",
         "aaSorting": [ [1,'desc'] ],
         "aoColumns": [ 
-        { "sWidth": "12%" },
-        { "sWidth": "5%" },
-        { "sWidth": "5%" },
-        { "sWidth": "5%" },
-        { "sWidth": "5%" },
-        { "sWidth": "10%" },
-        { "sWidth": "10%" },
-        { "sWidth": "20%" },
-        { "sWidth": "11%" },
-        { "sWidth": "11%" },
+        { "sTitle": "Hostname", "sWidth": "12%" },
+        { "sTitle": "PID", "sWidth": "5%" },
+        { "sTitle": "Command", "sWidth": "5%" },
+        { "sTitle": "Username", "sWidth": "5%" },
+        { "sTitle": "UID", "sWidth": "5%" },
+        { "sTitle": "Time", "sWidth": "10%" },
+        { "sTitle": "Timedelta", "sWidth": "10%" },
+        { "sTitle": "Filename", "sWidth": "20%" },
+        { "sTitle": "Created", "sWidth": "11%" },
+        { "sTitle": "Last Modified", "sWidth": "11%" },
         ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
             $('td',nRow).each( function (iPosition) {
-                if (this.title) {
-                    $('td:eq(' + iPosition + ')',nRow).html( this.title );
-                }
+                var $cell = $(nRow).children('td').eq(iPosition);
+                $cell.attr("title",aData[iPosition]);
             } );
             return nRow;
         },
     } );
-    /* end data table */
-
-} ); /* end document ready function */
+}
 
