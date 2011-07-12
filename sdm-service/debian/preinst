@@ -17,6 +17,8 @@ id -G www-data 2>/dev/null |  \
 
 [ -d ~www-data ] || \
     mkdir -p ~www-data
+[ -d /var/log/ur-sdm-service ] || \
+    mkdir -p /var/log/ur-sdm-service
 [ -f /var/log/ur-sdm-service/ur-sdm-service-webapp.log ] || \
     touch /var/log/ur-sdm-service/ur-sdm-service-webapp.log
 chown www-data: /var/log/ur-sdm-service/ur-sdm-service-webapp.log
