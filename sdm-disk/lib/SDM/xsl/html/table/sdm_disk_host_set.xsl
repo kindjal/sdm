@@ -34,8 +34,8 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/hosttable.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
-  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
-  drawHostTable();
+TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+drawHostTable();
 });
     </script>
     </head>

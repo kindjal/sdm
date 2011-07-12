@@ -34,8 +34,8 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/arraytable.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
-  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
-  drawArrayTable();
+TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+drawArrayTable();
 });
     </script>
     </head>

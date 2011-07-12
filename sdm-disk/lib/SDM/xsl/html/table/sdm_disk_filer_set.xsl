@@ -28,8 +28,8 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/filertable.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
-  TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
-  drawFilerTable();
+TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+drawFilerTable();
 });
     </script>
     </head>
