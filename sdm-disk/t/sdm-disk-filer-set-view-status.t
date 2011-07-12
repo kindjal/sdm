@@ -42,6 +42,7 @@ my $expected = {
     1,
     'linuscs103',
     'nsams2k1',
+    'This is a comment',
     '0000-00-00 00:00:00',
     '0000-00-00 00:00:00'
         ],
@@ -50,6 +51,7 @@ my $expected = {
     1,
     'linuscs107',
     'nsams2k2',
+    'This is another comment',
     '0000-00-00 00:00:00',
     '0000-00-00 00:00:00'
         ],
@@ -58,6 +60,7 @@ my $expected = {
     1,
     'unknown',
     'unknown',
+    'This is another comment',
     '0000-00-00 00:00:00',
     '0000-00-00 00:00:00'
         ]
