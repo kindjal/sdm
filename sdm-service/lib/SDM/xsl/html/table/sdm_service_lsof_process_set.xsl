@@ -30,9 +30,14 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/DataTables/media/js/jquery.dataTables.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/TableTools/media/js/TableTools.js"/>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/pkg/jquery.timers.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/common.js"/>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/res/js/app/lsofprocesstable.js"/>
+<script type="text/javascript" language="javascript" charset="utf-8">
+$(document).ready(function() {
+TableToolsInit.sSwfPath = "/res/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+drawLsofProcessTable();
+});
+</script>
     </head>
 
     <body id="dt_example">
