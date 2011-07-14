@@ -15,6 +15,7 @@ sub load_modules {
     eval "
         use SDM;
         use JSON;
+        use Date::Manip;
     ";
     if ($@) {
         die "failed to load required modules: $@";
@@ -44,11 +45,27 @@ sub process {
     return 0 unless ($hostname);
 
     # Remove existing records not just returned in JSON.
-    foreach my $existing (SDM::Service::Lsof::Process->get( hostname => $hostname )) {
-        my $key = $existing->{hostname} . "\t" . $existing->{pid};
-        $existing->delete unless (exists $records->{$key});
+    foreach my $existing (SDM::Service::Lsof::Process->get()) {
+        if ($existing->hostname eq $hostname) {
+            # Clean expired processes from live hosts reporting in 
+            my $key = $existing->hostname . "\t" . $existing->pid;
+            $existing->delete unless (exists $records->{$key});
+        } else {
+            # Clean processes whose hosts have not reported in in 1/2 day
+            my $err;
+            my $now = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+            my $last_modified = $self->last_modified;
+            if ($now and $last_modified) {
+                $now =~ s/[- ]/:/g;
+                $last_modified =~ s/[- ]/:/g;
+                my $date0 = ParseDate($now);
+                my $date1 = ParseDate($last_modified);
+                my $calc  = DateCalc($date0,$date1,\$err);
+                my $delta = Delta_Format($calc,0,'%st');
+                $existing->delete if ($delta > 16200);
+            }
+        }
     }
-    # Remove files that now have no process.
 
     # Enter fresh JSON records.
     foreach my $key (keys %$records) {
@@ -65,10 +82,9 @@ sub process {
         if ($process) {
             $process->update($record);
         } else {
-            $record->{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
             $process = SDM::Service::Lsof::Process->create( $record );
             unless ($process) {
-                die "failed to create new process record";
+                die "failed to create new process record: $!";
             }
             print "new process: " . Data::Dumper::Dumper $process;
         }
@@ -82,8 +98,7 @@ sub process {
         UR::Context->commit();
     }
 
-    #return scalar @changes;
-    return @changes;
+    return scalar @changes;
 }
 
 dispatch {
