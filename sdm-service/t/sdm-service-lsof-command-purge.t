@@ -33,15 +33,16 @@ $params = {
   uid      => 500,
   username => 'luser',
   command  => 'perl',
-  last_modified => Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()),
+  #last_modified => Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()),
 };
 $r = SDM::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 ok( UR::Context->commit(), "commit ok" );
 
 sleep 3;
-$r->command( 'python' );
-$r->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+$params->{command} = "python";
+$r->update( $params );
+ok( $r->age > 2, "process is aged");
 
 my $c = SDM::Service::Lsof::Process::Command::Purge->create( loglevel => "DEBUG" );
 $c->age(2);

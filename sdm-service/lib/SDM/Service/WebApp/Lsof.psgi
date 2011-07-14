@@ -55,7 +55,7 @@ sub process {
         my $record = delete $records->{$key};
         my $pid;
         # Skip /proc files and kernel threads
-        next if ( grep { /^(\/proc|\[.*\])/ } @{ $records->{$key}->{name} } );
+        next if ( grep { /^(\/proc|\[.*\])/ } @{ $record->{name} } );
 
         ($hostname,$pid) = split("\t",$key);
         $record->{hostname} = $hostname;
@@ -70,6 +70,7 @@ sub process {
             unless ($process) {
                 die "failed to create new process record";
             }
+            print "new process: " . Data::Dumper::Dumper $process;
         }
     }
 
@@ -81,7 +82,8 @@ sub process {
         UR::Context->commit();
     }
 
-    return scalar @changes;
+    #return scalar @changes;
+    return @changes;
 }
 
 dispatch {

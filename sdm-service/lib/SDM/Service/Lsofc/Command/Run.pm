@@ -34,15 +34,7 @@ class SDM::Service::Lsofc::Command::Run {
             # Wait this long for lsof to report back before dying.
             is    => 'Number',
             default_value => 15,
-            doc   => 'seconds to wait for lsof to update'
-        },
-        report_time => {
-            # If we see a process running for longer than this many seconds,
-            # report it to the home server.
-            # In production maybe this is five minutes (300 sec) or something.
-            is    => 'Number',
-            default_value => 10,
-            doc   => 'seconds a process must be running before being reported to server'
+            doc   => 'seconds to wait for lsof before dying'
         },
     ],
 };
@@ -89,19 +81,11 @@ sub execute {
                     # We matched on "p" and hash is not empty, so record it in lsofrecords.
                     my $process = delete $hash->{process};
                     my $key = Sys::Hostname::hostname() . "\t" . $process;
-                    if (defined $records->{$key}) {
-                        # We've seen this process before. Add to its time seen, keep time first seen.
-                        $hash->{'time'} = $records->{$key}->{'time'};
-                        my $delta = time - $records->{$key}->{'time'};
-                        $hash->{'timedelta'} = $records->{$key}->{'timedelta'} + $delta;
-                    }
                     $lsofrecords->{$key} = $hash;
                 }
                 # Start a new record with the pid.
                 $hash = {};
                 $hash->{'process'} = $2;
-                $hash->{'time'} = time;
-                $hash->{'timedelta'} = 0;
                 # Name must be a list
                 $hash->{'name'} = [];
             }
@@ -131,7 +115,6 @@ sub execute {
                 }
                 $self->logger->debug("Removed $count pids from memory") if ($count);
 
-                # Add the new stuff, updating time
                 $count = 0;
                 foreach my $key (keys %$lsofrecords) {
                     if (grep { /^(\/proc|\[)/ } @{ $lsofrecords->{$key}->{name} } ) {

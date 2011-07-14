@@ -6,6 +6,7 @@ use warnings;
 use feature "switch";
 
 use SDM;
+use Date::Manip;
 
 class SDM::Service::Lsof::Process {
     is => 'SDM::Service::Lsof',
@@ -18,8 +19,6 @@ class SDM::Service::Lsof::Process {
     ],
     has => [
         uid           => { is => 'Integer', default => 0 },
-        time          => { is => 'Integer', default => 0 },
-        timedelta     => { is => 'Integer', default => 0 },
         username      => { is => 'Text', default => '' },
         command       => { is => 'Text', default => '' },
     ],
@@ -29,9 +28,29 @@ class SDM::Service::Lsof::Process {
     ],
     has_optional => [
         created       => { is => 'Date' },
-        last_modified => { is => 'Date' }
+        last_modified => { is => 'Date' },
+        age           => {
+            is_calculated => 1,
+            calculate => q| return $self->age |,
+        },
     ],
 };
+
+sub age {
+    my $self = shift;
+
+    my $err;
+    my $created = $self->created;
+    my $last_modified = $self->last_modified;
+    return 0 unless ($created and $last_modified);
+    $created =~ s/[- ]/:/g;
+    $last_modified =~ s/[- ]/:/g;
+    my $date0 = ParseDate($created);
+    my $date1 = ParseDate($last_modified);
+    my $calc  = DateCalc($date0,$date1,\$err);
+    my $delta = Delta_Format($calc,0,'%st');
+    return $delta;
+}
 
 =head2 create
 Update a Process record... this is primarily to handle the filenames part.
@@ -57,18 +76,13 @@ sub update {
                     }
                 }
             }
-            when (/^timedelta$/) {
-                $self->timedelta( $record->{timedelta} );
-            }
-            when (/^last_modified$/) {
-                $self->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-            }
             default {
                 my $p = $self->__meta__->property($attr);
                 $self->$attr( $record->{$attr} ) if (! $p->is_id and $p->is_mutable);
             }
         }
     }
+    $self->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
 }
 
 =head2 create
@@ -96,6 +110,7 @@ sub create {
         }
     }
 
+    $params->{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( $params );
 }
 

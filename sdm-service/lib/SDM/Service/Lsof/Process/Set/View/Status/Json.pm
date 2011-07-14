@@ -22,7 +22,7 @@ sub aaData {
 
     foreach my $item ( $subject->members ) {
         my $filenames;
-	my @filenames = $item->filename;
+        my @filenames = $item->filename;
         if (@filenames) {
             $filenames = join(',',@filenames);
         }
@@ -32,8 +32,7 @@ sub aaData {
             $item->command,
             $item->username,
             $item->uid,
-            $item->time,
-            $item->timedelta,
+            $item->age,
             $filenames,
             $item->created ? $item->created : "0000-00-00 00:00:00",
             $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",

@@ -4,8 +4,6 @@ CREATE TABLE service_lsof_process (
   hostname      VARCHAR(255) NOT NULL DEFAULT '',
   pid           INTEGER NOT NULL DEFAULT 0,
   uid           INTEGER NOT NULL DEFAULT 0,
-  time          INTEGER NOT NULL DEFAULT 0,
-  timedelta     INTEGER NOT NULL DEFAULT 0,
   username      VARCHAR(255) NOT NULL DEFAULT '',
   command       VARCHAR(255) NOT NULL DEFAULT '',
   created       DATE,

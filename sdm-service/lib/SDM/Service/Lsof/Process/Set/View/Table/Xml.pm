@@ -23,8 +23,7 @@ class SDM::Service::Lsof::Process::Set::View::Table::Xml {
                         'command',
                         'username',
                         'uid',
-                        'time',
-                        'timedelta',
+                        'age',
                         'filename',
                         #{
                         #    name => 'files',

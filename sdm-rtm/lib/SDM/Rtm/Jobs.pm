@@ -18,6 +18,17 @@ class SDM::Rtm::Jobs {
             calculate_from => 'errFile',
             calculate => q| $errFile =~ /^(.*)\/logs/; return $1; |,
         },
+        build_id => {
+            is => 'Text',
+            calculate_from => 'errFile',
+            calculate => q| $errFile =~ /^\S+\/build(\d+)/; return $1; |,
+        },
+        #allocation_id => {
+        #    # FIXME: UR needs to support linking to non id properties, feature request.
+        #    is => 'List',
+        #    calculate_from => 'build_id',
+        #    calculate => q| return unless ($build_id); my @a = SDM::Disk::Allocation->get( owner_id => $build_id ); return map { $_->id } @a; |,
+        #},
         mount_path      => {
             is => 'Text',
             calculate_from => 'allocation_path',
@@ -126,5 +137,21 @@ class SDM::Rtm::Jobs {
         last_updated    => { is => 'Date'},
     ],
 };
+
+sub allocations {
+    # If a job is also a Build, can get allocations by build_id
+    my $self = shift;
+    return unless ($self->build_id);
+
+    # My allocations
+    my @allocations = SDM::Disk::Allocation->get( owner_id => $self->build_id );
+
+    # Read/Write allocations
+    use Genome;
+    my @sr = Genome::SoftwareResult->get( build_ids => $self->build_id );
+    my @sr_ids = map { $_->id } @sr;
+    push @allocations, SDM::Disk::Allocation->get( owner_id => \@sr_ids );
+    return @allocations;
+}
 
 1;
