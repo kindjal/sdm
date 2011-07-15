@@ -1,3 +1,10 @@
+ur-sdm-mibs (0.08-1) unstable; urgency=low
+
+  * Use 'mount -t nfs' to assign an nfsd IP to processes in
+    service_lsof_process table.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Fri, 15 Jul 2011 14:21:50 -0500
+
 ur-sdm-mibs (0.07-1) unstable; urgency=low
 
   * Change DATE to DATETIME/TIMESTAMP for seconds resolution.
