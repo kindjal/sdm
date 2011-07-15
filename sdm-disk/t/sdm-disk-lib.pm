@@ -124,6 +124,7 @@ sub testdata {
     $array->assign("linuscs103");
     $array = SDM::Disk::Array->create(name => "nsams2k2");
     $array->assign("linuscs107");
+
     SDM::Disk::Group->create(name => "SYSTEMS_DEVELOPMENT");
     SDM::Disk::Group->create(name => "SYSTEMS");
     SDM::Disk::Group->create(name => "INFO_APIPE");
@@ -142,7 +143,8 @@ sub testdata {
 sub has_gpfs_snmp {
     my $self = shift;
     my $master = "linuscs107";
-    open(PROG, "/usr/bin/snmpwalk -v 2c -c gscpublic -r10 -t10 $master gpfsClusterConfigTable 2>&1 |");
+    warn "snmpwalk: check $master for gpfsClusterConfigTable";
+    open(PROG, "/usr/bin/snmpwalk -v 2c -c gscpublic -r2 -t5 $master gpfsClusterConfigTable 2>&1 |");
     my $output = <PROG>;
     close(PROG);
     if ($output =~ /No Such Object/i) {

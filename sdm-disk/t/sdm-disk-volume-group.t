@@ -58,7 +58,7 @@ ok($item->count() == 2, "ok: 2 members of INFO_APIPE");
 ok($item->min('total_kb') == 5, "ok: 5 is min total_kb");
 ok($item->max('total_kb') == 30, "ok: 30 is max total_kb");
 ok($item->sum('total_kb') == 35, "ok: 35 is sum total_kb");
-my $item = $res[1];
+$item = $res[1];
 ok($item->disk_group() eq 'INFO_GENOME_MODELS', "ok: INFO_GENOME_MODELS comes next");
 ok($item->count() == 2, "ok: 2 members of INFO_GENOME_MODELS");
 ok($item->min('total_kb') == 10, "ok: 10 is min total_kb");
