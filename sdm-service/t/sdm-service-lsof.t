@@ -34,6 +34,7 @@ $params = {
   username => 'luser',
   command  => 'perl',
   name     => 'foo',
+  nfsd     => '192.168.56.100',
 };
 $r = SDM::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
@@ -49,6 +50,7 @@ $params = {
   uid      => 500,
   username => 'luser',
   command  => 'perl',
+  nfsd     => '192.168.56.101',
   name     => \@files,
 };
 $r = SDM::Service::Lsof::Process->create( $params );

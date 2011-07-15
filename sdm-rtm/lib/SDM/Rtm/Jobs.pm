@@ -49,6 +49,10 @@ class SDM::Rtm::Jobs {
         },
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', id_by => 'gpfs_disk_perf_id' },
     ],
+    has_many_optional => [
+        process         => { is => 'SDM::Service::Lsof::Process', reverse_as => 'job' },
+        nfsd            => { is => 'Text', via => 'process' },
+    ],
     has => [
         options         => { is => 'Number' },
         options2        => { is => 'Number' },

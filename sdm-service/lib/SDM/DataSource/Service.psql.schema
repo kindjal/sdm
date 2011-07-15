@@ -6,6 +6,7 @@ CREATE TABLE service_lsof_process (
   uid           INTEGER NOT NULL DEFAULT 0,
   username      VARCHAR(255) NOT NULL DEFAULT '',
   command       VARCHAR(255) NOT NULL DEFAULT '',
+  nfsd          VARCHAR(255),
   created       TIMESTAMP,
   last_modified TIMESTAMP,
   PRIMARY KEY(hostname,pid)

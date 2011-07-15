@@ -27,6 +27,7 @@ class SDM::Service::Lsof::Process {
         filename      => { is => 'Text', via => 'files' },
     ],
     has_optional => [
+        nfsd          => { is => 'Text' },
         created       => { is => 'Date' },
         last_modified => { is => 'Date' },
         age           => {

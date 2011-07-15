@@ -44,7 +44,9 @@ sub execute {
     $self->logger->debug(__PACKAGE__ . " execute");
 
     my $LSOF = IPC::Cmd::can_run("lsof");
+    my $MOUNT = IPC::Cmd::can_run("mount");
     die "lsof not found in PATH" unless ($LSOF);
+    die "mount not found in PATH" unless ($MOUNT);
 
     # lsof options, anything here must be expected by the server and
     # supported by the DB schema.
@@ -55,12 +57,42 @@ sub execute {
         L => 'username',
         u => 'uid',
     };
+    my $hostmap = {};
 
-    my @options = ("-r" . $self->wait,"-N","-F",join('',keys %$lsofargs) );
+    $| = 1;
+
+    my @options = ("-t","nfs");
     my @args = ();
     my $pid;
 
-    $| = 1;
+    die "cannot fork: $!" unless defined($pid = open(KID, "-|"));
+    $SIG{ALRM} = sub { die "$MOUNT pipe broke" };
+    if ($pid) {
+        # parent
+        my $host;
+        my $ip;
+        while (<KID>) {
+            # ntap11:/vol/appsrv-dev on /mnt/appsrv-dev type nfs (rw,bg,intr,tcp,rsize=32768,wsize=32768,addr=10.0.28.46)
+            m/^(\S+):.*addr=((\d+)(\.\d+){3})/;
+            if ($1 and $2) {
+                $host = $1;
+                $ip = $2;
+                $self->logger->debug(__PACKAGE__ . " mount reports $host at $ip");
+                $hostmap->{$host} = $ip;
+            }
+        }
+        close(KID);
+    } else {
+        # child execs mount
+        my $cmd = join(" ",$MOUNT,@args);
+        $self->logger->debug(__PACKAGE__ . " child executes mount: $cmd");
+        exec($MOUNT, @options, @args) or die "can't exec program: $!";
+        # exec never returns unless an error in exec();
+        die "failed to exec: $!";
+    }
+
+    @options = ("-r" . $self->wait,"-N","-F",join('',keys %$lsofargs) );
+    @args = ();
 
     die "cannot fork: $!" unless defined($pid = open(KID, "-|"));
     $SIG{ALRM} = sub { die "$LSOF pipe broke" };
@@ -94,7 +126,13 @@ sub execute {
                 if ($1 eq $key) {
                     # This is an lsof element that we are prepared to store.
                     if ($value eq 'name') {
-                        push @{ $hash->{$value} }, $2;
+                        # /gscuser/mcallawa/git/SDM (nfs10home:/vol/home/ebecker)
+                        my $name = $2;
+                        $name =~ /^.*\((\S+):(\S+)\)$/;
+                        if ($1 and $hostmap->{$1}) {
+                            $hash->{'nfsd'} = $hostmap->{$1};
+                        }
+                        push @{ $hash->{$value} }, $name;
                     } else {
                         $hash->{$value} = $2;
                     }
