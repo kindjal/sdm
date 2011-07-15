@@ -53,17 +53,8 @@ sub process {
         } else {
             # Clean processes whose hosts have not reported in in 1/2 day
             my $err;
-            my $now = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-            my $last_modified = $self->last_modified;
-            if ($now and $last_modified) {
-                $now =~ s/[- ]/:/g;
-                $last_modified =~ s/[- ]/:/g;
-                my $date0 = ParseDate($now);
-                my $date1 = ParseDate($last_modified);
-                my $calc  = DateCalc($date0,$date1,\$err);
-                my $delta = Delta_Format($calc,0,'%st');
-                $existing->delete if ($delta > 16200);
-            }
+            my $age = $existing->age;
+            $existing->delete if ($age > 16200);
         }
     }
 
