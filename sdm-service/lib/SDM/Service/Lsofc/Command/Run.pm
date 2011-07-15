@@ -138,7 +138,7 @@ sub execute {
                     Content_Length => $size,
                     Content => "data=$data"
                 );
-                #$self->logger->debug("send:  " . $data);
+                $self->logger->debug("POST:  " . $data);
                 if ($response->code != 200) {
                     $self->logger->debug("server responds:  " . $response->code . " " . $response->message);
                 } else {
