@@ -50,7 +50,7 @@ class SDM::Rtm::Jobs {
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', id_by => 'gpfs_disk_perf_id' },
     ],
     has_optional => [
-        process         => { is => 'SDM::Service::Lsof::Process', id_by => [ 'jobPid', 'exec_host' ] },
+        process         => { is => 'SDM::Service::Lsof::Process', id_by => [ 'exec_host', 'jobPid' ] },
         nfsd            => { is => 'Text', via => 'process' },
     ],
     has => [
@@ -151,10 +151,11 @@ sub allocations {
     my @allocations = SDM::Disk::Allocation->get( owner_id => $self->build_id );
 
     # Read/Write allocations
-    use Genome;
-    my @sr = Genome::SoftwareResult->get( build_ids => $self->build_id );
-    my @sr_ids = map { $_->id } @sr;
-    push @allocations, SDM::Disk::Allocation->get( owner_id => \@sr_ids );
+    #use Genome;
+    #my @sr = Genome::SoftwareResult->get( build_ids => $self->build_id );
+    #my @sr_ids = map { $_->id } @sr;
+    #push @allocations, SDM::Disk::Allocation->get( owner_id => \@sr_ids );
+
     return @allocations;
 }
 
