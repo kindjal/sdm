@@ -33,6 +33,7 @@ sub aaData {
             $item->username,
             $item->uid,
             $item->age,
+            $item->nfsd,
             $filenames,
             $item->created ? $item->created : "0000-00-00 00:00:00",
             $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",

@@ -24,6 +24,7 @@ class SDM::Service::Lsof::Process::Set::View::Table::Xml {
                         'username',
                         'uid',
                         'age',
+                        'nfsd',
                         'filename',
                         #{
                         #    name => 'files',
