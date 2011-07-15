@@ -27,13 +27,14 @@ class SDM::Service::Lsofc::Command::Run {
             # Wait this many seconds between lsof calls.
             # In production maybe this is every minute or 5 minutes.
             is    => 'Number',
-            default_value => 300,
+            default_value => 60,
             doc   => 'seconds to wait between lsof runs'
         },
         timeout => {
             # Wait this long for lsof to report back before dying.
+            # Needs to be longer than wait.
             is    => 'Number',
-            default_value => 15,
+            default_value => 65,
             doc   => 'seconds to wait for lsof before dying'
         },
     ],
@@ -47,6 +48,7 @@ sub execute {
     my $MOUNT = IPC::Cmd::can_run("mount");
     die "lsof not found in PATH" unless ($LSOF);
     die "mount not found in PATH" unless ($MOUNT);
+    die "'timeout' attribute must be longer than 'wait' attribute" if ($self->timeout <= $self->wait);
 
     # lsof options, anything here must be expected by the server and
     # supported by the DB schema.
