@@ -25,18 +25,11 @@ sub execute {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " execute");
     my $count = 0;
-    # FIXME: Rather "get" items where last_modified is > $self->age, but I
-    # don't know how to do that.
     my @entries = SDM::Service::Lsof::Process->get();
     foreach my $item (@entries) {
-        my $lm = $item->last_modified;
-        next unless ($lm);
-        $lm =~ s/[- ]/:/g;
-        my $date = new Date::Manip::Date;
-        my $err = $date->parse($lm);
-        my $sec = $date->printf('%s');
-        $self->logger->debug(__PACKAGE__ . " $sec");
-        if ($self->age > (time - $sec)) {
+        my $age = $item->age;
+        $self->logger->debug(__PACKAGE__ . " age in seconds: $age");
+        if ($age > $self->age) {
             $self->logger->debug(__PACKAGE__ . " remove stale entry: " . $item->hostname . " " . $item->pid);
             $item->delete;
             $count++;
