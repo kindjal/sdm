@@ -36,15 +36,15 @@ sub process {
     my $self = shift;
     my $content = shift;
     my $json = JSON->new;
-    my $records = $json->decode($content);
+    my $data = $json->decode($content);
 
     # Get the hostname from the first key of first record
-    my $firstkey = shift @{ [ keys %$records ] };
-    my $hostname = shift @{ [ split("\t",$firstkey) ] } if ($firstkey);
+    my $hostname = shift @{ [ keys %$data ] };
+    my $records = $data->{$hostname};
 
     # Remove existing records not just returned in JSON.
     foreach my $existing (SDM::Service::Lsof::Process->get()) {
-        if (defined $hostname and $existing->hostname eq $hostname) {
+        if ($hostname and $existing->hostname eq $hostname) {
             # Clean expired processes from live hosts reporting in 
             my $key = $existing->hostname . "\t" . $existing->pid;
             $existing->delete unless (exists $records->{$key});

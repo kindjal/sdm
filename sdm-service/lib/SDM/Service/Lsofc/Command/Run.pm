@@ -168,15 +168,18 @@ sub execute {
                 $self->logger->debug("Tracking $count pids in memory") if ($count);
 
                 # POST to server at end of record
-                my $data = $json->encode($records);
+                my $data = {};
+                my $hostname = Sys::Hostname::hostname;
+                $data->{$hostname} = $records;
+                my $jsondata = $json->encode($data);
                 my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
-                my $size = length($data);
+                my $size = length($jsondata);
                 my $response = $userAgent->request(POST $self->url,
                     Content_Type => 'application/x-www-form-urlencoded',
                     Content_Length => $size,
-                    Content => "data=$data"
+                    Content => "data=$jsondata"
                 );
-                $self->logger->debug("POST:  " . $data);
+                $self->logger->debug("POST:  " . $jsondata);
                 if ($response->code != 200) {
                     $self->logger->debug("server responds:  " . $response->code . " " . $response->message);
                 } else {
