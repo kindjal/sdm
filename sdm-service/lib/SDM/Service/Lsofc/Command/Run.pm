@@ -27,7 +27,7 @@ class SDM::Service::Lsofc::Command::Run {
             # Wait this many seconds between lsof calls.
             # In production maybe this is every minute or 5 minutes.
             is    => 'Number',
-            default_value => 5,
+            default_value => 300,
             doc   => 'seconds to wait between lsof runs'
         },
         timeout => {
