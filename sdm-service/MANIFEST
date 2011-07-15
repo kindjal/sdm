@@ -5,6 +5,7 @@ debian/compat
 debian/control
 debian/copyright
 debian/rules
+debian/preinst
 etc/ur-sdm-service-webapp.conf
 etc/ur-sdm-service-lsofc.conf
 lib/SDM/Service.pm
@@ -41,9 +42,11 @@ lib/SDM/Service/Lsof/File.pm
 lib/SDM/Service/Lsof/Process.pm
 lib/SDM/Service/Lsof/Command.pm
 lib/SDM/Service/Lsof/Process/Command/README
+lib/SDM/Service/Lsof/Process/Command/Purge.pm
 lib/SDM/Service/Lsof/Process/Command.pm
 lib/SDM/Service/Lsof/Process/Set/View/Table/Json.pm
 lib/SDM/Service/Lsof/Process/Set/View/Table/Xml.pm
+lib/SDM/Service/Lsof/Process/Set/View/Status/Json.pm
 lib/SDM/View/Resource/Html/css/blueprint/ie.css
 lib/SDM/View/Resource/Html/css/blueprint/plugins/buttons/icons/cross.png
 lib/SDM/View/Resource/Html/css/blueprint/plugins/buttons/icons/key.png
@@ -92,6 +95,7 @@ lib/SDM/View/Resource/Html/img/gc_logo_28.png
 lib/SDM/View/Resource/Html/img/gc_logo_white_shadow.png
 lib/SDM/View/Resource/Html/img/gradient_footer.png
 lib/SDM/View/Resource/Html/img/gradient_header.png
+lib/SDM/View/Resource/Html/img/underconstruction-small.png
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/css/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/css/smoothness/images/ui-bg_flat_75_ffffff_40x100.png
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/css/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png
@@ -502,7 +506,6 @@ lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/index.html
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/jquery-ui-1.8.12.custom.zip
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/js/jquery-1.5.1.min.js
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/js/jquery-ui-1.8.12.custom.min.js
-lib/SDM/View/Resource/Html/js/pkg/jquery.timers-1.2.js
 lib/SDM/View/Resource/Html/js/app/lsofprocesstable.js
 lib/SDM/DataSource/Service.psql.schema
 lib/SDM/DataSource/Service.sqlite3n.schema
@@ -515,7 +518,9 @@ lib/SDM/xsl/html/table/sdm_service_lsof_process_set.xsl
 MANIFEST.SKIP
 t/README
 t/sdm-service-webapp-core.t
+t/sdm-service-lsof-command-purge.t
 t/sdm-service-lib.pm
 t/sdm-service-test.t
 t/sdm-service-lsof.t
+t/sdm-service-webapp-lsof.t
 MANIFEST
