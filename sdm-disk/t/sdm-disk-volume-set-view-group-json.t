@@ -67,7 +67,7 @@ my $expected = {
 };
 use JSON;
 my $json = JSON->new->ascii->pretty->allow_nonref;
-$expected = $json->encode($expected);
+$got = $json->decode($got);
 
 ok( is_deeply( $got, $expected, "ok: is_deeply" ), "ok: json match");
 
