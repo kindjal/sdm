@@ -54,7 +54,8 @@ sub execute {
     # supported by the DB schema.
     my $lsofargs = {
         n => 'name',
-        p => 'process',
+        p => 'pid',
+        g => 'pgid',
         c => 'command',
         L => 'username',
         u => 'uid',
@@ -109,18 +110,18 @@ sub execute {
         while (<KID>) {
             m/^(\w)(.*)$/;
             if ($1 eq 'p') {
-                # -- Build a process/pid record of lsof open file item
+                # -- Build a process record of lsof open file item
                 # This record is keyed on PID of process with file open + hostname.
                 if (scalar keys %$hash) {
                     # We matched on "p" and hash is not empty, so record it in lsofrecords.
-                    my $process = delete $hash->{process};
-                    my $key = Sys::Hostname::hostname() . "\t" . $process;
+                    my $pid = delete $hash->{pid};
+                    my $key = Sys::Hostname::hostname() . "\t" . $pid;
                     $lsofrecords->{$key} = $hash;
                 }
                 # Start a new record with the pid.
                 $hash = {};
-                $hash->{'process'} = $2;
-                # Name must be a list
+                $hash->{'pid'} = $2;
+                # Name must be a list, a list of filenames open
                 $hash->{'name'} = [];
             }
             while (my ($key,$value) = each %$lsofargs) {
@@ -128,6 +129,7 @@ sub execute {
                 if ($1 eq $key) {
                     # This is an lsof element that we are prepared to store.
                     if ($value eq 'name') {
+                        # Look in the hostmap for the IP of the nfs server.
                         # /gscuser/mcallawa/git/SDM (nfs10home:/vol/home/ebecker)
                         my $name = $2;
                         $name =~ /^.*\((\S+):(\S+)\)$/;
