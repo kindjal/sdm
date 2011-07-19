@@ -35,7 +35,6 @@ my @res;
 #print join("\n",@items);
 
 my @g = SDM::Disk::GpfsDiskPerf->get( filername => 'gpfs-dev', mount_path => '/gscmnt/gpfsdev12' );
-print "res: " . Data::Dumper::Dumper @g;
 #my @items = map { $_->gpfsDiskPerfFSName } @g;
 #print join("\n",@items);
 
