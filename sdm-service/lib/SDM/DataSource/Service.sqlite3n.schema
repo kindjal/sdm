@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS service_lsof_process;
 CREATE TABLE IF NOT EXISTS service_lsof_process (
   hostname      VARCHAR(255) NOT NULL DEFAULT '',
   pid           UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  pgid          UNSIGNED INTEGER NOT NULL DEFAULT 0,
   uid           UNSIGNED INTEGER NOT NULL DEFAULT 0,
   username      VARCHAR(255) NOT NULL DEFAULT '',
   command       VARCHAR(255) NOT NULL DEFAULT '',
