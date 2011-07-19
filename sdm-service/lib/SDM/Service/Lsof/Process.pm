@@ -37,6 +37,13 @@ class SDM::Service::Lsof::Process {
         },
     ],
     has_optional => [
+        job            => {
+            is        => 'SDM::Rtm::Jobs',
+            is_calculated => 1,
+            reverse_as => 'process',
+            calculate_from => [ 'hostname','pid' ],
+            calculate => q| SDM::Rtm::Jobs->get( exec_host => $hostname, jobPid => $pid ); |,
+        },
         nfsd          => { is => 'Text' },
         created       => { is => 'Date' },
         last_modified => { is => 'Date' },
