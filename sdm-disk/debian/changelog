@@ -1,3 +1,9 @@
+ur-sdm-disk (0.09-1) unstable; urgency=low
+
+  * Track process groups.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 19 Jul 2011 13:32:17 -0500
+
 ur-sdm-disk (0.08-1) unstable; urgency=low
 
   * Use 'mount -t nfs' to assign an nfsd IP to processes in
