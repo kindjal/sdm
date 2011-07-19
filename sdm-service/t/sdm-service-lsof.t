@@ -26,6 +26,7 @@ ok( $t->testinit == 0, "ok: init db");
 my $params = { hostname => "vm75.gsc.wustl.edu", pid => 1 };
 my $r = SDM::Service::Lsof::Process->create( $params );
 ok( UR::Context->commit(), "basic commit ok" );
+$r->delete;
 
 $params = {
   hostname => "vm73.gsc.wustl.edu",
@@ -66,22 +67,38 @@ $params = {
 };
 $r = SDM::Service::Lsof::Process->create( $params );
 my @f = $r->files;
+
 ok( scalar @f == 3, "file list ok");
+ok( defined $r, "create ok");
+
+my @files2 = ('bing','boff');
+$params = {
+  hostname => "vm76.gsc.wustl.edu",
+  pid      => 12347,
+  pgid     => 12346,
+  uid      => 501,
+  username => 'luser',
+  command  => 'perl',
+  name     => \@files2,
+};
+$r = SDM::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 ok( UR::Context->commit(), "commit ok" );
 
-my @p = SDM::Service::Lsof::Process->get( hostname => "vm75.gsc.wustl.edu" );
-@f = SDM::Service::Lsof::File->get( hostname => "vm75.gsc.wustl.edu" );
+my @p = SDM::Service::Lsof::Process->get( hostname => "vm76.gsc.wustl.edu" );
+@f = SDM::Service::Lsof::File->get( hostname => "vm76.gsc.wustl.edu" );
 @f = map { $_->filename } @f;
-ok( is_deeply( \@files, \@f, "is_deeply" ), "files match" );
 
-# Deleting vm75 pid should autoremove vm75 files
+my @expected = (@files,@files2);
+ok( is_deeply( \@expected, \@f, "is_deeply" ), "files match" );
+
+# Deleting pids should autoremove files
 foreach my $pid (@p) {
     $pid->delete;
 }
 UR::Context->commit();
 
-# This should show only vm76 files
+# This should show only files from the remaning pid
 @f = SDM::Service::Lsof::File->get();
 @f = map { $_->filename } @f;
 ok( is_deeply( \@files, \@f, "is_deeply" ), "files match" );
