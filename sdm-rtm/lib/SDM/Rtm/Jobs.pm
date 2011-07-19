@@ -20,8 +20,8 @@ class SDM::Rtm::Jobs {
         },
         build_id => {
             is => 'Text',
-            calculate_from => 'errFile',
-            calculate => q| $errFile =~ /^\S+\/build(\d+)/; return $1; |,
+            calculate_from => 'projectName',
+            calculate => q| $projectName =~ /^build(\d+)/; return $1; |,
         },
         #allocation_id => {
         #    # FIXME: UR needs to support linking to non id properties, feature request.
