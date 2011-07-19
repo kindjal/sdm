@@ -18,13 +18,23 @@ class SDM::Service::Lsof::Process {
         pid           => { is => 'Integer' }
     ],
     has => [
+        pgid          => { is => 'Integer' },
         uid           => { is => 'Integer', default => 0 },
         username      => { is => 'Text', default => '' },
         command       => { is => 'Text', default => '' },
+        # Allows us to identify child processes, see family
+        pg_leader     => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pgid'] },
     ],
     has_many_optional => [
         files         => { is => 'SDM::Service::Lsof::File', reverse_as => 'process' },
         filename      => { is => 'Text', via => 'files' },
+        # 'pg' is process group and had been called 'children'
+        # But this includes the process group leader in the result, which is suboptimal, but fine for now.
+        pg            => {
+            is        => 'SDM::Service::Lsof::Process',
+            reverse_as => 'pg_leader',
+            doc       => 'All processes in the process group',
+        },
     ],
     has_optional => [
         nfsd          => { is => 'Text' },
@@ -94,6 +104,9 @@ sub create {
     my ($params) = @_;
     my $hostname = $params->{hostname};
     my $pid = $params->{pid};
+    unless ($params->{pgid}) {
+        $params->{pgid} = $pid;
+    }
 
     my $files = delete $params->{name};
     if ($files) {
