@@ -1,3 +1,13 @@
+ur-sdm-service (0.10-1) unstable; urgency=low
+
+  * Add init scripts
+  * Add lister for SDM::Service::Lsof::File
+  * Relate Files to Jobs
+  * Ensure snmp is using all mibs
+  * Fix netapp disk volume identification
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Wed, 20 Jul 2011 16:08:49 -0500
+
 ur-sdm-service (0.09-1) unstable; urgency=low
 
   * Track process groups.

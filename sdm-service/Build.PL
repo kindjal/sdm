@@ -65,7 +65,7 @@ EOS
 my $build = $class->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.09',
+  dist_version => '0.10',
   dist_abstract => 'Modules for service management',
   etc_files => {
     'etc/ur-sdm-service-webapp.conf' => 'etc/ur-sdm-service-webapp.conf',
