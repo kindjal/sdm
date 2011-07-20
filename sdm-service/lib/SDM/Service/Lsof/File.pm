@@ -16,6 +16,9 @@ class SDM::Service::Lsof::File {
     ],
     has => [
         filename     => { is => 'Text' },
+        hostname     => { is => 'Text' },
+        pid          => { is => 'Integer' },
+        process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid'] },
         mountpoint   => {
             is_calculated => 1,
             calculate_from => 'filename',
@@ -48,9 +51,6 @@ class SDM::Service::Lsof::File {
             calculate_from => [ 'filername', 'physical_path' ],
             calculate => q| return SDM::Disk::Volume->get( filername => $filername, physical_path => $physical_path ); |,
         },
-        hostname     => { is => 'Text' },
-        pid          => { is => 'Integer' },
-        process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid'] }
     ],
 };
 
