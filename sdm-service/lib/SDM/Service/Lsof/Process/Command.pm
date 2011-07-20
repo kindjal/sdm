@@ -13,7 +13,7 @@ use SDM::Command::Crud;
 SDM::Command::Crud->init_sub_commands(
     target_class => 'SDM::Service::Lsof::Process',
     target_name => 'process',
-    list   => { show => 'hostname,pid,command,username,uid,filename,age' },
+    list   => { show => 'hostname,pid,command,username,uid,age' },
     add    => { do_not_init => 1 },
     update => { do_not_init => 1 },
     delete => { do_not_init => 1 },
