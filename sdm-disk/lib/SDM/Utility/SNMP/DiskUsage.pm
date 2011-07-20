@@ -183,7 +183,7 @@ sub _convert_to_volume_data {
         my $volume;
         if ($self->hosttype eq 'netapp') {
             # Skip volumes that are not fixed disks.
-            next unless ($snmp_table->{$dfIndex}->{'hrStorageType'} eq 'flexibleVolume(2)');
+            next unless ($snmp_table->{$dfIndex}->{'dfType'} eq 'flexibleVolume(2)');
             if (exists $snmp_table->{$dfIndex}->{'df64TotalKBytes'}) {
                 $total = $snmp_table->{$dfIndex}->{'df64TotalKBytes'};
                 $used  = $snmp_table->{$dfIndex}->{'df64UsedKBytes'};
