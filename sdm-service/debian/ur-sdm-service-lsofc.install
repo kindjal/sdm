@@ -1,3 +1,4 @@
 /etc/init/ur-sdm-service-lsofc.conf
+/etc/init.d/ur-sdm-service-lsofc
 /usr/share/perl5/SDM/Service/Lsofc/Command/Run.pm
 /usr/share/perl5/SDM/Service/Lsofc/Command.pm
