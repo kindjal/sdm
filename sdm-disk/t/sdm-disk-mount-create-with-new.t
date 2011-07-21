@@ -13,6 +13,8 @@ use SDM;
 use Test::More;
 use Test::Exception;
 
+my $a;
+my $h;
 my $f;
 my $e;
 my $v;
@@ -24,9 +26,11 @@ my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 ok( SDM::Test::Lib->testinit == 0, "ok: init db");
 
-ok( $f = SDM::Disk::Filer->get_or_create( name => 'nfs11' ), "create filer ok");
-ok( $e = SDM::Disk::Export->get_or_create( filername => 'nfs11', physical_path => '/vol/sata821' ), "create export ok");
-ok( $v = SDM::Disk::Volume->_new( mount_path => '/gscmnt/sata821' ), "create volume ok");
-ok( $m = SDM::Disk::Mount->get_or_create( export_id => $e->id, volume_id => $v->id ), "create mount ok");
+ok( $a = SDM::Disk::Array->get_or_create( name => 'nsams2k1' ), "create array ok");
+ok( $h = SDM::Disk::Host->get_or_create( hostname => 'linuscs103' ), "create host ok");
+ok( defined $a->assign($h->hostname), "assigned array ok");
+ok( $f = SDM::Disk::Filer->get_or_create( name => 'gpfs' ), "create filer ok");
+ok( defined $h->assign($f->name), "assigned host ok");
+ok( $v = SDM::Disk::Volume->_new( mount_path => '/gscmnt/sata821', filername => 'gpfs', physical_path => '/vol/sata821' ), "create volume ok");
 ok( UR::Context->commit(), "commit ok");
 done_testing();

@@ -66,21 +66,7 @@ ok( defined $res->id, "properly got new volume");
 # Test creation of new mount of same Volume mount_path
 @params = ( filername => 'nfs12', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
 $res = SDM::Disk::Volume->get_or_create( @params );
-ok( eq_array( [ $res->filername ], [ 'nfs11', 'nfs12' ] ), "filername set match ok");
-
-@params = ( filername => 'nfs13', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
-$res = SDM::Disk::Volume->get_or_create( @params );
-ok( eq_array( [ $res->filername ], [ 'nfs11', 'nfs12', 'nfs13' ] ), "filername set match ok");
-
-# Test deletion of 1 of many Mounts of this Volume
-$res = SDM::Disk::Volume->get( @params );
-$res->delete( @params );
-ok( eq_array( [ $res->filername ], [ 'nfs11', 'nfs12' ] ), "filername set match ok");
-
-# Should have two mounts left
-@params = ( mount_path => '/gscmnt/sata800' );
-$res = SDM::Disk::Volume->get( @params );
-ok( defined $res->id, "properly have one of two mounts left" );
+ok( ! defined $res, "properly prevented duplicate volume creation");
 
 # Test update of value
 @params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
@@ -101,7 +87,7 @@ stderr_like { $res->purge(); } qr|Purging aging volume: /gscmnt/sata800|, "valid
 # Now test 'delete'
 @params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800' );
 $res = SDM::Disk::Volume->create( @params );
-$res = SDM::Disk::Volume->get();
+$res = SDM::Disk::Volume->get( @params );
 $res->delete();
 isa_ok( $res, 'UR::DeletedRef' );
 

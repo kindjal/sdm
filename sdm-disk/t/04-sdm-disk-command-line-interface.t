@@ -33,6 +33,6 @@ $t->runcmd("$perl $sdm disk array assign nsams2k1 linuscs103");
 $t->runcmd("$perl $sdm disk host assign linuscs103 gpfs");
 
 # Delete a volume that has mappings to filers and arrays
-$t->runcmd("$perl $sdm disk volume delete 1");
+$t->runcmd("$perl $sdm disk volume delete \"/gscmnt/ams1100\"");
 
 done_testing();

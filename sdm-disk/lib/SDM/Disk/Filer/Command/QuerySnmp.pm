@@ -135,11 +135,6 @@ sub update_volumes {
                 $path =~ s/\//\\\//g;
                 # FIXME: do we want to auto-remove like this?
                 if ( ! grep /$path/, keys %$volumedata ) {
-                    foreach my $m (SDM::Disk::Mount->get( $volume->id )) {
-                        $self->logger->warn(__PACKAGE__ . " delete stale mount for volume " . $volume->id);
-                        $m->delete;
-                    }
-                    # FIXME, check if there are other filers that export it?
                     $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->id);
                     $volume->delete;
                 }
