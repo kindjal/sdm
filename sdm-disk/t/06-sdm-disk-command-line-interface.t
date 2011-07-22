@@ -28,7 +28,7 @@ $t->runcmd("$perl $sdm disk group add --name SYSTEMS");
 $t->runcmd("$perl $sdm disk filer add --name gpfs-dev");
 $t->runcmd("$perl $sdm disk host add --hostname linuscs107");
 $t->runcmd("$perl $sdm disk array add --name nsams2k1");
-$t->runcmd("$perl $sdm disk volume add --mount-path=/gscmnt/gc2111 --physical-path=/vol/gc2111 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs-dev --disk-group=SYSTEMS");
+$t->runcmd("$perl $sdm disk volume add --name=gc2111 --physical-path=/vol/gc2111 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs-dev --disk-group=SYSTEMS");
 
 # Assign and detach: arrays and hosts
 $t->runcmd("$perl $sdm disk array assign nsams2k1 linuscs107");

@@ -30,17 +30,18 @@ ok( ! @res, "fake filer returns undef" );
 
 @res = SDM::Disk::GpfsDiskConfig->get( filername => 'gpfs-dev' );
 $res = shift @res;
+
 ok( ref $res eq "SDM::Disk::GpfsDiskConfig", "object made correctly");
 ok( $res->filername eq 'gpfs-dev', "filername set");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
-#ok( ref $res->volume eq 'SDM::Disk::Volume', "filer object related");
+#ok( ref $res->volume eq 'SDM::Disk::Volume', "volume object related");
 
-ok( defined $res->filername, "attr set" );
+ok( defined $res->filername, "filer attr set" );
+#ok( defined $res->volume, "volume attr set");
 ok( defined $res->gpfsDiskConfigName, "attr set");
 ok( defined $res->gpfsDiskConfigFSName, "attr set");
 ok( defined $res->gpfsDiskConfigStgPoolName, "attr set");
 ok( defined $res->gpfsDiskMetadata, "attr set");
 ok( defined $res->gpfsDiskData, "attr set");
-ok( defined $res->mount_path, "attr set");
 
 done_testing();

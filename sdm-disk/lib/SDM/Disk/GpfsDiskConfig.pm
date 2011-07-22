@@ -18,15 +18,9 @@ class SDM::Disk::GpfsDiskConfig {
         gpfsDiskConfigStgPoolName   => { is => 'Text' },
         gpfsDiskMetadata            => { is => 'Text' },
         gpfsDiskData                => { is => 'Text' },
-        mount_path                  => {
-            is => 'Text',
-            calculate_from => 'gpfsDiskConfigFSName',
-            # FIXME: site specific mount path convention
-            calculate => q( return '/gscmnt/' . shift ),
-        }
     ],
     has_optional => [
-        volume                      => { is => 'SDM::Disk::Volume', id_by => 'mount_path' },
+        volume                      => { is => 'SDM::Disk::Volume', id_by => 'gpfsDiskConfigFSName' },
         filer                       => { is => 'SDM::Disk::Filer',  id_by => 'filername' }
     ],
     has_constant => [

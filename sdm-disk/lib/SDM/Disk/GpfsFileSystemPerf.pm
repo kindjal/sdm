@@ -14,11 +14,7 @@ class SDM::Disk::GpfsFileSystemPerf {
     has => [
         filername                    => { is => 'Text' },
         filer                        => { is => 'SDM::Disk::Filer', id_by => 'filername' },
-        volume                       => { is => 'SDM::Disk::Volume', id_by => 'mount_path' },
-        mount_path                   => {
-            calculate_from  => 'gpfsFileSystemPerfName',
-            calculate       => q( return "/gscmnt/" . shift )
-        },
+        volume                       => { is => 'SDM::Disk::Volume', id_by => 'gpfsFileSystemPerfName' },
         gpfsFileSystemPerfName       => { is => 'Text' },
         gpfsFileSystemBytesReadL     => { is => 'Number' },
         gpfsFileSystemBytesReadH     => { is => 'Number' },

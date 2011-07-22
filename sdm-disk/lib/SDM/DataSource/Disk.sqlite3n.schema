@@ -53,9 +53,10 @@ CREATE TABLE IF NOT EXISTS disk_filer_host (
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_volume (
-  mount_path    VARCHAR(255) PRIMARY KEY,
-  filername     VARCHAR(255),
-  physical_path VARCHAR(255),
+  name         VARCHAR(255) PRIMARY KEY,
+  mount_point   VARCHAR(255) NOT NULL,
+  filername     VARCHAR(255) NOT NULL,
+  physical_path VARCHAR(255) NOT NULL,
   total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
@@ -63,7 +64,6 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   comments      VARCHAR(255),
   mount_options VARCHAR(255),
   disk_group    VARCHAR(255),
-  CONSTRAINT disk_volume_uq UNIQUE (filername,physical_path),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED
 );

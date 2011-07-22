@@ -10,11 +10,12 @@ class SDM::Disk::Volume::Command::Add {
     is => 'SDM::Command::Base',
     doc => 'add volumes',
     has => [
-        mount_path    => { is => 'Text' },
+        name          => { is => 'Text' },
         filername     => { is => 'Text' },
         physical_path => { is => 'Text' },
     ],
     has_optional => [
+        mount_point   => { is => 'Text' },
         total_kb      => { is => 'Number', default => 0 },
         used_kb       => { is => 'Number', default => 0 },
         disk_group    => { is => 'Text' },
@@ -25,7 +26,8 @@ sub execute {
     my $self = shift;
 
     my $param = {
-        mount_path    => $self->mount_path,
+        name          => $self->name,
+        mount_point   => $self->mount_point,
         filername     => $self->filername,
         physical_path => $self->physical_path,
         total_kb      => $self->total_kb,

@@ -29,7 +29,7 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 my $res;
 my @res;
 
-#my $vol = SDM::Disk::Volume->get( id => 1 );
+#my $vol = SDM::Disk::Volume->get( name => 'gpfsdev12' );
 #@res = $vol->gpfs_disk_perf;
 #my @items = map { $_->gpfsDiskPerfFSName } @res;
 #print join("\n",@items);

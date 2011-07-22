@@ -17,6 +17,19 @@ class SDM::Utility::SNMP::DiskUsage {
             default_value => 0,
             doc => 'Allow automounter to mount volumes to find disk groups'
         },
+        discover_volumes => {
+            is => 'Boolean',
+            default_value => 0,
+            doc => 'Discover volumes on the target filer'
+        }
+    ],
+    has_optional => [
+        mount_rule => {
+            is => 'Text',
+            valid_values => [ 'strip_home' ],
+            default_value => 0,
+            doc => 'Map physical_path /vol/homeXYZ to volume name XYZ',
+        }
     ],
     has_transient => [
         disk_groups => {
@@ -60,8 +73,7 @@ sub _translate_mount_point {
     return '' if (length($volume) <= 4);
     my $mapping = {
         qr|^/vol|       => "/gscmnt" . substr($volume,4),
-        qr|^/home(\d+)| => "/gscmnt" . substr($volume,5),
-        qr|^/gpfs(\S+)| => $volume,
+        qr|^/vol/home(\d+)| => "/gscmnt" . substr($volume,9),
     };
 
     foreach my $rx (keys %$mapping) {
@@ -109,6 +121,7 @@ Try to determine the disk group:
 =cut
 sub _get_disk_group {
     my $self = shift;
+    # FIXME: Volume as arg, the following are attrs of volume obj.
     my $physical_path = shift;
     my $mount_path = shift;
     $self->logger->debug(__PACKAGE__ . " _get_disk_group($physical_path)");
@@ -117,6 +130,7 @@ sub _get_disk_group {
 
     # Do we already have the disk group name?
     if (defined $mount_path) {
+        # FIXME: remove, should already have single volume and its moutn_path attr
         my @volumes = SDM::Disk::Volume->get( mount_path => $mount_path );
         my $volume = shift @volumes;
         if ($volume) {
@@ -180,9 +194,9 @@ sub _convert_to_volume_data {
         # Convert result blocks to bytes
         my $total;
         my $used;
-        my $volume;
+        my $physical_path;
         if ($self->hosttype eq 'netapp') {
-            # Skip volumes that are not fixed disks.
+            # Skip devices that are not fixed disks.
             next unless ($snmp_table->{$dfIndex}->{'dfType'} eq 'flexibleVolume(2)');
             if (exists $snmp_table->{$dfIndex}->{'df64TotalKBytes'}) {
                 $total = $snmp_table->{$dfIndex}->{'df64TotalKBytes'};
@@ -197,11 +211,11 @@ sub _convert_to_volume_data {
                 $high = $snmp_table->{$dfIndex}->{'dfHighUsedKBytes'};
                 $used = $self->_netapp_int32($low,$high);
             }
-            $volume = $snmp_table->{$dfIndex}->{'dfFileSys'};
+            $physical_path = $snmp_table->{$dfIndex}->{'dfFileSys'};
         } else {
-            # Skip volumes that are not fixed disks.
+            # Skip devices that are not fixed disks.
             next unless ($snmp_table->{$dfIndex}->{'hrStorageType'} eq 'HOST-RESOURCES-TYPES::hrStorageFixedDisk');
-            $volume = $snmp_table->{$dfIndex}->{'hrStorageDescr'};
+            $physical_path = $snmp_table->{$dfIndex}->{'hrStorageDescr'};
             # Correct for block size
             my $correction = [ split(/\s+/,$snmp_table->{$dfIndex}->{'hrStorageAllocationUnits'}) ]->[0];
             $correction = $correction / 1024;
@@ -209,14 +223,20 @@ sub _convert_to_volume_data {
             $used  = $snmp_table->{$dfIndex}->{'hrStorageUsed'} * $correction;
         }
 
-        my $mount_path = $self->_translate_mount_point($volume);
+        # Have filername+physical_path, need to make a Volume object with a mount_path.
+        # Need to determine mount_point and mount_key.
+        # FIXME: How can we translate hostname:physical_path to mount_path without hard coding a convention?
+        # This plus hostname gets unique mount_path because of table constraint on uniqueness.
+        my $volume = SDM::Disk::Volume->get( hostname => $self->hostname, physical_path => $physical_path );
+        #my $mount_path = $self->_translate_mount_point($physical_path);
+        my $mount_path = $volume->mount_path;
 
-        $volume_table->{$volume} = {} unless (exists $volume_table->{$volume});
-        $volume_table->{$volume}->{mount_path} = $mount_path;
-        $volume_table->{$volume}->{used_kb} = $used;
-        $volume_table->{$volume}->{total_kb} = $total;
-        $volume_table->{$volume}->{physical_path} = $volume;
-        $volume_table->{$volume}->{disk_group} = $self->_get_disk_group($volume,$mount_path);
+        $volume_table->{$physical_path} = {} unless (exists $volume_table->{$physical_path});
+        $volume_table->{$physical_path}->{mount_path} = $mount_path;
+        $volume_table->{$physical_path}->{used_kb} = $used;
+        $volume_table->{$physical_path}->{total_kb} = $total;
+        $volume_table->{$physical_path}->{physical_path} = $physical_path;
+        $volume_table->{$physical_path}->{disk_group} = $self->_get_disk_group($physical_path,$mount_path);
     }
     $self->logger->debug(__PACKAGE__ . " " . scalar(keys %$volume_table) . " items");
     return $volume_table;

@@ -36,8 +36,8 @@ class SDM::Disk::GpfsDiskPerf {
         mount_path                  => { is => 'Text' },
         filername                   => { is => 'Text' },
         filer                       => { is => 'SDM::Disk::Filer',  id_by => 'filername' },
-        volume_id                   => { is => 'Number' },
-        volume                      => { is => 'SDM::Disk::Volume', id_by => 'volume_id' },
+        volume_name                 => { is => 'Text' },
+        volume                      => { is => 'SDM::Disk::Volume', id_by => 'volume_name' },
     ],
     has_constant => [
         snmp_table                  => { is => 'Text', value => 'gpfsDiskPerfTable' }
@@ -47,7 +47,7 @@ class SDM::Disk::GpfsDiskPerf {
 
 sub __load__ {
     my ($class, $bx, $headers) = @_;
-    # Load from either a filername arg or a volume_id in the bx.
+    # Load from either a filername arg or a volume_name in the bx.
 
     # Make a header row from class properties.
     my @properties = $class->__meta__->properties;
@@ -60,11 +60,11 @@ sub __load__ {
     my $filername;
     my $volume;
 
-    my $volume_id = $bx->value_for( "volume_id" );
+    my $volume_name = $bx->value_for( "volume_name" );
 
     # We either need a volume id or a filername
-    if ($volume_id) {
-        $volume  = SDM::Disk::Volume->get( id => $volume_id );
+    if ($volume_name) {
+        $volume  = SDM::Disk::Volume->get( id => $volume_name );
         $mount_path = $volume->mount_path;
         $filername = $volume->filername;
     } else {
@@ -111,7 +111,7 @@ sub __load__ {
         $result->{filername} = $filername;
         $result->{filer} = $filer;
         $result->{volume} = $volume;
-        $result->{volume_id} = $volume_id;
+        $result->{volume_name} = $volume_name;
         $result->{mount_path} = $mount_path;
         $result->{snmp_table} = $snmp_table;
         # These are from the SNMP table.

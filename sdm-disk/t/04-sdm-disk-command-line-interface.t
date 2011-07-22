@@ -26,13 +26,13 @@ $t->runcmd("$perl $sdm disk group add --name SYSTEMS");
 $t->runcmd("$perl $sdm disk filer add --name gpfs");
 $t->runcmd("$perl $sdm disk host add --hostname linuscs103");
 $t->runcmd("$perl $sdm disk array add --name nsams2k1");
-$t->runcmd("$perl $sdm disk volume add --mount-path=/gscmnt/ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
+$t->runcmd("$perl $sdm disk volume add --name=ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
 
 # Assign and detach: arrays and hosts
 $t->runcmd("$perl $sdm disk array assign nsams2k1 linuscs103");
 $t->runcmd("$perl $sdm disk host assign linuscs103 gpfs");
 
 # Delete a volume that has mappings to filers and arrays
-$t->runcmd("$perl $sdm disk volume delete \"/gscmnt/ams1100\"");
+$t->runcmd("$perl $sdm disk volume delete ams1100");
 
 done_testing();

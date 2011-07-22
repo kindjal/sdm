@@ -7,19 +7,59 @@ use warnings;
 use SDM;
 use Date::Manip;
 
+=head2 SDM::Disk::Volume
+A Volume may be commonly referred to by its nfs mount_path:
+
+  /gscmnt/gc2111 -> nfshost:/vol/gc2111
+
+  name: gc2111
+  mount_point: /gscmnt
+  mount_path: /gscmnt/gc2111
+  filername: nfshost
+  physical_path: /vol/gc2111
+
+This scheme is born from conventions at The Genome Institute.
+We must also support schemes:
+
+  /gscmnt/400 -> nfshost:/vol/400
+
+  name: 400
+  mount_point: /gscmnt
+  mount_path: /gscmnt/400
+  filername: nfshost
+  physical_path: /vol/400
+
+And:
+
+  /gscmnt/200 -> nfshost:/vol/home200
+
+  name: 200
+  mount_point: /gscmnt
+  mount_path: /gscmnt/200
+  filername: nfshost
+  physical_path: /vol/home200
+
+=cut
 class SDM::Disk::Volume {
     table_name => 'disk_volume',
     id_by => [
         # A volume must be uniquely specified by mount_path.
         # There can be only one /gscmnt/foo, even if more than
         # one filer can have filername:/vol/foo
-        mount_path    => { is => 'Text', len => 255 },
+        name => { is => 'Text', len => 255 },
     ],
     has => [
         # More than one filer named fname might have /vol/home
         # but there can be only one way to nfs mount /gscmnt/home.
         # There should not be more than one mount_path for fname+physical_path,
         # this is enforce by the DB schema UNIQUE constraint.
+        mount_point     => { is => 'Text', default_value => '/gscmnt' },
+        mount_path      => {
+            is => 'Text',
+            is_calculated => 1,
+            calculate_from => [ 'name','mount_point' ],
+            calculate => q| return $mount_point . "/" . $name |,
+        },
         filername       => { is => 'Text', len => 255 },
         physical_path   => { is => 'Text', len => 255 },
         filer           => { is => 'SDM::Disk::Filer', id_by => 'filername' },
@@ -141,6 +181,10 @@ sub create {
     my $self = shift;
     my (%param) = @_ if (scalar @_);
 
+    unless ($param{name}) {
+        $self->error_message("name not specified in Volume->create()");
+        return;
+    }
     unless ($param{filername}) {
         $self->error_message("filer name not specified in Volume->create()");
         return;
@@ -149,9 +193,9 @@ sub create {
         $self->error_message("physical path not specified in Volume->create()");
         return;
     }
-    unless ($param{mount_path}) {
-        $self->error_message("mount path not specified in Volume->create()");
-        return;
+    unless ($param{mount_point}) {
+        $self->warning_message("using default value '/gscmnt' for unspecified mount_point");
+        $param{mount_point} = '/gscmnt';
     }
     unless ($param{total_kb}) {
         $param{total_kb} = 0;
@@ -164,7 +208,7 @@ sub create {
     # The exact volume doesn't exist, so make sure we have the Filer
     my $filer = SDM::Disk::Filer->get( name => $param{filername} );
     unless ($filer) {
-        $self->error_message("Failed to identify filer: " . $param{filername});
+        $self->error_message("failed to identify filer: " . $param{filername});
         return;
     }
 
@@ -176,7 +220,7 @@ sub create {
         $group_name = uc($param{disk_group});
         my $group = SDM::Disk::Group->get( name => $group_name );
         unless ($group) {
-            $self->error_message("Failed to identify group: " . $group_name );
+            $self->error_message("failed to identify group: " . $group_name );
             return;
         }
         $param{disk_group} = $group_name;

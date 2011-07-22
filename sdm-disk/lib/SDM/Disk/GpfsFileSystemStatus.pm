@@ -14,11 +14,7 @@ class SDM::Disk::GpfsFileSystemStatus {
     has => [
         filername                       => { is => 'Text' },
         filer                           => { is => 'SDM::Disk::Filer', id_by => 'filername' },
-        volume                          => { is => 'SDM::Disk::Volume', id_by => 'mount_path' },
-        mount_path                      => {
-            calculate_from  => 'gpfsFileSystemName',
-            calculate       => q( return "/gscmnt/" . shift )
-        },
+        volume                          => { is => 'SDM::Disk::Volume', id_by => 'gpfsFileSystemName' },
         gpfsFileSystemName              => { is => 'Text' },
         gpfsFileSystemStatus            => { is => 'Text' },
         gpfsFileSystemXstatus           => { is => 'Text' },

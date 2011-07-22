@@ -39,9 +39,8 @@ ok( ref $res eq "SDM::Disk::GpfsFileSystemPerf", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 
 ok( defined $res->filername, "attr set" );
-ok( defined $res->filer, "attr set" );
-#ok( defined $res->volume, "attr set" );
-ok( defined $res->mount_path, "attr set" );
+ok( defined $res->filer, "filer attr set" );
+#ok( defined $res->volume, "volume attr set" );
 ok( defined $res->gpfsFileSystemPerfName, "attr set" );
 ok( defined $res->gpfsFileSystemBytesReadL, "attr set" );
 ok( defined $res->gpfsFileSystemBytesReadH, "attr set" );

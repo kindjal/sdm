@@ -42,9 +42,9 @@ ok( defined $group, "created test group ok");
 my $dir = "$top/t/test_volume";
 File::Path::rmtree $dir;
 mkdir $dir, 0755 or die "Can't make test dir: $dir: $!";
-my @params = ( filername => 'localhost', mount_path => $dir, physical_path => $dir );
+my @params = ( filername => 'localhost', name => 'test_volume', mount_point => "$top/t", physical_path => $dir );
 my $volume = SDM::Disk::Volume->create( @params );
-ok( defined $volume->id, "properly created new volume");
+ok( defined $volume, "properly created new volume");
 
 my $command = SDM::Disk::Volume::Command::Assign->create( volume => $volume , group => $group );
 $res = $command->execute();

@@ -35,21 +35,21 @@ ok( defined SDM::Disk::Group->create( name => 'INFO_GENOME_MODELS' ), "created t
 ok( defined SDM::Disk::Group->create( name => 'INFO_APIPE' ), "created test group ok");
 
 # Test creation
-@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 20, used_kb => 5 );
+@params = ( filername => 'nfs11', name => 'sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 20, used_kb => 5 );
 $res = SDM::Disk::Volume->create( @params );
-ok( defined $res->id, "properly created new volume");
+ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata801', physical_path => '/vol/sata801', disk_group => 'INFO_GENOME_MODELS', total_kb => 10, used_kb => 0 );
+@params = ( filername => 'nfs11', name => 'sata801', physical_path => '/vol/sata801', disk_group => 'INFO_GENOME_MODELS', total_kb => 10, used_kb => 0 );
 $res = SDM::Disk::Volume->create( @params );
-ok( defined $res->id, "properly created new volume");
+ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata802', physical_path => '/vol/sata802', disk_group => 'INFO_APIPE', total_kb => 30, used_kb => 2 );
+@params = ( filername => 'nfs11', name => 'sata802', physical_path => '/vol/sata802', disk_group => 'INFO_APIPE', total_kb => 30, used_kb => 2 );
 $res = SDM::Disk::Volume->create( @params );
-ok( defined $res->id, "properly created new volume");
+ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', mount_path => '/gscmnt/sata803', physical_path => '/vol/sata803', disk_group => 'INFO_APIPE', total_kb => 5, used_kb => 8 );
+@params = ( filername => 'nfs11', name => 'sata803', physical_path => '/vol/sata803', disk_group => 'INFO_APIPE', total_kb => 5, used_kb => 8 );
 $res = SDM::Disk::Volume->create( @params );
-ok( defined $res->id, "properly created new volume");
+ok( defined $res, "properly created new volume");
 
 @res = SDM::Disk::Volume->get( -group_by => ['disk_group'], -order_by => ['disk_group'] );
 my $item = $res[0];
