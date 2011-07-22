@@ -24,11 +24,15 @@ class SDM::Utility::SNMP::DiskUsage {
         }
     ],
     has_optional => [
-        mount_rule => {
+        mount_point => {
             is => 'Text',
-            valid_values => [ 'strip_home' ],
+            default_value => '/gscmnt',
+            doc => 'Mount point used by autofs to mount target filer.  Only for discover_volumes mode.'
+        },
+        translate_path => {
+            is => 'Boolean',
             default_value => 0,
-            doc => 'Map physical_path /vol/homeXYZ to volume name XYZ',
+            doc => 'Map physical_path /vol/homeXYZ to volume name XYZ, this is an old convention',
         }
     ],
     has_transient => [
@@ -53,34 +57,6 @@ sub _netapp_int32 {
     if ($low < 0) {
         return ($high + 1) * 2**32 + $low;
     }
-}
-
-=head2 _translate_mount_point
-A "Volume" as reported by SNMP, eg. hrStorageDescr, is made available via some mount point.
-These are named by convention (and thus Site specific).  Parse the volume/physical_path to
-the conventional mount_path.
-=cut
-sub _translate_mount_point {
-    # Map a volume to a mount point.
-    my $self = shift;
-    my $volume = shift;
-    $self->logger->debug(__PACKAGE__ . " _translate_mount_point($volume)");
-
-    # FIXME: This is site specific
-    # These mount points are agreed upon by convention.
-    # Return empty if the $volume is shorter than the
-    # hash keys, preventing a substr() error on too short mounts.
-    return '' if (length($volume) <= 4);
-    my $mapping = {
-        qr|^/vol|       => "/gscmnt" . substr($volume,4),
-        qr|^/vol/home(\d+)| => "/gscmnt" . substr($volume,9),
-    };
-
-    foreach my $rx (keys %$mapping) {
-        return $mapping->{$rx} if ($volume =~ /$rx/);
-    }
-    $self->logger->error("can't produce mount_path for volume: $volume\n");
-    return;
 }
 
 =head2 _get_disk_group_via_snmp
@@ -223,13 +199,31 @@ sub _convert_to_volume_data {
             $used  = $snmp_table->{$dfIndex}->{'hrStorageUsed'} * $correction;
         }
 
-        # Have filername+physical_path, need to make a Volume object with a mount_path.
-        # Need to determine mount_point and mount_key.
-        # FIXME: How can we translate hostname:physical_path to mount_path without hard coding a convention?
-        # This plus hostname gets unique mount_path because of table constraint on uniqueness.
-        my $volume = SDM::Disk::Volume->get( hostname => $self->hostname, physical_path => $physical_path );
-        #my $mount_path = $self->_translate_mount_point($physical_path);
-        my $mount_path = $volume->mount_path;
+        # FIXME: we're either discovering volumes or updating volumes.
+        # If discover, check if translate path is set, mount_point must be set,
+        unless ($self->mount_point) {
+            $self->logger->error(__PACKAGE__ . " no mount_point defined, use --mount-point");
+            return;
+        }
+
+        my $volume_name = basename $physical_path;
+        if ($self->translate_path) {
+            $volume_name = substr($volume_name,4); # strip out ^home to satisfy an old GC convention
+        }
+
+        my $mount_path = $self->mount_point . "/" . $volume_name;
+        unless ($self->discover_volumes) {
+            # In this case we expect to have defined all our volumes and know their mount_paths.
+            # FIXME: What if we've defined 69 volumes and we added 1, it'll be annoying to have to manually add them.
+            # Otherwise, we choose a mount_path based on convention, above.
+            my $volume = SDM::Disk::Volume->get( $volume_name );
+            unless ($volume) {
+                $self->logger->warn(__PACKAGE__ . " no volume found for " . $self->hostname . ":$physical_path");
+                $self->logger->warn(__PACKAGE__ . " perhaps: sdm disk volume add --name $volume_name --filername " . $self->hostname . " --physical-path $physical_path --mount-point " . $self->mount_point);
+                next;
+            }
+            $mount_path = $volume->mount_path;
+        }
 
         $volume_table->{$physical_path} = {} unless (exists $volume_table->{$physical_path});
         $volume_table->{$physical_path}->{mount_path} = $mount_path;
