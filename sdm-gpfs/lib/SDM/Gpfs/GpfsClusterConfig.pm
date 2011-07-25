@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsClusterConfig;
+package SDM::Gpfs::GpfsClusterConfig;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsClusterConfig {
+class SDM::Gpfs::GpfsClusterConfig {
     id_by => [
         # FIXME: id_by should be gpfsClusterName, but UR breaks with an id_by that isn't "id"
         id => { is => 'Number' },

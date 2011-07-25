@@ -199,6 +199,8 @@ sub _convert_to_volume_data {
             $used  = $snmp_table->{$dfIndex}->{'hrStorageUsed'} * $correction;
         }
 
+        next if ($physical_path eq "/");
+
         # FIXME: we're either discovering volumes or updating volumes.
         # If discover, check if translate path is set, mount_point must be set,
         unless ($self->mount_point) {
@@ -218,7 +220,7 @@ sub _convert_to_volume_data {
             # Otherwise, we choose a mount_path based on convention, above.
             my $volume = SDM::Disk::Volume->get( $volume_name );
             unless ($volume) {
-                $self->logger->warn(__PACKAGE__ . " no volume found for " . $self->hostname . ":$physical_path");
+                $self->logger->warn(__PACKAGE__ . " no volume found for " . $self->hostname . ": $physical_path");
                 $self->logger->warn(__PACKAGE__ . " perhaps: sdm disk volume add --name $volume_name --filername " . $self->hostname . " --physical-path $physical_path --mount-point " . $self->mount_point);
                 next;
             }
@@ -226,6 +228,7 @@ sub _convert_to_volume_data {
         }
 
         $volume_table->{$physical_path} = {} unless (exists $volume_table->{$physical_path});
+        $volume_table->{$physical_path}->{name} = $volume_name;
         $volume_table->{$physical_path}->{mount_path} = $mount_path;
         $volume_table->{$physical_path}->{used_kb} = $used;
         $volume_table->{$physical_path}->{total_kb} = $total;

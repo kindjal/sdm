@@ -148,32 +148,32 @@ sub update_volumes {
             foreach my $path ($volume->physical_path) {
                 next unless($path);
                 $path =~ s/\//\\\//g;
-                # FIXME: do we want to auto-remove like this?
                 if ( ! grep /$path/, keys %$volumedata ) {
-                    $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->id);
-                    $volume->delete;
+                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
+                    # FIXME: do we want to auto-remove like this?
+                    #$volume->delete;
                 }
             }
         }
         return 1 if ($self->cleanonly);
     }
 
-    $self->logger->error(__PACKAGE__ . " updating " . scalar(keys %$volumedata) . " volumes");
-
     foreach my $physical_path (keys %$volumedata) {
 
-        my $mount_path = $volumedata->{$physical_path}->{mount_path};
-        if (! defined $mount_path or $mount_path eq '') {
+        next if ($physical_path eq '/');
+
+        my $name = $volumedata->{$physical_path}->{name};
+        if (! defined $name or $name eq '') {
             $self->logger->error(__PACKAGE__ . " skipping volume with incomplete parameters: $physical_path");
             next;
         }
 
-        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, mount_path => $mount_path );
+        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $mount_path");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
             next;
         }
-        $self->logger->debug(__PACKAGE__ . " found volume: $filername, $physical_path, $mount_path");
+        $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
 
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
@@ -189,11 +189,11 @@ sub update_volumes {
                 next;
             }
         } else {
-            $self->logger->warn(__PACKAGE__ . " no group found for $mount_path");
+            $self->logger->warn(__PACKAGE__ . " no group found for volume: $name");
         }
 
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $name");
             next;
         }
 
@@ -207,7 +207,6 @@ sub update_volumes {
                 if (! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
-
     }
     return 1;
 }
