@@ -19,7 +19,11 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/../sdm-disk/t/sdm-disk-lib.pm";
+if ($top =~ /deploy/) {
+    require "$top/t/sdm-disk-lib.pm";
+} else {
+    require "$top/../sdm-disk/t/sdm-disk-lib.pm";
+}
 ok( SDM::Test::Lib->has_gpfs_snmp == 1, "gpfs ok");
 ok( SDM::Test::Lib->testinit == 0, "init db");
 ok( SDM::Test::Lib->testdata == 0, "data db");

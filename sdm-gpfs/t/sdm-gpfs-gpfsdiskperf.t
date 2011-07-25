@@ -21,7 +21,11 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/../sdm-disk/t/sdm-disk-lib.pm";
+if ($top =~ /deploy/) {
+    require "$top/t/sdm-disk-lib.pm";
+} else {
+    require "$top/../sdm-disk/t/sdm-disk-lib.pm";
+}
 ok( SDM::Test::Lib->has_gpfs_snmp == 1, "gpfs ok");
 ok( SDM::Test::Lib->testinit == 0, "init db");
 ok( SDM::Test::Lib->testdata == 0, "data db");
@@ -29,13 +33,13 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 my $res;
 my @res;
 
-@res = SDM::Disk::GpfsDiskPerf->get( filername => 'fakefiler' );
+@res = SDM::Gpfs::GpfsDiskPerf->get( filername => 'fakefiler' );
 ok( ! @res, "fake filer returns undef" );
 
-@res = SDM::Disk::GpfsDiskPerf->get( filername => 'gpfs-dev' );
+@res = SDM::Gpfs::GpfsDiskPerf->get( filername => 'gpfs-dev' );
 $res = shift @res;
 
-ok( ref $res eq "SDM::Disk::GpfsDiskPerf", "object made correctly");
+ok( ref $res eq "SDM::Gpfs::GpfsDiskPerf", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 #print Data::Dumper::Dumper $res;
 

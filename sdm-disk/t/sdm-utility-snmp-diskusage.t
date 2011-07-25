@@ -106,7 +106,7 @@ lives_ok { $ref = $obj->read_snmp_into_table('gpfsFileSDMPerfTable') } "ok: live
 lives_ok { $ref = $obj->read_snmp_into_table('gpfsDiskPerfTable') } "ok: lives";
 #print Data::Dumper::Dumper $ref;
 lives_ok { $ref = $obj->acquire_volume_data() } "ok: lives";
-ok( scalar keys %$ref > 1, "got data");
+ok( scalar keys %$ref >= 1, "got data");
 #print Data::Dumper::Dumper $ref;
 
 done_testing();
