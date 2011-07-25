@@ -43,7 +43,6 @@ class SDM::Disk::Filer {
             is => 'Text',
             calculate => q/ my %h; foreach my $h ($self->host) { map { $h{$_} = 1 } $h->arrayname }; return keys %h; /
         },
-        exports         => { is => 'SDM::Disk::Export', reverse_as => 'filer' },
     ],
     schema_name => 'Disk',
     data_source => 'SDM::DataSource::Disk',
@@ -107,12 +106,7 @@ sub delete {
 
     my @volumes = SDM::Disk::Volume->get( filername => $self->name );
 
-    # Before we remove the Filer, we must remove its exports and hostmappings
-    foreach my $export ( $self->exports ) {
-        $self->warning_message("Remove Export " . $export->id . " for Filer " . $self->name);
-        $export->delete() or
-            die "Failed to remove Export for Filer: " . $self->name;
-    }
+    # Before we remove the Filer, we must remove its hostmappings
     foreach my $hm ( $self->hostmappings ) {
         $self->warning_message("Remove Filer-Host mapping " . $hm->id . " for Filer " . $self->name);
         $hm->delete() or

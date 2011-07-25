@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS disk_host_array;
 DROP TABLE IF EXISTS disk_array;
 DROP TABLE IF EXISTS disk_host;
 DROP TABLE IF EXISTS disk_volume;
-DROP TABLE IF EXISTS disk_export;
 DROP TABLE IF EXISTS disk_filer_host;
 DROP TABLE IF EXISTS disk_filer;
 CREATE TABLE IF NOT EXISTS disk_user (
@@ -53,30 +52,20 @@ CREATE TABLE IF NOT EXISTS disk_filer_host (
   CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
-CREATE TABLE IF NOT EXISTS disk_export (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  filername     VARCHAR(255) NOT NULL CONSTRAINT disk_export_fk REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
-  physical_path VARCHAR(255) NOT NULL,
-  created       DATE,
-  last_modified DATE,
-  CONSTRAINT disk_export_uq UNIQUE (filername,physical_path)
-);
 CREATE TABLE IF NOT EXISTS disk_volume (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  mount_path    VARCHAR(255) NOT NULL,
+  name         VARCHAR(255) PRIMARY KEY,
+  mount_point   VARCHAR(255) NOT NULL,
+  filername     VARCHAR(255) NOT NULL,
+  physical_path VARCHAR(255) NOT NULL,
   total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
   last_modified DATE,
   comments      VARCHAR(255),
-  disk_group    VARCHAR(255) CONSTRAINT disk_volume_fk REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
-);
-CREATE TABLE IF NOT EXISTS disk_mount (
-  export_id     INTEGER,
-  volume_id     INTEGER,
-  PRIMARY KEY(export_id,volume_id),
-  CONSTRAINT disk_mount_export_fk FOREIGN KEY(export_id) REFERENCES disk_export (id) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT disk_mount_volume_fk FOREIGN KEY(volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+  mount_options VARCHAR(255),
+  disk_group    VARCHAR(255),
+  CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (
   name          VARCHAR(255) PRIMARY KEY,

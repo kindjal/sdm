@@ -28,7 +28,14 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev" );
+my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0 );
+stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skipped unknown volume ok";
+
+$c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 1 );
 lives_ok { $c->execute(); } "run lived";
+my $v = SDM::Disk::Volume->get( filername => "gpfs-dev" );
+ok($v->filername eq 'gpfs-dev', "filername set");
+ok(defined $v->name, "volume name set");
+ok(defined $v->used_kb, "used_kb set");
 
 done_testing();

@@ -1,3 +1,12 @@
+ur-sdm-rtm (0.11-1) unstable; urgency=low
+
+  * Make Volume:Filer 1:1
+  * Log better with lsofc
+  * Remove assumptions about /gscmnt and other mount_point
+  * Prep work for automount exporter
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Mon, 25 Jul 2011 14:35:55 -0500
+
 ur-sdm-rtm (0.10-1) unstable; urgency=low
 
   * Add init scripts

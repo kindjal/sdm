@@ -44,7 +44,6 @@ class SDM::Disk::Host {
         filermappings   => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'host' },
         filer           => { is => 'SDM::Disk::Filer', via => 'filermappings', to => 'filer' },
         filername       => { is => 'Text', via => 'filer', to => 'name' },
-        #exports         => { is => 'SDM::Disk::Export', reverse_as => 'host' },
     ],
     schema_name => 'Disk',
     data_source => 'SDM::DataSource::Disk',

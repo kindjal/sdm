@@ -1,0 +1,14 @@
+Source: ur-sdm-gpfs
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), snmp
+Build-Depends-Indep: perl, libur-perl, libtest-simple-perl, libtest-output-perl
+Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/Object-Accessor/
+
+Package: ur-sdm-gpfs
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace, ur-sdm-disk
+Description: A UR Object framework for GPFS querying
+ A UR Object framework for GPFS querying

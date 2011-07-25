@@ -56,9 +56,9 @@ my $expected = {
       ],
       [
          "SYSTEMS_DEVELOPMENT",
-         300,
-         230,
-         76.6666666666667
+         400,
+         280,
+         70
       ]
    ],
    "iTotalRecords" => 4,

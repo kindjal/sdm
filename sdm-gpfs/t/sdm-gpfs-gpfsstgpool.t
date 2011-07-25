@@ -21,7 +21,7 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 # Start with a fresh database
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
-require "$top/t/sdm-disk-lib.pm";
+require "$top/../sdm-disk/t/sdm-disk-lib.pm";
 ok( SDM::Test::Lib->has_gpfs_snmp == 1, "gpfs ok");
 ok( SDM::Test::Lib->testinit == 0, "init db");
 ok( SDM::Test::Lib->testdata == 0, "data db");
@@ -29,23 +29,23 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 my $res;
 my @res;
 
-@res = SDM::Disk::Host->get( hostname => 'linuscs107' );
-$res = shift @res;
-$res = $res->gpfs_node_status;
+@res = SDM::Disk::GpfsStgPool->get( filername => 'fakefiler' );
+ok( ! @res, "fake filer returns undef" );
 
-ok( ref $res eq "SDM::Disk::GpfsNodeStatus", "object made correctly");
+@res = SDM::Disk::GpfsStgPool->get( filername => 'gpfs-dev' );
+$res = shift @res;
+
+ok( ref $res eq "SDM::Disk::GpfsStgPool", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 
 ok( defined $res->filername, "attr set" );
 ok( defined $res->filer, "attr set" );
-ok( defined $res->gpfsNodeName, "attr set" );
-ok( defined $res->gpfsNodeIP, "attr set" );
-ok( defined $res->gpfsNodePlatform, "attr set" );
-ok( defined $res->gpfsNodeStatus, "attr set" );
-ok( defined $res->gpfsNodeFailureCount, "attr set" );
-ok( defined $res->gpfsNodeThreadWait, "attr set" );
-ok( defined $res->gpfsNodeHealthy, "attr set" );
-ok( defined $res->gpfsNodeDiagnosis, "attr set" );
-ok( defined $res->gpfsNodeVersion, "attr set" );
+ok( defined $res->gpfsStgPoolName, "attr set" );
+ok( defined $res->gpfsStgPoolFSName, "attr set" );
+ok( defined $res->gpfsStgPoolTotalSpaceL, "attr set" );
+ok( defined $res->gpfsStgPoolTotalSpaceH, "attr set" );
+ok( defined $res->gpfsStgPoolFreeSpaceL, "attr set" );
+ok( defined $res->gpfsStgPoolFreeSpaceH, "attr set" );
+ok( defined $res->gpfsStgPoolNumDisks, "attr set" );
 
 done_testing();

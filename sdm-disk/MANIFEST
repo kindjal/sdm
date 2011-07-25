@@ -26,8 +26,6 @@ lib/SDM/Disk/Assignment.pm
 lib/SDM/Disk/Assignment/Command.pm
 lib/SDM/Disk/Command.pm
 lib/SDM/Disk/Command/README
-lib/SDM/Disk/Export.pm
-lib/SDM/Disk/Export/Command.pm
 lib/SDM/Disk/Filer.pm
 lib/SDM/Disk/Filer/Command.pm
 lib/SDM/Disk/Filer/Command/GpfsCrfs.pm
@@ -62,8 +60,6 @@ lib/SDM/Disk/Host/Set/View/Table/Xml.pm
 lib/SDM/Disk/HostArrayBridge.pm
 lib/SDM/Disk/HostArrayBridge/Command.pm
 lib/SDM/Disk/HostArrayBridge/Command/README
-lib/SDM/Disk/Mount.pm
-lib/SDM/Disk/Mount/Command.pm
 lib/SDM/Disk/User.pm
 lib/SDM/Disk/User/Command.pm
 lib/SDM/Disk/Volume.pm

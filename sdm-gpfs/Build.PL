@@ -11,7 +11,7 @@ my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
   dist_version => '0.11',
-  dist_abstract => 'Modules for disk management',
+  dist_abstract => 'Modules for GPFS querying',
   build_requires => {
     'Module::Build' => '',
     'UR' => '0.31',
@@ -23,4 +23,5 @@ my $build = Module::Build->new(
   },
 );
 
+$build->add_build_element('schema');
 $build->create_build_script;

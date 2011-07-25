@@ -24,16 +24,10 @@ class SDM::Disk::GpfsDiskStatus {
         gpfsDiskFullBlockFreeSpaceH => { is => 'Number' },
         gpfsDiskSubBlockFreeSpaceL  => { is => 'Number' },
         gpfsDiskSubBlockFreeSpaceH  => { is => 'Number' },
-        mount_path                  => {
-            is => 'Text',
-            calculate_from => 'gpfsDiskFSName',
-            # FIXME: Site specific moun point convention
-            calculate => q( return '/gscmnt/' . shift; )
-        }
     ],
     has_optional => [
         filer                       => { is => 'SDM::Disk::Filer',  id_by => 'filername' },
-        volume                      => { is => 'SDM::Disk::Volume', id_by => 'mount_path' }
+        volume                      => { is => 'SDM::Disk::Volume', id_by => 'gpfsDiskFSName' }
     ],
     has_constant => [
         snmp_table                  => { is => 'Text', value => 'gpfsDiskStatusTable' }

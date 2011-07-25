@@ -19,75 +19,90 @@ use File::Basename qw(basename);
 local $| = 1;
 
 class SDM::Disk::Filer::Command::QuerySnmp {
-  is => 'SDM::Command::Base',
-  has_optional => [
-    force => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Query all filers regardless of status',
-    },
-    allow_mount => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Allow mounting of filesystems to discover disk groups',
-    },
-    timeout => {
-      is => 'Number',
-      default => 15,
-      doc => 'Not yet implemented',
-    },
-    host_maxage => {
-      is => 'Number',
-      default => 86400,
-      doc => 'max seconds since last check',
-    },
-    vol_maxage => {
-      is => 'Number',
-      default => 15,
-      doc => 'max days until volume is considered purgable',
-    },
-    rrdpath => {
-      is => 'Text',
-      default => $ENV{SDM_DISK_RRDPATH} ||= "/var/cache/sdm/rrd",
-      doc => 'Path to rrd file storage (not yet implemented)',
-    },
-    purge => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Purge aged volume entries (not yet implemented)',
-    },
-    cleanonly => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Remove volumes from the DB that the Filer no longer exports',
-    },
-    discover_groups => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Discover disk groups from touch files on volumes and create them on the fly',
-    },
-    is_current => {
-      is => 'Boolean',
-      default => 0,
-      doc => 'Check currency status',
-    },
-    filername => {
-      # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
-      # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
-      #is => 'SDM::Disk::Filer',
-      is => 'Text',
-      doc => 'SNMP query the named filer',
-    },
-    physical_path => {
-      is => 'Text',
-      doc => 'SNMP query the named filer for this export',
-    },
-    query_paths => {
-      is => 'Boolean',
-      doc => 'SNMP query the named filer for exports, but not usage',
-    },
-  ],
-  doc => 'Queries volume usage via SNMP',
+    is => 'SDM::Command::Base',
+    has_optional => [
+        force => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Query all filers regardless of status',
+        },
+        allow_mount => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Allow mounting of filesystems to discover disk groups rather than only relying on SNMP',
+        },
+        mount_point => {
+            is => 'Text',
+            default => '/gscmnt',
+            doc => 'Specify the mount_point used by autofs to access volumes, this is used with --discover_volumes',
+        },
+        translate_path => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Map physical_path /vol/homeXYZ to volume name XYZ, this is an old convention',
+        },
+        timeout => {
+            is => 'Number',
+            default => 15,
+            doc => 'Not yet implemented',
+        },
+        host_maxage => {
+            is => 'Number',
+            default => 86400,
+            doc => 'max seconds since last check',
+        },
+        vol_maxage => {
+            is => 'Number',
+            default => 15,
+            doc => 'max days until volume is considered purgable',
+        },
+        rrdpath => {
+            is => 'Text',
+            default => $ENV{SDM_DISK_RRDPATH} ||= "/var/cache/sdm/rrd",
+            doc => 'Path to rrd file storage (not yet implemented)',
+        },
+        purge => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Purge aged volume entries (not yet implemented)',
+        },
+        cleanonly => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Remove volumes from the DB that the Filer no longer exports',
+        },
+        discover_groups => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Discover disk groups from touch files on volumes and create them on the fly',
+        },
+        discover_volumes => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Create volumes based on what SNMP discovers, otherwise only update volumes already defined',
+        },
+        is_current => {
+            is => 'Boolean',
+            default => 0,
+            doc => 'Check currency status',
+        },
+        filername => {
+            # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
+            # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
+            #is => 'SDM::Disk::Filer',
+            is => 'Text',
+            doc => 'SNMP query the named filer',
+        },
+        physical_path => {
+            is => 'Text',
+            doc => 'SNMP query the named filer for this export',
+        },
+        query_paths => {
+            is => 'Boolean',
+            doc => 'SNMP query the named filer for exports, but not usage',
+        },
+    ],
+    doc => 'Queries volume usage via SNMP',
 };
 
 sub help_brief {
@@ -133,37 +148,32 @@ sub update_volumes {
             foreach my $path ($volume->physical_path) {
                 next unless($path);
                 $path =~ s/\//\\\//g;
-                # FIXME: do we want to auto-remove like this?
                 if ( ! grep /$path/, keys %$volumedata ) {
-                    foreach my $m (SDM::Disk::Mount->get( $volume->id )) {
-                        $self->logger->warn(__PACKAGE__ . " delete stale mount for volume " . $volume->id);
-                        $m->delete;
-                    }
-                    # FIXME, check if there are other filers that export it?
-                    $self->logger->warn(__PACKAGE__ . " delete volume no longer exported by filer '$filername': " . $volume->id);
-                    $volume->delete;
+                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
+                    # FIXME: do we want to auto-remove like this?
+                    #$volume->delete;
                 }
             }
         }
         return 1 if ($self->cleanonly);
     }
 
-    $self->logger->error(__PACKAGE__ . " updating " . scalar(keys %$volumedata) . " volumes");
-
     foreach my $physical_path (keys %$volumedata) {
 
-        my $mount_path = $volumedata->{$physical_path}->{mount_path};
-        if (! defined $mount_path or $mount_path eq '') {
+        next if ($physical_path eq '/');
+
+        my $name = $volumedata->{$physical_path}->{name};
+        if (! defined $name or $name eq '') {
             $self->logger->error(__PACKAGE__ . " skipping volume with incomplete parameters: $physical_path");
             next;
         }
 
-        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, mount_path => $mount_path );
+        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $mount_path");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
             next;
         }
-        $self->logger->debug(__PACKAGE__ . " found volume: $filername, $physical_path, $mount_path");
+        $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
 
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
@@ -179,11 +189,11 @@ sub update_volumes {
                 next;
             }
         } else {
-            $self->logger->warn(__PACKAGE__ . " no group found for $mount_path");
+            $self->logger->warn(__PACKAGE__ . " no group found for volume: $name");
         }
 
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $name");
             next;
         }
 
@@ -197,7 +207,6 @@ sub update_volumes {
                 if (! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
-
     }
     return 1;
 }
@@ -253,11 +262,10 @@ sub _query_snmp {
     # Update Filer data that are not current
     eval {
         my @params = ( loglevel => $self->loglevel, hostname => $filer->name );
-        if ($self->discover_groups) {
-            # Tell the snmp utility it's ok to mount to look for disk groups
-            # FIXME: site specific for nfs automounter
-            push @params, ( allow_mount => $self->allow_mount );
-        }
+        push @params, ( allow_mount => $self->allow_mount ) if ($self->discover_groups);
+        push @params, ( translate_path => $self->translate_path );
+        push @params, ( discover_volumes => $self->discover_volumes );
+        push @params, ( mount_point => $self->mount_point );
         my $snmp = SDM::Utility::SNMP::DiskUsage->create( @params );
         unless ($snmp) {
             $self->logger->error(__PACKAGE__ . " unable to query SNMP on filer " . $filer->name);

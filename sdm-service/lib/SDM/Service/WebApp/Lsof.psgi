@@ -42,6 +42,11 @@ sub process {
     my $hostname = shift @{ [ keys %$data ] };
     my $records = $data->{$hostname};
 
+    unless (ref $records eq 'HASH') {
+        print "agent at $hostname reports problem: $records\n";
+        return 0;
+    }
+
     # Remove existing records not just returned in JSON.
     foreach my $existing (SDM::Service::Lsof::Process->get()) {
         if ($hostname and $existing->hostname eq $hostname) {

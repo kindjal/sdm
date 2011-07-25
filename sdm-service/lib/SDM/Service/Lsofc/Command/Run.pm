@@ -38,17 +38,70 @@ class SDM::Service::Lsofc::Command::Run {
             doc   => 'seconds to wait for lsof before dying'
         },
     ],
+    has_transient => [
+        userAgent => {
+            is => 'LWP::UserAgent',
+        }
+    ]
 };
+
+sub error {
+    # An error method to logger msg + exit 1
+    # Better than die because we log in init/upstart script
+    my $self = shift;
+    my $msg = shift;
+    $self->logger->error(__PACKAGE__ . " $msg");
+    exit 1;
+}
+
+sub post {
+    my $self = shift;
+    my (%param) = @_;
+    my $records = $param{records};
+    my $msg = $param{msg};
+
+    # POST to server at end of record
+    my $data = {};
+    my $hostname = Sys::Hostname::hostname;
+    if ($msg) {
+        # Here there was a problem, and we're telling URL what
+        # the problem is so it's visible on that server.
+        $data->{$hostname} = $msg;
+    } else {
+        $data->{$hostname} = $records;
+    }
+
+    my $json = JSON->new;
+    my $jsondata = $json->encode($data);
+    my $size = length($jsondata);
+    my $response = $self->userAgent->request(POST $self->url,
+        Content_Type => 'application/x-www-form-urlencoded',
+        Content_Length => $size,
+        Content => "data=$jsondata"
+    );
+
+    my $count = $#{ [ keys %$records ] } + 1;
+    $self->logger->info(__PACKAGE__ . "POST: $count records to " . $self->url);
+    $self->logger->debug(__PACKAGE__ . "POST:  " . $jsondata);
+
+    if ($response->code != 200) {
+        $self->logger->debug(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->message);
+    } else {
+        $self->logger->debug(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->content);
+    }
+
+    return;
+}
 
 sub execute {
     my $self = shift;
-    $self->logger->debug(__PACKAGE__ . " execute");
+    $self->logger->info(__PACKAGE__ . " execute");
 
     my $LSOF = IPC::Cmd::can_run("lsof");
     my $MOUNT = IPC::Cmd::can_run("mount");
-    die "lsof not found in PATH" unless ($LSOF);
-    die "mount not found in PATH" unless ($MOUNT);
-    die "'timeout' attribute must be longer than 'wait' attribute" if ($self->timeout <= $self->wait);
+    $self->error("lsof not found in PATH") unless ($LSOF);
+    $self->error("mount not found in PATH") unless ($MOUNT);
+    $self->error("'timeout' attribute must be longer than 'wait' attribute") if ($self->timeout <= $self->wait);
 
     # lsof options, anything here must be expected by the server and
     # supported by the DB schema.
@@ -68,8 +121,8 @@ sub execute {
     my @args = ();
     my $pid;
 
-    die "cannot fork: $!" unless defined($pid = open(KID, "-|"));
-    $SIG{ALRM} = sub { die "$MOUNT pipe broke" };
+    $self->error("cannot fork: $!") unless defined($pid = open(KID, "-|"));
+    $SIG{ALRM} = sub { $self->error("$MOUNT pipe broke: $!") };
     if ($pid) {
         # parent
         my $host;
@@ -89,19 +142,22 @@ sub execute {
         # child execs mount
         my $cmd = join(" ",$MOUNT,@args);
         $self->logger->debug(__PACKAGE__ . " child executes mount: $cmd");
-        exec($MOUNT, @options, @args) or die "can't exec program: $!";
+        exec($MOUNT, @options, @args) or $self->error("can't exec program: $!");
         # exec never returns unless an error in exec();
-        die "failed to exec: $!";
+        $self->error("failed to exec: $!");
     }
 
     @options = ("-r" . $self->wait,"-N","-F",join('',keys %$lsofargs) );
     @args = ();
 
-    die "cannot fork: $!" unless defined($pid = open(KID, "-|"));
-    $SIG{ALRM} = sub { die "$LSOF pipe broke" };
+    # This userAgent posts to url, either sending lsof results, or an error message.
+    #my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
+    my $self->userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
+
+    $self->error("cannot fork: $!") unless defined($pid = open(KID, "-|"));
+    $SIG{ALRM} = sub { $self->post(msg => "$LSOF pipe broke: $!") };
     if ($pid) {
         # parent
-        my $json = JSON->new;
         # records are reported to the server
         my $records = {};
         # lsofrecords is the clients way to keep tabs on things
@@ -150,59 +206,43 @@ sub execute {
                 foreach my $key (keys %$records) {
                     # Remove previously seen pid no longer running
                     if (! exists $lsofrecords->{$key}) {
-                        #$self->logger->debug("Remove " . $key);
+                        #$self->logger->debug(__PACKAGE__ . " Remove " . $key);
                         delete $records->{$key};
                         $count++;
                     }
                 }
-                $self->logger->debug("Removed $count pids from memory") if ($count);
+                $self->logger->debug(__PACKAGE__ . " Removed $count pids from memory") if ($count);
 
                 $count = 0;
                 foreach my $key (keys %$lsofrecords) {
                     if (grep { /^(\/proc|\[)/ } @{ $lsofrecords->{$key}->{name} } ) {
-                        #$self->logger->debug("skipping " . Data::Dumper::Dumper $lsofrecords->{$key}->{name});
+                        #$self->logger->debug(__PACKAGE__ . " skipping " . Data::Dumper::Dumper $lsofrecords->{$key}->{name});
                         next;
                     }
-                    #$self->logger->debug("Add " . Data::Dumper::Dumper $key);
+                    #$self->logger->debug(__PACKAGE__ . " Add " . Data::Dumper::Dumper $key);
                     $records->{$key} = $lsofrecords->{$key};
                     $count++;
                 }
                 $lsofrecords = {};
 
-                $self->logger->debug("Tracking $count pids in memory") if ($count);
+                $self->logger->debug(__PACKAGE__ . " Tracking $count pids in memory") if ($count);
 
-                # POST to server at end of record
-                my $data = {};
-                my $hostname = Sys::Hostname::hostname;
-                $data->{$hostname} = $records;
-                my $jsondata = $json->encode($data);
-                my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
-                my $size = length($jsondata);
-                my $response = $userAgent->request(POST $self->url,
-                    Content_Type => 'application/x-www-form-urlencoded',
-                    Content_Length => $size,
-                    Content => "data=$jsondata"
-                );
-                $self->logger->debug("POST:  " . $jsondata);
-                if ($response->code != 200) {
-                    $self->logger->debug("server responds:  " . $response->code . " " . $response->message);
-                } else {
-                    $self->logger->debug("server responds:  " . $response->code . " " . $response->content);
-                }
+                $self->post( records => $records );
 
                 alarm $self->timeout;
             }
         }
-        close(KID) or warn "$LSOF exited $?";
+        close(KID) or $self->logger->warning(__PACKAGE__ . " $LSOF exited: $?");
     } else {
         # child execs lsof
         my $cmd = join(" ",$LSOF,@options,@args);
         $self->logger->debug(__PACKAGE__ . " child executes lsof: $cmd");
-        exec($LSOF, @options, @args) or die "can't exec program: $!";
+        exec($LSOF, @options, @args) or $self->error("can't exec program: $!");
         # exec never returns unless an error in exec();
-        die "failed to exec: $!";
+        $self->error("failed to exec: $!");
     }
 
+    $self->logger->info(__PACKAGE__ . " end of execute");
     return 1;
 }
 
