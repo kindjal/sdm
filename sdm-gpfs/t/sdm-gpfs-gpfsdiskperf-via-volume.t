@@ -34,7 +34,7 @@ my @res;
 #my @items = map { $_->gpfsDiskPerfFSName } @res;
 #print join("\n",@items);
 
-my @g = SDM::Disk::GpfsDiskPerf->get( filername => 'gpfs-dev', mount_path => '/gscmnt/gpfsdev12' );
+my @g = SDM::Gpfs::GpfsDiskPerf->get( filername => 'gpfs-dev', mount_path => '/gscmnt/gpfsdev12' );
 #my @items = map { $_->gpfsDiskPerfFSName } @g;
 #print join("\n",@items);
 

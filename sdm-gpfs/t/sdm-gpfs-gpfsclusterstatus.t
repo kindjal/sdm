@@ -26,11 +26,11 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 
 my $res;
 
-$res  = SDM::Disk::GpfsClusterStatus->get( filername => 'fakefiler' );
+$res  = SDM::Gpfs::GpfsClusterStatus->get( filername => 'fakefiler' );
 ok( ! defined $res, "fake filer returns undef" );
 
-$res  = SDM::Disk::GpfsClusterStatus->get( filername => 'gpfs-dev' );
-ok( ref $res eq "SDM::Disk::GpfsClusterStatus", "object made correctly");
+$res  = SDM::Gpfs::GpfsClusterStatus->get( filername => 'gpfs-dev' );
+ok( ref $res eq "SDM::Gpfs::GpfsClusterStatus", "object made correctly");
 ok( $res->filername eq 'gpfs-dev', "filername set");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 

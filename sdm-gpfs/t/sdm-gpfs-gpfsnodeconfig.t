@@ -33,7 +33,7 @@ my @res;
 $res = shift @res;
 $res = $res->gpfs_node_config;
 
-ok( ref $res eq "SDM::Disk::GpfsNodeConfig", "object made correctly");
+ok( ref $res eq "SDM::Gpfs::GpfsNodeConfig", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 
 ok( defined $res->filername, "attr set" );

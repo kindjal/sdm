@@ -29,13 +29,13 @@ ok( SDM::Test::Lib->testdata == 0, "data db");
 my $res;
 my @res;
 
-@res = SDM::Disk::GpfsFileSystemStatus->get( filername => 'fakefiler' );
+@res = SDM::Gpfs::GpfsFileSystemStatus->get( filername => 'fakefiler' );
 ok( ! @res, "fake filer returns undef" );
 
-@res = SDM::Disk::GpfsFileSystemStatus->get( filername => 'gpfs-dev' );
+@res = SDM::Gpfs::GpfsFileSystemStatus->get( filername => 'gpfs-dev' );
 $res = shift @res;
 
-ok( ref $res eq "SDM::Disk::GpfsFileSystemStatus", "object made correctly");
+ok( ref $res eq "SDM::Gpfs::GpfsFileSystemStatus", "object made correctly");
 ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
 
 ok( defined $res->filername, "attr set" );
