@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsDiskStatus;
+package SDM::Gpfs::GpfsDiskStatus;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsDiskStatus {
+class SDM::Gpfs::GpfsDiskStatus {
     id_by => [
         # FIXME: id_by should be gpfsDiskStatusName, but UR breaks with an id_by that isn't "id"
         id => { is => 'Number' },

@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsFileSystemStatus;
+package SDM::Gpfs::GpfsFileSystemStatus;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsFileSystemStatus {
+class SDM::Gpfs::GpfsFileSystemStatus {
     id_by => [
         # FIXME: id_by should be gpfsClusterName, but UR breaks with an id_by that isn't "id"
         id => { is => 'Number' },

@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsNodeConfig;
+package SDM::Gpfs::GpfsNodeConfig;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsNodeConfig {
+class SDM::Gpfs::GpfsNodeConfig {
     id_by => [
         id => { is => 'Number' }
     ],

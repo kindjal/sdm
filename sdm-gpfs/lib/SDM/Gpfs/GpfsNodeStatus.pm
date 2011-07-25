@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsNodeStatus;
+package SDM::Gpfs::GpfsNodeStatus;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsNodeStatus {
+class SDM::Gpfs::GpfsNodeStatus {
     id_by => [
         id => { is => 'Number' }
     ],

@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsStgPool;
+package SDM::Gpfs::GpfsStgPool;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsStgPool {
+class SDM::Gpfs::GpfsStgPool {
     id_by => [
         # FIXME: id_by should be gpfsClusterName, but UR breaks with an id_by that isn't "id"
         id => { is => 'Number' },

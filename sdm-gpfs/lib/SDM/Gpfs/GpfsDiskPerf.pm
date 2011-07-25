@@ -1,12 +1,12 @@
 
-package SDM::Disk::GpfsDiskPerf;
+package SDM::Gpfs::GpfsDiskPerf;
 
 use strict;
 use warnings;
 
 use SDM;
 
-class SDM::Disk::GpfsDiskPerf {
+class SDM::Gpfs::GpfsDiskPerf {
     id_by => [
         # FIXME: id_by should be gpfsClusterName, but UR breaks with an id_by that isn't "id"
         id => { is => 'Number' },
