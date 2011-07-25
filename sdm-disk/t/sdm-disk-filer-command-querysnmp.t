@@ -33,7 +33,8 @@ stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skip
 
 $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 1 );
 lives_ok { $c->execute(); } "run lived";
-my $v = SDM::Disk::Volume->get( filername => "gpfs-dev" );
+my @v = SDM::Disk::Volume->get( filername => "gpfs-dev" );
+my $v = shift @v;
 ok($v->filername eq 'gpfs-dev', "filername set");
 ok(defined $v->name, "volume name set");
 ok(defined $v->used_kb, "used_kb set");
