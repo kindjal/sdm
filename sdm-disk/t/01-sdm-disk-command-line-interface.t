@@ -45,4 +45,6 @@ $t->runcmd("$perl $sdm disk volume add --mount-path=/gscmnt/ams1100 --physical-p
 # Note mixed case group name which is fixed in Volume.pm
 $t->runcmd("$perl $sdm disk volume add --mount-path=/gscmnt/ams1101 --physical-path=/vol/ams1101 --total-kb=18438990688 --used-kb=7722964896 --filername=gpfs --disk-group=SYSTems");
 
+stdout_like { $t->runcmd("$perl $sdm disk volume list --noheaders --show mount_path --filter mount_path~%ams1101"); } qr/ams1101/, "ok: volume list works";
+
 done_testing();
