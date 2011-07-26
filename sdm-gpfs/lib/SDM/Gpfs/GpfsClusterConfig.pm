@@ -65,6 +65,10 @@ sub __load__ {
         $master = $host->hostname if ($host->master);
     }
     my $snmp = SDM::Utility::SNMP->create( hostname => $master );
+    unless ($snmp) {
+        $class->error_message(__PACKAGE__ . " $master snmpd does not respond");
+        return;
+    }
     my $table = $snmp->read_snmp_into_table( $snmp_table );
 
     my $id;
