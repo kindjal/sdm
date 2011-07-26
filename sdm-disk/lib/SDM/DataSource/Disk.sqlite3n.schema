@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS disk_volume;
 DROP TABLE IF EXISTS disk_filer_host;
 DROP TABLE IF EXISTS disk_filer;
 CREATE TABLE IF NOT EXISTS disk_user (
-  email         VARCHAR(255) NOT NULL PRIMARY KEY,
+  email         VARCHAR(255) PRIMARY KEY,
   created       DATE,
   last_modified DATE
 );
@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS disk_filer (
   name          VARCHAR(255) PRIMARY KEY,
   status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   filesystem    VARCHAR(255),
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
   comments      VARCHAR(255),
   created       DATE,
   last_modified DATE
@@ -53,7 +55,7 @@ CREATE TABLE IF NOT EXISTS disk_filer_host (
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_volume (
-  name         VARCHAR(255) PRIMARY KEY,
+  name          VARCHAR(255) PRIMARY KEY,
   mount_point   VARCHAR(255) NOT NULL,
   filername     VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
@@ -62,7 +64,7 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   created       DATE,
   last_modified DATE,
   comments      VARCHAR(255),
-  mount_options VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
   disk_group    VARCHAR(255),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED
