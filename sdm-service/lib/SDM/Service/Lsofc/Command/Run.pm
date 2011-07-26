@@ -85,7 +85,7 @@ sub post {
     $self->logger->debug(__PACKAGE__ . " POST:  " . $jsondata);
 
     if ($response->code != 200) {
-        $self->logger->debug(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->message);
+        $self->logger->warn(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->message);
     } else {
         $self->logger->debug(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->content);
     }
