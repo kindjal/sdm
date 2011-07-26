@@ -38,7 +38,7 @@ class SDM::Service::Lsofc::Command::Run {
             doc   => 'seconds to wait for lsof before dying'
         },
     ],
-    has_transient => [
+    has_transient_optional => [
         userAgent => {
             is => 'LWP::UserAgent',
         }
@@ -81,8 +81,8 @@ sub post {
     );
 
     my $count = $#{ [ keys %$records ] } + 1;
-    $self->logger->info(__PACKAGE__ . "POST: $count records to " . $self->url);
-    $self->logger->debug(__PACKAGE__ . "POST:  " . $jsondata);
+    $self->logger->info(__PACKAGE__ . " POST: $count records to " . $self->url);
+    $self->logger->debug(__PACKAGE__ . " POST:  " . $jsondata);
 
     if ($response->code != 200) {
         $self->logger->debug(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->message);
@@ -151,8 +151,8 @@ sub execute {
     @args = ();
 
     # This userAgent posts to url, either sending lsof results, or an error message.
-    #my $userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
-    my $self->userAgent = LWP::UserAgent->new(agent => __PACKAGE__);
+    my $lwp = LWP::UserAgent->new(agent => __PACKAGE__);
+    $self->userAgent($lwp);
 
     $self->error("cannot fork: $!") unless defined($pid = open(KID, "-|"));
     $SIG{ALRM} = sub { $self->post(msg => "$LSOF pipe broke: $!") };
