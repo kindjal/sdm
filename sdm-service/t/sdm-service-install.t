@@ -69,5 +69,6 @@ foreach my $file (@desired_files) {
         $error = 1;
     }
 }
+ok( $error == 0, "desired files are installed" );
 
 done_testing();
