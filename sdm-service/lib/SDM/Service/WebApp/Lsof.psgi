@@ -42,8 +42,8 @@ sub process {
     my $hostname = shift @{ [ keys %$data ] };
     my $records = $data->{$hostname};
 
-    unless (ref $records eq 'HASH') {
-        print "agent at $hostname reports problem: $records\n";
+    unless (ref($records) =~ /^HASH/) {
+        print STDERR "agent at $hostname reports problem: $records\n";
         return 0;
     }
 
@@ -80,7 +80,7 @@ sub process {
             unless ($process) {
                 die "failed to create new process record: $!";
             }
-            print "new process: " . Data::Dumper::Dumper $process;
+            #print STDERR "new process: " . Data::Dumper::Dumper $process;
         }
     }
 
