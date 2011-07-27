@@ -10,7 +10,6 @@
 /usr/share/man/man3/SDM::Service::Lsof::File::Set::View::Status::Json.3pm
 /usr/share/man/man3/SDM::Service::Lsof::Process.3pm
 /usr/share/man/man3/SDM::Service::Lsof::Process::Set::View::Status::Json.3pm
-/usr/share/man/man3/SDM::Service::Lsof::Process.3pm
 /usr/share/perl5/SDM/Service/Automount/Command/Export.pm
 /usr/share/perl5/SDM/Service/Automount/Command.pm
 /usr/share/perl5/SDM/Service/Automount.pm
