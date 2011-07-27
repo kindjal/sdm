@@ -39,12 +39,6 @@ class SDM::Service::Lsof::File {
             calculate_from => 'filename',
             calculate => q| $filename =~ m/\S+\s\((\S+):(\S+)\)/; return $2; |,
         },
-        export => {
-            is => 'SDM::Disk::Export',
-            is_calculated => 1,
-            calculate_from => [ 'filername', 'physical_path' ],
-            calculate => q| return SDM::Disk::Export->get( filername => $filername, physical_path => $physical_path ); |,
-        },
         volume => {
             is => 'SDM::Disk::Volume',
             is_calculated => 1,
