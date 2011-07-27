@@ -1,15 +1,6 @@
 /etc/init/ur-sdm-service-webapp.conf
 /etc/init.d/ur-sdm-service-webapp
-/usr/share/man/man3/SDM::Service::Lsof::Process.3pm
 /usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm
-/usr/share/perl5/SDM/Service/Lsof/Process/Set/View/Table/Json.pm
-/usr/share/perl5/SDM/Service/Lsof/Process/Set/View/Table/Xml.pm
-/usr/share/perl5/SDM/Service/Lsof/Process/Set/View/Status/Json.pm
-/usr/share/perl5/SDM/Service/Lsof/Process/Command.pm
-/usr/share/perl5/SDM/Service/Lsof/Process/Command/Purge.pm
-/usr/share/perl5/SDM/Service/Lsof/Command.pm
-/usr/share/perl5/SDM/Service/Lsof/Process.pm
-/usr/share/perl5/SDM/Service/Lsof/File.pm
 /usr/share/perl5/SDM/Service/WebApp/Command/Run.pm
 /usr/share/perl5/SDM/Service/WebApp/Starman/Server.pm
 /usr/share/perl5/SDM/Service/WebApp/Loader.pm
