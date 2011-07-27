@@ -17,5 +17,5 @@ my $build = Module::Build->new(
   },
 );
 
-$build->add_build_element('sqlite3n-schema');
+$build->add_build_element('sqlite3-schema');
 $build->create_build_script;
