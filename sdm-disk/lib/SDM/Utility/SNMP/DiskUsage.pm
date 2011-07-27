@@ -224,6 +224,12 @@ sub _convert_to_volume_data {
                 $self->logger->warn(__PACKAGE__ . " perhaps: sdm disk volume add --name $volume_name --filername " . $self->hostname . " --physical-path $physical_path --mount-point " . $self->mount_point);
                 next;
             }
+            # We allow Volumes to be "moved" to other filers.  If the current host offers a physical path
+            # for a volume defined elsewhere, then ignore it here and warn.
+            if ($volume->filername ne $self->hostname) {
+                $self->logger->warn(__PACKAGE__ . " volume " . $volume->name . " is configured at filer " . $volume->filername . ", ignoring $physical_path on " . $self->hostname);
+                next;
+            }
             $mount_path = $volume->mount_path;
         }
 
