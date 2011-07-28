@@ -72,11 +72,9 @@ sub testinit {
         print "flush sqlite3 DB\n";
         unlink "$base/DataSource/Disk.sqlite3";
         unlink "$base/DataSource/Disk.sqlite3-dump";
-        unlink "$base/DataSource/Disk.sqlite3n";
-        unlink "$base/DataSource/Disk.sqlite3n-dump";
         print "make new sqlite3 DB\n";
-        $self->runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3n < $base/DataSource/Disk.sqlite3n.schema");
-        $self->runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3n .dump > $base/DataSource/Disk.sqlite3n-dump");
+        $self->runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3 < $base/DataSource/Disk.sqlite3.schema");
+        $self->runcmd("/usr/bin/sqlite3 $base/DataSource/Disk.sqlite3 .dump > $base/DataSource/Disk.sqlite3-dump");
     }
 
     if ($driver eq "Pg") {
@@ -99,9 +97,7 @@ sub testinit {
 
     print "flush and remake Meta\n";
     unlink "$base/DataSource/Meta.sqlite3";
-    unlink "$base/DataSource/Meta.sqlite3n";
     unlink "$base/DataSource/Meta.sqlite3-dump";
-    unlink "$base/DataSource/Meta.sqlite3n-dump";
     return 0;
 }
 

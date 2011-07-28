@@ -19,7 +19,7 @@ class SDM::Service::Lsof::File {
         hostname     => { is => 'Text' },
         pid          => { is => 'Integer' },
         process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid'] },
-        mountpoint   => {
+        mount_point   => {
             is_calculated => 1,
             calculate_from => 'filename',
             calculate => q| $filename =~ m/\S+\s\((\S+)\)/; return $1; |,
@@ -37,6 +37,7 @@ class SDM::Service::Lsof::File {
         physical_path => {
             is_calculated => 1,
             calculate_from => 'filename',
+            # This assumes an NFS mount filename format: filename (server:mount_point)
             calculate => q| $filename =~ m/\S+\s\((\S+):(\S+)\)/; return $2; |,
         },
         volume => {
