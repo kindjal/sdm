@@ -39,6 +39,11 @@ class SDM::Service::WebApp::Command::Run {
             is    => 'Boolean',
             default_value => 0,
             doc   => 'force the use of the same port',
+        },
+        workers => {
+            is    => 'Number',
+            default_value => 20,
+            doc   => 'specify the number of worker processes',
         }
     ],
 };
@@ -114,7 +119,7 @@ sub run_starman {
     $runner->parse_options(
         '--app', $psgi_path,
         '--port', $self->port,
-        '--workers', 5,
+        '--workers', $self->workers,
         '--single_request', 1,
         '-r',
         '-R', $self->psgi_path,
