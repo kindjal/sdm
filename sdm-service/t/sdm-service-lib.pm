@@ -54,15 +54,15 @@ sub runcmd {
     my $self = shift;
     my $command = shift;
     $ENV{SDM_NO_REQUIRE_USER_VERIFY} ||= 1;
-    print("$command\n");
+    #print STDERR "$command\n";
     system("$command");
     if ($? == -1) {
-         print "failed to execute: $!\n";
+         print STDERR "failed to execute: $!\n";
     } elsif ($? & 127) {
-         printf "child died with signal %d, %s coredump\n",
+         printf STDERR "child died with signal %d, %s coredump\n",
              ($? & 127),  ($? & 128) ? 'with' : 'without';
     } else {
-         printf "child exited with value %d\n", $? >> 8;
+        # printf STDERR "child exited with value %d\n", $? >> 8;
     }
     ok( $? >> 8 == 0, "ok: $command") or die;
 }

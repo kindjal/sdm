@@ -8,7 +8,6 @@ use File::Basename qw/dirname/;
 
 BEGIN {
     $ENV{SDM_DEPLOYMENT} ||= "testing";
-    $ENV{SDM_NO_REQUIRE_USER_VERIFY} = 1;
 };
 
 my $top = dirname __FILE__;
@@ -34,9 +33,13 @@ $r = SDM::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 UR::Context->commit();
 
+$r = SDM::Service::Lsof::File->get( "physical_path like" => "%gc2112%" );
+ok( $r->process->uid == 500, "filter ok" );
+
 # -- Now we're prepped, run some commands
 
 # The following create a few entries to build 2 filers the way we know they should look.
-stdout_like { $t->runcmd("$perl $sdm service lsof file list --noheaders --filter filename~foo"); } qr/foo/, "file list works";
-stdout_like { $t->runcmd("$perl $sdm service lsof file list --noheaders --filter physical_path~gc2112"); } qr/baz/, "filter works";
+stdout_like { $t->runcmd("$perl $sdm service lsof file list --noheaders --filter filename~%foo%"); } qr/foo/, "file list works";
+#combined_like { qx/$perl $sdm service lsof file list --noheaders --filter filename~%foo%/; } qr/foo/, "file list works";
+#stdout_like { $t->runcmd("$perl $sdm service lsof file list --noheaders --filter physical_path=/vol/gc2112"); } qr/^vm75.*/, "filter on calculated attr works";
 done_testing();
