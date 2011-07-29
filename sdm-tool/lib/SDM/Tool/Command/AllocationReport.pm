@@ -8,10 +8,16 @@ class SDM::Tool::Command::AllocationReport {
     is => 'SDM::Command::Base',
     has_optional => [
         build_id => {
-            is => 'Number'
+            is => 'Number',
+            doc => 'show me all allocations for this build id',
         },
         job_id => {
-            is => 'Number'
+            is => 'Number',
+            doc => 'show me all allocations for this job id, assuming the job is part of a Model Build'
+        },
+        volume => {
+            is => 'Text',
+            doc => 'filter allocations for this named volume'
         }
     ]
 };
@@ -19,6 +25,25 @@ class SDM::Tool::Command::AllocationReport {
 use SDM;
 use Genome;
 use Data::Dumper;
+
+sub help_detail {
+    return <<EOF;
+Query for disk allocations used by running builds.  Some examples:
+
+Show me all allocations used by running builds:
+  sdm tool allocation-report | tee output.txt
+
+Show me all allocations used by build 1234
+  sdm tool allocation-report --build-id 1234 | tee output.txt
+
+Show me all allocations used by job 1234, assuming job 1234 is a Build:
+  sdm tool allocation-report --job-id 1234 | tee output.txt
+
+Show me all builds using volume gc2111:
+  sdm tool allocation-report --volume gc2111 | tee output.txt
+
+EOF
+}
 
 sub execute {
 
@@ -36,6 +61,7 @@ sub execute {
     } elsif ($self->job_id) {
         push @jobs, $self->job_id
     } else {
+        $self->logger->warn(__PACKAGE__ . " finding all running jobs");
         @jobs = SDM::Rtm::Jobs->get( stat => "RUNNING" );
         unless (@jobs) {
             $self->logger->error(__PACKAGE__ . " no running jobs found");
@@ -44,7 +70,7 @@ sub execute {
     }
 
     if (@jobs) {
-        $self->logger->info(__PACKAGE__ . " " . scalar @jobs + 1 . " running jobs");
+        $self->logger->info(__PACKAGE__ . " " . scalar @jobs . " running jobs");
         foreach my $job (@jobs) {
             my $name = $job->projectName;
             if ($name =~ /^build(\d+)/ ) {
@@ -58,25 +84,64 @@ sub execute {
         return;
     }
 
-    my $allocations;
+    $self->logger->debug(__PACKAGE__ . " query for builds");
     my @builds = Genome::Model::Build->get( id => \@build_ids );
 
+    $self->logger->warn(__PACKAGE__ . " finding allocations for " . scalar @builds . " running builds");
+    my $allocations;
     foreach my $build (@builds) {
-        print "build " . $build->id ."\n";
-        print "  data_directory " . $build->data_directory . "\n";
+        $self->logger->debug(__PACKAGE__ . " examine build " . $build->id);
+        my $paths;
+
+        $paths->{data_directory} = [];
+        push @{ $paths->{data_directory} }, $build->data_directory;
 
         foreach my $allocation ($build->all_allocations) {
             next if ($build->data_directory eq $allocation->absolute_path);
-            print "  input_path " . $allocation->absolute_path . "\n";
+            $paths->{input_path} = [];
+            push @{ $paths->{input_path} }, $allocation->absolute_path;
         }
 
         my @sru = Genome::SoftwareResult::User->get( user_id => $build->id, user_class_name => $build->subclass_name );
         foreach my $sru (@sru) {
             my $sr = $sru->software_result;
-            print "  software_result " . $sr->output_dir . "\n";
+            $paths->{software_result} = [];
+            push @{ $paths->{software_result} }, $sr->output_dir;
         }
-        print "\n";
+
+        if ($self->volume) {
+            # Only print out info on desired volume
+            my @paths = values %$paths;
+            while (my ($k,$v) = each %$paths) {
+                my @list;
+                foreach my $path (@$v) {
+                    my $vol = $self->volume;
+                    push @list, $path if ($path =~ /$vol/);
+                }
+                if (@list) {
+                    $paths->{$k} = \@list;
+                } else {
+                    delete $paths->{$k};
+                }
+            }
+            next unless (keys %$paths);
+            print "build " . $build->id . "\n";
+            while (my ($k,$v) = each %$paths) {
+                my @lines = map { "\t$k $_" } @{ $paths->{$k}};
+                print join("\n",@lines);
+                print "\n";
+            }
+        } else {
+            # Print out all info
+            print "build " . $build->id . "\n";
+            while (my ($k,$v) = each %$paths) {
+                my @lines = map { "\t$k $_" } @{ $paths->{$k}};
+                print join("\n",@lines);
+                print "\n";
+            }
+        }
     }
+
     return 1;
 }
 
