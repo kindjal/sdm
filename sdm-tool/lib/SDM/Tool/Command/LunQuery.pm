@@ -1,5 +1,5 @@
 
-package SDM::Gpfs::Command::LunQuery;
+package SDM::Tool::Command::LunQuery;
 
 use strict;
 use warnings;
@@ -7,10 +7,11 @@ use warnings;
 use SDM;
 use Net::SSH;
 
-class SDM::Gpfs::Command::LunQuery {
+class SDM::Tool::Command::LunQuery {
     is => "SDM::Command::Base",
     has => [
-        hostname => { is => 'Text', doc => 'hostname of gpfs master node' }
+        hostname => { is => 'Text', doc => 'hostname of gpfs master node' },
+        threshold => { is => 'Number', doc => 'threshold of slowness', default_value => 0.01 }
     ]
 };
 
@@ -23,14 +24,17 @@ sub _exit {
 
 sub execute {
     my $self = shift;
-    my $results = {};
     my $mmdsh;
     my $mmfsadm;
-    my $mmlsnsd;
-    my $hosts;
-    my @hosts;
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "which mmdsh mmfsadm mmlsnsd && mmlsnode") or $self->_exit("error running mmlsnode: $!");
+    my $mmlsnode;
+    my $multipath;
+
+    my $cmd = "which mmdsh mmfsadm mmlsnode multipath";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "PATH=\"/usr/lpp/mmfs/bin:\$PATH\" $cmd") or $self->_exit("error: which: $!");
+    close(WRITER);
     while (<ERROR>) {
+        print;
         if (/Permission denied/) {
             $self->logger->error("Set up ssh keys to allow access to " . $self->hostname);
             exit 1;
@@ -39,63 +43,79 @@ sub execute {
     while (<READER>) {
         $mmdsh = $_ if (/\/mmdsh/);
         $mmfsadm = $_ if (/\/mmfsadm/);
-        $mmlsnsd = $_ if (/\/mmlsnsd/);
-        $hosts = $_ if (/$self->hostname/);
+        $mmlsnode = $_ if (/\/mmlsnode/);
+        $multipath = $_ if (/\/multipath/);
     }
     close(READER);
-    close(WRITER);
+    close(ERROR);
 
     $self->_exit("mmdsh not in PATH") unless ($mmdsh);
     $self->_exit("mmfsadm not in PATH") unless ($mmfsadm);
-    $self->_exit("mmlsnsd not in PATH") unless ($mmlsnsd);
-    $self->_exit("error discovering cluster members") unless ($hosts);
+    $self->_exit("mmlsnode not in PATH") unless ($mmlsnode);
+    $self->_exit("multipath not in PATH") unless ($multipath);
 
-    @hosts = split(/\s+/);
-    shift @hosts;
-    $hosts = join(",",@hosts);
+    chomp $mmdsh;
+    chomp $mmfsadm;
+    chomp $mmlsnode;
+    chomp $multipath;
 
-    Net::SSH::sshopen2('root@' . $self->hostname, *READER, *WRITER, "$mmdsh -L $hosts $mmfsadm dump waiters 2>/dev/null") or $self->_exit("error running mmdsh/mmfsadm: $!");
-    DSH:
+    $cmd = "$mmlsnode";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: mmlsnode: $!");
+    while (<ERROR>) {
+        print;
+        if (/Permission denied/) {
+            $self->logger->error("Set up ssh keys to allow access to " . $self->hostname);
+            exit 1;
+        }
+    }
+
+    my $hosts;
+    my @hosts;
     while (<READER>) {
-        next unless (/^.* (\d+\.\d+) seconds.* (dm-.*)$/);
-        my $sec = $1;
-        my $dm  = $2;
-        next unless ($sec > 0.01);
-        my $lun;
-
-        opendir(my $dh, "/dev/mpath") or $self->_exit("error in opendir: $!");
-        LUN:
-        foreach my $entry (readdir($dh)) {
-            next unless ($entry);
-            my $target = readlink("/dev/mpath/$entry");
-            if (defined $target and $target =~ /$dm/) {
-                $lun = $entry;
-                last LUN;
-            }
-        }
-        closedir $dh;
-        next DSH unless ($lun);
-        my $nsd;
-        Net::SSH::sshopen2('root@' . $self->hostname, *READER2, *WRITER2, "$mmlsnsd -d $lun 2>/dev/null") or $self->_exit("error running mmlsnsd: $!");
-        while (<READER2>) {
-            next if (/^[\s-]*$/);
-            next if (/^ File/);
-            $nsd = shift @{ [ split() ] };
-        }
-        close(READER2);
-        close(WRITER2);
-        next unless ($nsd);
-        unless ($results->{$nsd}) {
-            #print STDERR "lun:nsd $lun:$nsd\r";
-            $results->{$nsd} = 1;
-        }
+        my $hostname = $self->hostname;
+        $hosts = $1 if (/^\s+\S+\s+(.*$hostname.*)$/);
     }
     close(READER);
     close(WRITER);
-    my @nsds = sort keys %$results;
-    print "LUNs reporting as waiters:\n";
-    print join("\n", @nsds);
-    print "\n";
+    close(ERROR);
+
+    $self->_exit("error discovering cluster members") unless ($hosts);
+    chomp $hosts;
+    $hosts =~ s/\s+$//;
+    $hosts =~ s/\s+/,/g;
+    $self->logger->debug(__PACKAGE__ . " cluster members: $hosts");
+
+    my $dms;
+    $cmd = "$mmdsh -L $hosts $mmfsadm dump waiters";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running mmdsh/mmfsadm: $!");
+    while (<READER>) {
+        next unless (/^.* (\d+\.\d+) seconds.* (dm-.*)$/);
+        my $sec = $1;
+        next unless ($sec > $self->threshold);
+        $dms->{$2} = $sec;
+    }
+    close(READER);
+    close(WRITER);
+    close(ERROR);
+
+    my $luns;
+    $cmd = "$multipath -l";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running multipath: $!");
+    while (<READER>) {
+        next unless (/^(\w+)\s+\S+\s+(\S+)/);
+        $luns->{$2} = $1;
+    }
+    close(READER);
+    close(WRITER);
+    close(ERROR);
+
+    foreach my $dm (sort { $dms->{$a} cmp $dms->{$b} } keys %$dms) {
+        print "$dm," . $luns->{$dm} . "," . $dms->{$dm} . "\n";
+    }
+
     return 1;
 }
 
