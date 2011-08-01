@@ -89,22 +89,7 @@ sub execute {
     $hosts =~ s/\s+/,/g;
     $self->logger->debug(__PACKAGE__ . " cluster members: $hosts");
 
-    # Discover slow devices
-    my $dms;
-    $cmd = "$mmdsh -L $hosts $mmfsadm dump waiters";
-    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running mmdsh/mmfsadm: $!");
-    while (<READER>) {
-        next unless (/^.* (\d+\.\d+) seconds.* (dm-.*)$/);
-        my $sec = $1;
-        next unless ($sec > $self->threshold);
-        $dms->{$2} = $sec;
-    }
-    close(READER);
-    close(WRITER);
-    close(ERROR);
-
-    # Get the mapping from dm name to lun name
+    # Get the mapping from dm name to lun name. This is the slowest part.
     my $luns;
     $cmd = "$multipath -l";
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
@@ -130,6 +115,21 @@ sub execute {
             /^\s+(\S+)\s+(\S+)/;
             $vols->{$2} = $1;
         }
+    }
+    close(READER);
+    close(WRITER);
+    close(ERROR);
+
+    # Discover slow devices
+    my $dms;
+    $cmd = "$mmdsh -L $hosts $mmfsadm dump waiters";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running mmdsh/mmfsadm: $!");
+    while (<READER>) {
+        next unless (/^.* (\d+\.\d+) seconds.* (dm-.*)$/);
+        my $sec = $1;
+        next unless ($sec > $self->threshold);
+        $dms->{$2} = $sec;
     }
     close(READER);
     close(WRITER);
