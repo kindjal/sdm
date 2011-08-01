@@ -27,9 +27,10 @@ sub execute {
     my $mmdsh;
     my $mmfsadm;
     my $mmlsnode;
+    my $mmlsnsd;
     my $multipath;
 
-    my $cmd = "which mmdsh mmfsadm mmlsnode multipath";
+    my $cmd = "which mmdsh mmfsadm mmlsnode mmlsnsd multipath";
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
     Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "PATH=\"/usr/lpp/mmfs/bin:\$PATH\" $cmd") or $self->_exit("error: which: $!");
     close(WRITER);
@@ -44,6 +45,7 @@ sub execute {
         $mmdsh = $_ if (/\/mmdsh/);
         $mmfsadm = $_ if (/\/mmfsadm/);
         $mmlsnode = $_ if (/\/mmlsnode/);
+        $mmlsnsd = $_ if (/\/mmlsnsd/);
         $multipath = $_ if (/\/multipath/);
     }
     close(READER);
@@ -52,16 +54,19 @@ sub execute {
     $self->_exit("mmdsh not in PATH") unless ($mmdsh);
     $self->_exit("mmfsadm not in PATH") unless ($mmfsadm);
     $self->_exit("mmlsnode not in PATH") unless ($mmlsnode);
+    $self->_exit("mmlsnsd not in PATH") unless ($mmlsnsd);
     $self->_exit("multipath not in PATH") unless ($multipath);
 
     chomp $mmdsh;
     chomp $mmfsadm;
     chomp $mmlsnode;
+    chomp $mmlsnsd;
     chomp $multipath;
 
+    # Get cluster membership
     $cmd = "$mmlsnode";
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: mmlsnode: $!");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: $cmd: $!");
     while (<ERROR>) {
         print;
         if (/Permission denied/) {
@@ -69,7 +74,6 @@ sub execute {
             exit 1;
         }
     }
-
     my $hosts;
     my @hosts;
     while (<READER>) {
@@ -79,13 +83,13 @@ sub execute {
     close(READER);
     close(WRITER);
     close(ERROR);
-
     $self->_exit("error discovering cluster members") unless ($hosts);
     chomp $hosts;
     $hosts =~ s/\s+$//;
     $hosts =~ s/\s+/,/g;
     $self->logger->debug(__PACKAGE__ . " cluster members: $hosts");
 
+    # Discover slow devices
     my $dms;
     $cmd = "$mmdsh -L $hosts $mmfsadm dump waiters";
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
@@ -100,10 +104,11 @@ sub execute {
     close(WRITER);
     close(ERROR);
 
+    # Get the mapping from dm name to lun name
     my $luns;
     $cmd = "$multipath -l";
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running multipath: $!");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running $cmd: $!");
     while (<READER>) {
         next unless (/^(\w+)\s+\S+\s+(\S+)/);
         $luns->{$2} = $1;
@@ -112,8 +117,26 @@ sub execute {
     close(WRITER);
     close(ERROR);
 
+    # Get the filesystem names for the luns
+    my $vols;
+    $cmd = "$mmlsnsd";
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error running $cmd: $!");
+    while (<READER>) {
+        next unless (/,/);
+        if (/^\s+(\(free disk\))\s+(\S+)/) {
+            $vols->{$2} = "free";
+        } else {
+            /^\s+(\S+)\s+(\S+)/;
+            $vols->{$2} = $1;
+        }
+    }
+    close(READER);
+    close(WRITER);
+    close(ERROR);
+
     foreach my $dm (sort { $dms->{$a} cmp $dms->{$b} } keys %$dms) {
-        print "$dm," . $luns->{$dm} . "," . $dms->{$dm} . "\n";
+        print "$dm," . $luns->{$dm} . "," . $vols->{ $luns->{$dm} } . "," . $dms->{$dm} . "\n";
     }
 
     return 1;
