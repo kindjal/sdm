@@ -59,7 +59,7 @@ sub execute {
     } elsif ($self->build_id) {
         push @build_ids, $self->build_id;
     } elsif ($self->job_id) {
-        push @jobs, $self->job_id
+        @jobs = SDM::Rtm::Jobs->get( jobid => $self->job_id  );
     } else {
         $self->logger->warn(__PACKAGE__ . " finding all running jobs");
         @jobs = SDM::Rtm::Jobs->get( stat => "RUNNING" );
@@ -70,7 +70,7 @@ sub execute {
     }
 
     if (@jobs) {
-        $self->logger->info(__PACKAGE__ . " " . scalar @jobs . " running jobs");
+        $self->logger->warn(__PACKAGE__ . " " . scalar @jobs . " running jobs");
         foreach my $job (@jobs) {
             my $name = $job->projectName;
             if ($name =~ /^build(\d+)/ ) {
@@ -89,6 +89,9 @@ sub execute {
 
     $self->logger->warn(__PACKAGE__ . " finding allocations for " . scalar @builds . " running builds");
     my $allocations;
+
+    my @header = ('Build ID','Build Subclass','Model Name','Processing Profile','Allocation Type','Path');
+    print join(",",@header) . "\n";
     foreach my $build (@builds) {
         $self->logger->debug(__PACKAGE__ . " examine build " . $build->id);
         my $paths;
@@ -102,6 +105,7 @@ sub execute {
             push @{ $paths->{input_path} }, $allocation->absolute_path;
         }
 
+        $self->logger->debug(__PACKAGE__ . " " . $build->id . " " . $build->subclass_name);
         my @sru = Genome::SoftwareResult::User->get( user_id => $build->id, user_class_name => $build->subclass_name );
         foreach my $sru (@sru) {
             my $sr = $sru->software_result;
@@ -110,7 +114,7 @@ sub execute {
         }
 
         if ($self->volume) {
-            # Only print out info on desired volume
+            # Filter results for named volume
             my @paths = values %$paths;
             while (my ($k,$v) = each %$paths) {
                 my @list;
@@ -125,21 +129,15 @@ sub execute {
                 }
             }
             next unless (keys %$paths);
-            print "build " . $build->id . "\n";
-            while (my ($k,$v) = each %$paths) {
-                my @lines = map { "\t$k $_" } @{ $paths->{$k}};
-                print join("\n",@lines);
-                print "\n";
-            }
-        } else {
-            # Print out all info
-            print "build " . $build->id . "\n";
-            while (my ($k,$v) = each %$paths) {
-                my @lines = map { "\t$k $_" } @{ $paths->{$k}};
-                print join("\n",@lines);
-                print "\n";
-            }
         }
+
+        my @row = ($build->id,$build->subclass_name,$build->model_name,$build->processing_profile_name);
+        while (my ($k,$v) = each %$paths) {
+            #my @lines = map { "\t$k $_" } @{ $paths->{$k}};
+            #push @row,@lines;
+            @row = (@row,$k,@{ $paths->{$k} });
+        }
+        print join(",",@row) . "\n";
     }
 
     return 1;
