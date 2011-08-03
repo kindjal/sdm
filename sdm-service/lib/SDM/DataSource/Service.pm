@@ -53,6 +53,8 @@ sub create_dbh {
     my $self = shift->_singleton_object();
     my $dbh = $self->SUPER::create_dbh(@_);
     if ($ENV{SDM_DATABASE_DRIVER} eq "SQLite") {
+        # Setting autocommit makes >1 workers work when long running.
+        $dbh->{AutoCommit} = 1;
         $dbh->do("PRAGMA foreign_keys = ON");
     }
     return $dbh;
