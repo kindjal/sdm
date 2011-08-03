@@ -1,3 +1,14 @@
+ur-sdm-gpfs (0.12-1) unstable; urgency=low
+
+  * Make worker count an CLI argument.
+  * Allow sdm-service webapp workers to be long running.
+  * Prevent production mode Starman from reloading files.
+  * Increase lsof wait from 60 to 300 seconds.
+  * Add sdm-tools with allocation report and lun report.
+  * Move GMSchema to sdm pkg.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Wed, 03 Aug 2011 16:31:36 -0500
+
 ur-sdm-gpfs (0.11-1) unstable; urgency=low
 
   * Make a new package for gpfs modules.
