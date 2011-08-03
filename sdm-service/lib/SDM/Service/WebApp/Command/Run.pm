@@ -44,6 +44,11 @@ class SDM::Service::WebApp::Command::Run {
             is    => 'Number',
             default_value => 20,
             doc   => 'specify the number of worker processes',
+        },
+        single_request => {
+            is    => 'Boolean',
+            default_value => 0,
+            doc   => 'specify that each worker handle one request and exit',
         }
     ],
 };
@@ -120,7 +125,7 @@ sub run_starman {
         '--app', $psgi_path,
         '--port', $self->port,
         '--workers', $self->workers,
-        '--single_request', 1,
+        '--single_request', $self->single_request,
         '-r',
         '-R', $self->psgi_path,
         # '-R', SDM->base_dir # watching base_dir makes servers restart whenever sqlite test db is updated
