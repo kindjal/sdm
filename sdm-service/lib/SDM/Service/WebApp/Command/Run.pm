@@ -130,7 +130,7 @@ sub run_starman {
         '--workers' => $self->workers,
         '--single_request' => $self->single_request,
     );
-    if ($self->{env} eq 'development') {
+    if ($self->{env} and $self->{env} eq 'development') {
         $options{'-r'} = '';
         $options{'-R'} = $self->psgi_path;
     }
