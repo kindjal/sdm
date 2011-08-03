@@ -7,7 +7,6 @@ use warnings;
 use SDM;
 use SDM::Service::WebApp::Starman;
 use SDM::Service::WebApp::Runner;
-use SDM::Service::WebApp::Loader;
 
 use File::Basename qw/ dirname /;
 use Workflow;
@@ -34,6 +33,11 @@ class SDM::Service::WebApp::Command::Run {
             is    => 'Number',
             default_value => '8090',
             doc   => 'tcp port for internal server to listen'
+        },
+        env => {
+            is    => 'Text',
+            valid_values => ['development','production'],
+            doc   => 'run mode, development enables reloading changed files',
         },
         fixed_port => {
             is    => 'Boolean',
@@ -115,21 +119,22 @@ sub run_starman {
 
     my $runner = SDM::Service::WebApp::Runner->new(
         server => 'SDM::Service::WebApp::Starman',
-        loader => 'SDM::Service::WebApp::Loader',
-        env    => 'development',
+        env    => $self->env,
     );
 
     my $psgi_path = $self->psgi_path . '/Main.psgi';
 
-    $runner->parse_options(
-        '--app', $psgi_path,
-        '--port', $self->port,
-        '--workers', $self->workers,
-        '--single_request', $self->single_request,
-        '-r',
-        '-R', $self->psgi_path,
-        # '-R', SDM->base_dir # watching base_dir makes servers restart whenever sqlite test db is updated
-        );
+    my %options = (
+        '--app' => $psgi_path,
+        '--port' => $self->port,
+        '--workers' => $self->workers,
+        '--single_request' => $self->single_request,
+    );
+    if ($self->{env} eq 'development') {
+        $options{'-r'} = '';
+        $options{'-R'} = $self->psgi_path;
+    }
+    $runner->parse_options( %options );
 
     $runner->run;
 }
