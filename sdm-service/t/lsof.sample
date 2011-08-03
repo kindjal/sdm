@@ -1,0 +1,708 @@
+p5074
+g5074
+cres
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.err (gpfs66:/vol/gc2015)
+p5075
+g5074
+c1312287994.8032
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.err (gpfs66:/vol/gc2015)
+n/usr/local/lsf/spool/1312287994.8032941 (lsf:/vol/lsf)
+p5077
+g5074
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.err (gpfs66:/vol/gc2015)
+p5078
+g5074
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p5079
+g5074
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878470445/build113929515/logs/113929556.err (gpfs66:/vol/gc2015)
+p5112
+g5074
+csamtools
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
+p6320
+g5074
+csh
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+p6321
+g5074
+cbwa
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/bwa/bwa-0.5.9-64/bwa (appsrv:/export/ia32-linux)
+n/gscmnt/sata760/production/csf_113408006/gerald_B07AUABXX_4.bam (nfs2:/vol/sata760)
+p6980
+g6980
+clim
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/lim.041911 (lsf:/vol/lsf)
+p6998
+g6998
+cmelim
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/melim.171901 (lsf:/vol/lsf)
+p6999
+g6980
+cpim
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/pim (lsf:/vol/lsf)
+p7002
+g6998
+celim.gstat
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gstat (lsf:/vol/lsf)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gstat (lsf:/vol/lsf)
+p7003
+g6998
+celim.gtmp
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gtmp (lsf:/vol/lsf)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gtmp (lsf:/vol/lsf)
+p7149
+g7149
+cres
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+p7190
+g7190
+csbatchd
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/sbatchd (lsf:/vol/lsf)
+p8647
+g25181
+csh
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+p8648
+g25181
+cbwa
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/bwa/bwa-0.5.9-64/bwa (appsrv:/export/ia32-linux)
+n/gscmnt/gc4011/info/model_data/ref_build_aligner_index_data/2741951221/build101947881/bwa/0_5_9/all_sequences.fa.pac (gpfs66:/vol/gc4011)
+n/gscmnt/gc7000/info/alignment_data/2878749514/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25190-113919715/gerald_D0DAJABXX_1.bam.1.sai (gpfs66:/vol/aggr0/gc7000)
+n/gscmnt/gc2008/info/alignment_data/2878749514/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25190-113927132/gerald_D0DAJABXX_1.bam.2.sai (gpfs66:/vol/gc2008)
+n/gscmnt/sata763/production/csf_113775745/gerald_D0DAJABXX_1.bam (nfs2:/vol/sata763)
+n/gscmnt/sata763/production/csf_113775745/gerald_D0DAJABXX_1.bam (nfs2:/vol/sata763)
+p9292
+g25277
+csh
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+p9293
+g25277
+cbwa
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/bwa/bwa-0.5.9-64/bwa (appsrv:/export/ia32-linux)
+n/gscmnt/gc4011/info/model_data/ref_build_aligner_index_data/2741951221/build101947881/bwa/0_5_9/all_sequences.fa.pac (gpfs66:/vol/gc4011)
+n/gscmnt/gc2008/info/alignment_data/2878501888/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25286-113919761/gerald_B074RABXX_8.bam.1.sai (gpfs66:/vol/gc2008)
+n/gscmnt/gc2009/info/alignment_data/2878501888/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25286-113927477/gerald_B074RABXX_8.bam.2.sai (gpfs68:/vol/gc2009)
+n/gscmnt/sata758/production/csf_113411632/gerald_B074RABXX_8.bam (nfs2:/vol/sata758)
+n/gscmnt/sata758/production/csf_113411632/gerald_B074RABXX_8.bam (nfs2:/vol/sata758)
+p9348
+g32495
+csh
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+p9349
+g32495
+cbwa
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/bwa/bwa-0.5.9-64/bwa (appsrv:/export/ia32-linux)
+n/gscmnt/sata762/production/csf_113872765/gerald_70K56AAXX_1.bam (nfs2:/vol/sata762)
+p9565
+g25132
+csh
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+p9566
+g25132
+cbwa
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/bwa/bwa-0.5.9-64/bwa (appsrv:/export/ia32-linux)
+n/gscmnt/gc4011/info/model_data/ref_build_aligner_index_data/2741951221/build101947881/bwa/0_5_9/all_sequences.fa.pac (gpfs66:/vol/gc4011)
+n/gscmnt/gc2009/info/alignment_data/2878501887/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25141-113919643/gerald_B074RABXX_4.bam.1.sai (gpfs68:/vol/gc2009)
+n/gscmnt/gc2012/info/alignment_data/2878501887/alignment-blade13-1-1.gsc.wustl.edu-apipe-builder-25141-113927585/gerald_B074RABXX_4.bam.2.sai (gpfs69:/vol/gc2012)
+n/gscmnt/sata761/production/csf_113411885/gerald_B074RABXX_4.bam (nfs2:/vol/sata761)
+n/gscmnt/sata761/production/csf_113411885/gerald_B074RABXX_4.bam (nfs2:/vol/sata761)
+p10908
+g6998
+csleep
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gstat (lsf:/vol/lsf)
+p11648
+g11648
+cres
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.err (gpfs68:/vol/gc2014)
+p11654
+g11648
+c1312066949.7942
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.err (gpfs68:/vol/gc2014)
+n/usr/local/lsf/spool/1312066949.7942869 (lsf:/vol/lsf)
+p11656
+g11648
+cperl
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.err (gpfs68:/vol/gc2014)
+p11657
+g11648
+cperl
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/custom/genome-1274-fix1/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p11658
+g11648
+cperl
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2877132970/build113839542/logs/113839570.err (gpfs68:/vol/gc2014)
+p25132
+g25132
+cres
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.out (gpfs68:/vol/gc2013)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.err (gpfs68:/vol/gc2013)
+p25138
+g25132
+c1312273822.8007
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.out (gpfs68:/vol/gc2013)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.err (gpfs68:/vol/gc2013)
+n/usr/local/lsf/spool/1312273822.8007372 (lsf:/vol/lsf)
+p25140
+g25132
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.out (gpfs68:/vol/gc2013)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.err (gpfs68:/vol/gc2013)
+p25141
+g25132
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p25142
+g25132
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.out (gpfs68:/vol/gc2013)
+n/gscmnt/gc2013/info/model_data/2878519295/build113917378/logs/113917400.err (gpfs68:/vol/gc2013)
+p25153
+g25132
+csamtools
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
+p25181
+g25181
+cres
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.out (gpfs66:/vol/gc2005)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.err (gpfs66:/vol/gc2005)
+p25187
+g25181
+c1312273920.8007
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.out (gpfs66:/vol/gc2005)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.err (gpfs66:/vol/gc2005)
+n/usr/local/lsf/spool/1312273920.8007421 (lsf:/vol/lsf)
+p25189
+g25181
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.out (gpfs66:/vol/gc2005)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.err (gpfs66:/vol/gc2005)
+p25190
+g25181
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p25191
+g25181
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.out (gpfs66:/vol/gc2005)
+n/gscmnt/gc2005/info/model_data/2878795555/build113917414/logs/113917420.err (gpfs66:/vol/gc2005)
+p25197
+g25181
+csamtools
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
+p25277
+g25277
+cres
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.err (gpfs66:/vol/gc2015)
+p25283
+g25277
+c1312274118.8007
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.err (gpfs66:/vol/gc2015)
+n/usr/local/lsf/spool/1312274118.8007479 (lsf:/vol/lsf)
+p25285
+g25277
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.err (gpfs66:/vol/gc2015)
+p25286
+g25277
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p25287
+g25277
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.out (gpfs66:/vol/gc2015)
+n/gscmnt/gc2015/info/model_data/2878519065/build113917468/logs/113917483.err (gpfs66:/vol/gc2015)
+p25293
+g25277
+csamtools
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
+p31300
+g11648
+csamtools
+u13022
+Lapipe-builder
+n/gscuser/apipe-builder (nfs10home:/vol/home)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
+p32341
+g6998
+csleep
+u0
+Lroot
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/elim.gtmp (lsf:/vol/lsf)
+p32495
+g32495
+cres
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/usr/local/lsf/7.0/linux2.6-glibc2.3-x86_64/etc/res (lsf:/vol/lsf)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.err (gpfs68:/vol/gc2014)
+p32496
+g32495
+c1312283844.8030
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.err (gpfs68:/vol/gc2014)
+n/usr/local/lsf/spool/1312283844.8030025 (lsf:/vol/lsf)
+p32498
+g32495
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.err (gpfs68:/vol/gc2014)
+p32499
+g32495
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Cwd/Cwd.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/File/Glob/Glob.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/List/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Data/Dumper/Dumper.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/IO/IO.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Time/HiRes/HiRes.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Fcntl/Fcntl.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBI/DBI.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Sys/Hostname/Hostname.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Sub/Name/Name.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Digest/MD5/MD5.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/MIME/Base64/Base64.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Socket/Socket.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Date/Pcalc/Pcalc.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Storable/Storable.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/DB_File/DB_File.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/version/vxs/vxs.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/List/MoreUtils/MoreUtils.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Util/Util.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/C3/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Devel/GlobalDestruction/GlobalDestruction.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Class/MOP/MOP.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Moose/Moose.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/Encode/Encode.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/String/CRC32/CRC32.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/JSON/XS/XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Compress/Zlib/Zlib.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.3/i686-linux/auto/Socket6/Socket6.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Guard/Guard.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Text/CSV_XS/CSV_XS.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DateTime/DateTime.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Data/UUID/UUID.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/Oracle/Oracle.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libclntsh.so.10.1 (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/lib/libnnz10.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/oracore/zoneinfo/timezlrg.dat (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/DBD/SQLite/SQLite.so (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/i686-linux/auto/Params/Validate/Validate.so (appsrv:/export/ia32-linux)
+n/gsc/pkg/oracle/10gR2/db_1/rdbms/mesg/ocius.msb (appsrv:/export/ia32-linux)
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl/Genome/DataSource/Meta.sqlite3 (appsrv:/export/scripts)
+n/gsc/lib/perl5/site_perl/5.8.7/MIME/Types.pm (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/site_perl/5.8.7/POE/Component/IKC/LocalKernel.pm (appsrv:/export/ia32-linux)
+p32500
+g32495
+cperl
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/bin/perl (appsrv:/export/ia32-linux)
+n/gsc/lib/perl5/5.8.7/i686-linux/auto/POSIX/POSIX.so (appsrv:/export/ia32-linux)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.out (gpfs68:/vol/gc2014)
+n/gscmnt/gc2014/info/model_data/2878838182/build113925818/logs/113925826.err (gpfs68:/vol/gc2014)
+p32526
+g32495
+csamtools
+u13022
+Lapipe-builder
+n/gsc/scripts/opt/genome/snapshots/genome-1280/lib/perl (appsrv:/export/scripts)
+n/gsc/pkg/bio/samtools/samtools-0.1.7ar599/samtools (appsrv:/export/ia32-linux)
