@@ -3,7 +3,6 @@
 /usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm
 /usr/share/perl5/SDM/Service/WebApp/Command/Run.pm
 /usr/share/perl5/SDM/Service/WebApp/Starman/Server.pm
-/usr/share/perl5/SDM/Service/WebApp/Loader.pm
 /usr/share/perl5/SDM/Service/WebApp/Runner.pm
 /usr/share/perl5/SDM/Service/WebApp/Core.pm
 /usr/share/perl5/SDM/Service/WebApp/Starman.pm
