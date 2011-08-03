@@ -22,7 +22,7 @@ if ($ENV{SDM_DATABASE_DRIVER} eq "SQLite") {
         is => [ 'UR::DataSource::SQLite', 'UR::Singleton' ],
         has_constant => [
             driver => { default_value => 'SQLite' },
-            dump_on_commit => { default_value => 1 },
+            dump_on_commit => { default_value => 0 },
         ]
     };
 } elsif ($ENV{SDM_DATABASE_DRIVER} eq "Pg") {
