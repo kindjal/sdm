@@ -1,0 +1,5 @@
+ur-sdm-tool (0.12-1) unstable; urgency=low
+
+  * Make a new package for tools.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Wed, 03 Aug 2011 16:39:04 -0500

@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+PACKAGE=$(shell dh_listpackages)
+
+%:
+	PATH="/bin:/usr/bin" ; \
+	dh $@
+
+override_dh_strip:
+override_dh_auto_test:
