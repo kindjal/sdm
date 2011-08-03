@@ -20,6 +20,8 @@ sub load_modules {
     if ($@) {
         die "failed to load required modules: $@";
     }
+    my $dbh = SDM::DataSource::Service->_singleton_object->_default_dbh;
+    SDM::DataSource::Service->_singleton_object->disconnect_default_handle if ($dbh);
 
     # search's callbacks are expensive, web server can't change anything anyway so don't waste the time
     SDM::Search->unregister_callbacks('UR::Object');
@@ -90,6 +92,9 @@ sub process {
     my @changes = (@added,@removed);
     if (@changes) {
         UR::Context->commit();
+        foreach my $obj (@changes) {
+            $obj->unload;
+        }
     }
 
     return scalar @changes;
