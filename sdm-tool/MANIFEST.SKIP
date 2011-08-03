@@ -1,0 +1,8 @@
+debian/*.log
+debian/ur-sdm-tool*
+blib
+_build
+lib/SDM/DataSource/*-bak
+lib/SDM/DataSource/*-dump
+lib/SDM/DataSource/*-journal
+build_deb_test_results/t/sdm-search.t
