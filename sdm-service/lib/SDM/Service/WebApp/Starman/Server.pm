@@ -2,6 +2,7 @@
 package SDM::Service::WebApp::Starman::Server;
 
 use base qw( Starman::Server );
+use HTTP::Parser::XS qw(parse_http_request);
 use constant DEBUG => $ENV{STARMAN_DEBUG} || 0;
 use Socket qw(IPPROTO_TCP TCP_NODELAY SOL_SOCKET SO_REUSEADDR);
 
