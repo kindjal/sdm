@@ -1,0 +1,19 @@
+
+description     "SDM lsof client daemon"
+
+start on filesystem
+stop on runlevel [06]
+
+respawn
+
+env LOG_DIR=/var/log/ur-sdm-service
+env LSOF_SERVER=sysmgr.gsc.wustl.edu
+
+pre-start script
+    if [ ! -d "$LOG_DIR" ]; then
+        mkdir -p "$LOG_DIR"
+        chmod 755 "$LOG_DIR"
+    fi
+end script
+
+exec /usr/bin/sdm service lsofc run --url http://${LSOF_SERVER}/service/lsof --loglevel INFO --logfile ${LOG_DIR}/ur-sdm-service-lsofc.log
