@@ -1,5 +1,3 @@
-/etc/init/ur-sdm-service-webapp.conf
-/etc/init.d/ur-sdm-service-webapp
 /usr/share/man/man3/SDM::Service::WebApp::Lsof.psgi.3pm
 /usr/share/perl5/SDM/Service/WebApp/Command/Run.pm
 /usr/share/perl5/SDM/Service/WebApp/Starman/Server.pm

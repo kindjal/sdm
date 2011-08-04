@@ -67,11 +67,6 @@ my $build = $class->new(
   license => 'lgpl',
   dist_version => '0.12',
   dist_abstract => 'Modules for service management',
-  etc_files => {
-    'etc/ur-sdm-service-webapp.conf' => 'etc/ur-sdm-service-webapp.conf',
-    'etc/ur-sdm-service-lsofc.conf' => 'etc/ur-sdm-service-lsofc.conf'
-  },
-  install_path => { 'etc' => '/etc/init' },
   build_requires => {
     'Module::Build' => '',
     'UR' => '0.31',
@@ -82,7 +77,6 @@ my $build = $class->new(
   bindoc_dirs => ['cmd-bindoc'],
 );
 
-$build->add_build_element('etc');
 $build->add_build_element('psgi');
 $build->add_build_element('schema');
 $build->create_build_script;
