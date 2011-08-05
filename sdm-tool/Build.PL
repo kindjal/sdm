@@ -12,6 +12,7 @@ my $build = Module::Build->new(
   license => 'lgpl',
   dist_version => '0.12',
   dist_abstract => 'SDM Tools',
+  scripts => [ 'bin/sdm-automount.pl' ],
   build_requires => {
     'Module::Build' => '',
     'UR' => '0.31',
@@ -23,5 +24,4 @@ my $build = Module::Build->new(
   },
 );
 
-$build->add_build_element('schema');
 $build->create_build_script;
