@@ -9,6 +9,6 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-tool
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace, libgenome-perl
 Description: A UR Object framework for GPFS querying
  A UR Object framework for GPFS querying
