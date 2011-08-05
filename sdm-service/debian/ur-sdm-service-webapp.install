@@ -14,3 +14,4 @@
 /usr/share/perl5/SDM/Service/WebApp/Main.psgi
 /usr/share/perl5/SDM/Service/WebApp/Hello.psgi
 /usr/share/perl5/SDM/Service/WebApp/Cache.psgi
+/var/log/ur-sdm-service/ur-sdm-service-webapp.log

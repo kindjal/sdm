@@ -8,11 +8,12 @@ unexport PERL_MB_OPT
 	/usr/bin/env dh $@
 
 override_dh_auto_test:
-#override_dh_auto_install:
-#	dh_auto_install
-#	install -d ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource
-#	cp -ap lib/SDM/View/Resource/Html ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource/Html
-#	cp -ap lib/SDM/xsl ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/xsl
-#	install -d ./debian/tmp/etc/init.d
-#	ln -s /lib/init/upstart-job ./debian/tmp/etc/init.d/ur-sdm-service-webapp
-#	ln -s /lib/init/upstart-job ./debian/tmp/etc/init.d/ur-sdm-service-lsofc
+override_dh_auto_install:
+	dh_auto_install
+	install -d ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource
+	cp -ap lib/SDM/View/Resource/Html ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/View/Resource/Html
+	cp -ap lib/SDM/xsl ./debian/ur-sdm-service-webapp/usr/share/perl5/SDM/xsl
+	install -d ./debian/tmp/var/log/ur-sdm-service
+	touch ./debian/tmp/var/log/ur-sdm-service/ur-sdm-service-webapp.log
+	install -d ./debian/tmp/var/log/ur-sdm-service
+	touch ./debian/tmp/var/log/ur-sdm-service/ur-sdm-service-lsofc.log
