@@ -13,6 +13,10 @@ use Data::Dumper;
 $Data::Dumper::Indent = 1;
 use File::Find::Rule;
 
+unless ( -d "./debian" ) {
+    plan skip_all => "Skip test when ./debian dir is missing";
+}
+
 # Start with a fresh database
 use FindBin;
 use File::Basename qw/dirname/;
