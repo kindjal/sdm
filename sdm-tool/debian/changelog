@@ -1,3 +1,10 @@
+ur-sdm-tool (0.13-1) unstable; urgency=low
+
+  * Include automount tool
+  * Require libgenome-perl for allocation report
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Fri, 05 Aug 2011 10:53:27 -0500
+
 ur-sdm-tool (0.12-1) unstable; urgency=low
 
   * Make a new package for tools.

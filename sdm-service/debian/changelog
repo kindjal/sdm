@@ -1,3 +1,9 @@
+ur-sdm-service (0.13-1) unstable; urgency=low
+
+  * Include logrotate configs
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Fri, 05 Aug 2011 10:59:21 -0500
+
 ur-sdm-service (0.12-1) unstable; urgency=low
 
   * Make worker count an CLI argument.

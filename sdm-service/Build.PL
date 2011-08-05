@@ -65,7 +65,7 @@ EOS
 my $build = $class->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.12',
+  dist_version => '0.13',
   dist_abstract => 'Modules for service management',
   build_requires => {
     'Module::Build' => '',
