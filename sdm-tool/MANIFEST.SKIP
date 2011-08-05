@@ -1,5 +1,6 @@
 debian/*.log
 debian/ur-sdm-tool*
+debian/files
 blib
 _build
 lib/SDM/DataSource/*-bak
