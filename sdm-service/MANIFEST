@@ -5,9 +5,7 @@ debian/compat
 debian/control
 debian/copyright
 debian/rules
-debian/preinst
-etc/ur-sdm-service-webapp.conf
-etc/ur-sdm-service-lsofc.conf
+debian/ur-sdm-service-webapp.preinst
 lib/SDM/Service.pm
 lib/SDM/Service/Base.pm
 lib/SDM/Service/Command.pm
@@ -20,7 +18,6 @@ lib/SDM/Service/WebApp/Command/Run.pm
 lib/SDM/Service/WebApp/Core.pm
 lib/SDM/Service/WebApp/Dump.psgi
 lib/SDM/Service/WebApp/Hello.psgi
-lib/SDM/Service/WebApp/Loader.pm
 lib/SDM/Service/WebApp/Main.psgi
 lib/SDM/Service/WebApp/Redirect.psgi
 lib/SDM/Service/WebApp/Resource.psgi
@@ -508,14 +505,12 @@ lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/js/jquery-1.5.1.min.js
 lib/SDM/View/Resource/Html/js/pkg/jquery-ui-1.8.12.custom/js/jquery-ui-1.8.12.custom.min.js
 lib/SDM/View/Resource/Html/js/app/lsofprocesstable.js
 lib/SDM/DataSource/Service.psql.schema
-lib/SDM/DataSource/Service.sqlite3n.schema
+lib/SDM/DataSource/Service.sqlite3.schema
 lib/SDM/DataSource/Service.pm
-lib/SDM/DataSource/Service.sqlite3n
-lib/SDM/DataSource/Service.sqlite3n-dump
-lib/SDM/DataSource/Service.sqlite3n-bak
 lib/SDM/xsl/html/table/root.xsl
 lib/SDM/xsl/html/table/sdm_service_lsof_process_set.xsl
 MANIFEST.SKIP
+t/01-sdm-service-command-line-interface.t
 t/README
 t/sdm-service-webapp-core.t
 t/sdm-service-lsof-command-purge.t
