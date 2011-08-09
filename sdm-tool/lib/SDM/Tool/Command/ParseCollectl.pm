@@ -64,7 +64,7 @@ class SDM::Tool::Command::ParseCollectl {
         },
         column => {
             is => 'Number',
-            default_value => 11,
+            default_value => 12,
             doc => 'column of collectl log to calculate'
         },
         limit => {
@@ -103,7 +103,7 @@ sub get_filehandle {
     $self->logger->info(__PACKAGE__ . " " . $cmd);
 
     if ($self->hostname eq 'localhost') {
-        open(READER, "$cmd |") or die "open error: $!";
+        open(READER, "$cmd 2>/dev/null |") or die "open error: $!";
         return *READER;
     }
 
@@ -173,7 +173,7 @@ sub execute {
     }
 
     my $count = 0;
-    my $col = $self->{column};
+    my $col = $self->{column} - 1;
     foreach my $name (reverse sort { $self->{table}->{$a}->avg($col) cmp $self->{table}->{$b}->avg($col) } @{ [ keys %{ $self->{table} } ] } ) {
         print "$name " . $self->{table}->{$name}->avg($col) . "\n";
         $count++;
