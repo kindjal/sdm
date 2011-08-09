@@ -6,6 +6,7 @@ use warnings;
 
 class SDM::Tool::Command::AllocationReport {
     is => 'SDM::Command::Base',
+    doc => 'find disk allocations used by running builds/jobs',
     has_optional => [
         build_id => {
             is => 'Number',

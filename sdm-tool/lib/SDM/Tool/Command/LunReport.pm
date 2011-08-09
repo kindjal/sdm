@@ -9,6 +9,7 @@ use Net::SSH;
 
 class SDM::Tool::Command::LunReport {
     is => "SDM::Command::Base",
+    doc => 'ssh to a gpfs cluster and parse "dump waiters" output',
     has => [
         hostname => { is => 'Text', doc => 'hostname of gpfs master node' },
         threshold => { is => 'Number', doc => 'threshold of slowness', default_value => 0.01 }
