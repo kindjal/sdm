@@ -34,6 +34,14 @@ class SDM::Jira::Issue {
         component => { is => 'Number' },
         issuestatus_obj => { is => 'SDM::Jira::Issuestatus', id_by => 'issuestatus' },
         status => { is => 'Text', via => 'issuestatus_obj', to => 'pname' },
+    ],
+    has_many_optional => [
+        label_obj => {
+            is => 'SDM::Jira::Label', reverse_as => 'issue'
+        },
+        label => {
+            is => 'Text', via => 'label_obj', to => 'label'
+        },
     ]
 };
 
