@@ -1,3 +1,4 @@
+
 package SDM::Disk::Array;
 
 use strict;
@@ -7,7 +8,6 @@ use SDM;
 class SDM::Disk::Array {
     type_name => 'disk array',
     table_name => 'disk_array',
-    is => 'SDM::Object::Equipment',
     id_by => [
         name          => { is => 'Text', len => 255 },
     ],
@@ -16,10 +16,6 @@ class SDM::Disk::Array {
         disk_type     => { is => 'Text', via => 'disk_sets' },
     ],
     has_optional => [
-        #manufacturer  => { is => 'Text' },
-        #model         => { is => 'Text' },
-        #serial        => { is => 'Text' },
-        #comments      => { is => 'Text' },
         disk_set_num  => {
             is => 'Integer',
             calculate => q| my @s = $self->disk_sets; return scalar @s;|,
@@ -28,13 +24,17 @@ class SDM::Disk::Array {
             is => 'SDM::Value::KBytes',
             calculate => q| my $s = 0; for $b ($self->disk_sets) { my $c = $b->capacity; $s+=$c if ($c); }; return SDM::Value::KBytes->get($s); |,
         },
+        uuid          => {
+            is => 'Text',
+            doc => 'UUID identifying the hardware used by this array'
+        },
+        hardware      => { is => 'SDM::Asset::Hardware', id_by => 'uuid' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
     has_many_optional => [
         mappings      => { is => 'SDM::Disk::HostArrayBridge', reverse_as => 'array' },
         host          => { is => 'SDM::Disk::Host', via => 'mappings', to => 'host' },
-        #hostname      => { via => 'mappings', to => 'hostname' },
         hostname      => { is => 'Text', via => 'host', to => 'hostname' },
     ],
     schema_name => 'Disk',
