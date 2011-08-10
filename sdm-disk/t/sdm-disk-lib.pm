@@ -96,8 +96,11 @@ sub testinit {
     }
 
     print "flush and remake Meta\n";
-    unlink "$base/DataSource/Meta.sqlite3";
-    unlink "$base/DataSource/Meta.sqlite3-dump";
+    my $ds = "$top/../sdm/lib/SDM/DataSource";
+    unlink "$ds/Meta.sqlite3";
+    unlink "$ds/Meta.sqlite3-dump";
+    $self->runcmd("/usr/bin/sqlite3 $ds/Meta.sqlite3 < $ds/Meta.sqlite3-schema");
+    $self->runcmd("/usr/bin/sqlite3 $ds/Meta.sqlite3 .dump > $ds/Meta.sqlite3-dump");
     return 0;
 }
 
