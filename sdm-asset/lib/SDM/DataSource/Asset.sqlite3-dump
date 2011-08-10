@@ -1,0 +1,15 @@
+PRAGMA foreign_keys = ON;
+BEGIN TRANSACTION;
+CREATE TABLE asset_hardware (
+  id            VARCHAR(255) PRIMARY KEY,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  serial        VARCHAR(255),
+  description   VARCHAR(255),
+  comments      VARCHAR(255),
+  location      VARCHAR(255),
+  created       DATETIME,
+  last_modified DATETIME
+);
+INSERT INTO "asset_hardware" VALUES ('ad362b8ad91349a3b7298afb37f0efd5','Dell','G3730','xa1234yz','This is a sample piece of hardware','This is a comment','The astral plane','2011-08-10 14:43:13',null);
+COMMIT;
