@@ -14,7 +14,6 @@ class SDM::DataSource::Jira {
         server => { default_value => "dbname=jira;host=$hostname" },
         owner  => { default_value => 'jira_user' },
         login  => { default_value => 'jira_user' },
-        #auth   => { default_value => 'm23$4xy1z' },
         auth   => { default_value => 'jira_pass' },
     ]
 };
