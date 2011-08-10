@@ -7,6 +7,7 @@ use SDM;
 class SDM::Disk::Array {
     type_name => 'disk array',
     table_name => 'disk_array',
+    is => 'SDM::Object::Equipment',
     id_by => [
         name          => { is => 'Text', len => 255 },
     ],
@@ -15,10 +16,10 @@ class SDM::Disk::Array {
         disk_type     => { is => 'Text', via => 'disk_sets' },
     ],
     has_optional => [
-        manufacturer  => { is => 'Text' },
-        model         => { is => 'Text' },
-        serial        => { is => 'Text' },
-        comments      => { is => 'Text' },
+        #manufacturer  => { is => 'Text' },
+        #model         => { is => 'Text' },
+        #serial        => { is => 'Text' },
+        #comments      => { is => 'Text' },
         disk_set_num  => {
             is => 'Integer',
             calculate => q| my @s = $self->disk_sets; return scalar @s;|,
@@ -64,6 +65,7 @@ sub create {
         return;
     }
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
+    warn "" . Data::Dumper::Dumper %params;
     return $self->SUPER::create( %params );
 }
 
