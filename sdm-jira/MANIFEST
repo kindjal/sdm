@@ -1,0 +1,14 @@
+bin/sdm-automount.pl
+lib/SDM/Tool/Command/LunReport.pm
+lib/SDM/Tool/Command/AllocationReport.pm
+lib/SDM/Tool/Command.pm
+lib/SDM/Tool.pm
+bin/sdm-automount.pl
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+Build.PL
+MANIFEST
+MANIFEST.SKIP
