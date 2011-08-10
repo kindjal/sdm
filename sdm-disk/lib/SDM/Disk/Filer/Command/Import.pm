@@ -7,7 +7,6 @@ use warnings;
 use SDM;
 
 use Text::CSV;
-use Getopt::Std;
 use Data::Dumper;
 
 $| = 1;
