@@ -74,11 +74,11 @@ CREATE TABLE IF NOT EXISTS disk_array (
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   serial        VARCHAR(255),
-  arraysize     UNSIGNED INTEGER DEFAULT 0,
-  created       DATE,
-  last_modified DATE,
+  description   VARCHAR(255),
   comments      VARCHAR(255),
-  hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+  location      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
 );
 CREATE TABLE IF NOT EXISTS disk_array_disk_set (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
