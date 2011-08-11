@@ -9,6 +9,7 @@ BEGIN { $INC{"SDM/Config.pm"} = 'no' };
 # Default production DB settings
 $ENV{SDM_DEPLOYMENT} ||= 'production';
 $ENV{SDM_GENOME_INSTITUTE_NETWORKS} = 1;
+$ENV{SDM_ZENOSS_DATABASE_HOSTNAME} ||= 'monitor.gsc.wustl.edu';
 
 if ($ENV{SDM_DEPLOYMENT} eq 'testing') {
     $ENV{SDM_DATABASE_DRIVER} ||= 'SQLite';
