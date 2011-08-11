@@ -8,7 +8,7 @@ use SDM;
 
 class SDM::Asset {
     is          => 'SDM::Command::Base',
-    doc         => 'SDM Asset',
+    doc         => 'SDM Asset management',
 };
 
 1;
