@@ -8,7 +8,7 @@ use SDM;
 
 class SDM::Tool::Command {
     is          => 'Command::Tree',
-    doc         => 'SDM Tools',
+    doc         => 'SDM tools',
 };
 
 1;

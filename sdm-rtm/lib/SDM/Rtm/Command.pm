@@ -6,7 +6,7 @@ use warnings;
 
 class SDM::Rtm::Command {
     is          => 'Command::Tree',
-    doc         => 'Work with RTM',
+    doc         => 'Work with RTM/LSF jobs',
 };
 
 1;

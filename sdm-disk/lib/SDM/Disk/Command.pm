@@ -6,7 +6,7 @@ use warnings;
 
 class SDM::Disk::Command {
     is          => 'Command::Tree',
-    doc         => 'Work with disk',
+    doc         => 'Work with disk objects',
 };
 
 1;

@@ -8,7 +8,7 @@ use SDM;
 
 class SDM::Jira::Command {
     is          => 'Command::Tree',
-    doc         => 'SDM Jira integration',
+    doc         => 'Work with Jira issues',
 };
 
 1;
