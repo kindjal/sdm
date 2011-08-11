@@ -1,0 +1,5 @@
+ur-sdm-zenoss (0.14-1) unstable; urgency=low
+
+  * New zenoss package.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Thu, 11 Aug 2011 11:23:45 -0500
