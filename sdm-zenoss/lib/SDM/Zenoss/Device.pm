@@ -89,6 +89,18 @@ sub getComponents {
     return $response->decoded;
 }
 
+sub getBoundTemplates {
+    my $self = shift;
+    my $info;
+    my $API = SDM::Zenoss::API->create();
+    my $response = $API->connection->device_getBoundTemplates(
+        {
+            uid => $self->uid
+        }
+    );
+    return $response->decoded;
+}
+
 sub getRRDValue {
     my $self = shift;
     my $dsname = shift;
@@ -100,7 +112,7 @@ sub getRRDValue {
 
     my $response = $API->connection->_agent->request($query);
     unless ($response->is_success && $response->code == 200) {
-        $self->error_message("Zenoss XML-RPC error");
+        return undef;
     }
     return $response->{_content};
 }
