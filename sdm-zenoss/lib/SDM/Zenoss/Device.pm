@@ -15,7 +15,7 @@ class SDM::Zenoss::Device {
         name => { is => 'Text' },
         ipaddress => { is => 'SDM::Value::Ipaddress' },
         productionatate => { is => 'Text' },
-    ]
+    ],
 };
 
 sub __load__ {
@@ -31,8 +31,16 @@ sub __load__ {
     my $response = $API->connection->device_getDevices(
         {
             #params => { deviceClass => '/Server' },
+            start => 0,
+            limit => undef,
+            sort => uid,
+            dir => 'ASC',
         }
     );
+    if ( $response->decoded->{message} =~ /error/i ) {
+        warn $response->decoded->{message};
+        return \@header, \@rows;
+    }
 
     my $id;
     foreach my $result ( @{ $response->decoded->{devices} } ) {
@@ -45,8 +53,8 @@ sub __load__ {
         # make IP a class
         while (my ($key, $value) = each %$lcresult) {
             if ($key eq 'ipaddress') {
-                my $ip = SDM::Value::Ipaddress->create($value);
-                $lcresult->{lc($key)} = $ip;
+                next unless ($value);
+                $lcresult->{lc($key)} = SDM::Value::Ipaddress->get_or_create( id => $value );
             }
         }
         # Ensure values are in the same order as the header row.
@@ -55,6 +63,46 @@ sub __load__ {
     }
 
     return \@header, \@rows;
+}
+
+sub getInfo {
+    my $self = shift;
+    my $info;
+    my $API = SDM::Zenoss::API->create();
+    my $response = $API->connection->device_getInfo(
+        {
+            uid => $self->uid
+        }
+    );
+    return $response->decoded;
+}
+
+sub getComponents {
+    my $self = shift;
+    my $info;
+    my $API = SDM::Zenoss::API->create();
+    my $response = $API->connection->device_getComponents(
+        {
+            uid => $self->uid
+        }
+    );
+    return $response->decoded;
+}
+
+sub getRRDValue {
+    my $self = shift;
+    my $dsname = shift;
+    my $info;
+    my $API = SDM::Zenoss::API->create();
+    my $url = $API->connection->connector->endpoint . $self->uid . "/getRRDValue?dsname=$dsname";
+    my $query = HTTP::Request->new(GET => "$url");
+    $query->content_type('application/json; charset=utf-8');
+
+    my $response = $API->connection->_agent->request($query);
+    unless ($response->is_success && $response->code == 200) {
+        $self->error_message("Zenoss XML-RPC error");
+    }
+    return $response->{_content};
 }
 
 1;
