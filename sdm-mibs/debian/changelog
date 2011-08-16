@@ -1,3 +1,9 @@
+ur-sdm-mibs (0.14-1) unstable; urgency=low
+
+  * Add sdm-asset and sdm-zenoss.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 16 Aug 2011 11:48:14 -0500
+
 ur-sdm-mibs (0.13-1) unstable; urgency=low
 
   * Changes to sdm-service and sdm-tool.
