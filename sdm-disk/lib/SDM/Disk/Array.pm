@@ -16,6 +16,10 @@ class SDM::Disk::Array {
         disk_type     => { is => 'Text', via => 'disk_sets' },
     ],
     has_optional => [
+        manufacturer  => { is => 'Text' },
+        model         => { is => 'Text' },
+        serial        => { is => 'Text' },
+        comments      => { is => 'Text' },
         disk_set_num  => {
             is => 'Integer',
             calculate => q| my @s = $self->disk_sets; return scalar @s;|,
@@ -24,11 +28,6 @@ class SDM::Disk::Array {
             is => 'SDM::Value::KBytes',
             calculate => q| my $s = 0; for $b ($self->disk_sets) { my $c = $b->capacity; $s+=$c if ($c); }; return SDM::Value::KBytes->get($s); |,
         },
-        uuid          => {
-            is => 'Text',
-            doc => 'UUID identifying the hardware used by this array'
-        },
-        hardware      => { is => 'SDM::Asset::Hardware', id_by => 'uuid' },
         created       => { is => 'DATE' },
         last_modified => { is => 'DATE' },
     ],
@@ -65,7 +64,6 @@ sub create {
         return;
     }
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-    warn "" . Data::Dumper::Dumper %params;
     return $self->SUPER::create( %params );
 }
 
