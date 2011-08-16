@@ -43,9 +43,9 @@ sub execute {
     }
 
     my $cmd = join(" ",$mmcrfs,"/vol/" . $self->name,$self->name,$arg,"-A yes");
-    if ($self->_ask_user_question( "Ok to run: $cmd", 0) eq 'y') {
+    if ($self->_ask_user_question( "Ok to run: $cmd", 0) eq 'yes') {
         $self->logger->warn(__PACKAGE__ . " execute");
-        #qx($cmd);
+        qx($cmd);
     } else {
         $self->logger->warn(__PACKAGE__ . " aborted");
     }
