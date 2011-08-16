@@ -9,6 +9,10 @@ class SDM::Zenoss::Device {
         uid => { is => 'Text' }
     },
     has => [
+        _api => { calculate => q(
+            our $API;
+            $API ||= SDM::Zenoss::API->create();
+        )},
         events => {
             is => 'Hash'
         },
@@ -27,8 +31,8 @@ sub __load__ {
     # Return an empty list if error.
     my @rows = [];
 
-    my $API = SDM::Zenoss::API->create();
-    my $response = $API->connection->device_getDevices(
+    # Should only create() API the first time.
+    my $response = $class->_api->connection->device_getDevices(
         {
             #params => { deviceClass => '/Server' },
             start => 0,
@@ -68,8 +72,7 @@ sub __load__ {
 sub getInfo {
     my $self = shift;
     my $info;
-    my $API = SDM::Zenoss::API->create();
-    my $response = $API->connection->device_getInfo(
+    my $response = $self->_api->connection->device_getInfo(
         {
             uid => $self->uid
         }
@@ -80,8 +83,7 @@ sub getInfo {
 sub getComponents {
     my $self = shift;
     my $info;
-    my $API = SDM::Zenoss::API->create();
-    my $response = $API->connection->device_getComponents(
+    my $response = $self->_api->connection->device_getComponents(
         {
             uid => $self->uid
         }
@@ -92,8 +94,7 @@ sub getComponents {
 sub getBoundTemplates {
     my $self = shift;
     my $info;
-    my $API = SDM::Zenoss::API->create();
-    my $response = $API->connection->device_getBoundTemplates(
+    my $response = $self->_api->connection->device_getBoundTemplates(
         {
             uid => $self->uid
         }
@@ -105,12 +106,11 @@ sub getRRDValue {
     my $self = shift;
     my $dsname = shift;
     my $info;
-    my $API = SDM::Zenoss::API->create();
-    my $url = $API->connection->connector->endpoint . $self->uid . "/getRRDValue?dsname=$dsname";
+    my $url = $self->_api->connection->connector->endpoint . $self->uid . "/getRRDValue?dsname=$dsname";
     my $query = HTTP::Request->new(GET => "$url");
     $query->content_type('application/json; charset=utf-8');
 
-    my $response = $API->connection->_agent->request($query);
+    my $response = $self->_api->connection->_agent->request($query);
     unless ($response->is_success && $response->code == 200) {
         return undef;
     }
