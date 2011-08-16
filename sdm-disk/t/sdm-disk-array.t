@@ -33,23 +33,6 @@ ok( $res->id eq 'nsams2k1', "properly created new array");
 $res = SDM::Disk::Array->get( @params );
 ok( $res->id eq 'nsams2k1', "properly got new array");
 
-# Test inherited items
-@params = (
-  name => 'nsams2k7',
-  manufacturer => 'manufacturer',
-  model => 'model',
-  serial => '1234EAFX',
-  description => 'description',
-  comments => 'comments',
-  location => 'location',
-  arraysize => 123000000,
-);
-$res = SDM::Disk::Array->create( @params );
-ok( $res->id eq 'nsams2k7', "properly created another new array");
-warn "" . Data::Dumper::Dumper $res;
-UR::Context->commit;
-exit;
-
 @params = ( name => 'nsams2k4' );
 $res = SDM::Disk::Array->create( @params );
 ok( $res->id eq 'nsams2k4', "properly created another new array");
