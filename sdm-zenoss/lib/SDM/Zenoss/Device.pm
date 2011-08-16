@@ -9,10 +9,6 @@ class SDM::Zenoss::Device {
         uid => { is => 'Text' }
     },
     has => [
-        _api => { calculate => q(
-            our $API;
-            $API ||= SDM::Zenoss::API->create();
-        )},
         events => {
             is => 'Hash'
         },
@@ -21,6 +17,13 @@ class SDM::Zenoss::Device {
         productionatate => { is => 'Text' },
     ],
 };
+
+sub _api {
+    my $class = shift;
+    our $API;
+    $API ||= SDM::Zenoss::API->create();
+    return $API;
+}
 
 sub __load__ {
     my ($class, $bx, $headers) = @_;
