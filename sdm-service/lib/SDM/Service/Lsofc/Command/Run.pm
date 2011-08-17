@@ -11,7 +11,7 @@ use Data::Dumper;
 use JSON;
 use LWP::UserAgent;
 use HTTP::Request::Common;
-use Sys::Hostname;
+use Sys::Hostname qw(); # Use qw() to allow us to have a hostname attribute below.
 
 $Data::Dumper::Indent = 1;
 
@@ -23,19 +23,17 @@ class SDM::Service::Lsofc::Command::Run {
             default_value => 'http://localhost:8090/server/lsof',
             doc   => 'lsofd server URL',
         },
-        wait => {
+        interval => {
             # Wait this many seconds between lsof calls.
             # In production maybe this is every minute or 5 minutes.
             is    => 'Number',
             default_value => 300,
-            doc   => 'seconds to wait between lsof runs'
+            doc   => 'seconds to wait between lsof reports'
         },
-        timeout => {
-            # Wait this long for lsof to report back before dying.
-            # Needs to be longer than wait.
-            is    => 'Number',
-            default_value => 310,
-            doc   => 'seconds to wait for lsof before dying'
+        hostname => {
+            is => 'Text',
+            default_value => 'foo',
+            doc => 'Host to masquerade as (testing only)',
         },
     ],
     has_transient_optional => [
@@ -62,27 +60,27 @@ sub post {
 
     # POST to server at end of record
     my $data = {};
-    my $hostname = Sys::Hostname::hostname;
     if ($msg) {
         # Here there was a problem, and we're telling URL what
         # the problem is so it's visible on that server.
-        $data->{$hostname} = $msg;
+        $data->{$self->hostname} = $msg;
     } else {
-        $data->{$hostname} = $records;
+        $data->{$self->hostname} = $records;
     }
 
     my $json = JSON->new;
     my $jsondata = $json->encode($data);
     my $size = length($jsondata);
+
+    my $count = $#{ [ keys %$records ] } + 1;
+    $self->logger->info(__PACKAGE__ . " POST: $count records to " . $self->url);
+    $self->logger->debug(__PACKAGE__ . " POST:  " . $jsondata);
+
     my $response = $self->userAgent->request(POST $self->url,
         Content_Type => 'application/x-www-form-urlencoded',
         Content_Length => $size,
         Content => "data=$jsondata"
     );
-
-    my $count = $#{ [ keys %$records ] } + 1;
-    $self->logger->info(__PACKAGE__ . " POST: $count records to " . $self->url);
-    $self->logger->debug(__PACKAGE__ . " POST:  " . $jsondata);
 
     if ($response->code != 200) {
         $self->logger->warn(__PACKAGE__ . " server responds:  " . $response->code . " " . $response->message);
@@ -95,13 +93,13 @@ sub post {
 
 sub execute {
     my $self = shift;
-    $self->logger->info(__PACKAGE__ . " execute");
+    my $name = $self->hostname;
+    $self->logger->info(__PACKAGE__ . " execute on " . $name);
 
     my $LSOF = IPC::Cmd::can_run("lsof");
     my $MOUNT = IPC::Cmd::can_run("mount");
     $self->error("lsof not found in PATH") unless ($LSOF);
     $self->error("mount not found in PATH") unless ($MOUNT);
-    $self->error("'timeout' attribute must be longer than 'wait' attribute") if ($self->timeout <= $self->wait);
 
     # lsof options, anything here must be expected by the server and
     # supported by the DB schema.
@@ -147,7 +145,7 @@ sub execute {
         $self->error("failed to exec: $!");
     }
 
-    @options = ("-r" . $self->wait,"-N","-F",join('',keys %$lsofargs) );
+    @options = ("-r" . $self->interval,"-N","-F",join('',keys %$lsofargs) );
     @args = ();
 
     # This userAgent posts to url, either sending lsof results, or an error message.
@@ -171,7 +169,7 @@ sub execute {
                 if (scalar keys %$hash) {
                     # We matched on "p" and hash is not empty, so record it in lsofrecords.
                     my $pid = delete $hash->{pid};
-                    my $key = Sys::Hostname::hostname() . "\t" . $pid;
+                    my $key = $self->hostname . "\t" . $pid;
                     $lsofrecords->{$key} = $hash;
                 }
                 # Start a new record with the pid.
@@ -201,6 +199,9 @@ sub execute {
 
             if ($1 eq 'm') {
                 # -- End of lsof run, report in to server.
+                # Disable alarm until we're done reporting in.
+                alarm 0;
+
                 # We only want to report long running pids
                 my $count = 0;
                 foreach my $key (keys %$records) {
@@ -229,7 +230,8 @@ sub execute {
 
                 $self->post( records => $records );
 
-                alarm $self->timeout;
+                # Consider 2 * interval long enough to wait for lsof to report in.
+                alarm $self->interval * 2;
             }
         }
         close(KID) or $self->logger->warning(__PACKAGE__ . " $LSOF exited: $?");
