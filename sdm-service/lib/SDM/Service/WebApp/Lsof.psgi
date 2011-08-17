@@ -7,6 +7,7 @@ use warnings;
 
 use Web::Simple 'SDM::Service::WebApp::Lsof';
 
+use Data::Dumper;
 $Data::Dumper::Indent = 1;
 
 our $loaded = 0;
@@ -25,6 +26,7 @@ sub load_modules {
 
     # search's callbacks are expensive, web server can't change anything anyway so don't waste the time
     SDM::Search->unregister_callbacks('UR::Object');
+
     $loaded = 1;
 }
 
@@ -45,11 +47,17 @@ sub process {
     my $records = $data->{$hostname};
 
     unless (ref($records) =~ /^HASH/) {
-        print STDERR "agent at $hostname reports problem: $records\n";
+        print STDERR __PACKAGE__ . " agent at $hostname reports problem: $records\n";
         return 0;
     }
 
     # Remove existing records not just returned in JSON.
+    # FIXME: Only delete objects from the same hostname, so that
+    #   worker1 does not delete objects for host A while worker2 processes a new POST.
+    #foreach my $existing (SDM::Service::Lsof::Process->get( hostname => $hostname )) {
+    #    my $key = $existing->hostname . "\t" . $existing->pid;
+    #    $existing->delete unless (exists $records->{$key});
+    #}
     foreach my $existing (SDM::Service::Lsof::Process->get()) {
         if ($hostname and $existing->hostname eq $hostname) {
             # Clean expired processes from live hosts reporting in 
@@ -82,7 +90,6 @@ sub process {
             unless ($process) {
                 die "failed to create new process record: $!";
             }
-            #print STDERR "new process: " . Data::Dumper::Dumper $process;
         }
     }
 
@@ -90,11 +97,24 @@ sub process {
     my @added = grep { $_->__changes__ } $UR::Context::current->all_objects_loaded('SDM::Service::Lsof::Process');
     my @removed = $UR::Context::current->all_objects_loaded('UR::Object::Ghost');
     my @changes = (@added,@removed);
-    if (@changes) {
-        UR::Context->commit();
-        foreach my $obj (@changes) {
-            $obj->unload;
+
+    # We're about to commit().  UR catches RDBMS errors and pushes them into a stack which
+    # we copy here.  Then if commit returns undef, we examine the stack for known error conditions.
+    my @errors;
+    UR::Context->message_callback('error', sub { push @errors, $_[0]->text });
+    my $rc = UR::Context->commit();
+    unless ($rc) {
+        if ( grep { /are not unique/ } @errors ) {
+            push @errors, "Two agents running on the same host!";
         }
+        my $msg = join(", ",@errors);
+        # Die so our dispatcher can return 500 to client.
+        die "commit failed, rolled back: $msg";
+    }
+    # Unload new objects so we don't get UR errors like:
+    # Process ID 'blade11-2-15.gsc.wustl.edu     21426' has just been loaded, but it exists in the application as a new unsaved object!
+    foreach my $obj (@added) {
+        $obj->unload;
     }
 
     return scalar @changes;
@@ -109,16 +129,20 @@ dispatch {
 
         load_modules();
 
+        my $code = 200;
         eval {
             my $count = $self->process($params->{data});
             $msg = "OK: $count changes";
         };
         if ($@) {
+            $code = 500;
             $msg = __PACKAGE__ . " Error in process: $@";
+            # Print to local error log
+            print STDERR $msg;
         }
 
         return [
-            200,
+            $code,
             ['Content-type', 'text/plain'],
             [$msg]
         ];
