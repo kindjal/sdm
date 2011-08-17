@@ -13,9 +13,9 @@ CREATE TABLE service_lsof_process (
   PRIMARY KEY(hostname,pid)
 );
 CREATE TABLE service_lsof_file (
-  id            BIGSERIAL PRIMARY KEY,
   pid           INTEGER,
   hostname      VARCHAR(255),
   filename      VARCHAR(255),
+  PRIMARY KEY(pid,hostname,filename),
   CONSTRAINT    service_lsof_hostname_fk FOREIGN KEY (hostname,pid) REFERENCES service_lsof_process (hostname,pid) ON DELETE CASCADE
 );
