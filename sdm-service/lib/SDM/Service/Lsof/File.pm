@@ -12,12 +12,11 @@ class SDM::Service::Lsof::File {
     schema_name => 'Service',
     table_name => 'service_lsof_file',
     id_by => [
-        id           => { is => 'Integer' },
-    ],
-    has => [
         filename     => { is => 'Text' },
         hostname     => { is => 'Text' },
         pid          => { is => 'Integer' },
+    ],
+    has => [
         process      => { is => 'SDM::Service::Lsof::Process', id_by => ['hostname','pid'] },
         mount_point   => {
             is_calculated => 1,
