@@ -9,7 +9,8 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-service
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace
+# Service::Process links to Rtm::Job
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace,ur-sdm-rtm
 Description: A UR Object framework for running SDM services data management
  UR Object framework for running SDM services data management, currently just
  includes a development web server.
