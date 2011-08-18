@@ -88,8 +88,7 @@ ok( UR::Context->commit(), "commit ok" );
 
 # This should get what we just created.
 my $s = SDM::Service::Lsof::Process->get_or_create( $params );
-warn "r" . Data::Dumper::Dumper $r;
-warn "s" . Data::Dumper::Dumper $s;
+ok( is_deeply( $r, $s, "is_deeply" ), "get_or_create ok" );
 exit;
 
 my @p = SDM::Service::Lsof::Process->get( hostname => "vm76.gsc.wustl.edu" );
