@@ -7,7 +7,7 @@ Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
 
-Package: ur-sdm-tool
+Package: ur-sdm-jira
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace
 Description: A UR Object framework for querying Atlassian Jira DB
