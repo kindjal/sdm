@@ -32,7 +32,7 @@ class SDM::Service::Lsofc::Command::Run {
         },
         hostname => {
             is => 'Text',
-            default_value => 'foo',
+            default_value => Sys::Hostname::hostname,
             doc => 'Host to masquerade as (testing only)',
         },
     ],
