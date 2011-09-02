@@ -10,7 +10,7 @@ use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
 class SDM::Utility::SNMP {
-    is => 'SDM::Command::Base',
+    is => "SDM::Utility",
     has => [
         community   => { is => 'Text', default => "gscpublic" },
         version     => { is => 'Text', default => "2c" },
@@ -30,6 +30,15 @@ class SDM::Utility::SNMP {
         hostname     => { is => 'Text' },
         hosttype     => { is => 'Text' },
         prefixes     => { is => 'List',   default => [ '/vol','/home','/gpfs' ] },
+        tabledata    => {
+            is => 'Array',
+            doc => 'an array reference to lines of snmp data'
+        },
+        sloppy       => {
+            is => 'Boolean',
+            doc => "allow sloppy creation that doesn't check host type",
+            default_value => 0,
+        },
     ],
 };
 
@@ -68,6 +77,8 @@ sub _get_host_type {
 Parse a list of SNMP get/walk results into hashes.
 The results of the SNMP query are lines that look like:
   NETAPP-MIB::df64SisSavedKBytes.21 = Counter64: 0
+  ifTable:
+    IF-MIB::ifIndex[16777216] = INTEGER: 16777216
 I split this around "=" because of variations in left and right side that make a single regex a little hard to read.
 LHS: /^(\S+)::(\S+)\.(\d+|"\S+")$/ =>  $mib $oid $idx where sometimes idx is numeric and other times a string.
 RHS: /^(|(\S+):\s+)(.*)$/ => $type $value where sometimes type is empty.
@@ -80,11 +91,11 @@ sub _parse_snmp_line {
     my $hash;
     return if ($line =~ /No Such Object/);
     my ($oid,$value) = split(/\s+=\s+/,$line);
-    $oid =~ /^(\S+)::(\S+?)\.(\d+|"\S+")$/;
+    $oid =~ /^(\S+)::(\S+?)(\.|\[)(\d+|"\S+")(|\])$/;
     $hash = {
         mib   => $1,
         oid   => $2,
-        idx   => $3,
+        idx   => $4,
     };
     unless ($value ) {
         $self->logger->error(__PACKAGE__ . " snmp result parse error: $line");
@@ -137,11 +148,24 @@ a list of hashes representing the returned list of SNMP lines.
 =cut
 sub run {
     my $self = shift;
+    my @results = ();
+
+    # If tabledata is set, use it instead of calling a command.
+    # We use this for testing.
+    if ($self->tabledata) {
+        foreach my $line (@{ $self->tabledata }) {
+            chomp $line;
+            my $hash = $self->_parse_snmp_line($line);
+            next unless ($hash);
+            push @results, $hash;
+        }
+        return \@results;
+    }
+
     my $oid = shift;
     return unless ($oid);
-    my @results = ();
     my $cmd = join(" ",$self->exec,$self->args,$self->hostname,$oid);
-    $self->logger->info(__PACKAGE__ . " run $cmd");
+    $self->logger->debug(__PACKAGE__ . " run $cmd");
     open FH, "$cmd |" or die "failed to run $self->exec: $!";
     while (<FH>) {
         chomp;
@@ -165,6 +189,10 @@ sub create {
         return;
     }
     my $obj = $class->SUPER::create( %params );
+
+    # We use sloppy for unit testing
+    return $obj if ($params{sloppy});
+
     # FIXME: This feels wrong, both to call SNMP at object creation time, and to use the _get_host_type method
     # both with or without arguments.
     my $hosttype = $obj->_get_host_type($params{hostname});
@@ -173,7 +201,7 @@ sub create {
         return;
     }
     $obj->hosttype($hosttype);
-    $obj->command($params{command});
+    $obj->command($params{command}) if ($params{command});
     return $obj;
 }
 
