@@ -9,7 +9,7 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-namespace
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.31), libcache-memcached-perl, liblog-log4perl-perl, libmro-compat-perl, libwebservice-solr-perl, libsmart-comments-perl
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), libur-perl (>= 0.31), libcache-memcached-perl, liblog-log4perl-perl, libmro-compat-perl, libwebservice-solr-perl, libsmart-comments-perl, snmp
 Suggests: libgetopt-complete-perl
 Description: A UR Object framework for SDM Management
  A UR Object framework for SDM Management, notably for disk space management.

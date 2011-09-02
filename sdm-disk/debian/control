@@ -1,7 +1,7 @@
 Source: ur-sdm-disk
 Section: perl
 Priority: optional
-Build-Depends: debhelper (>= 7), snmp
+Build-Depends: debhelper (>= 7)
 Build-Depends-Indep: perl, libur-perl, libtest-simple-perl, libtest-output-perl, libtest-exception-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libsmart-comments-perl, libnet-ssh-perl, libyaml-libyaml-perl, libfile-slurp-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
@@ -9,6 +9,6 @@ Homepage: http://search.cpan.org/dist/Object-Accessor/
 
 Package: ur-sdm-disk
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace, ur-sdm-mibs, libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libsmart-comments-perl, libdbd-oracle-perl, libdbd-pg-perl, libdbd-mysql-perl, libnet-ssh-perl, libyaml-libyaml-perl, libfile-slurp-perl, snmp
+Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5), ur-sdm-namespace, ur-sdm-mibs, libur-perl, libdate-manip-perl, libjson-perl, librrds-perl, librrdtool-oo-perl, rrdtool, libsmart-comments-perl, libdbd-oracle-perl, libdbd-pg-perl, libdbd-mysql-perl, libnet-ssh-perl, libyaml-libyaml-perl, libfile-slurp-perl
 Description: A UR Object framework for disk management
  A UR Object framework for disk management.
