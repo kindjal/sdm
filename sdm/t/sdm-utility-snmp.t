@@ -28,7 +28,7 @@ sub slurp {
 my $table = "$top/t/ifDescr.txt";
 my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', sloppy => 1 );
 $snmp->tabledata( slurp($table) );
-my $a = $snmp->read_snmp_into_table('ifTable');
+my $a = $snmp->read_snmp_into_table('ifDescr');
 
 $table = "$top/t/ifHCInUcastPkts.txt";
 $snmp->tabledata( slurp($table) );
@@ -49,37 +49,12 @@ while (my ($k,$v) = each %$c) {
     $result->{$k} = { %{$result->{$k}}, %$v };
 }
 
-#my $result = { %$a, %$b, %$c };
-#warn "a" . Data::Dumper::Dumper $a;
-#warn "b" . Data::Dumper::Dumper $b;
-#warn "c" . Data::Dumper::Dumper $c;
-warn "res" . Data::Dumper::Dumper $result;
-
-__END__
 my $obj = $result->{19951616};
+warn "" . Data::Dumper::Dumper $obj;
 my $expected;
-$expected->{ifIndex} = '19951616';
 $expected->{ifDescr} = 'fc7/8';
-$expected->{ifType} = 'fibreChannel(56)';
-$expected->{ifMtu} = '2112';
-$expected->{ifSpeed} = '0';
-$expected->{ifPhysAddress} = '21:88:0:d:ec:82:2a:40';
-$expected->{ifAdminStatus} = 'down(2)';
-$expected->{ifOperStatus} = 'down(2)';
-$expected->{ifLastChange} = '(0) 0:00:00.00';
-$expected->{ifInOctets} = '116';
-$expected->{ifInUcastPkts} = '1';
-$expected->{ifInNUcastPkts} = '0';
-$expected->{ifInDiscards} = '0';
-$expected->{ifInErrors} = '0';
-$expected->{ifInUnknownProtos} = '0';
-$expected->{ifOutOctets} = '116';
-$expected->{ifOutUcastPkts} = '11453220';
-$expected->{ifOutNUcastPkts} = '0';
-$expected->{ifOutDiscards} = '0';
-$expected->{ifOutErrors} = '0';
-$expected->{ifOutQLen} = '0';
-$expected->{ifSpecific} = 'SNMPv2-SMI::zeroDotZero';
+$expected->{ifHCOutUcastPkts} = '11536844';
+$expected->{ifHCInUcastPkts} = '1';
 ok( is_deeply( $obj, $expected, "is_deeply" ), "objects match" );
 
 $table = "$top/t/hrStorageTable.txt";
