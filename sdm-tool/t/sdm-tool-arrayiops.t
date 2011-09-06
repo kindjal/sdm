@@ -25,17 +25,31 @@ sub slurp {
     return \@content;
 }
 
-my $table = "$top/t/ifTable.txt";
+my $table = "$top/../sdm/t/ifDescr.txt";
 my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', sloppy => 1 );
 $snmp->tabledata( slurp($table) );
-my $snmp_table = $snmp->read_snmp_into_table('ifTable');
+my $a = $snmp->read_snmp_into_table('ifDescr');
 
-my $t = SDM::Tool::Command::ArrayIops->create( hostname => 'localhost', fcport => 'fc1/1' );
-my ($write,$read) = $t->calculate( $snmp_table );
-ok($write == 1575893693, "writes match");
-ok($read == 2445739607, "reads match");
+$table = "$top/../sdm/t/ifHCInUcastPkts.txt";
+$snmp->tabledata( slurp($table) );
+my $b = $snmp->read_snmp_into_table('ifHCInUcastPkts');
 
-my $msg = $t->execute( $snmp_table );
-warn "" . Data::Dumper::Dumper $msg;
+$table = "$top/../sdm/t/ifHCOutUcastPkts.txt";
+$snmp->tabledata( slurp($table) );
+my $c = $snmp->read_snmp_into_table('ifHCOutUcastPkts');
+my $result;
+
+while (my ($k,$v) = each %$a) {
+    $result->{$k} = $v;
+}
+while (my ($k,$v) = each %$b) {
+    $result->{$k} = { %{$result->{$k}}, %$v };
+}
+while (my ($k,$v) = each %$c) {
+    $result->{$k} = { %{$result->{$k}}, %$v };
+}
+
+my $t = SDM::Tool::Command::ArrayIops->create( hostname => 'localhost', fcport => 'fc1/1', loglevel => 'DEBUG' );
+my ($write,$read) = $t->calculate( $result, "fc1/1" );
 
 done_testing();
