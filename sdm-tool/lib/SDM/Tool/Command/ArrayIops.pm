@@ -67,6 +67,7 @@ sub calculate {
         $self->logger->debug(__PACKAGE__ . " fiber channel port not found: $fcport");
         return (0,0);
     }
+    $self->logger->debug(__PACKAGE__ . " raw read: $read, raw write: $write");
     if ($self->size) {
         $read /= $self->size;
         $write /= $self->size;
