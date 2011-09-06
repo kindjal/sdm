@@ -5,7 +5,7 @@ use Module::Build;
 my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.14',
+  dist_version => '0.15',
   dist_abstract => 'Modules for system data miner',
   scripts => [ 'bin/sdm' ],
   build_requires => {

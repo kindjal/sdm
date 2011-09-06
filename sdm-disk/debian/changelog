@@ -1,3 +1,9 @@
+ur-sdm-disk (0.15-1) unstable; urgency=low
+
+  * Add array iops tool.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 06 Sep 2011 16:47:24 -0500
+
 ur-sdm-disk (0.14-1) unstable; urgency=low
 
   * Add sdm-asset and sdm-zenoss.
