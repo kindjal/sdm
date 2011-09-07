@@ -11,7 +11,7 @@ debian/rules
 lib/SDM/DataSource/Disk.oracle.schema
 lib/SDM/DataSource/Disk.pm
 lib/SDM/DataSource/Disk.psql.schema
-lib/SDM/DataSource/Disk.sqlite3n.schema
+lib/SDM/DataSource/Disk.sqlite3.schema
 lib/SDM/DataSource/GMSchema.pm
 lib/SDM/Disk.pm
 lib/SDM/Disk/Array.pm

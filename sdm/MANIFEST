@@ -22,8 +22,8 @@ lib/SDM/Completion/Command.pm
 lib/SDM/Completion/Command/Bash.pm
 lib/SDM/Completion/Command/Update.pm
 lib/SDM/DataSource/Meta.pm
-lib/SDM/DataSource/Meta.sqlite3n
-lib/SDM/DataSource/Meta.sqlite3n-schema
+lib/SDM/DataSource/Meta.sqlite3
+lib/SDM/DataSource/Meta.sqlite3-schema
 lib/SDM/Env.pm
 lib/SDM/Env/SDM_DATABASE_DRIVER.pm
 lib/SDM/Env/SDM_DATABASE_HOSTNAME.pm
