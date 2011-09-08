@@ -11,14 +11,12 @@ class SDM::Rtm::Host {
     data_source => 'SDM::DataSource::Rtm',
     doc         => 'work with grid jobs',
     id_by => [
-        clusterid   => { is => 'Number' },
         host        => { is => 'Text' },
-        #status      => { is => 'Text' },
-        #prev_status => { is => 'Text' },
+        clusterid   => { is => 'Number' },
     ],
     has => [
-        status        => { is => 'Text' },
-        prev_status   => { is => 'Text' },
+        status      => { is => 'Text' },
+        prev_status => { is => 'Text' },
         hStatus       => { is => 'Number', default_value => 0 },
         hCtrlMsg      => { is => 'Text', default_value => '' },
         time_in_state => { is => 'Number', default_value => 0 },
@@ -38,9 +36,8 @@ class SDM::Rtm::Host {
     ],
     has_many_optional => [
         jobs => {
-            is => 'Number',
-            calculate_from => 'host',
-            calculate => q| my @h = SDM::Rtm::Jobs->get( exec_host => $host ); return map { $_->jobid } @h; |,
+            is => "SDM::Rtm::Jobs",
+            reverse_as => "host"
         }
     ]
 };

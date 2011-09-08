@@ -48,10 +48,9 @@ class SDM::Rtm::Jobs {
             calculate => q| my @g = SDM::Disk::GpfsDiskPerf->get( filername => $filername, mount_path => $mount_path ); return map { $_->id } @g; |,
         },
         gpfs_disk_perf  => { is => 'SDM::Disk::GpfsDiskPerf', id_by => 'gpfs_disk_perf_id' },
-    ],
-    has_optional => [
         process         => { is => 'SDM::Service::Lsof::Process', id_by => [ 'exec_host', 'jobPid' ] },
         nfsd            => { is => 'Text', via => 'process' },
+        host            => { is => 'SDM::Rtm::Host', id_by => [ 'exec_host', 'clusterid' ] },
     ],
     has => [
         options         => { is => 'Number' },
