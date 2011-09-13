@@ -1,5 +1,5 @@
 
-package SDM::Disk::Filer::Command::QuerySnmp;
+package SDM::Disk::Filer::Command::QueryGpfs;
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use SDM;
 # Checking currentness in host_is_current()
 use Date::Manip;
 use Date::Manip::Date;
+
 # Usage function
 use Pod::Find qw(pod_where);
 use Pod::Usage;
@@ -18,7 +19,7 @@ use File::Basename qw(basename);
 # Autoflush
 local $| = 1;
 
-class SDM::Disk::Filer::Command::QuerySnmp {
+class SDM::Disk::Filer::Command::QueryGpfs {
     is => 'SDM::Command::Base',
     has_optional => [
         force => {
@@ -29,7 +30,7 @@ class SDM::Disk::Filer::Command::QuerySnmp {
         allow_mount => {
             is => 'Boolean',
             default => 0,
-            doc => 'Allow mounting of filesystems to discover disk groups rather than only relying on SNMP',
+            doc => 'Allow mounting of filesystems to discover disk groups',
         },
         mount_point => {
             is => 'Text',
@@ -79,7 +80,7 @@ class SDM::Disk::Filer::Command::QuerySnmp {
         discover_volumes => {
             is => 'Boolean',
             default => 0,
-            doc => 'Create volumes based on what SNMP discovers, otherwise only update volumes already defined',
+            doc => 'Create volumes based on what we discover, otherwise only update volumes already defined',
         },
         is_current => {
             is => 'Boolean',
@@ -91,18 +92,18 @@ class SDM::Disk::Filer::Command::QuerySnmp {
             # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
             #is => 'SDM::Disk::Filer',
             is => 'Text',
-            doc => 'SNMP query the named filer',
+            doc => 'Query the named filer',
         },
         physical_path => {
             is => 'Text',
-            doc => 'SNMP query the named filer for this export',
+            doc => 'Query the named filer for this export',
         },
         query_paths => {
             is => 'Boolean',
-            doc => 'SNMP query the named filer for exports, but not usage',
+            doc => 'Query the named filer for exports, but not usage',
         },
     ],
-    doc => 'Queries volume usage via SNMP',
+    doc => 'Queries volume usage of GPFS filer',
 };
 
 sub help_brief {
@@ -117,16 +118,27 @@ EOS
 
 sub help_detail {
     return <<EOS
-Updates volume usage information. Blah blah blah details blah.
+Updates volume usage information
 EOS
 }
 
 =head2 update_volumes
-Update SNMP data for all Volumes associated with this Filer.
+Update data for all Volumes associated with this Filer.
 =cut
 sub update_volumes {
     my $self = shift;
     my $volumedata = shift;
+    # volumedata is a hash that looks like this:
+    # volumedata: {
+    #     '/vol/aggr0' => {
+    #                       'disk_group' => undef,
+    #                       'total_kb' => '11603570688',
+    #                       'mount_path' => '/gscmnt/aggr0',
+    #                       'name' => 'aggr0',
+    #                       'used_kb' => 93415936,
+    #                       'physical_path' => '/vol/aggr0'
+    #                     }
+    #   }
     my $filername = shift;
 
     unless ($filername) {
@@ -134,15 +146,15 @@ sub update_volumes {
         return;
     }
     unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer " . $filername . " returned empty SNMP volumedata");
+        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer " . $filername . " returned empty volumedata");
         return;
     }
 
     $self->logger->warn(__PACKAGE__ . " update_volumes($filername)");
 
     unless ($self->physical_path) {
-        # QuerySnmp First find and remove volumes in the DB that are not detected on this filer
-        # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
+        # QueryGpfs First find and remove volumes in the DB that are not detected on this filer
+        # For this filer, find any stored volumes that aren't present in the volumedata.
         # Note that we skip this step if we specified a single physical_path to update.
         foreach my $volume ( SDM::Disk::Volume->get( filername => $filername ) ) {
             foreach my $path ($volume->physical_path) {
@@ -241,15 +253,15 @@ sub purge_volumes {
     }
 }
 
-=head2 _query_snmp
-The SNMP bits of execute()
+=head2 query_gpfs
+The SSH bits of execute()
 =cut
-sub _query_snmp {
+sub query_gpfs {
     my $self = shift;
     my $filer = shift;
 
     # Just check if Filer is_current
-    $self->logger->warn(__PACKAGE__ . " running SNMP query on filer " . $filer->name);
+    $self->logger->warn(__PACKAGE__ . " running query on filer " . $filer->name);
     if ($self->is_current) {
         if ($filer->is_current($self->host_maxage)) {
             $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is current");
@@ -266,34 +278,32 @@ sub _query_snmp {
         push @params, ( translate_path => $self->translate_path );
         push @params, ( discover_volumes => $self->discover_volumes );
         push @params, ( mount_point => $self->mount_point );
-        my $snmp = SDM::Utility::SNMP::DiskUsage->create( @params );
-        unless ($snmp) {
-            $self->logger->error(__PACKAGE__ . " unable to query SNMP on filer " . $filer->name);
+
+        my $gpfs = SDM::GPFS::DiskUsage->create( @params );
+        unless ($gpfs) {
+            $self->logger->error(__PACKAGE__ . " unable to query on filer " . $filer->name);
             return;
         }
 
-        # Query SNMP for disk usage numbers
-        # This is different from read_snmp_into_table() because we have platform depenedent volume data
-        # that we need to parse and apply logic to.  See SNMP::DiskUsage for details.
-        my $table = $snmp->acquire_volume_data();
+        # Query disk usage numbers
+        my $table = $gpfs->acquire_volume_data();
         # Volume data must be updated before GPFS data is updated below.
         $self->update_volumes( $table, $filer->name );
-        warn "table: " . Data::Dumper::Dumper $table;
 
-        $snmp->delete();
+        $gpfs->delete();
         $filer->status(1);
         $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
     };
     if ($@) {
         # log here, but not high priority, it's common
-        $self->logger->warn(__PACKAGE__ . " error with SNMP query: $@");
+        $self->logger->warn(__PACKAGE__ . " error with query: $@");
         $filer->status(0);
     }
 
 }
 
 =head2 execute
-Execute QuerySnmp() queries SNMP on a named Filer and stores disk usage information.
+Execute QueryGpfs() queries on a named Filer and stores disk usage information.
 =cut
 sub execute {
     my $self = shift;
@@ -328,7 +338,7 @@ sub execute {
     }
 
     foreach my $filer (@filers) {
-        $self->_query_snmp($filer);
+        $self->query_gpfs($filer);
     }
 
     UR::Context->commit();

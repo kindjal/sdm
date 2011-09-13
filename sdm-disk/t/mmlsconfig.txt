@@ -1,0 +1,235 @@
+Configuration data for cluster clustername=gpfs.gsc.wustl.edu:
+--------------------------------------------------------------
+clusterName clustername=gpfs.gsc.wustl.edu
+clusterId 720606955618040750
+autoload yes
+minReleaseLevel 3.3.0.2
+dmapiFileHandleSize 32
+maxFilesToCache 64000
+pagepool 8G
+maxStatCache 40000
+maxMBpS 5000
+nfsPrefetchStrategy 1
+cnfsSharedRoot /vol/system
+cnfsVIP gpfs
+defaultMountDir /vol
+cnfsMountdPort 4046
+prefetchThreads 72
+worker1Threads 396
+tiebreakerDisks ams2k4lun0044;ams2k1lun02bf;ams2k1lun02c0
+nsdMaxWorkerThreads 32
+seqDiscardThreshhold 5G
+[linuscs103,linuscs104,linuscs105,linuscs106]
+cnfsReboot yes
+[common]
+cnfsNFSDprocs 512
+adminMode allToAll
+
+File systems in cluster clustername=gpfs.gsc.wustl.edu:
+-------------------------------------------------------
+/dev/aggr0
+/dev/ams1100
+/dev/ams1101
+/dev/ams1102
+/dev/ams1103
+/dev/ams1104
+/dev/ams1105
+/dev/ams1106
+/dev/ams1107
+/dev/ams1108
+/dev/ams1109
+/dev/ams1110
+/dev/ams1111
+/dev/ams1112
+/dev/ams1113
+/dev/ams1114
+/dev/ams1115
+/dev/ams1116
+/dev/ams1117
+/dev/ams1118
+/dev/ams1119
+/dev/ams1120
+/dev/ams1121
+/dev/ams1122
+/dev/ams1123
+/dev/ams1124
+/dev/ams1125
+/dev/ams1126
+/dev/ams1127
+/dev/ams1128
+/dev/ams1129
+/dev/ams1130
+/dev/ams1131
+/dev/ams1132
+/dev/ams1133
+/dev/ams1134
+/dev/ams1135
+/dev/ams1136
+/dev/ams1137
+/dev/ams1138
+/dev/ams1139
+/dev/ams1140
+/dev/ams1141
+/dev/ams1142
+/dev/ams1143
+/dev/ams1144
+/dev/ams1145
+/dev/ams1146
+/dev/ams1147
+/dev/ams1148
+/dev/ams1149
+/dev/ams1150
+/dev/ams1151
+/dev/ams1152
+/dev/ams1153
+/dev/ams1154
+/dev/ams1155
+/dev/ams1156
+/dev/ams1157
+/dev/ams1158
+/dev/ams1159
+/dev/ams1160
+/dev/ams1161
+/dev/ams1162
+/dev/ams1163
+/dev/ams1164
+/dev/ams1165
+/dev/ams1166
+/dev/ams1167
+/dev/ams1168
+/dev/ams1169
+/dev/ams1170
+/dev/ams1171
+/dev/ams1172
+/dev/ams1173
+/dev/ams1174
+/dev/ams1175
+/dev/ams1176
+/dev/ams1177
+/dev/ams1178
+/dev/ams1179
+/dev/ams1180
+/dev/ams1181
+/dev/ams1182
+/dev/ams1183
+/dev/ams1184
+/dev/ams1185
+/dev/arx-metadata
+/dev/d2d1
+/dev/gc2000
+/dev/gc2001
+/dev/gc2002
+/dev/gc2003
+/dev/gc2004
+/dev/gc2005
+/dev/gc2006
+/dev/gc2007
+/dev/gc2008
+/dev/gc2009
+/dev/gc2010
+/dev/gc2011
+/dev/gc2012
+/dev/gc2013
+/dev/gc2014
+/dev/gc2015
+/dev/gc2016
+/dev/gc4000
+/dev/gc4001
+/dev/gc4002
+/dev/gc4003
+/dev/gc4004
+/dev/gc4005
+/dev/gc4006
+/dev/gc4007
+/dev/gc4008
+/dev/gc4009
+/dev/gc4010
+/dev/gc4011
+/dev/gc4012
+/dev/gc4013
+/dev/gc4014
+/dev/gc4015
+/dev/gc4016
+/dev/gc4017
+/dev/gc4018
+/dev/gc4019
+/dev/gc4020
+/dev/gc4021
+/dev/gc4022
+/dev/gc4023
+/dev/gc4024
+/dev/gc4025
+/dev/gc4026
+/dev/gc4027
+/dev/gc4028
+/dev/gc4029
+/dev/gc4030
+/dev/gc4031
+/dev/gc4032
+/dev/gc4033
+/dev/gc4034
+/dev/gc4035
+/dev/gc4036
+/dev/gc4037
+/dev/gc4038
+/dev/gc4039
+/dev/gc4040
+/dev/gc4041
+/dev/gc4042
+/dev/gc4043
+/dev/gc4044
+/dev/gc4045
+/dev/gc4046
+/dev/gc4047
+/dev/gc4048
+/dev/gc4049
+/dev/gc4050
+/dev/gc4051
+/dev/gc4052
+/dev/gc4053
+/dev/gc4054
+/dev/gc4055
+/dev/gc4056
+/dev/gc4057
+/dev/gc4058
+/dev/gc4059
+/dev/gc4060
+/dev/gc4061
+/dev/gc4062
+/dev/gc4063
+/dev/gc4064
+/dev/gc4065
+/dev/gc4066
+/dev/gc4067
+/dev/gc4068
+/dev/gc4069
+/dev/gc4070
+/dev/gc4071
+/dev/gc4072
+/dev/gc4073
+/dev/gc4074
+/dev/gc4075
+/dev/gc4076
+/dev/gc4077
+/dev/gc4078
+/dev/gc4079
+/dev/gc4080
+/dev/gc4081
+/dev/gc4082
+/dev/gc4083
+/dev/gc4084
+/dev/gc4085
+/dev/gc4086
+/dev/gc4087
+/dev/gc4088
+/dev/gc4089
+/dev/gc4090
+/dev/gc4091
+/dev/gc4092
+/dev/gc4093
+/dev/gc4094
+/dev/gc4095
+/dev/gc4096
+/dev/gpfs-arx-metadata
+/dev/system
+/dev/xp4101

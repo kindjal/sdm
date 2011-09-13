@@ -1,0 +1,6 @@
+*** Report for FILESET  quotas on aggr0
+                         Block Limits                                    |                     File Limits
+Name       type             KB      quota      limit   in_doubt    grace |    files   quota    limit in_doubt    grace entryType
+root       FILESET      123672          0          0          0     none |      108       0        0        0     none i         
+gc7000     FILESET  62210072304          0 214748364800   27967088     none |   214324       0        0      138     none e         
+gc7001     FILESET  93793940608          0 214748364800    3597672     none |  4376582       0        0      574     none e         

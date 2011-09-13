@@ -1,5 +1,5 @@
 
-package SDM::Utility::SNMP::DiskUsage;
+package SDM::Utility::GPFS::DiskUsage;
 
 use strict;
 use warnings;
@@ -9,9 +9,14 @@ use File::Basename qw/basename dirname/;
 use Data::Dumper;
 $Data::Dumper::Terse = 1;
 
-class SDM::Utility::SNMP::DiskUsage {
+class SDM::Utility::GPFS::DiskUsage {
     is => 'SDM::Command::Base',
     has => [
+        hostname => {
+            is => 'Text',
+            default_value => undef,
+            doc => 'Hostname of GPFS cluster master',
+        },
         allow_mount => {
             is => 'Boolean',
             default_value => 0,
@@ -43,57 +48,10 @@ class SDM::Utility::SNMP::DiskUsage {
     ]
 };
 
-=head2 _netapp_int32
-Older netapps don't have a single 64 bit counter for disk space, but rather a "low" and "high"
-counter that we put together for the final result.
-=cut
-sub _netapp_int32 {
-    my $self = shift;
-    my $low = shift;
-    my $high = shift;
-    if ($low >= 0) {
-        return $high * 2**32 + $low;
-    }
-    if ($low < 0) {
-        return ($high + 1) * 2**32 + $low;
-    }
-}
-
-=head2 _get_disk_group_via_snmp
-Again by convention, we split a volume space into directories to be assigned a "disk_group".
-We can configure a Filer's snmpd to export a Table with disk group info.  This method gets that data.
-=cut
-sub _get_disk_group_via_snmp {
-    my $self = shift;
-    my $physical_path = shift;
-
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp($physical_path)");
-    my $oid = '1.3.6.1.4.1.8072.1.3.2.4.1.2.15.100.105.115.107.95.103.114.111.117.112.95.110.97.109.101';
-
-    unless ($self->disk_groups) {
-        $self->disk_groups( $self->read_snmp_into_table($oid) );
-    }
-    foreach my $key (sort {$a <=> $b} keys %{$self->disk_groups}) {
-        my $value = pop @{ [ values %{ $self->disk_groups->{$key} } ] };
-        my $path = dirname $value;
-        my $group = basename $value;
-        $group =~ s/^DISK_//;
-        #$self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp has $key $value $path $physical_path $group");
-        if ($path eq $physical_path) {
-            $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns $group for $physical_path");
-            return $group;
-        }
-    }
-    $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns undef for $physical_path");
-    return undef;
-}
-
 =head2 _get_disk_group
 Again by convention, we split a volume space into directories to be assigned a "disk_group".
 Try to determine the disk group:
- - By looking at the Volume data we store.
- - By looking at the SNMP data we query.
- - By looking for a touch file in the volume mount path (optionally).
+ - By looking for a touch file in the volume path.
 =cut
 sub _get_disk_group {
     my $self = shift;
@@ -128,10 +86,10 @@ sub _get_disk_group {
 
     # Determine the disk group name
     if ($self->hosttype eq 'linux') {
-        my $disk_group = $self->_get_disk_group_via_snmp($physical_path);
+        my $disk_group = $self->_get_disk_group($physical_path);
         # If not defined or empty, go to mount point and look for touch file.
         if (defined $disk_group and $disk_group ne '') {
-            $self->logger->debug(__PACKAGE__ . " _get_disk_group snmp returns: $disk_group");
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group returns: $disk_group");
             return $disk_group;
         }
     }
@@ -157,15 +115,15 @@ sub _get_disk_group {
 }
 
 =head2 _convert_to_volume_data
-Convert the SNMP query results to attributes of our Volumes.
+Convert the query results to attributes of our Volumes.
 This is the final result that our caller is asking for.
 =cut
 sub _convert_to_volume_data {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " convert_to_volume_data");
-    my $snmp_table = shift;
+    my $table = shift;
     my $volume_table = {};
-    foreach my $dfIndex (keys %$snmp_table) {
+    foreach my $dfIndex (keys %$table) {
 
         # Convert result blocks to bytes
         my $total;
@@ -173,30 +131,30 @@ sub _convert_to_volume_data {
         my $physical_path;
         if ($self->hosttype eq 'netapp') {
             # Skip devices that are not fixed disks.
-            next unless ($snmp_table->{$dfIndex}->{'dfType'} eq 'flexibleVolume(2)');
-            if (exists $snmp_table->{$dfIndex}->{'df64TotalKBytes'}) {
-                $total = $snmp_table->{$dfIndex}->{'df64TotalKBytes'};
-                $used  = $snmp_table->{$dfIndex}->{'df64UsedKBytes'};
+            next unless ($table->{$dfIndex}->{'dfType'} eq 'flexibleVolume(2)');
+            if (exists $table->{$dfIndex}->{'df64TotalKBytes'}) {
+                $total = $table->{$dfIndex}->{'df64TotalKBytes'};
+                $used  = $table->{$dfIndex}->{'df64UsedKBytes'};
             } else {
                 # Fix 32 bit integer stuff
-                my $low = $snmp_table->{$dfIndex}->{'dfLowTotalKBytes'};
-                my $high = $snmp_table->{$dfIndex}->{'dfHighTotalKBytes'};
+                my $low = $table->{$dfIndex}->{'dfLowTotalKBytes'};
+                my $high = $table->{$dfIndex}->{'dfHighTotalKBytes'};
                 $total = $self->_netapp_int32($low,$high);
 
-                $low = $snmp_table->{$dfIndex}->{'dfLowUsedKBytes'};
-                $high = $snmp_table->{$dfIndex}->{'dfHighUsedKBytes'};
+                $low = $table->{$dfIndex}->{'dfLowUsedKBytes'};
+                $high = $table->{$dfIndex}->{'dfHighUsedKBytes'};
                 $used = $self->_netapp_int32($low,$high);
             }
-            $physical_path = $snmp_table->{$dfIndex}->{'dfFileSys'};
+            $physical_path = $table->{$dfIndex}->{'dfFileSys'};
         } else {
             # Skip devices that are not fixed disks.
-            next unless ($snmp_table->{$dfIndex}->{'hrStorageType'} eq 'HOST-RESOURCES-TYPES::hrStorageFixedDisk');
-            $physical_path = $snmp_table->{$dfIndex}->{'hrStorageDescr'};
+            next unless ($table->{$dfIndex}->{'hrStorageType'} eq 'HOST-RESOURCES-TYPES::hrStorageFixedDisk');
+            $physical_path = $table->{$dfIndex}->{'hrStorageDescr'};
             # Correct for block size
-            my $correction = [ split(/\s+/,$snmp_table->{$dfIndex}->{'hrStorageAllocationUnits'}) ]->[0];
+            my $correction = [ split(/\s+/,$table->{$dfIndex}->{'hrStorageAllocationUnits'}) ]->[0];
             $correction = $correction / 1024;
-            $total = $snmp_table->{$dfIndex}->{'hrStorageSize'} * $correction;
-            $used  = $snmp_table->{$dfIndex}->{'hrStorageUsed'} * $correction;
+            $total = $table->{$dfIndex}->{'hrStorageSize'} * $correction;
+            $used  = $table->{$dfIndex}->{'hrStorageUsed'} * $correction;
         }
 
         next if ($physical_path eq "/");
@@ -245,20 +203,34 @@ sub _convert_to_volume_data {
     return $volume_table;
 }
 
+=head2 read_into_table
+Gathers raw data into a hash table
+=cut
+sub read_into_table {
+    my $self = shift
+    my $table;
+
+    my $cmd = shift;
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: $cmd: $!");
+    close(WRITER);
+    close(ERROR);
+    while (<READER>) {
+    }
+    return;
+
+    return $table;
+}
+
 =head2 acquire
-Run this subclass of SNMP to gather DiskUsage data.
+Run this to gather DiskUsage data.
 =cut
 sub acquire_volume_data {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
-    unless ($self->hosttype) {
-        $self->logger->error(__PACKAGE__ . " can't determine hosttype of host: " . $self->hostname);
-        return;
-    }
-    my $oid = $self->hosttype eq 'netapp' ?  'dfTable' : 'hrStorageTable';
-    my $snmp_table = $self->read_snmp_into_table($oid);
-    return unless ($snmp_table);
-    my $volume_table = $self->_convert_to_volume_data( $snmp_table );
+    my $table = $self->read_into_table();
+    return unless ($table);
+    my $volume_table = $self->_convert_to_volume_data( $table );
     return $volume_table;
 }
 
