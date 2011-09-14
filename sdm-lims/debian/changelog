@@ -1,0 +1,5 @@
+ur-sdm-lims (0.15-1) unstable; urgency=low
+
+  * Add LIMS interface.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu> Wed, 14 Sep 2011 10:27:45 -0500
