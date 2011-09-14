@@ -36,7 +36,11 @@ class SDM::Lims::Organism::Sample {
         source_type                 => { is => 'Text' },
         taxon_id                    => { is => 'Number' },
         tissue_label                => { is => 'Text' },
-        tissue_name                 => { is => 'Text' }
+        tissue_name                 => { is => 'Text' },
+        individual => {
+            is => 'SDM::Lims::Organism::Individual',
+            id_by => 'source_id'
+        }
     ]
 };
 
