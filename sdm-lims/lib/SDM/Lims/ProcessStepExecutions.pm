@@ -23,7 +23,11 @@ class SDM::Lims::ProcessStepExecutions {
         pipe           => { is => 'Number' },
         prior_pse_id   => { is => 'Number' },
         pr_pse_result  => { is => 'Text' },
-        tp_id          => { is => 'Number' }
+        tp_id          => { is => 'Number' },
+        step => {
+            is => 'SDM::Lims::ProcessSteps',
+            id_by => 'ps_ps_id'
+        }
     ],
     has_many_optional => [
         woipse => {
@@ -34,6 +38,15 @@ class SDM::Lims::ProcessStepExecutions {
             is => 'SDM::Lims::WorkOrderItem',
             via => 'woipse',
             to => 'woi'
+        },
+        psejob => {
+            is => 'SDM::Lims::PseJob',
+            reverse_as => 'pse'
+        },
+        job => {
+            is => 'SDM::Lims::GridJobsFinished',
+            via => 'psejob',
+            to => 'job'
         }
     ]
 };
