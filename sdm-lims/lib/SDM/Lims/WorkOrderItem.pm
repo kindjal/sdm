@@ -3,7 +3,7 @@ package SDM::Lims::WorkOrderItem;
 
 use SDM;
 
-class SDM::Lims::WorOrderItem {
+class SDM::Lims::WorkOrderItem {
     table_name => 'GSC.WORK_ORDER_ITEM',
     data_source => 'SDM::DataSource::Oltp',
     doc         => 'work with work order items',
@@ -23,6 +23,22 @@ class SDM::Lims::WorOrderItem {
         sample            => {
             is => "SDM::Lims::Organism::Sample",
             id_by => 'dna_id'
+        },
+        individual        => {
+            is => "SDM::Lims::Organism::Individual",
+            via => 'sample',
+            to => 'individual'
+        }
+    ],
+    has_many_optional => [
+        woipse => {
+            is => 'SDM::Lims::WoiPse',
+            reverse_as => 'woi'
+        },
+        pse => {
+            is => 'SDM::Lims::ProcessStepExecutions',
+            via => 'woipse',
+            to => 'pse'
         }
     ]
 };
