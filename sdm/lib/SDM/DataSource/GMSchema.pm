@@ -18,17 +18,22 @@ sub server {
 }
 
 sub login {
-    "mguser";}
+    "mguser";
+}
 
 sub auth {
-    "mguser_prd";}
+    "mguser_prd";
+}
 
 sub owner {
-    "MG";}
-
+    "MG";
+}
 
 sub table_and_column_names_are_upper_case { 1; }
 
+1;
+
+__END__
 sub _init_created_dbh {
     my ($self, $dbh) = @_;
     return unless defined $dbh;
@@ -74,10 +79,6 @@ sub _get_sequence_name_for_table_and_column {
         $self->SUPER::_get_sequence_name_for_table_and_column($table_name, $column_name);
     }
 }
-
-1;
-
-__END__
 
 # A list of the old GM schema tables that Genome::Model should ignore
 my @OLD_GM_TABLES = qw(
