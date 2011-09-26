@@ -93,6 +93,12 @@ class SDM::Disk::Volume {
         },
         gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
     ],
+    has_many_optional => [
+        filesets => {
+            is => 'SDM::Disk::Fileset',
+            reverse_as => 'volume'
+        }
+    ],
     schema_name => 'Disk',
     data_source => 'SDM::DataSource::Disk',
 };
@@ -181,27 +187,14 @@ sub create {
     my $self = shift;
     my (%param) = @_ if (scalar @_);
 
-    unless ($param{name}) {
-        $self->error_message("name not specified in Volume->create()");
+    my @missing;
+    foreach my $attr ( $self->__meta__->properties ) {
+        next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or $attr->default_value);
+        push @missing, $attr->property_name unless (exists $param{$attr->property_name});
+    }
+    if (@missing) {
+        $self->error_message("missing required attributes in create(): " . join(" ",@missing));
         return;
-    }
-    unless ($param{filername}) {
-        $self->error_message("filer name not specified in Volume->create()");
-        return;
-    }
-    unless ($param{physical_path}) {
-        $self->error_message("physical path not specified in Volume->create()");
-        return;
-    }
-    unless ($param{mount_point}) {
-        $self->warning_message("using default value '/gscmnt' for unspecified mount_point");
-        $param{mount_point} = '/gscmnt';
-    }
-    unless ($param{total_kb}) {
-        $param{total_kb} = 0;
-    }
-    unless ($param{used_kb}) {
-        $param{used_kb} = 0;
     }
 
     # Note: Is it ok to auto-create Filers?  I say no for now.
@@ -228,6 +221,16 @@ sub create {
 
     $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( %param );
+}
+
+sub delete {
+    my $self = shift;
+    my @filesets = SDM::Disk::Fileset->get( parent_volume_name => $self->name );
+    if (@filesets) {
+        $self->error_message("cowardly refusing to delete a volume that contains filesets!  delete the filesets first!");
+        return;
+    }
+    return $self->SUPER::delete();
 }
 
 1;

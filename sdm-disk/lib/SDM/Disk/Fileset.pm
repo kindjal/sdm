@@ -11,6 +11,7 @@ class SDM::Disk::Fileset {
     is => 'SDM::Disk::Volume',
     has => [
         type            => { is => 'Text', default_value => 'FILESET' },
+        kb_size         => { is => 'Number' },
         kb_quota        => { is => 'Number' },
         kb_limit        => { is => 'Number' },
         kb_in_doubt     => { is => 'Number' },

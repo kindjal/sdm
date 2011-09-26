@@ -26,9 +26,12 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $c = SDM::Disk::Filer::Command::QueryGpfs->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0 );
+my $c = SDM::Utility::GPFS::DiskUsage->create( loglevel => "DEBUG" );
 
-warn "" . Data::Dumper::Dumper $c;
+open(FH,"<$top/t/mmlscluster.txt") or "die failed to open mmlscluster.txt";
+my $content = do { local $/; <FH> };
+close(FH);
+$c->parse_mmlscluster($content);
 
 #stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skipped unknown volume ok";
 #
