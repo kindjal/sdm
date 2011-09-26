@@ -29,8 +29,9 @@ my $host = 'linuscs107';
 my @params = ( loglevel => 'DEBUG', hostname => $host );
 
 sub fileslurp {
-    my $file = shift;
-    open(FH,"<$file") or "die failed to open $file";
+    my $filename = shift;
+    return unless (defined $filename);
+    open FH, "<", $filename or die "failed to open $filename: $!";
     my $content = do { local $/; <FH> };
     close(FH);
     return $content;
@@ -38,87 +39,45 @@ sub fileslurp {
 
 my $c = SDM::Utility::GPFS::DiskUsage->create( @params );
 
-$c->parse_mmlscluster( fileslurp( "$top/t/mmlscluser.txt" ) );
+$c->parse_mmlscluster( fileslurp( "$top/t/mmlscluster.txt" ) );
+my $h = SDM::Disk::Host->get( hostname => "linuscs103" );
+ok( $h->master == 1, "master host found" );
+
 my $vol = $c->parse_mmlsnsd( fileslurp( "$top/t/mmlsnsd.txt" ) );
-warn "" . Data::Dumper::Dumper $vol;
-
-__END__
-
-my $line = 'GPFS-MIB::gpfsNodeName."linuscs107.gsc.wustl.edu" = STRING: "linuscs107.gsc.wustl.edu"';
-my $hash = $obj->_parse_snmp_line( $line );
+$c->parse_nsd_df( fileslurp( "$top/t/df.txt" ), $vol );
+$c->parse_disk_groups( fileslurp( "$top/t/disk_groups.txt" ), $vol );
 my $expected = {
-    'value' => '"linuscs107.gsc.wustl.edu"',
-    'oid' => 'gpfsNodeName',
-    'type' => 'STRING',
-    'idx' => '"linuscs107.gsc.wustl.edu"',
-    'mib' => 'GPFS-MIB'
+    'ams2k4lun00b4' => [
+        'linuscs105.gsc.wustl.edu',
+        'linuscs106.gsc.wustl.edu',
+        'linuscs103.gsc.wustl.edu',
+        'linuscs104.gsc.wustl.edu '
+        ],
+    'mount_path' => '/gscmnt/gc4013',
+    'physical_path' => '/vol/gc4013',
+    'disk_group' => 'INFO_GENOME_MODELS',
+    'total_kb' => '6914310144',
+    'ams2k4lun00b3' => [
+        'linuscs103.gsc.wustl.edu',
+        'linuscs104.gsc.wustl.edu',
+        'linuscs105.gsc.wustl.edu',
+        'linuscs106.gsc.wustl.edu '
+        ],
+    'used_kb' => '5184528384',
+    'ams2k4lun002f' => [
+        'linuscs103.gsc.wustl.edu',
+        'linuscs104.gsc.wustl.edu',
+        'linuscs105.gsc.wustl.edu',
+        'linuscs106.gsc.wustl.edu '
+        ]
 };
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
+ok( is_deeply( $vol->{'gc4013'}, $expected, "ok: is_deeply"), "ok: mmlsnsd parses");
 
-$line = 'GPFS-MIB::gpfsFileSDMPerfName."gpfsdev14" = STRING: "gpfsdev14"';
-$hash = $obj->_parse_snmp_line( $line );
-$expected = {
-    'value' => '"gpfsdev14"',
-    'oid' => 'gpfsFileSDMPerfName',
-    'type' => 'STRING',
-    'idx' => '"gpfsdev14"',
-    'mib' => 'GPFS-MIB'
-};
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
-
-$line = 'GPFS-MIB::gpfsFileSDMBytesReadL."system" = Gauge32: 0';
-$hash = $obj->_parse_snmp_line( $line );
-$expected = {
-    'value' => '0',
-    'oid' => 'gpfsFileSDMBytesReadL',
-    'type' => 'Gauge32',
-    'idx' => '"system"',
-    'mib' => 'GPFS-MIB'
-};
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
-
-$line = 'SNMPv2-MIB::sysDescr.0 = STRING: NetApp Release 7.3.2: Thu Oct 15 04:12:15 PDT 2009';
-$hash = $obj->_parse_snmp_line( $line );
-$expected = {
-    'value' => 'NetApp Release 7.3.2: Thu Oct 15 04:12:15 PDT 2009',
-    'oid' => 'sysDescr',
-    'type' => 'STRING',
-    'idx' => '0',
-    'mib' => 'SNMPv2-MIB'
-};
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
-
-$line = 'SNMPv2-MIB::sysDescr.0 = STRING: Linux linuscs107 2.6.18-194.8.1.el5 #1 SMP Wed Jun 23 10:52:51 EDT 2010 x86_64';
-$hash = $obj->_parse_snmp_line( $line );
-$expected = {
-    'value' => 'Linux linuscs107 2.6.18-194.8.1.el5 #1 SMP Wed Jun 23 10:52:51 EDT 2010 x86_64',
-    'oid' => 'sysDescr',
-    'type' => 'STRING',
-    'idx' => '0',
-    'mib' => 'SNMPv2-MIB'
-};
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
-
-$line = 'GPFS-MIB::gpfsNodeVersion."blade12-4-15.gsc.wustl.edu" = ""';
-$hash = $obj->_parse_snmp_line( $line );
-$expected = {
-    'value' => '""',
-    'oid' => 'gpfsNodeVersion',
-    'type' => undef,
-    'idx' => '"blade12-4-15.gsc.wustl.edu"',
-    'mib' => 'GPFS-MIB'
-};
-ok( is_deeply( $hash, $expected, "ok: is_deeply"), "ok: line parses");
-
-my $ref;
-lives_ok { $ref = $obj->read_snmp_into_table('gpfsMIBObjects') } "ok: lives";
-#print Data::Dumper::Dumper $ref;
-lives_ok { $ref = $obj->read_snmp_into_table('gpfsFileSDMPerfTable') } "ok: lives";
-#print Data::Dumper::Dumper $ref;
-lives_ok { $ref = $obj->read_snmp_into_table('gpfsDiskPerfTable') } "ok: lives";
-#print Data::Dumper::Dumper $ref;
-lives_ok { $ref = $obj->acquire_volume_data() } "ok: lives";
-ok( scalar keys %$ref >= 1, "got data");
-#print Data::Dumper::Dumper $ref;
+$c->parse_mmrepquota( fileslurp( "$top/t/mmrepquota.txt" ), $vol );
+$expected = [
+  ['gc7000','FILESET','62210072304','0','214748364800','27967088','none','214324','0','0','138','none','e' ],
+  ['gc7001','FILESET','93793940608','0','214748364800','3597672','none','4376582','0','0','574','none','e' ],
+];
+ok( is_deeply( $vol->{'aggr0'}->{'filesets'}, $expected, "ok: is_deeply"), "ok: mmreqpquota parses");
 
 done_testing();
