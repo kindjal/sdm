@@ -24,7 +24,7 @@ my $driver = $ds->driver;
 my $top = dirname dirname abs_path(__FILE__);
 my $base = "$top/lib/SDM";
 my $perl = "$^X -I $top/lib -I $top/../sdm/lib";
-my $sdm = can_run("sdm");
+my $sdm = can_run("./bin/sdm");
 unless ($sdm) {
     if (-e "./sdm-disk/sdm/bin/sdm") {
         $sdm = "./sdm-disk/sdm/bin/sdm";
