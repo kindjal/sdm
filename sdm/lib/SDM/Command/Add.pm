@@ -53,9 +53,9 @@ sub execute {
     my $target_class = $self->_target_class;
     my $id = pop @{ [ grep { $_->is_id } $target_class->__meta__->property_metas ] };
     if ($id) {
-        my $res = $target_class->get( $id->attribute_name => $attrs{$id->attribute_name} );
+        my $res = $target_class->get( $id->property_name => $attrs{$id->property_name} );
         if ($res) {
-            $self->error_message("'$target_class' object already exists with this id: " . $attrs{$id->attribute_name} );
+            $self->error_message("'$target_class' object already exists with this id: " . $attrs{$id->property_name} );
             return;
         }
     }
