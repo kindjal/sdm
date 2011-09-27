@@ -9,6 +9,9 @@ use SDM;
 class SDM::Disk::Fileset {
     table_name => 'disk_fileset',
     is => 'SDM::Disk::Volume',
+    id_by => [
+        name            => { is => 'Text' }
+    ],
     has => [
         type            => { is => 'Text', default_value => 'FILESET' },
         kb_size         => { is => 'Number' },

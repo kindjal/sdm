@@ -189,7 +189,7 @@ sub create {
 
     my @missing;
     foreach my $attr ( $self->__meta__->properties ) {
-        next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or $attr->default_value);
+        next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or defined $attr->default_value);
         push @missing, $attr->property_name unless (exists $param{$attr->property_name});
     }
     if (@missing) {
