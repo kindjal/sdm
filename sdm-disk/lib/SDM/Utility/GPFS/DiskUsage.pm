@@ -154,7 +154,9 @@ sub parse_disk_groups {
     my @lines = split("\n",$content);
     foreach my $line (@lines) {
         # /vol/gc4020/DISK_INFO_ALIGNMENTS
-        my ($empty,$toss,$vol,$group) = split(/\//,$line);
+        # /vol/aggr0/gc7000/DISK_INFO_ALIGNMENTS
+        my @parts = split(/\//,$line);
+        my ($vol,$group) = @parts[-2,-1];
         next unless ($volumeref->{$vol});
         $group  =~ s/^DISK_//;
         $volumeref->{$vol}->{'disk_group'} = $group;
@@ -193,11 +195,10 @@ sub acquire_volume_data {
     my $volumes = $self->parse_mmlsnsd( $self->ssh_cmd( "mmlsnsd" ) );
     # get usage info from df -P
     $self->parse_nsd_df( $self->ssh_cmd( "df -P" ), $volumes );
-    # get disk groups via touch files
-    $self->parse_disk_groups( $self->ssh_cmd( "/usr/bin/find /vol -mindepth 2 -maxdepth 2 -type f -name \"DISK_*\" 2>/dev/null" ), $volumes );
-
-    # mmrepquota get filesets
+    # mmrepquota get filesets, where are also volumes
     $self->parse_mmrepquota( $self->ssh_cmd( "mmrepquota" ), $volumes );
+    # get disk groups via touch files for each volume
+    $self->parse_disk_groups( $self->ssh_cmd( "/usr/bin/find /vol -mindepth 2 -maxdepth 3 -type f -name \"DISK_*\" 2>/dev/null" ), $volumes );
 
     return $volumes;
 }
