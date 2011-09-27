@@ -130,13 +130,15 @@ sub update_volumes {
     my $volumedata = shift;
     # volumedata is a hash that looks like this:
     # volumedata: {
-    #     '/vol/aggr0' => {
+    #     'aggr0' => {
     #                       'disk_group' => undef,
     #                       'total_kb' => '11603570688',
     #                       'mount_path' => '/gscmnt/aggr0',
     #                       'name' => 'aggr0',
     #                       'used_kb' => 93415936,
     #                       'physical_path' => '/vol/aggr0'
+    #                       'filesets' => [ ... ],
+    #                       '...LUN...' => [ ... ],
     #                     }
     #   }
     my $filername = shift;
@@ -170,15 +172,9 @@ sub update_volumes {
         return 1 if ($self->cleanonly);
     }
 
-    foreach my $physical_path (keys %$volumedata) {
+    foreach my $name (keys %$volumedata) {
 
-        next if ($physical_path eq '/');
-
-        my $name = $volumedata->{$physical_path}->{name};
-        if (! defined $name or $name eq '') {
-            $self->logger->error(__PACKAGE__ . " skipping volume with incomplete parameters: $physical_path");
-            next;
-        }
+        my $physical_path = $volumedata->{$name}->{physical_path};
 
         my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
         unless ($volume) {
@@ -187,14 +183,30 @@ sub update_volumes {
         }
         $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
 
+        foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
+            my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
+            my %params;
+            @params{@keys} = @$fileset;
+            $params{parent_volume_name} = $name;
+            $params{filername} = $filername;
+            $params{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $name;
+
+            my $fs = SDM::Disk::Fileset->get_or_create( %params );
+            unless ($fs) {
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: $name");
+                next;
+            }
+            $self->logger->debug(__PACKAGE__ . " found fileset: $name");
+        }
+
         # Ensure we have the Group before we update this attribute of a Volume
-        my $group_name = $volumedata->{$physical_path}->{disk_group};
+        my $group_name = $volumedata->{$name}->{disk_group};
         if ($group_name) {
             my $group;
             if ($self->discover_groups) {
-                $group = SDM::Disk::Group->get_or_create( name => $volumedata->{$physical_path}->{disk_group} );
+                $group = SDM::Disk::Group->get_or_create( name => $volumedata->{$name}->{disk_group} );
             } else {
-                $group = SDM::Disk::Group->get( name => $volumedata->{$physical_path}->{disk_group} );
+                $group = SDM::Disk::Group->get( name => $volumedata->{$name}->{disk_group} );
             }
             unless ($group) {
                 $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
@@ -209,13 +221,15 @@ sub update_volumes {
             next;
         }
 
-        foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
-            next unless (defined $volumedata->{$physical_path}->{$attr});
+        # FIXME: do same with filesets? or do this like filesets above?
+        foreach my $attr (keys %{ $volumedata->{$name} }) {
+            next unless (defined $volumedata->{$name}->{$attr});
             # FIXME: Don't update disk group from filesystem, only the reverse.
             #next if ($attr eq 'disk_group');
             my $p = $volume->__meta__->property($attr);
+            next unless ($p);
             # Primary keys are immutable, don't try to update them
-            $volume->$attr($volumedata->{$physical_path}->{$attr})
+            $volume->$attr($volumedata->{$name}->{$attr})
                 if (! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
@@ -279,7 +293,7 @@ sub query_gpfs {
         push @params, ( discover_volumes => $self->discover_volumes );
         push @params, ( mount_point => $self->mount_point );
 
-        my $gpfs = SDM::GPFS::DiskUsage->create( @params );
+        my $gpfs = SDM::Utility::GPFS::DiskUsage->create( @params );
         unless ($gpfs) {
             $self->logger->error(__PACKAGE__ . " unable to query on filer " . $filer->name);
             return;
