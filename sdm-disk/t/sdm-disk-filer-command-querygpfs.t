@@ -94,4 +94,7 @@ UR::Context->commit();
 my $v = SDM::Disk::Volume->get( name => "gc7001" );
 ok( $v->name eq 'gc7001', "volume is fileset" );
 
+my $rrd = SDM::Utility::DiskGroupRRD->create( loglevel => 'DEBUG' );
+$rrd->run();
+
 done_testing();
