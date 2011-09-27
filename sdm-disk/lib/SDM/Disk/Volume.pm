@@ -94,7 +94,7 @@ class SDM::Disk::Volume {
         gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
     ],
     has_many_optional => [
-        filesets => {
+        fileset => {
             is => 'SDM::Disk::Fileset',
             reverse_as => 'volume'
         }

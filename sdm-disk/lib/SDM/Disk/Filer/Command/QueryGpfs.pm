@@ -184,19 +184,20 @@ sub update_volumes {
         $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
 
         foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
+
             my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
             my %params;
             @params{@keys} = @$fileset;
             $params{parent_volume_name} = $name;
             $params{filername} = $filername;
-            $params{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $name;
+            $params{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $params{name};
 
             my $fs = SDM::Disk::Fileset->get_or_create( %params );
             unless ($fs) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: $name");
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $params{name});
                 next;
             }
-            $self->logger->debug(__PACKAGE__ . " found fileset: $name");
+            $self->logger->debug(__PACKAGE__ . " found fileset: " . $params{name});
         }
 
         # Ensure we have the Group before we update this attribute of a Volume
