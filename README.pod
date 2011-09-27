@@ -15,8 +15,24 @@ git clone ssh://git/srv/git/SDM.git
 
 =head2 Use it
 
-CLI users must be in the "systems" unix user group on a host with /usr/bin/sdm.
+CLI users must be in the "systems" unix user group on a host with /usr/bin/sdm.  Use the --help option to explore possibilities.
+
+ /usr/bin/sdm --help
 
 The web interface runs on http://sysmgr/.
+
+=head2 How is it useful?
+
+We use the UR object-relation mapper (ORM) to build classes representing data stored in severeal disparate databases (eg. storage, jira, rt, zenoss, etc.)  Often, these data are related in ways that users know, but systems do not.  SDM attempts to provide a software interface for leveraging these relationships.  For example, we store information about storage infrastructure (disks, volumes arrays, etc.) in one database.  Outages and events related to this infrastructure is stored elsewhere, in Zenoss.  Tickets related to human efforts are stored in RT and Jira.  By performing cross data source joins, we can relate objects across these data sources and ask questions like, "Show me all storage arrays with Zenoss outages in the last week." or "Show me all Platform LSF jobs writing data to some disk volume."
+
+One goal is to be able to answer questions from within one system, rather than having to shell into numerous systems and run numerous commands to gather the data required to answer such questions.
+
+Also, the web interface provides a mechanism to build custom views of objects on the fly, via the REST interface.
+
+=head2 Author
+
+Matt Callaway <mcallaway@genome.wustl.edu>
+
+
 
 =cut
