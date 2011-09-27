@@ -1,0 +1,22 @@
+
+=pod
+
+=head2 System Data Miner (SDM)
+
+System Data Miner (SDM) is software that represents TGI systems infrastructure.
+
+The idea is to leverage UR's (http://www.urobject.org/) ability to perform cross datasource joins to build relationships between objects stored in different systems. We have classes that represent storage infrastructure, we hook into Zenoss, Platform RTM, Jira, and other data sources.
+
+The goal is to be able to get useful information easily by leveraging these relationships. Instead of manually hunting around for this bit of info or that bit of info to answer your question, the hope is that you'll be able to query SDM in a clear way to get the info you need.
+
+=head2 Get the code
+
+git clone ssh://git/srv/git/SDM.git
+
+=head2 Use it
+
+CLI users must be in the "systems" unix user group on a host with /usr/bin/sdm.
+
+The web interface runs on http://sysmgr/.
+
+=cut
