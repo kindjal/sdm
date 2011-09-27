@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS disk_array_disk_set;
 DROP TABLE IF EXISTS disk_host_array;
 DROP TABLE IF EXISTS disk_array;
 DROP TABLE IF EXISTS disk_host;
+DROP TABLE IF EXISTS disk_fileset;
 DROP TABLE IF EXISTS disk_volume;
 DROP TABLE IF EXISTS disk_filer_host;
 DROP TABLE IF EXISTS disk_filer;
@@ -68,6 +69,35 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   disk_group    VARCHAR(255),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_fileset (
+  name          VARCHAR(255) PRIMARY KEY,
+  mount_point   VARCHAR(255) NOT NULL,
+  filername     VARCHAR(255) NOT NULL,
+  physical_path VARCHAR(255) NOT NULL,
+  total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  type          VARCHAR(255) NOT NULL,
+  kb_size       UNSIGNED INTEGER NOT NULL,
+  kb_quota      UNSIGNED INTEGER NOT NULL,
+  kb_limit      UNSIGNED INTEGER NOT NULL,
+  kb_in_doubt   UNSIGNED INTEGER NOT NULL,
+  kb_grace      UNSIGNED INTEGER NOT NULL,
+  files         UNSIGNED INTEGER NOT NULL,
+  file_quota    UNSIGNED INTEGER NOT NULL,
+  file_limit    UNSIGNED INTEGER NOT NULL,
+  file_in_doubt UNSIGNED INTEGER NOT NULL,
+  file_grace    UNSIGNED INTEGER NOT NULL,
+  file_entryType VARCHAR(1) NOT NULL,
+  parent_volume_name VARCHAR(255) NOT NULL,
+  CONSTRAINT disk_fileset_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_fileset_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_name) REFERENCES disk_volume (name) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (
   name          VARCHAR(255) PRIMARY KEY,
