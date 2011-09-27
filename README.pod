@@ -38,6 +38,16 @@ Note that we hook into the Genome UR namespace in some places too, so I add this
 
  alias sdm="/usr/bin/perl $( for DIR in $SN/sdm*/lib; do echo -n  "-I $DIR "; done ) -I $HOME/git/genome/lib/perl $SN/sdm/bin/sdm"
 
+=head3 Running unit tests
+
+Here's a slightly different alias "sd" that sets up @INC but doesn't call ./bin/sdm:
+
+ alias sd="/usr/bin/perl $( for DIR in $SN/sdm*/lib; do echo -n  "-I $DIR "; done ) -I $HOME/git/genome/lib/perl"
+
+With this you can run unit tests:
+
+ sd sdm-disk/t/01-sdm-disk-command-line-interface.t 2>&1 | tee log
+
 =head2 Author
 
 Matt Callaway <mcallaway@genome.wustl.edu>
