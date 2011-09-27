@@ -10,7 +10,7 @@ use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
 class SDM::Utility::SNMP {
-    is => "SDM::Utility",
+    is => "SDM::Command::Base",
     has => [
         community   => { is => 'Text', default => "gscpublic" },
         version     => { is => 'Text', default => "2c" },
