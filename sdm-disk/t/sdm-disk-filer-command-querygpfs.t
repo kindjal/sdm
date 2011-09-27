@@ -49,8 +49,16 @@ ok( $h->master == 1, "master host found" );
 
 my $vol = $c->parse_mmlsnsd( fileslurp( "$top/t/mmlsnsd.txt" ) );
 $c->parse_nsd_df( fileslurp( "$top/t/df.txt" ), $vol );
+
+$c->parse_mmrepquota( fileslurp( "$top/t/mmrepquota.txt" ), $vol );
+my $expected = [
+  ['gc7000','FILESET','62210072304','0','214748364800','27967088','none','214324','0','0','138','none','e' ],
+  ['gc7001','FILESET','93793940608','0','214748364800','3597672','none','4376582','0','0','574','none','e' ],
+];
+ok( is_deeply( $vol->{'aggr0'}->{'filesets'}, $expected, "ok: is_deeply"), "ok: mmreqpquota parses");
+
 $c->parse_disk_groups( fileslurp( "$top/t/disk_groups.txt" ), $vol );
-my $expected = {
+$expected = {
     'ams2k4lun00b4' => [
         'linuscs105.gsc.wustl.edu',
         'linuscs106.gsc.wustl.edu',
@@ -76,13 +84,6 @@ my $expected = {
         ]
 };
 ok( is_deeply( $vol->{'gc4013'}, $expected, "ok: is_deeply"), "ok: mmlsnsd parses");
-
-$c->parse_mmrepquota( fileslurp( "$top/t/mmrepquota.txt" ), $vol );
-$expected = [
-  ['gc7000','FILESET','62210072304','0','214748364800','27967088','none','214324','0','0','138','none','e' ],
-  ['gc7001','FILESET','93793940608','0','214748364800','3597672','none','4376582','0','0','574','none','e' ],
-];
-ok( is_deeply( $vol->{'aggr0'}->{'filesets'}, $expected, "ok: is_deeply"), "ok: mmreqpquota parses");
 
 @params = ( loglevel => 'DEBUG', filername => "gpfs", discover_groups => 1 );
 
