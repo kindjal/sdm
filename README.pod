@@ -9,10 +9,6 @@ The idea is to leverage UR's (http://www.urobject.org/) ability to perform cross
 
 The goal is to be able to get useful information easily by leveraging these relationships. Instead of manually hunting around for this bit of info or that bit of info to answer your question, the hope is that you'll be able to query SDM in a clear way to get the info you need.
 
-=head2 Get the code
-
-git clone ssh://git/srv/git/SDM.git
-
 =head2 Use it
 
 CLI users must be in the "systems" unix user group on a host with /usr/bin/sdm.  Use the --help option to explore possibilities.
@@ -28,6 +24,19 @@ We use the UR object-relation mapper (ORM) to build classes representing data st
 One goal is to be able to answer questions from within one system, rather than having to shell into numerous systems and run numerous commands to gather the data required to answer such questions.
 
 Also, the web interface provides a mechanism to build custom views of objects on the fly, via the REST interface.
+
+=head2 Get the code
+
+git clone ssh://git/srv/git/SDM.git
+
+The code is separated into sub units that can each be built into .deb packages, eg. sdm-disk, sdm-jira, sdm-rtm, etc.  Each depends upon the toplevel ./sdm namespace definition area.  Code may be executed from the checkout and applied to SQLite databases.  Some of the units expect a separate instance of a running database, eg. Jira, RT, Zenoss.  But specifically the sdm-disk unit can be run entirely within SQLite local to the checkout.  I use a bash shell alias like this:
+
+ SN=/home/archive/SDM
+ alias sdm="/usr/bin/perl $( for DIR in $SN/sdm*/lib; do echo -n  "-I $DIR "; done ) $SN/sdm/bin/sdm"
+
+Note that we hook into the Genome UR namespace in some places too, so I add this:
+
+ alias sdm="/usr/bin/perl $( for DIR in $SN/sdm*/lib; do echo -n  "-I $DIR "; done ) -I $HOME/git/genome/lib/perl $SN/sdm/bin/sdm"
 
 =head2 Author
 
