@@ -10,7 +10,7 @@ use Data::Dumper;
 $Data::Dumper::Terse = 1;
 
 class SDM::Utility::SNMP::DiskUsage {
-    is => 'SDM::Command::Base',
+    is => 'SDM::Utility::SNMP',
     has => [
         allow_mount => {
             is => 'Boolean',
