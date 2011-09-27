@@ -10,7 +10,7 @@ BEGIN {
 my $build = Module::Build->new(
   module_name => 'SDM',
   license => 'lgpl',
-  dist_version => '0.15',
+  dist_version => '0.16',
   dist_abstract => 'SDM Metrics',
   build_requires => {
     'Module::Build' => '',

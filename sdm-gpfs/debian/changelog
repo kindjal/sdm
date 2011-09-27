@@ -1,3 +1,9 @@
+ur-sdm-gpfs (0.16-1) unstable; urgency=low
+
+  * Add GPFS fileset support and QueryGpfs command to sdm-disk.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Tue, 27 Sep 2011 11:28:29 -0500
+
 ur-sdm-gpfs (0.15-1) unstable; urgency=low
 
   * Add array iops tool.
