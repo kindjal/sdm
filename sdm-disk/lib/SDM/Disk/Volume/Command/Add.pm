@@ -16,8 +16,8 @@ class SDM::Disk::Volume::Command::Add {
     ],
     has_optional => [
         mount_point   => { is => 'Text' },
-        total_kb      => { is => 'Number', default => 0 },
-        used_kb       => { is => 'Number', default => 0 },
+        total_kb      => { is => 'Number' },
+        used_kb       => { is => 'Number' },
         disk_group    => { is => 'Text' },
     ],
 };
@@ -27,13 +27,13 @@ sub execute {
 
     my $param = {
         name          => $self->name,
-        mount_point   => $self->mount_point,
         filername     => $self->filername,
         physical_path => $self->physical_path,
-        total_kb      => $self->total_kb,
-        used_kb       => $self->used_kb,
     };
+    $param->{mount_point} = $self->mount_point if (defined $self->mount_point);
     $param->{disk_group} = $self->disk_group if (defined $self->disk_group);
+    $param->{total_kb} = $self->total_kb if (defined $self->total_kb);
+    $param->{used_kb} = $self->total_kb if (defined $self->used_kb);
 
     return SDM::Disk::Volume->create( %$param );
 }
