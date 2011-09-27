@@ -278,7 +278,6 @@ sub _query_snmp {
         my $table = $snmp->acquire_volume_data();
         # Volume data must be updated before GPFS data is updated below.
         $self->update_volumes( $table, $filer->name );
-        warn "table: " . Data::Dumper::Dumper $table;
 
         $snmp->delete();
         $filer->status(1);
