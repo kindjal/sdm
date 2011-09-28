@@ -74,9 +74,41 @@ my $expected = {
 ok( is_deeply( $vol->{'gc4013'}, $expected, "ok: is_deeply"), "ok: mmlsnsd parses");
 
 $c->parse_mmrepquota( fileslurp( "$top/t/mmrepquota.txt" ), $vol );
+my %fs1 = (
+        name => 'gc7000',
+        type => 'FILESET',
+        kb_size => '62210072304',
+        kb_quota => '0',
+        kb_limit => '214748364800',
+        kb_in_doubt => '27967088',
+        kb_grace => 'none',
+        files => '214324',
+        file_quota => '0',
+        file_limit => '0',
+        file_in_doubt => '138',
+        file_grace => 'none',
+        file_entryType => 'e',
+        parent_volume_name => 'aggr0'
+);
+my %fs2 = (
+        name => 'gc7001',
+        type => 'FILESET',
+        kb_size => '93793940608',
+        kb_quota => '0',
+        kb_limit => '214748364800',
+        kb_in_doubt => '3597672',
+        kb_grace => 'none',
+        files => '4376582',
+        file_quota => '0',
+        file_limit => '0',
+        file_in_doubt => '574',
+        file_grace => 'none',
+        file_entryType => 'e',
+        parent_volume_name => 'aggr0'
+);
 $expected = [
-  ['gc7000','FILESET','62210072304','0','214748364800','27967088','none','214324','0','0','138','none','e' ],
-  ['gc7001','FILESET','93793940608','0','214748364800','3597672','none','4376582','0','0','574','none','e' ],
+  \%fs1,
+  \%fs2,
 ];
 ok( is_deeply( $vol->{'aggr0'}->{'filesets'}, $expected, "ok: is_deeply"), "ok: mmreqpquota parses");
 

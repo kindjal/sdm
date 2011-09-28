@@ -156,10 +156,19 @@ sub parse_disk_groups {
         # /vol/gc4020/DISK_INFO_ALIGNMENTS
         # /vol/aggr0/gc7000/DISK_INFO_ALIGNMENTS
         my @parts = split(/\//,$line);
-        my ($vol,$group) = @parts[-2,-1];
-        next unless ($volumeref->{$vol});
+        my ($volume,$group) = @parts[-2,-1];
         $group  =~ s/^DISK_//;
-        $volumeref->{$vol}->{'disk_group'} = $group;
+        if ($volumeref->{$volume}) {
+            $volumeref->{$volume}->{'disk_group'} = $group;
+            next;
+        }
+        foreach my $key (keys %$volumeref) {
+            if ($volumeref->{$key}->{'filesets'}) {
+                foreach my $fileset (@{ $volumeref->{$key}->{'filesets'} }) {
+                    $fileset->{'disk_group'} = $group if ($fileset->{'name'} eq $volume);
+                }
+            }
+        }
     }
 }
 
@@ -178,8 +187,15 @@ sub parse_mmrepquota {
         $line =~ s/\|//g;
         $line =~ s/\s+$//g;
         next unless ($volumeref->{$parentVolume});
+
+        my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
+        my @values = split(/\s+/,$line,13);
+        my %params;
+        @params{@keys} = @values;
+        $params{parent_volume_name} = $parentVolume;
+
         $volumeref->{$parentVolume}->{'filesets'} = [] unless ($volumeref->{$parentVolume}->{'filesets'});
-        push @{ $volumeref->{$parentVolume}->{'filesets'} }, [ split(/\s+/,$line,13) ];
+        push @{ $volumeref->{$parentVolume}->{'filesets'} }, \%params;
     }
 }
 
@@ -187,10 +203,8 @@ sub acquire_volume_data {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
 
-
     # mmlscluster get cluster members
     $self->parse_mmlscluster( $self->ssh_cmd( "mmlscluster" ) );
-
     # mmlsnsd get volumes
     my $volumes = $self->parse_mmlsnsd( $self->ssh_cmd( "mmlsnsd" ) );
     # get usage info from df -P

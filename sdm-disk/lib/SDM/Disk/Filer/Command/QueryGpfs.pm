@@ -183,21 +183,30 @@ sub update_volumes {
         }
         $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
 
+        # Create filesets if present
         foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
 
-            my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
-            my %params;
-            @params{@keys} = @$fileset;
-            $params{parent_volume_name} = $name;
-            $params{filername} = $filername;
-            $params{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $params{name};
+            $fileset->{parent_volume_name} = $name;
+            $fileset->{filername} = $filername;
+            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
 
-            my $fs = SDM::Disk::Fileset->get_or_create( %params );
+            my $fs = SDM::Disk::Fileset->get_or_create( %$fileset );
             unless ($fs) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $params{name});
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
                 next;
             }
-            $self->logger->debug(__PACKAGE__ . " found fileset: " . $params{name});
+            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name});
+            foreach my $attr (keys %{ $volumedata->{$name} }) {
+                next unless (defined $volumedata->{$name}->{$attr});
+                # FIXME: Don't update disk group from filesystem, only the reverse.
+                #next if ($attr eq 'disk_group');
+                my $p = $fs->__meta__->property($attr);
+                next unless ($p);
+                # Primary keys are immutable, don't try to update them
+                $fs->$attr($volumedata->{$name}->{$attr})
+                    if (! $p->is_id and $p->is_mutable);
+                $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+            }
         }
 
         # Ensure we have the Group before we update this attribute of a Volume
@@ -222,7 +231,6 @@ sub update_volumes {
             next;
         }
 
-        # FIXME: do same with filesets? or do this like filesets above?
         foreach my $attr (keys %{ $volumedata->{$name} }) {
             next unless (defined $volumedata->{$name}->{$attr});
             # FIXME: Don't update disk group from filesystem, only the reverse.
