@@ -6,8 +6,8 @@ use warnings;
 use feature 'switch';
 
 use SDM;
+use Net::SSH;
 use Data::Dumper;
-$Data::Dumper::Terse = 1;
 
 =head2 SDM::GPFS::DiskUsage
 Class that gathers volume data from GPFS filer.
@@ -58,11 +58,25 @@ sub _ssh_cmd {
     my $self = shift;
     my $cmd = shift;
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: $cmd: $!");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or die "error: $cmd: $!";
     close(WRITER);
+    my $error = do { local $/; <ERROR> };
     close(ERROR);
     my $content = do { local $/; <READER> };
     close(READER);
+    given ($error) {
+        when (defined $error and $error =~ /Permission denied/) {
+            chomp $error;
+            $self->logger->error(__PACKAGE__ . " " . $self->hostname . ": " . $error);
+            $self->logger->error(__PACKAGE__ . " please set up ssh keys");
+            exit 1;
+        }
+        when (defined $error and $error ne '') {
+            chomp $error;
+            $self->logger->error(__PACKAGE__ . " " . $self->hostname . ": " . $error);
+            exit 1;
+        }
+    }
     return $content;
 }
 
@@ -225,13 +239,13 @@ sub acquire_volume_data {
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
 
     # mmlscluster get cluster members
-    $self->_parse_mmlscluster( $self->_ssh_cmd( "mmlscluster" ) );
+    $self->_parse_mmlscluster( $self->_ssh_cmd( "/usr/lpp/mmfs/bin/mmlscluster" ) );
     # mmlsnsd get volumes
-    my $volumes = $self->_parse_mmlsnsd( $self->_ssh_cmd( "mmlsnsd" ) );
+    my $volumes = $self->_parse_mmlsnsd( $self->_ssh_cmd( "/usr/lpp/mmfs/bin/mmlsnsd" ) );
     # get usage info from df -P
-    $self->_parse_nsd_df( $self->_ssh_cmd( "df -P" ), $volumes );
+    $self->_parse_nsd_df( $self->_ssh_cmd( "/bin/df -P" ), $volumes );
     # mmrepquota get filesets, where are also volumes
-    $self->_parse_mmrepquota( $self->_ssh_cmd( "mmrepquota" ), $volumes );
+    $self->_parse_mmrepquota( $self->_ssh_cmd( "/usr/lpp/mmfs/bin/mmrepquota -ja" ), $volumes );
     # get disk groups via touch files for each volume
     $self->_parse_disk_groups( $self->_ssh_cmd( "/usr/bin/find /vol -mindepth 2 -maxdepth 3 -type f -name \"DISK_*\" 2>/dev/null" ), $volumes );
 
@@ -245,15 +259,9 @@ use warnings;
 
 use SDM;
 
-# Checking currentness in host_is_current()
-use Date::Manip;
-use Date::Manip::Date;
-
 # Usage function
 use Pod::Find qw(pod_where);
 use Pod::Usage;
-
-use File::Basename qw(basename);
 
 # Autoflush
 local $| = 1;
@@ -261,6 +269,17 @@ local $| = 1;
 class SDM::Disk::Filer::Command::QueryGpfs {
     is => 'SDM::Command::Base',
     has_optional => [
+        filername => {
+            # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
+            # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
+            #is => 'SDM::Disk::Filer',
+            is => 'Text',
+            doc => 'Query the named filer',
+        },
+        hostname => {
+            is => 'Text',
+            doc => 'Query the named host to discover and query the filer given by --filername'
+        },
         force => {
             is => 'Boolean',
             default => 0,
@@ -321,26 +340,6 @@ class SDM::Disk::Filer::Command::QueryGpfs {
             default => 0,
             doc => 'Create volumes based on what we discover, otherwise only update volumes already defined',
         },
-        is_current => {
-            is => 'Boolean',
-            default => 0,
-            doc => 'Check currency status',
-        },
-        filername => {
-            # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
-            # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
-            #is => 'SDM::Disk::Filer',
-            is => 'Text',
-            doc => 'Query the named filer',
-        },
-        physical_path => {
-            is => 'Text',
-            doc => 'Query the named filer for this export',
-        },
-        query_paths => {
-            is => 'Boolean',
-            doc => 'Query the named filer for exports, but not usage',
-        },
     ],
     doc => 'Queries volume usage of GPFS filer',
 };
@@ -392,30 +391,32 @@ sub _update_volumes {
     }
 
     $self->logger->warn(__PACKAGE__ . " update_volumes($filername)");
-    unless ($self->physical_path) {
-        # QueryGpfs First find and remove volumes in the DB that are not detected on this filer
-        # For this filer, find any stored volumes that aren't present in the volumedata.
-        # Note that we skip this step if we specified a single physical_path to update.
-        foreach my $volume ( SDM::Disk::Volume->get( filername => $filername ) ) {
-            foreach my $path ($volume->physical_path) {
-                next unless($path);
-                $path =~ s/\//\\\//g;
-                if ( ! grep /$path/, keys %$volumedata ) {
-                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
-                    # FIXME: do we want to auto-remove like this?
-                    #$volume->delete;
-                }
+
+    # First find and remove volumes in the DB that are not detected on this filer
+    # For this filer, find any stored volumes that aren't present in the volumedata.
+    # Note that we skip this step if we specified a single physical_path to update.
+    my @volumes = ( SDM::Disk::Volume->get( filername => $filername ) );
+    # FIXME: Don't warn if no volumes are found yet...
+    foreach my $volume ( @volumes ) {
+        foreach my $path ($volume->physical_path) {
+            next unless($path);
+            $path =~ s/\//\\\//g;
+            if ( ! grep /$path/, keys %$volumedata ) {
+                $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
+                # FIXME: do we want to auto-remove like this?
+                #$volume->delete;
             }
         }
-        return 1 if ($self->cleanonly);
     }
+    return 1 if ($self->cleanonly);
 
     foreach my $name (keys %$volumedata) {
 
         # Ensure we have Groups before we update this attribute of a Volume or Fileset
         my @groups;
-        @groups = map { $_->{disk_group} } @{ $volumedata->{$name}->{filesets} } if ($volumedata->{$name}->{filesets});
+        @groups = map { $_->{disk_group} if ($_->{disk_group}) } @{ $volumedata->{$name}->{filesets} } if ($volumedata->{$name}->{filesets});
         push @groups, $volumedata->{$name}->{disk_group} if ($volumedata->{$name}->{disk_group});
+        @groups = grep { defined $_ } @groups;
         foreach my $group_name (@groups) {
             my $group;
             if ($self->discover_groups) {
@@ -504,26 +505,22 @@ sub _purge_volumes {
 }
 
 =head2 query_gpfs
-The SSH bits of execute()
+Query the master host of a filer and update volume data.
 =cut
 sub _query_gpfs {
     my $self = shift;
-    my $filer = shift;
+    my (%params) = @_;
+    my $filername = $params{filername};
+    my $hostname = $params{hostname};
 
-    # Just check if Filer is_current
-    $self->logger->warn(__PACKAGE__ . " running query on filer " . $filer->name);
-    if ($self->is_current) {
-        if ($filer->is_current($self->host_maxage)) {
-            $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is current");
-        } else {
-            $self->logger->warn(__PACKAGE__ . " filer " . $filer->name . " is NOT current, last check: " . $filer->last_modified);
-        }
-        next;
+    unless ($hostname) {
+        $self->logger->error(__PACKAGE__ . " filer has no known master host, define one or use --hostname");
+        return;
     }
 
-    # Update Filer data that are not current
+    # Query the master node hostname and update Filer data.
     eval {
-        my @params = ( loglevel => $self->loglevel, hostname => $filer->name );
+        my @params = ( loglevel => $self->loglevel, hostname => $hostname );
         push @params, ( allow_mount => $self->allow_mount ) if ($self->discover_groups);
         push @params, ( translate_path => $self->translate_path );
         push @params, ( discover_volumes => $self->discover_volumes );
@@ -531,25 +528,26 @@ sub _query_gpfs {
 
         my $gpfs = SDM::GPFS::DiskUsage->create( @params );
         unless ($gpfs) {
-            $self->logger->error(__PACKAGE__ . " unable to query on filer " . $filer->name);
+            $self->logger->error(__PACKAGE__ . " unable to query filer host '$hostname'");
             return;
         }
 
         # Query disk usage numbers
         my $table = $gpfs->acquire_volume_data();
-        # Volume data must be updated before GPFS data is updated below.
-        $self->_update_volumes( $table, $filer->name );
+        unless ($table) {
+            $self->logger->error(__PACKAGE__ . " filer host $hostname returned no data");
+            return;
+        }
 
+        # Volume data must be updated before GPFS data is updated below.
+        $self->_update_volumes( $table, $filername );
         $gpfs->delete();
-        $filer->status(1);
-        $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
     };
     if ($@) {
         # log here, but not high priority, it's common
         $self->logger->warn(__PACKAGE__ . " error with query: $@");
-        $filer->status(0);
     }
-
+    return 1;
 }
 
 =head2 execute
@@ -559,36 +557,63 @@ sub execute {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " execute");
 
+    # What filer to query and via what host?
     my @filers;
-    if (defined $self->filername) {
-        # FIXME: should this be a get(), do we want to allow transparently adding Filers?
-        #@filers = SDM::Disk::Filer->get_or_create( name => $self->filername );
-        @filers = SDM::Disk::Filer->get( name => $self->filername );
-    } else {
+    if ($self->hostname and ! defined $self->filername) {
+        $self->logger->error(__PACKAGE__ . " you also need to specify --filername with --hostname");
+        return;
+    }
+
+    if ($self->filername) {
+        # See if filer is present and has master host defined...
+        my $filer = SDM::Disk::Filer->get_or_create( name => $self->filername, type => 'gpfs' );
+        unless ($filer) {
+            $self->logger->error(__PACKAGE__ . " failed to get or create '" . $self->filername . "'");
+            return;
+        }
+        push @filers, $filer;
+        if (defined $self->hostname) {
+            my $host = SDM::Disk::Host->get_or_create( hostname => $self->hostname );
+            unless ($host) {
+                $self->logger->error(__PACKAGE__ . " failed to get or create host '" . $self->hostname . "'");
+                return;
+            }
+            $host->assign( $filer->name );
+            $host->master( 1 );
+        }
+    }
+
+    # If not given on the CLI, ask the DB about filers we know about.
+    unless (@filers) {
         if ($self->force) {
             # If "force", get all Filers and query them even if status is 0.
-            @filers = SDM::Disk::Filer->get();
+            @filers = SDM::Disk::Filer->get( type => 'gpfs' );
         } else {
             # Query all filers that have status => 1...
             # This is what we use for a cron job.
-            @filers = SDM::Disk::Filer->get( status => 1 );
+            @filers = SDM::Disk::Filer->get( type => 'gpfs', status => 1 );
         }
     }
 
-    # Allow the ability to update a single physical_path on a filer.
-    if (defined $self->physical_path) {
-        unless ($self->filername) {
-            $self->logger->error(__PACKAGE__ . " specify a filer to query for physical_path: " . $self->physical_path);
-            return;
-        }
+    unless (@filers) {
+        $self->logger->warn(__PACKAGE__ . " no filers to be scanned. Add filers if there are none, or use --hostname to query a GPFS master.");
     }
 
-    unless (scalar @filers) {
-        $self->logger->warn(__PACKAGE__ . " no filers to be scanned. Add filers if there are none, or use --force to scan all filers.");
-    }
-
+    # Otherwise, query existing filers for update
     foreach my $filer (@filers) {
-        $self->_query_gpfs($filer);
+        my $hostname;
+        foreach my $host ($filer->host) {
+            $hostname = $host->hostname if ($host->master);
+        }
+        my $filername = $filer->name;
+        unless ($hostname) {
+            $self->logger->error(__PACKAGE__ . " filer '$filername' has no master host associated with it.");
+            next;
+        }
+        if ( $self->_query_gpfs(filername => $filername, hostname => $hostname ) ) {
+            $filer->status(1);
+            $filer->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
     }
 
     UR::Context->commit();
