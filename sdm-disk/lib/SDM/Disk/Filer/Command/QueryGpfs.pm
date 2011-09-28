@@ -1,4 +1,243 @@
 
+package SDM::GPFS::DiskUsage;
+
+use strict;
+use warnings;
+use feature 'switch';
+
+use SDM;
+use Data::Dumper;
+$Data::Dumper::Terse = 1;
+
+=head2 SDM::GPFS::DiskUsage
+Class that gathers volume data from GPFS filer.
+=cut
+class SDM::GPFS::DiskUsage {
+    is => 'SDM::Command::Base',
+    has => [
+        hostname => {
+            is => 'Text',
+            default_value => undef,
+            doc => 'Hostname of GPFS cluster master',
+        },
+        allow_mount => {
+            is => 'Boolean',
+            default_value => 0,
+            doc => 'Allow automounter to mount volumes to find disk groups'
+        },
+        discover_volumes => {
+            is => 'Boolean',
+            default_value => 0,
+            doc => 'Discover volumes on the target filer'
+        }
+    ],
+    has_optional => [
+        mount_point => {
+            is => 'Text',
+            default_value => '/gscmnt',
+            doc => 'Mount point used by autofs to mount target filer.  Only for discover_volumes mode.'
+        },
+        translate_path => {
+            is => 'Boolean',
+            default_value => 0,
+            doc => 'Map physical_path /vol/homeXYZ to volume name XYZ, this is an old convention',
+        }
+    ],
+    has_transient => [
+        disk_groups => {
+            default_value => {},
+            is => 'HASH',
+        }
+    ]
+};
+
+=head2 sub _ssh_cmd
+General function for getting content from an ssh command.
+=cut
+sub _ssh_cmd {
+    my $self = shift;
+    my $cmd = shift;
+    $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
+    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or $self->_exit("error: $cmd: $!");
+    close(WRITER);
+    close(ERROR);
+    my $content = do { local $/; <READER> };
+    close(READER);
+    return $content;
+}
+
+=head2 parse_mmlscluster
+Add all hosts and make one GPFS master
+=cut
+sub _parse_mmlscluster {
+    my $self = shift;
+    my $content = shift;
+    return unless ($content);
+    $self->logger->debug(__PACKAGE__ . " parse mmlscluster");
+    my @lines = split("\n",$content);
+    my $master;
+    my @hosts;
+    foreach my $line (@lines) {
+        given ($line) {
+            when (/Primary server:\s+(\S+)/) {
+                $master = $1;
+            }
+            when (/^\s+\d+\s+(\S+)/) {
+                push @hosts, $1;
+            }
+        }
+    }
+
+    sub _splithost {
+        my $host = shift;
+        if ($host =~ /\./) {
+            my $toss;
+            ($host,$toss) = split(/\./,$host,2);
+        }
+        return $host;
+    }
+
+    $master = _splithost($master);
+    @hosts = map { _splithost($_) } @hosts;
+
+    $self->logger->debug(__PACKAGE__ . " hosts: " . join(",",@hosts));
+    foreach my $host (@hosts) {
+        my $h = SDM::Disk::Host->get_or_create( hostname => $host );
+        unless ($h) {
+            $self->error_message("cannot get_or_create cluster member host $host");
+            return;
+        }
+        if ($host eq $master) {
+            $self->logger->debug(__PACKAGE__ . " master host: $host");
+            $h->master(1);
+        }
+    }
+}
+
+=head2 _parse_mmlsnsd
+Obtain a hash reference containing Volumes from GPFS's mmlsnsd command
+=cut
+sub _parse_mmlsnsd {
+    my $self = shift;
+    my $content = shift;
+    return unless ($content);
+    $self->logger->debug(__PACKAGE__ . " parse mmlsnsd");
+    my @lines = split("\n",$content);
+    my $volumes;
+    foreach my $line (@lines) {
+        next if ($line =~ /^$/ or $line =~ /^-/ or $line =~ /^ File/ or $line =~ /^\s+\(free/);
+        $line =~ s/^\s+//;
+        my ($vol,$disk,$hosts) = split(/\s+/,$line,3);
+        $volumes->{$vol} = {} unless ($volumes->{$vol});
+        $volumes->{$vol}->{$disk} = [ split(/,/,$hosts) ];
+        $volumes->{$vol}->{'physical_path'} = "/vol/" . $vol;
+        $volumes->{$vol}->{'mount_path'} = $self->mount_point . "/" . $vol;
+    }
+    return $volumes;
+}
+
+=head2 _parse_nsd_df
+Update a volume hashref with usage info from "df -P" output
+=cut
+sub _parse_nsd_df {
+    my $self = shift;
+    my $content = shift;
+    my $volumeref = shift;
+    return unless ($content);
+    $self->logger->debug(__PACKAGE__ . " parse nsd df");
+    my @lines = split("\n",$content);
+    foreach my $line (@lines) {
+        next if ($line !~ /^\//);
+        # /dev/aggr0           1092014213120 210499456768 881514756352      20% /vol/aggr0
+        my ($vol,$total,$used,$avail,$cap,$mount) = split(/\s+/,$line,6);
+        $vol =~ s/^\/dev\///;
+        next unless ($volumeref->{$vol});
+        $volumeref->{$vol}->{'total_kb'} = $total;
+        $volumeref->{$vol}->{'used_kb'} = $used;
+    }
+}
+
+=head2 _parse_disk_groups
+Update a volume hashref with disk group info from a "find" command.
+=cut
+sub _parse_disk_groups {
+    my $self = shift;
+    my $content = shift;
+    my $volumeref = shift;
+    return unless ($content);
+    $self->logger->debug(__PACKAGE__ . " parse disk groups");
+    my @lines = split("\n",$content);
+    foreach my $line (@lines) {
+        # /vol/gc4020/DISK_INFO_ALIGNMENTS
+        # /vol/aggr0/gc7000/DISK_INFO_ALIGNMENTS
+        my @parts = split(/\//,$line);
+        my ($volume,$group) = @parts[-2,-1];
+        $group  =~ s/^DISK_//;
+        if ($volumeref->{$volume}) {
+            $volumeref->{$volume}->{'disk_group'} = $group;
+            next;
+        }
+        foreach my $key (keys %$volumeref) {
+            if ($volumeref->{$key}->{'filesets'}) {
+                foreach my $fileset (@{ $volumeref->{$key}->{'filesets'} }) {
+                    $fileset->{'disk_group'} = $group if ($fileset->{'name'} eq $volume);
+                }
+            }
+        }
+    }
+}
+
+=head2 _parse_mmrepquota
+Update a volume hashref with fileset data from GPFS's mmrepquota command.
+=cut
+sub _parse_mmrepquota {
+    my $self = shift;
+    my $content = shift;
+    my $volumeref = shift;
+    return unless ($content);
+    $self->logger->debug(__PACKAGE__ . " parse mmrepquota");
+    my @lines = split("\n",$content);
+    my $filesets;
+    my $parentVolume;
+    foreach my $line (@lines) {
+        $parentVolume = $1 if ($line =~ /^\*\*\*.*quotas on (.*)/);
+        next if ($line =~ /^\W+/ or $line =~ /^Name/ or $line =~ /root/);
+        $line =~ s/\|//g;
+        $line =~ s/\s+$//g;
+        next unless ($volumeref->{$parentVolume});
+
+        my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
+        my @values = split(/\s+/,$line,13);
+        my %params;
+        @params{@keys} = @values;
+        $params{parent_volume_name} = $parentVolume;
+
+        $volumeref->{$parentVolume}->{'filesets'} = [] unless ($volumeref->{$parentVolume}->{'filesets'});
+        push @{ $volumeref->{$parentVolume}->{'filesets'} }, \%params;
+    }
+}
+
+=head2 sub acquire_volume_data
+Run a series of commands via SSH on a GPFS filer and return a hash containing volume data.
+=cut
+sub acquire_volume_data {
+    my $self = shift;
+    $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
+
+    # mmlscluster get cluster members
+    $self->_parse_mmlscluster( $self->_ssh_cmd( "mmlscluster" ) );
+    # mmlsnsd get volumes
+    my $volumes = $self->_parse_mmlsnsd( $self->_ssh_cmd( "mmlsnsd" ) );
+    # get usage info from df -P
+    $self->_parse_nsd_df( $self->_ssh_cmd( "df -P" ), $volumes );
+    # mmrepquota get filesets, where are also volumes
+    $self->_parse_mmrepquota( $self->_ssh_cmd( "mmrepquota" ), $volumes );
+    # get disk groups via touch files for each volume
+    $self->_parse_disk_groups( $self->_ssh_cmd( "/usr/bin/find /vol -mindepth 2 -maxdepth 3 -type f -name \"DISK_*\" 2>/dev/null" ), $volumes );
+
+    return $volumes;
+}
+
 package SDM::Disk::Filer::Command::QueryGpfs;
 
 use strict;
@@ -107,25 +346,25 @@ class SDM::Disk::Filer::Command::QueryGpfs {
 };
 
 sub help_brief {
-    return 'Updates volume usage information';
+    return 'Updates volume usage information from GPFS filer';
 }
 
 sub help_synopsis {
     return <<EOS
-Updates volume usage information
+Updates volume usage information from GPFS filer
 EOS
 }
 
 sub help_detail {
     return <<EOS
-Updates volume usage information
+Updates volume usage information from GPFS filer
 EOS
 }
 
 =head2 update_volumes
 Update data for all Volumes associated with this Filer.
 =cut
-sub update_volumes {
+sub _update_volumes {
     my $self = shift;
     my $volumedata = shift;
     # volumedata is a hash that looks like this:
@@ -153,7 +392,6 @@ sub update_volumes {
     }
 
     $self->logger->warn(__PACKAGE__ . " update_volumes($filername)");
-
     unless ($self->physical_path) {
         # QueryGpfs First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata.
@@ -174,63 +412,31 @@ sub update_volumes {
 
     foreach my $name (keys %$volumedata) {
 
-        my $physical_path = $volumedata->{$name}->{physical_path};
+        # Ensure we have Groups before we update this attribute of a Volume or Fileset
+        my @groups;
+        @groups = map { $_->{disk_group} } @{ $volumedata->{$name}->{filesets} } if ($volumedata->{$name}->{filesets});
+        push @groups, $volumedata->{$name}->{disk_group} if ($volumedata->{$name}->{disk_group});
+        foreach my $group_name (@groups) {
+            my $group;
+            if ($self->discover_groups) {
+                $group = SDM::Disk::Group->get_or_create( name => $group_name );
+            } else {
+                $group = SDM::Disk::Group->get( name => $group_name );
+            }
+            unless ($group) {
+                $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
+                next;
+            }
+        }
 
+        # Now we have groups, so add the volumes we've discovered.
+        my $physical_path = $volumedata->{$name}->{physical_path};
         my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
         unless ($volume) {
             $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
             next;
         }
         $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
-
-        # Create filesets if present
-        foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
-
-            $fileset->{parent_volume_name} = $name;
-            $fileset->{filername} = $filername;
-            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
-
-            my $fs = SDM::Disk::Fileset->get_or_create( %$fileset );
-            unless ($fs) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
-                next;
-            }
-            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name});
-            foreach my $attr (keys %{ $volumedata->{$name} }) {
-                next unless (defined $volumedata->{$name}->{$attr});
-                # FIXME: Don't update disk group from filesystem, only the reverse.
-                #next if ($attr eq 'disk_group');
-                my $p = $fs->__meta__->property($attr);
-                next unless ($p);
-                # Primary keys are immutable, don't try to update them
-                $fs->$attr($volumedata->{$name}->{$attr})
-                    if (! $p->is_id and $p->is_mutable);
-                $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-            }
-        }
-
-        # Ensure we have the Group before we update this attribute of a Volume
-        my $group_name = $volumedata->{$name}->{disk_group};
-        if ($group_name) {
-            my $group;
-            if ($self->discover_groups) {
-                $group = SDM::Disk::Group->get_or_create( name => $volumedata->{$name}->{disk_group} );
-            } else {
-                $group = SDM::Disk::Group->get( name => $volumedata->{$name}->{disk_group} );
-            }
-            unless ($group) {
-                $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
-                next;
-            }
-        } else {
-            $self->logger->warn(__PACKAGE__ . " no group found for volume: $name");
-        }
-
-        unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $name");
-            next;
-        }
-
         foreach my $attr (keys %{ $volumedata->{$name} }) {
             next unless (defined $volumedata->{$name}->{$attr});
             # FIXME: Don't update disk group from filesystem, only the reverse.
@@ -242,14 +448,34 @@ sub update_volumes {
                 if (! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
+
+        # Create filesets if present
+        foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
+
+            $fileset->{parent_volume_name} = $name;
+            $fileset->{filername} = $filername;
+            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
+            $fileset->{total_kb} = $fileset->{kb_limit};
+            $fileset->{used_kb} = $fileset->{kb_size};
+
+            my $fs = SDM::Disk::Fileset->get_or_create( %$fileset );
+            unless ($fs) {
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
+                next;
+            }
+            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name} . ": $filername, " . $fileset->{physical_path});
+            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+
     }
     return 1;
 }
 
-=head2 purge_volumes
+=head2 validate_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and warn on all stale volumes.
+NB. This isn't used or exposed yet, not sure if this is the right place to do this.
 =cut
-sub validate_volumes {
+sub _validate_volumes {
     my $self = shift;
     $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
@@ -263,8 +489,9 @@ sub validate_volumes {
 
 =head2 purge_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and purge all stale volumes.
+NB. This isn't used or exposed yet, not sure if this is the right place to do this.
 =cut
-sub purge_volumes {
+sub _purge_volumes {
     my $self = shift;
     $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
@@ -279,7 +506,7 @@ sub purge_volumes {
 =head2 query_gpfs
 The SSH bits of execute()
 =cut
-sub query_gpfs {
+sub _query_gpfs {
     my $self = shift;
     my $filer = shift;
 
@@ -302,7 +529,7 @@ sub query_gpfs {
         push @params, ( discover_volumes => $self->discover_volumes );
         push @params, ( mount_point => $self->mount_point );
 
-        my $gpfs = SDM::Utility::GPFS::DiskUsage->create( @params );
+        my $gpfs = SDM::GPFS::DiskUsage->create( @params );
         unless ($gpfs) {
             $self->logger->error(__PACKAGE__ . " unable to query on filer " . $filer->name);
             return;
@@ -311,7 +538,7 @@ sub query_gpfs {
         # Query disk usage numbers
         my $table = $gpfs->acquire_volume_data();
         # Volume data must be updated before GPFS data is updated below.
-        $self->update_volumes( $table, $filer->name );
+        $self->_update_volumes( $table, $filer->name );
 
         $gpfs->delete();
         $filer->status(1);
@@ -361,7 +588,7 @@ sub execute {
     }
 
     foreach my $filer (@filers) {
-        $self->query_gpfs($filer);
+        $self->_query_gpfs($filer);
     }
 
     UR::Context->commit();
