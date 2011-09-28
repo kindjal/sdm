@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS disk_user (
 CREATE TABLE IF NOT EXISTS disk_filer (
   name          VARCHAR(255) PRIMARY KEY,
   status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  type          VARCHAR(255),
   filesystem    VARCHAR(255),
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),

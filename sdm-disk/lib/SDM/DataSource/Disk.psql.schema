@@ -16,6 +16,7 @@ CREATE TABLE disk_user (
 CREATE TABLE disk_filer (
   name          VARCHAR(255) PRIMARY KEY,
   status        SMALLINT NOT NULL DEFAULT 0,
+  type          VARCHAR(255),
   filesystem    VARCHAR(255),
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
