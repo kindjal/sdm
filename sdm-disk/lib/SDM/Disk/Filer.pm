@@ -11,11 +11,12 @@ use Smart::Comments -ENV;
 class SDM::Disk::Filer {
     table_name => 'disk_filer',
     id_by => [
-        name            => { is => 'Text', len => 255 },
+        name            => { is => 'Text' },
     ],
     has_optional => [
-        comments        => { is => 'Text', len => 255 },
-        filesystem      => { is => 'Text', len => 255 },
+        type            => { is => 'Text' },
+        comments        => { is => 'Text' },
+        filesystem      => { is => 'Text' },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
         status          => { is => 'UnsignedInteger', default => 0 },
