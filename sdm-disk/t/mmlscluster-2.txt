@@ -1,0 +1,20 @@
+
+GPFS cluster information
+========================
+  GPFS cluster name:         gpfs-dev.gsc.wustl.edu
+  GPFS cluster id:           720606972798331568
+  GPFS UID domain:           gpfs-dev.gsc.wustl.edu
+  Remote shell command:      /usr/bin/ssh
+  Remote file copy command:  /usr/bin/scp
+
+GPFS cluster configuration servers:
+-----------------------------------
+  Primary server:    linuscs107.gsc.wustl.edu
+  Secondary server:  linuscs108.gsc.wustl.edu
+
+ Node  Daemon node name            IP address       Admin node name             Designation    
+-----------------------------------------------------------------------------------------------
+   1   linuscs107.gsc.wustl.edu    10.0.28.57       linuscs107.gsc.wustl.edu    quorum-manager
+   2   linuscs108.gsc.wustl.edu    10.0.28.58       linuscs108.gsc.wustl.edu    quorum-manager
+   3   linuscs109.gsc.wustl.edu    10.0.28.59       linuscs109.gsc.wustl.edu    quorum-manager
+

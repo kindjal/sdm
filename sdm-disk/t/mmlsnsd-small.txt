@@ -1,0 +1,6 @@
+
+ File system   Disk name    NSD servers                                    
+---------------------------------------------------------------------------
+ aggr0         xp4metalun4418 linuscs104.gsc.wustl.edu,linuscs105.gsc.wustl.edu,linuscs106.gsc.wustl.edu,linuscs103.gsc.wustl.edu 
+ aggr0         ams2k7lun0002 linuscs106.gsc.wustl.edu,linuscs103.gsc.wustl.edu,linuscs104.gsc.wustl.edu,linuscs105.gsc.wustl.edu 
+ ams1100       ams2k1lun0009 linuscs104.gsc.wustl.edu,linuscs105.gsc.wustl.edu,linuscs106.gsc.wustl.edu,linuscs103.gsc.wustl.edu 

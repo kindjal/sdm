@@ -1,0 +1,4 @@
+Filesystem         1024-blocks      Used Available Capacity Mounted on
+/dev/sdq1             57535232  16699204  37913408      31% /
+tmpfs                  6146436         0   6146436       0% /dev/shm
+/dev/aggr0           11603570688  99416576 11504154112       1% /vol/aggr0
