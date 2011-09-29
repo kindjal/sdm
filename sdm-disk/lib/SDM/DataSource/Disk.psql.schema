@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS disk_array cascade;
 DROP TABLE IF EXISTS disk_host cascade;
 DROP TABLE IF EXISTS disk_fileset cascade;
 DROP TABLE IF EXISTS disk_volume cascade;
+DROP TABLE IF EXISTS disk_polyserve_volume cascade;
 DROP TABLE IF EXISTS disk_filer_host cascade;
 DROP TABLE IF EXISTS disk_filer cascade;
 CREATE TABLE disk_user (
@@ -56,10 +57,11 @@ CREATE TABLE disk_filer_host (
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) ON DELETE CASCADE
 );
 CREATE TABLE disk_volume (
-  name          VARCHAR(255) PRIMARY KEY,
-  mount_point   VARCHAR(255) NOT NULL,
+  id            VARCHAR(255) PRIMARY KEY,
+  name          VARCHAR(255),
   filername     VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
+  mount_point   VARCHAR(255) NOT NULL,
   total_kb      BIGINT DEFAULT 0 NOT NULL,
   used_kb       BIGINT DEFAULT 0 NOT NULL,
   created       DATE,
@@ -67,14 +69,33 @@ CREATE TABLE disk_volume (
   comments      VARCHAR(255),
   mount_options VARCHAR(255) NOT NULL,
   disk_group    VARCHAR(255),
+  UNIQUE(name,filername),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL,
   CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name)
 );
-CREATE TABLE disk_fileset (
-  name          VARCHAR(255) PRIMARY KEY,
-  mount_point   VARCHAR(255) NOT NULL,
+CREATE TABLE disk_polyserve_volume (
+  id            VARCHAR(255) PRIMARY KEY,
+  name          VARCHAR(255) NOT NULL,
   filername     VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
+  mount_point   VARCHAR(255) NOT NULL,
+  total_kb      BIGINT DEFAULT 0 NOT NULL,
+  used_kb       BIGINT DEFAULT 0 NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  UNIQUE (name),
+  CONSTRAINT disk_psvolume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL,
+  CONSTRAINT disk_psvolume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name)
+);
+CREATE TABLE disk_fileset (
+  id            VARCHAR(255) PRIMARY KEY,
+  name          VARCHAR(255) NOT NULL,
+  filername     VARCHAR(255) NOT NULL,
+  physical_path VARCHAR(255) NOT NULL,
+  mount_point   VARCHAR(255) NOT NULL,
   total_kb      BIGINT DEFAULT 0 NOT NULL,
   used_kb       BIGINT DEFAULT 0 NOT NULL,
   created       DATE,
@@ -94,20 +115,22 @@ CREATE TABLE disk_fileset (
   file_in_doubt BIGINT NOT NULL,
   file_grace    BIGINT NOT NULL,
   file_entryType VARCHAR(1) NOT NULL,
-  parent_volume_name VARCHAR(255),
-  CONSTRAINT disk_fileset_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL,
+  parent_volume_id VARCHAR(255) NOT NULL,
+  UNIQUE (name,filername),
   CONSTRAINT disk_fileset_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name),
-  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_name) REFERENCES disk_volume (name)
+  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_id) REFERENCES disk_volume (id)
 );
 CREATE TABLE disk_array (
   name          VARCHAR(255) PRIMARY KEY,
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   serial        VARCHAR(255),
+  description   VARCHAR(255),
+  comments      VARCHAR(255),
+  location      VARCHAR(255),
   arraysize     BIGINT DEFAULT 0,
   created       DATE,
   last_modified DATE,
-  comments      VARCHAR(255),
   hostname      VARCHAR(255) CONSTRAINT disk_array_host_fk REFERENCES disk_host (hostname)
 );
 CREATE TABLE disk_array_disk_set (
