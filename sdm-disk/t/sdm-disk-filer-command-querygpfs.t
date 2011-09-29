@@ -41,7 +41,7 @@ sub fileslurp {
 }
 
 my $c = SDM::GPFS::DiskUsage->create( @params );
-
+# The following mimic SDM::GPFS::DiskUsage->acquire_volume_data
 my $vol;
 $c->_parse_mmlscluster( fileslurp( "$top/t/mmlscluster.txt" ) );
 $vol = $c->_parse_mmlsnsd( fileslurp( "$top/t/mmlsnsd.txt" ) );

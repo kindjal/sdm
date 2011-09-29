@@ -11,12 +11,16 @@ BEGIN {
 use Test::More;
 use Test::Output;
 use Test::Exception;
+use Data::Dumper;
 
 use_ok( 'SDM' );
 
 unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
     plan skip_all => "Don't assume we can reach SNMP on named hosts for non GI networks";
 }
+
+use SDM::Utility::SNMP;
+use SDM::Disk::Filer::Command::QuerySnmp;
 
 # Start with a fresh database
 use FindBin;
@@ -28,8 +32,38 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
+sub fileslurp {
+    my $filename = shift;
+    open(FH,"<$filename") or die "Failed to open $filename: $!";
+    my $content = do { local $/; <FH> };
+    close(FH);
+    return $content;
+}
+
+my $filer = SDM::Disk::Filer->get( name => 'gpfs-dev' );
+
+my $d = SDM::SNMP::DiskUsage->create( loglevel => "DEBUG", discover_volumes => 1, hostname => 'linuscs107' );
+$d->hosttype('netapp');
 my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0 );
-stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skipped unknown volume ok";
+
+#stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skipped unknown volume ok";
+# mimic acquire_volume_data and update_volumes
+# first with discover_volumes = 0 then 1
+# netapp and linux host
+my $oid = 'dfTable';
+my $lines = fileslurp("$top/t/dfTable.txt");
+my @content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+my $snmp_table = $d->read_snmp_into_table($oid, \@content);
+my $table = $d->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table, $filer->name );
+UR::Context->commit();
+
+__END__
+
+$oid = 'hrStorageTable';
+my $snmp_table = $c->read_snmp_into_table($oid);
+my $table = $c->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table, $filer->name );
 
 $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 1 );
 lives_ok { $c->execute(); } "run lived";
