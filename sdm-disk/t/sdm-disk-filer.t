@@ -28,14 +28,14 @@ my @params = ();
 ok( ! defined SDM::Disk::Filer->create( @params ), "properly fail to create filer with empty param" );
 
 # Test creation
-@params = ( name => 'nfs11' );
+@params = ( name => 'nfs11', type => 'polyserve' );
 $res = SDM::Disk::Filer->create( @params );
 ok( $res->id eq 'nfs11', "properly created new filer");
 @params = ( name => 'nfs11' );
 $res = SDM::Disk::Filer->get( @params );
 ok( $res->id eq 'nfs11', "properly got new filer");
 
-@params = ( name => 'nfs12' );
+@params = ( name => 'nfs12', type => 'polyserve' );
 $res = SDM::Disk::Filer->create( @params );
 ok( $res->id eq 'nfs12', "properly created another new filer");
 
