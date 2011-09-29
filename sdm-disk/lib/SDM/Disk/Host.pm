@@ -64,7 +64,7 @@ sub assign {
         $self->error_message("the filer named '$filername' is unknown");
         return;
     }
-    my $res = SDM::Disk::FilerHostBridge->create( host => $self, filer => $filer );
+    my $res = SDM::Disk::FilerHostBridge->get_or_create( host => $self, filer => $filer );
     return $res;
 }
 

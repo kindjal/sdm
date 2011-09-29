@@ -395,25 +395,27 @@ sub _update_volumes {
     # First find and remove volumes in the DB that are not detected on this filer
     # For this filer, find any stored volumes that aren't present in the volumedata.
     # Note that we skip this step if we specified a single physical_path to update.
-    my @volumes = ( SDM::Disk::Volume->get( filername => $filername ) );
+    # FIXME: Make this include filesets too
+    #my @volumes = ( SDM::Disk::Volume->get( filername => $filername ) );
     # FIXME: Don't warn if no volumes are found yet...
-    foreach my $volume ( @volumes ) {
-        foreach my $path ($volume->physical_path) {
-            next unless($path);
-            $path =~ s/\//\\\//g;
-            if ( ! grep /$path/, keys %$volumedata ) {
-                $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
-                # FIXME: do we want to auto-remove like this?
-                #$volume->delete;
-            }
-        }
-    }
-    return 1 if ($self->cleanonly);
+    #foreach my $volume ( @volumes ) {
+    #    foreach my $path ($volume->physical_path) {
+    #        next unless($path);
+    #        $path =~ s/\//\\\//g;
+    #        if ( ! grep /$path/, keys %$volumedata ) {
+    #            $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
+    #            # FIXME: do we want to auto-remove like this?
+    #            #$volume->delete;
+    #        }
+    #    }
+    #}
+    #return 1 if ($self->cleanonly);
 
     foreach my $name (keys %$volumedata) {
 
         # Ensure we have Groups before we update this attribute of a Volume or Fileset
         my @groups;
+        # Filesets have groups only if they inherit Volume
         @groups = map { $_->{disk_group} if ($_->{disk_group}) } @{ $volumedata->{$name}->{filesets} } if ($volumedata->{$name}->{filesets});
         push @groups, $volumedata->{$name}->{disk_group} if ($volumedata->{$name}->{disk_group});
         @groups = grep { defined $_ } @groups;
@@ -421,6 +423,7 @@ sub _update_volumes {
             my $group;
             if ($self->discover_groups) {
                 $group = SDM::Disk::Group->get_or_create( name => $group_name );
+                $self->logger->debug(__PACKAGE__ . " created disk group: $group_name");
             } else {
                 $group = SDM::Disk::Group->get( name => $group_name );
             }
@@ -432,10 +435,16 @@ sub _update_volumes {
 
         # Now we have groups, so add the volumes we've discovered.
         my $physical_path = $volumedata->{$name}->{physical_path};
-        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
+        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
+        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, name => $name );
+        my $volume = SDM::Disk::Volume->get( filername => $filername, name => $name );
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
-            next;
+            $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path, name => $name );
+            $self->logger->error(__PACKAGE__ . " create volume: $filername, $name");
+            unless ($volume) {
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
+                next;
+            }
         }
         $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
         foreach my $attr (keys %{ $volumedata->{$name} }) {
@@ -455,17 +464,53 @@ sub _update_volumes {
 
             $fileset->{parent_volume_name} = $name;
             $fileset->{filername} = $filername;
-            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
-            $fileset->{total_kb} = $fileset->{kb_limit};
-            $fileset->{used_kb} = $fileset->{kb_size};
+            # Do this if Fileset can inherit Volume
+            #$fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
+            #$fileset->{total_kb} = $fileset->{kb_limit};
+            #$fileset->{used_kb} = $fileset->{kb_size};
+            # Otherwise... move disk group to Volume below.
+            my $disk_group = delete $fileset->{disk_group};
 
-            my $fs = SDM::Disk::Fileset->get_or_create( %$fileset );
+            my $fs = SDM::Disk::Fileset->get( filername => $filername, name => $fileset->{name} );
             unless ($fs) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
-                next;
+                $self->logger->error(__PACKAGE__ . " create fileset: $filername, " . $fileset->{name});
+                $fs = SDM::Disk::Fileset->create( %$fileset );
+                unless ($fs) {
+                    $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
+                    next;
+                }
             }
-            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name} . ": $filername, " . $fileset->{physical_path});
-            $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name});
+            foreach my $attr (keys %$fileset) {
+                next unless (defined $fileset->{$attr});
+                my $p = $fs->__meta__->property($attr);
+                next unless ($p);
+                # Primary keys are immutable, don't try to update them
+                $fs->$attr($fileset->{$attr})
+                    if (! $p->is_id and $p->is_mutable);
+                $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+            }
+
+            # Do this if Fileset cannot inherit Volume
+            # Now create a Volume to represent the Fileset, since we can't do DB
+            # level inheritance with multi-column primary keys (UR limitation).
+            # If we could, we wouldn't have to do this, we could make Fileset
+            # is SDM::Disk::Volume.
+            my $physical_path = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
+            my $volume = SDM::Disk::Volume->get( filername => $filername, name => $fileset->{name}, physical_path => $physical_path );
+            unless ($volume) {
+                $volume = SDM::Disk::Volume->create( filername => $filername, name => $fileset->{name}, physical_path => $physical_path );
+                unless ($volume) {
+
+                    $self->logger->error(__PACKAGE__ . " failed to create volume for fileset: " . $fileset->{name} . ": $filername");
+                    return;
+                }
+            }
+            $volume->total_kb( $fileset->{kb_limit} );
+            $volume->used_kb( $fileset->{kb_size} );
+            #$volume->disk_group( $fileset->{disk_group} );
+            $volume->disk_group( $disk_group );
+            $self->logger->debug(__PACKAGE__ . " updated volume for fileset: " . $fileset->{name} . ": $filername, ");
         }
 
     }

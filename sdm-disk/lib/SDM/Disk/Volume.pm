@@ -43,12 +43,11 @@ And:
 class SDM::Disk::Volume {
     table_name => 'disk_volume',
     id_by => [
-        # A volume must be uniquely specified by mount_path.
-        # There can be only one /gscmnt/foo, even if more than
-        # one filer can have filername:/vol/foo
-        name => { is => 'Text', len => 255 },
+        name            => { is => 'Text', len => 255 },
+        filername       => { is => 'Text', len => 255 },
     ],
     has => [
+        physical_path   => { is => 'Text', len => 255 },
         # More than one filer named fname might have /vol/home
         # but there can be only one way to nfs mount /gscmnt/home.
         # There should not be more than one mount_path for fname+physical_path,
@@ -60,8 +59,6 @@ class SDM::Disk::Volume {
             calculate_from => [ 'name','mount_point' ],
             calculate => q| return $mount_point . "/" . $name |,
         },
-        filername       => { is => 'Text', len => 255 },
-        physical_path   => { is => 'Text', len => 255 },
         filer           => { is => 'SDM::Disk::Filer', id_by => 'filername' },
         hostname        => { is => 'Text', via => 'filer', to => 'hostname' },
         arrayname       => { is => 'Text', via => 'filer', to => 'arrayname' },

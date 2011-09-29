@@ -57,10 +57,10 @@ CREATE TABLE IF NOT EXISTS disk_filer_host (
   CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_volume (
-  name          VARCHAR(255) PRIMARY KEY,
-  mount_point   VARCHAR(255) NOT NULL,
-  filername     VARCHAR(255) NOT NULL,
+  name          VARCHAR(255),
+  filername     VARCHAR(255),
   physical_path VARCHAR(255) NOT NULL,
+  mount_point   VARCHAR(255) NOT NULL,
   total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
   created       DATE,
@@ -68,21 +68,13 @@ CREATE TABLE IF NOT EXISTS disk_volume (
   comments      VARCHAR(255),
   mount_options VARCHAR(255) NOT NULL,
   disk_group    VARCHAR(255),
+  PRIMARY KEY (name,filername),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE disk_fileset (
-  name          VARCHAR(255) PRIMARY KEY,
-  mount_point   VARCHAR(255) NOT NULL,
-  filername     VARCHAR(255) NOT NULL,
-  physical_path VARCHAR(255) NOT NULL,
-  total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
-  created       DATE,
-  last_modified DATE,
-  comments      VARCHAR(255),
-  mount_options VARCHAR(255) NOT NULL,
-  disk_group    VARCHAR(255),
+  name          VARCHAR(255),
+  filername     VARCHAR(255),
   type          VARCHAR(255) NOT NULL,
   kb_size       UNSIGNED INTEGER NOT NULL,
   kb_quota      UNSIGNED INTEGER NOT NULL,
@@ -95,10 +87,12 @@ CREATE TABLE disk_fileset (
   file_in_doubt UNSIGNED INTEGER NOT NULL,
   file_grace    UNSIGNED INTEGER NOT NULL,
   file_entryType VARCHAR(1) NOT NULL,
+  created       DATE,
+  last_modified DATE,
   parent_volume_name VARCHAR(255) NOT NULL,
-  CONSTRAINT disk_fileset_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED,
+  PRIMARY KEY (name,filername),
   CONSTRAINT disk_fileset_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
-  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_name) REFERENCES disk_volume (name) DEFERRABLE INITIALLY DEFERRED
+  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_name,filername) REFERENCES disk_volume (name,filername) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (
   name          VARCHAR(255) PRIMARY KEY,
