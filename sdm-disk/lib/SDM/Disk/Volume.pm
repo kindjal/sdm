@@ -89,6 +89,28 @@ class SDM::Disk::Volume {
             /,
         },
         gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
+        fileset_cap => {
+            is => 'Number',
+            calculate_from => ['fileset','total_kb'],
+            calculate => q|
+                my $kb;
+                foreach my $fs ($fileset) {
+                    $kb += $fs->kb_limit;
+                }
+                return sprintf "%0.2d%%", $kb/$total_kb*100;
+            |,
+        },
+        fileset_total => {
+            is => 'Number',
+            calculate_from => 'fileset',
+            calculate => q|
+                my $kb;
+                foreach my $fs ($fileset) {
+                    $kb += $fs->kb_limit;
+                }
+                return $kb;
+            |,
+        },
     ],
     has_many_optional => [
         fileset => {
