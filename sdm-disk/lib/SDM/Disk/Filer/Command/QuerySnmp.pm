@@ -221,7 +221,7 @@ sub _convert_to_volume_data {
             my $volume = SDM::Disk::Volume->get( $volume_name );
             unless ($volume) {
                 $self->logger->warn(__PACKAGE__ . " no volume found for " . $self->hostname . ": $physical_path");
-                $self->logger->warn(__PACKAGE__ . " perhaps: sdm disk volume add --name $volume_name --filername " . $self->hostname . " --physical-path $physical_path --mount-point " . $self->mount_point);
+                $self->logger->warn(__PACKAGE__ . " consider using --discover-volumes");
                 next;
             }
             # We allow Volumes to be "moved" to other filers.  If the current host offers a physical path
@@ -384,24 +384,24 @@ Updates volume usage information. Blah blah blah details blah.
 EOS
 }
 
-=head2 update_volumes
+=head2 _update_volumes
 Update SNMP data for all Volumes associated with this Filer.
 =cut
-sub update_volumes {
+sub _update_volumes {
     my $self = shift;
     my $volumedata = shift;
     my $filername = shift;
 
     unless ($filername) {
-        $self->logger->error(__PACKAGE__ . " update_volumes(): no filer given");
+        $self->logger->error(__PACKAGE__ . " _update_volumes(): no filer given");
         return;
     }
     unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer " . $filername . " returned empty SNMP volumedata");
+        $self->logger->warn(__PACKAGE__ . " _update_volumes(): filer " . $filername . " returned empty SNMP volumedata");
         return;
     }
 
-    $self->logger->warn(__PACKAGE__ . " update_volumes($filername)");
+    $self->logger->warn(__PACKAGE__ . " _update_volumes($filername)");
 
     unless ($self->physical_path) {
         # QuerySnmp First find and remove volumes in the DB that are not detected on this filer
@@ -474,10 +474,10 @@ sub update_volumes {
     return 1;
 }
 
-=head2 purge_volumes
+=head2 _validate_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and warn on all stale volumes.
 =cut
-sub validate_volumes {
+sub _validate_volumes {
     my $self = shift;
     $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
@@ -489,10 +489,10 @@ sub validate_volumes {
     }
 }
 
-=head2 purge_volumes
+=head2 _purge_volumes
 Iterate over all Volumes associated with this Filer, check is_current() and purge all stale volumes.
 =cut
-sub purge_volumes {
+sub _purge_volumes {
     my $self = shift;
     $self->logger->error(__PACKAGE__ . " max age has not been specified\n")
         if (! defined $self->vol_maxage);
@@ -540,7 +540,7 @@ sub _query_snmp {
         # that we need to parse and apply logic to.  See SNMP::DiskUsage for details.
         my $table = $snmp->acquire_volume_data();
         # Volume data must be updated before GPFS data is updated below.
-        $self->update_volumes( $table, $filer->name );
+        $self->_update_volumes( $table, $filer->name );
 
         $snmp->delete();
         $filer->status(1);
@@ -563,9 +563,8 @@ sub execute {
 
     my @filers;
     if (defined $self->filername) {
-        # FIXME: should this be a get(), do we want to allow transparently adding Filers?
-        #@filers = SDM::Disk::Filer->get_or_create( name => $self->filername );
-        @filers = SDM::Disk::Filer->get( name => $self->filername );
+        @filers = SDM::Disk::Filer->get_or_create( name => $self->filername );
+        $self->logger->info(__PACKAGE__ . " added new filer " . $self->filername);
     } else {
         if ($self->force) {
             # If "force", get all Filers and query them even if status is 0.
