@@ -6,7 +6,6 @@ use warnings;
 
 use SDM;
 use Date::Manip;
-use Smart::Comments -ENV;
 
 class SDM::Disk::Filer {
     table_name => 'disk_filer',
@@ -66,7 +65,6 @@ sub is_current {
     my $host_maxage = shift;
     # Default max age is 15 days.
     $host_maxage = 1296000 unless (defined $host_maxage and $host_maxage > 0);
-    ### Filer->is_current: $host_maxage
     return 0 if (! defined $self->last_modified);
     return 0 if ($self->last_modified eq "0000-00-00 00:00:00");
 
@@ -83,11 +81,6 @@ sub is_current {
     die "Error in DateCalc: $date0, $date1, $err\n" if (! defined $calc);
 
     my $delta = int(Delta_Format($calc,0,'%st'));
-
-    ### Filer->is_current date0: $date0
-    ### Filer->is_current date1: $date1
-    ### Filer->is_current delta: $delta
-    ### Filer->is_current host_maxage: $host_maxage
 
     return 0 if (! defined $delta);
     return 1
@@ -118,7 +111,6 @@ sub create {
 
 sub delete {
     my $self = shift;
-    ### Filer->delete: $self
 
     my @volumes = SDM::Disk::Volume->get( filername => $self->name );
 
@@ -129,7 +121,6 @@ sub delete {
             die "Failed to remove Filer-Host map for Filer: " . $self->name;
     }
 
-    ### Filer delete();
     $self->warning_message("Remove Filer " . $self->name);
     my $res = $self->SUPER::delete();
 
