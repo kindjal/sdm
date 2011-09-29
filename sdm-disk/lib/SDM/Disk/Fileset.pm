@@ -8,10 +8,10 @@ use SDM;
 
 class SDM::Disk::Fileset {
     table_name => 'disk_fileset',
-    #is => 'SDM::Disk::Volume',
+    is => 'SDM::Disk::Volume',
+    id_generator => '-uuid',
     id_by => [
-        name            => { is => 'Text' },
-        filername       => { is => 'Text' }
+        id              => { is => 'Text' },
     ],
     has => [
         type            => { is => 'Text', default_value => 'FILESET' },
@@ -26,15 +26,14 @@ class SDM::Disk::Fileset {
         file_in_doubt   => { is => 'Number' },
         file_grace      => { is => 'Number' },
         file_entryType  => { is => 'Text' },
-        parent_volume_name => { is => 'Text' },
+        parent_volume_id => { is => 'Text' },
         volume          => {
             is => 'SDM::Disk::Volume',
-            id_by => ['parent_volume_name','filername']
+            id_by => 'parent_volume_id'
         },
-    ],
-    has_optional => [
-        last_modified   => { is => 'Date' },
-        created         => { is => 'Date' },
+        parent_volume_name => {
+            via => 'volume', to => 'name'
+        },
     ],
     data_source => 'SDM::DataSource::Disk',
 };
