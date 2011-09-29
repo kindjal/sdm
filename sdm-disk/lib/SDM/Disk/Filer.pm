@@ -13,8 +13,16 @@ class SDM::Disk::Filer {
     id_by => [
         name            => { is => 'Text' },
     ],
+    has => [
+        type            => {
+            # Filer->type was invented to distinguish between Volumes and PolyserveVolumes,
+            # which have different UNIQUEness constraints.  Only Polyserve is different at this time.
+            is => 'Text',
+            doc => 'Filer type',
+            valid_values => ['gpfs','polyserve','netapp','vcf','nfs'],
+        },
+    ],
     has_optional => [
-        type            => { is => 'Text' },
         comments        => { is => 'Text' },
         filesystem      => { is => 'Text' },
         created         => { is => 'DATE' },
@@ -93,10 +101,17 @@ Create method for Filer sets created attribute.
 sub create {
     my $self = shift;
     my (%params) = @_;
-    unless ($params{name}) {
-        $self->error_message("No name given for Filer");
+
+    my @missing;
+    foreach my $attr ( $self->__meta__->properties ) {
+        next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or defined $attr->default_value);
+        push @missing, $attr->property_name unless (exists $params{$attr->property_name});
+    }
+    if (@missing) {
+        $self->error_message("missing required attributes in create(): " . join(" ",@missing));
         return;
     }
+
     $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
     return $self->SUPER::create( %params );
 }
