@@ -284,6 +284,18 @@ local $| = 1;
 class SDM::Disk::Filer::Command::QuerySnmp {
     is => 'SDM::Command::Base',
     has_optional => [
+        filername => {
+            # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
+            # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
+            #is => 'SDM::Disk::Filer',
+            is => 'Text',
+            doc => 'SNMP query the named filer, which we assume resolves via DNS to the IP of a host',
+        },
+        type => {
+            is => 'Text',
+            doc => 'Specify filer type if you are adding a new filer with --filername',
+            valid_values => ['gpfs','polyserve','vcf','netapp','nfs']
+        },
         force => {
             is => 'Boolean',
             default => 0,
@@ -349,13 +361,6 @@ class SDM::Disk::Filer::Command::QuerySnmp {
             default => 0,
             doc => 'Check currency status',
         },
-        filername => {
-            # If I use is => Filer here, UR errors out immediately if the filer doesn't exist.
-            # If I use is => Text, then I can use get_or_create to add on the fly, or query them all.
-            #is => 'SDM::Disk::Filer',
-            is => 'Text',
-            doc => 'SNMP query the named filer',
-        },
         physical_path => {
             is => 'Text',
             doc => 'SNMP query the named filer for this export',
@@ -390,29 +395,29 @@ Update SNMP data for all Volumes associated with this Filer.
 sub _update_volumes {
     my $self = shift;
     my $volumedata = shift;
-    my $filername = shift;
+    my $filer = shift;
 
-    unless ($filername) {
+    unless ($filer->name) {
         $self->logger->error(__PACKAGE__ . " _update_volumes(): no filer given");
         return;
     }
     unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " _update_volumes(): filer " . $filername . " returned empty SNMP volumedata");
+        $self->logger->warn(__PACKAGE__ . " _update_volumes(): filer " . $filer->name . " returned empty SNMP volumedata");
         return;
     }
 
-    $self->logger->warn(__PACKAGE__ . " _update_volumes($filername)");
+    $self->logger->warn(__PACKAGE__ . " _update_volumes(" . $filer->name . ")");
 
     unless ($self->physical_path) {
         # QuerySnmp First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
-        foreach my $volume ( SDM::Disk::Volume->get( filername => $filername ) ) {
+        foreach my $volume ( SDM::Disk::Volume->get( filername => $filer->name ) ) {
             foreach my $path ($volume->physical_path) {
                 next unless($path);
                 $path =~ s/\//\\\//g;
                 if ( ! grep /$path/, keys %$volumedata ) {
-                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': " . $volume->id);
+                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '" . $filer->name . "': " . $volume->id);
                     # FIXME: do we want to auto-remove like this?
                     #$volume->delete;
                 }
@@ -431,12 +436,17 @@ sub _update_volumes {
             next;
         }
 
-        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
+        my $volume;
+        if ($filer->type eq 'polyserve') {
+            $volume = SDM::Disk::PolyserveVolume->get_or_create( filername => $filer->name, physical_path => $physical_path, name => $name );
+        } else {
+            $volume = SDM::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, name => $name );
+        }
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: " . $filer->name . ", $physical_path, $name");
             next;
         }
-        $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
+        $self->logger->debug(__PACKAGE__ . " found volume: $name: " . $filer->name . ", $physical_path");
 
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
@@ -540,7 +550,7 @@ sub _query_snmp {
         # that we need to parse and apply logic to.  See SNMP::DiskUsage for details.
         my $table = $snmp->acquire_volume_data();
         # Volume data must be updated before GPFS data is updated below.
-        $self->_update_volumes( $table, $filer->name );
+        $self->_update_volumes( $table, $filer );
 
         $snmp->delete();
         $filer->status(1);
@@ -563,8 +573,19 @@ sub execute {
 
     my @filers;
     if (defined $self->filername) {
-        @filers = SDM::Disk::Filer->get_or_create( name => $self->filername );
-        $self->logger->info(__PACKAGE__ . " added new filer " . $self->filername);
+        @filers = SDM::Disk::Filer->get( name => $self->filername );
+        unless (@filers) {
+            unless ($self->type) {
+                $self->logger->error(__PACKAGE__ . " specify --type along with --filername");
+                return;
+            }
+            @filers = SDM::Disk::Filer->create( name => $self->filername, type => $self->type );
+            unless (@filers) {
+                $self->logger->error(__PACKAGE__ . " unable to create filer: " . $self->filername);
+                return;
+            }
+            $self->logger->info(__PACKAGE__ . " added new filer " . $self->filername);
+        }
     } else {
         if ($self->force) {
             # If "force", get all Filers and query them even if status is 0.
