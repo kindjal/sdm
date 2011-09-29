@@ -42,11 +42,13 @@ And:
 =cut
 class SDM::Disk::Volume {
     table_name => 'disk_volume',
+    id_generator => '-uuid',
     id_by => [
-        name            => { is => 'Text', len => 255 },
-        filername       => { is => 'Text', len => 255 },
+        id => { is => 'Text' },
     ],
     has => [
+        name            => { is => 'Text', len => 255 },
+        filername       => { is => 'Text', len => 255 },
         physical_path   => { is => 'Text', len => 255 },
         # More than one filer named fname might have /vol/home
         # but there can be only one way to nfs mount /gscmnt/home.
@@ -91,10 +93,10 @@ class SDM::Disk::Volume {
         gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
         fileset_cap => {
             is => 'Number',
-            calculate_from => ['fileset','total_kb'],
+            calculate_from => 'total_kb',
             calculate => q|
                 my $kb;
-                foreach my $fs ($fileset) {
+                foreach my $fs ( $self->fileset ) {
                     $kb += $fs->kb_limit;
                 }
                 return sprintf "%0.2d%%", $kb/$total_kb*100;
@@ -102,10 +104,9 @@ class SDM::Disk::Volume {
         },
         fileset_total => {
             is => 'Number',
-            calculate_from => 'fileset',
             calculate => q|
                 my $kb;
-                foreach my $fs ($fileset) {
+                foreach my $fs ($self->fileset) {
                     $kb += $fs->kb_limit;
                 }
                 return $kb;
