@@ -462,14 +462,11 @@ sub _update_volumes {
         # Create filesets if present
         foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
 
-            $fileset->{parent_volume_name} = $name;
+            $fileset->{parent_volume_id} = $volume->id;
             $fileset->{filername} = $filername;
-            # Do this if Fileset can inherit Volume
-            #$fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
-            #$fileset->{total_kb} = $fileset->{kb_limit};
-            #$fileset->{used_kb} = $fileset->{kb_size};
-            # Otherwise... move disk group to Volume below.
-            my $disk_group = delete $fileset->{disk_group};
+            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
+            $fileset->{total_kb} = $fileset->{kb_limit};
+            $fileset->{used_kb} = $fileset->{kb_size};
 
             my $fs = SDM::Disk::Fileset->get( filername => $filername, name => $fileset->{name} );
             unless ($fs) {
@@ -490,26 +487,6 @@ sub _update_volumes {
                     if (! $p->is_id and $p->is_mutable);
                 $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
             }
-
-            # Do this if Fileset cannot inherit Volume
-            # Now create a Volume to represent the Fileset, since we can't do DB
-            # level inheritance with multi-column primary keys (UR limitation).
-            # If we could, we wouldn't have to do this, we could make Fileset
-            # is SDM::Disk::Volume.
-            my $physical_path = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
-            my $volume = SDM::Disk::Volume->get( filername => $filername, name => $fileset->{name}, physical_path => $physical_path );
-            unless ($volume) {
-                $volume = SDM::Disk::Volume->create( filername => $filername, name => $fileset->{name}, physical_path => $physical_path );
-                unless ($volume) {
-
-                    $self->logger->error(__PACKAGE__ . " failed to create volume for fileset: " . $fileset->{name} . ": $filername");
-                    return;
-                }
-            }
-            $volume->total_kb( $fileset->{kb_limit} );
-            $volume->used_kb( $fileset->{kb_size} );
-            #$volume->disk_group( $fileset->{disk_group} );
-            $volume->disk_group( $disk_group );
             $self->logger->debug(__PACKAGE__ . " updated volume for fileset: " . $fileset->{name} . ": $filername, ");
         }
 
@@ -652,7 +629,7 @@ sub execute {
         }
         my $filername = $filer->name;
         unless ($hostname) {
-            $self->logger->error(__PACKAGE__ . " filer '$filername' has no master host associated with it.");
+            $self->logger->error(__PACKAGE__ . " filer '$filername' has no master host associated with it, use --hostname to add one");
             next;
         }
         if ( $self->_query_gpfs(filername => $filername, hostname => $hostname ) ) {
