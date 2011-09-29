@@ -34,9 +34,9 @@ class SDM::Utility::SNMP {
             is => 'Array',
             doc => 'an array reference to lines of snmp data'
         },
-        sloppy       => {
+        unittest       => {
             is => 'Boolean',
-            doc => "allow sloppy creation that doesn't check host type",
+            doc => "allow creation that doesn't check host type",
             default_value => 0,
         },
     ],
@@ -125,10 +125,14 @@ Query SNMP OID and return a hash table of the results.
 sub read_snmp_into_table {
     my $self = shift;
     my $oid = shift;
+    my $results = shift;
     $self->logger->debug(__PACKAGE__ . " read_snmp_into_table($oid)");
     my $table = {};
-    $self->command('snmpwalk');
-    my $results = $self->run($oid);
+    unless ($results) {
+        # Normally we run this command, but in unittesting we may have been given input.
+        $self->command('snmpwalk');
+        $results = $self->run($oid);
+    }
     foreach my $hash (@$results) {
         my $idx = $hash->{idx};
         $idx =~ s/"//g;
@@ -190,8 +194,7 @@ sub create {
     }
     my $obj = $class->SUPER::create( %params );
 
-    # We use sloppy for unit testing
-    return $obj if ($params{sloppy});
+    return $obj if ($params{unittest});
 
     # FIXME: This feels wrong, both to call SNMP at object creation time, and to use the _get_host_type method
     # both with or without arguments.
