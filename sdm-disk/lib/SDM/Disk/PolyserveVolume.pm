@@ -8,7 +8,7 @@ use SDM;
 use Date::Manip;
 
 =head2 SDM::Disk::PolyserveVolume
-Polyserve volumes have UNIQUE(name) vs. normal volumes which are UNIQUE(name,filername)
+Polyserve volumes have DB table UNIQUE(name) vs. normal volumes which are UNIQUE(name,filername)
 =cut
 class SDM::Disk::PolyserveVolume {
     table_name => 'disk_polyserve_volume',
