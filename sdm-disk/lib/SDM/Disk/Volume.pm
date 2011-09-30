@@ -200,6 +200,38 @@ sub purge {
     }
 }
 
+sub name {
+    # Override the name accessor to prevent modifying an existing object into another existing object
+    # Prevent changing filername1:name1 into an already existing filername1:name2
+    my $self = shift;
+    my $name = shift;
+    my $filername = $self->__filername;
+    if ($name) {
+        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
+            $self->error_message("an object already exists with name $name on filer $filername");
+            return;
+        }
+        return $self->__name( $name );
+    }
+    return $self->__name();
+}
+
+sub filername {
+    # Override the name accessor to prevent modifying an existing object into another existing object
+    # Prevent changing filername1:name1 into an already existing filername2:name1
+    my $self = shift;
+    my $filername = shift;
+    my $name = $self->__name;
+    if ($filername) {
+        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
+            $self->error_message("an object already exists with name $name on filer $filername");
+            return;
+        }
+        return $self->__filername( $filername );
+    }
+    return $self->__filername();
+}
+
 =head2 create
 Create a volume, error if it already exists.
 =cut
@@ -218,7 +250,6 @@ sub create {
     }
 
     # Note: Is it ok to auto-create Filers?  I say no for now.
-    # The exact volume doesn't exist, so make sure we have the Filer
     my $filer = SDM::Disk::Filer->get( name => $param{filername} );
     unless ($filer) {
         $self->error_message("failed to identify filer: " . $param{filername});
@@ -237,6 +268,14 @@ sub create {
             return;
         }
         $param{disk_group} = $group_name;
+    }
+
+    if ($param{name} and $param{filername}) {
+        my @obj = SDM::Disk::Volume->get( name => $param{name}, filername => $param{filername} );
+        if (@obj) {
+            $self->error_message("an object already exists with name $param{name} and filername $param{filername}");
+            return;
+        }
     }
 
     $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
