@@ -6,6 +6,7 @@ use warnings;
 
 use SDM;
 use Date::Manip;
+use feature 'switch';
 
 class SDM::Disk::Filer {
     table_name => 'disk_filer',
@@ -86,6 +87,35 @@ sub is_current {
     return 1
         if $delta > $host_maxage;
     return 0;
+}
+
+=head2 create_volume
+Convenience method to ensure that Volume objects are created properly
+for the complete set of Filer types.  Right now this is just to make
+sure polyserve filers get PolyserveVolumes.
+=cut
+sub create_volume {
+    my $self = shift;
+    my (%params) = @_;
+    $params{filername} = $self->name;
+    my $volume;
+    given ($self->type) {
+        when('polyserve') {
+            $volume = SDM::Disk::PolyserveVolume->create( %params );
+            unless ($volume) {
+                $self->error_message("failed to create volume");
+                return;
+            }
+        }
+        default {
+            $volume = SDM::Disk::Volume->create( %params );
+            unless ($volume) {
+                $self->error_message("failed to create volume");
+                return;
+            }
+        }
+    }
+    return $volume;
 }
 
 =head create
