@@ -7,39 +7,6 @@ use warnings;
 use SDM;
 use Date::Manip;
 
-=head2 SDM::Disk::Volume
-A Volume may be commonly referred to by its nfs mount_path:
-
-  /gscmnt/gc2111 -> nfshost:/vol/gc2111
-
-  name: gc2111
-  mount_point: /gscmnt
-  mount_path: /gscmnt/gc2111
-  filername: nfshost
-  physical_path: /vol/gc2111
-
-This scheme is born from conventions at The Genome Institute.
-We must also support schemes:
-
-  /gscmnt/400 -> nfshost:/vol/400
-
-  name: 400
-  mount_point: /gscmnt
-  mount_path: /gscmnt/400
-  filername: nfshost
-  physical_path: /vol/400
-
-And:
-
-  /gscmnt/200 -> nfshost:/vol/home200
-
-  name: 200
-  mount_point: /gscmnt
-  mount_path: /gscmnt/200
-  filername: nfshost
-  physical_path: /vol/home200
-
-=cut
 class SDM::Disk::Volume {
     table_name => 'disk_volume',
     id_generator => '-uuid',
@@ -47,7 +14,7 @@ class SDM::Disk::Volume {
         id => { is => 'Text' },
     ],
     has => [
-        name            => { is => 'Text', len => 255 },
+        #name            => { is => 'Text', len => 255 },
         filername       => { is => 'Text', len => 255 },
         physical_path   => { is => 'Text', len => 255 },
         # More than one filer named fname might have /vol/home
@@ -55,12 +22,6 @@ class SDM::Disk::Volume {
         # There should not be more than one mount_path for fname+physical_path,
         # this is enforce by the DB schema UNIQUE constraint.
         mount_point     => { is => 'Text', default_value => '/gscmnt' },
-        mount_path      => {
-            is => 'Text',
-            is_calculated => 1,
-            calculate_from => [ 'name','mount_point' ],
-            calculate => q| return $mount_point . "/" . $name |,
-        },
         filer           => { is => 'SDM::Disk::Filer', id_by => 'filername' },
         hostname        => { is => 'Text', via => 'filer', to => 'hostname' },
         arrayname       => { is => 'Text', via => 'filer', to => 'arrayname' },
@@ -80,6 +41,20 @@ class SDM::Disk::Volume {
         mount_options   => { is => 'Text', default_value => '-intr,tcp,rsize=32768,wsize=32768' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
         #gpfs_disk_perf  => { is => 'SDM::Gpfs::GpfsDiskPerf', reverse_as => 'volume' },
+        duplicates => {
+            is => 'Text',
+            doc => 'ID of another volume, to allow a volume to be stored as unique but really be a duplicate. ie. Polyserve nfs11+/vol/sata800 duplicates nfs12+/vol/sata800'
+        },
+        duplicate => {
+            is => 'SDM::Disk::Volume',
+            id_by => 'duplicates',
+        },
+        same_as => {
+            is => 'Text',
+            doc => 'A printable form of "duplicates" to be used in an object lister',
+            calculate_from => 'duplicate',
+            calculate => q| return unless $duplicate; my $fn = $duplicate->filername; my $p = $duplicate->physical_path;  return "$fn:$p"; |,
+        },
         gpfs_fsperf_id  => {
             is => 'Number',
             calculate_from => 'mount_path',
@@ -200,31 +175,29 @@ sub purge {
     }
 }
 
-sub name {
-    # Override the name accessor to prevent modifying an existing object into another existing object
-    # Prevent changing filername1:name1 into an already existing filername1:name2
-    my $self = shift;
-    my $name = shift;
-    my $filername = $self->__filername;
-    if ($name) {
-        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
-            $self->error_message("an object already exists with name $name on filer $filername");
-            return;
-        }
-        return $self->__name( $name );
-    }
-    return $self->__name();
-}
+#sub name {
+#    # Override the name accessor to prevent modifying an existing object into another existing object
+#    # Prevent changing filername1:name1 into an already existing filername1:name2
+#    my $self = shift;
+#    my $name = shift;
+#    my $filername = $self->__filername;
+#    if ($name) {
+#        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
+#            $self->error_message("an object already exists with name $name on filer $filername");
+#            return;
+#        }
+#        return $self->__name( $name );
+#    }
+#    return $self->__name();
+#}
 
 sub filername {
-    # Override the name accessor to prevent modifying an existing object into another existing object
-    # Prevent changing filername1:name1 into an already existing filername2:name1
     my $self = shift;
     my $filername = shift;
-    my $name = $self->__name;
+    my $physical_path = $self->physical_path;
     if ($filername) {
-        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
-            $self->error_message("an object already exists with name $name on filer $filername");
+        if ( SDM::Disk::Volume->get( physical_path => $physical_path, filername => $filername ) ) {
+            $self->error_message("an object already exists with physical_path $physical_path on filer $filername");
             return;
         }
         return $self->__filername( $filername );
@@ -270,10 +243,10 @@ sub create {
         $param{disk_group} = $group_name;
     }
 
-    if ($param{name} and $param{filername}) {
-        my @obj = SDM::Disk::Volume->get( name => $param{name}, filername => $param{filername} );
+    if ($param{filername} and $param{physical_path}) {
+        my @obj = SDM::Disk::Volume->get( filername => $param{filername}, physical_path => $param{physical_path} );
         if (@obj) {
-            $self->error_message("an object already exists with name $param{name} and filername $param{filername}");
+            $self->error_message("an object already exists with filername $param{filername} and physical_path $param{physical_path}");
             return;
         }
     }
@@ -284,7 +257,7 @@ sub create {
 
 sub delete {
     my $self = shift;
-    my @filesets = SDM::Disk::Fileset->get( parent_volume_name => $self->name );
+    my @filesets = SDM::Disk::Fileset->get( parent_volume_id => $self->id );
     if (@filesets) {
         $self->error_message("cowardly refusing to delete a volume that contains filesets!  delete the filesets first!");
         return;
