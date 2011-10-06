@@ -100,13 +100,6 @@ sub create_volume {
     $params{filername} = $self->name;
     my $volume;
     given ($self->type) {
-        when('polyserve') {
-            $volume = SDM::Disk::PolyserveVolume->create( %params );
-            unless ($volume) {
-                $self->error_message("failed to create volume");
-                return;
-            }
-        }
         default {
             $volume = SDM::Disk::Volume->create( %params );
             unless ($volume) {
