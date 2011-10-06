@@ -78,7 +78,6 @@ sub _get_disk_group_via_snmp {
         my $path = dirname $value;
         my $group = basename $value;
         $group =~ s/^DISK_//;
-        #$self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp has $key $value $path $physical_path $group");
         if ($path eq $physical_path) {
             $self->logger->debug(__PACKAGE__ . " _get_disk_group_via_snmp returns $group for $physical_path");
             return $group;
@@ -97,24 +96,21 @@ Try to determine the disk group:
 =cut
 sub _get_disk_group {
     my $self = shift;
-    # FIXME: Volume as arg, the following are attrs of volume obj.
     my $physical_path = shift;
     my $mount_path = shift;
     $self->logger->debug(__PACKAGE__ . " _get_disk_group($physical_path)");
+    return unless ($physical_path);
 
     my $disk_group;
 
     # Do we already have the disk group name?
-    if (defined $mount_path) {
-        # FIXME: remove, should already have single volume and its moutn_path attr
-        my @volumes = SDM::Disk::Volume->get( mount_path => $mount_path );
-        my $volume = shift @volumes;
-        if ($volume) {
-            $disk_group = $volume->disk_group;
-            if (defined $disk_group) {
-                $self->logger->debug(__PACKAGE__ . " _get_disk_group returns existing group $disk_group");
-                return $disk_group if (defined $disk_group);
-            }
+    my @volumes = SDM::Disk::Volume->get( physical_path => $physical_path );
+    my $volume = shift @volumes;
+    if ($volume) {
+        my $disk_group = $volume->disk_group;
+        if (defined $disk_group) {
+            $self->logger->debug(__PACKAGE__ . " _get_disk_group returns existing group $disk_group");
+            return $disk_group;
         }
     }
 
@@ -145,11 +141,13 @@ sub _get_disk_group {
     # This will actually mount a mount point via automounter.
     # Be careful to not overwhelm NFS servers.
     # NB. This is a convention from Storage team to use DISK_ touchfiles.
-    my $file = pop @{ [ glob("$mount_path/DISK_*") ] };
-    if (defined $file and $file =~ m/^\S+\/DISK_(\S+)/) {
-        $disk_group = $1;
-    } else {
-        $disk_group = undef;
+    if ($mount_path) {
+        my $file = pop @{ [ glob("$mount_path/DISK_*") ] };
+        if (defined $file and $file =~ m/^\S+\/DISK_(\S+)/) {
+            $disk_group = $1;
+        } else {
+            $disk_group = undef;
+        }
     }
 
     $self->logger->debug(__PACKAGE__ . " _get_disk_group filesystem mount returns: " . Data::Dumper::Dumper $disk_group);
@@ -208,33 +206,17 @@ sub _convert_to_volume_data {
             return;
         }
 
-        my $volume_name = basename $physical_path;
         if ($self->translate_path) {
-            $volume_name = substr($volume_name,4); # strip out ^home to satisfy an old GC convention
+            # FIXME: Local to TGI only
+            $physical_path =~ s/\/home/\//; # strip out ^home to satisfy an old TGI convention
         }
 
-        my $mount_path = $self->mount_point . "/" . $volume_name;
-        unless ($self->discover_volumes) {
-            # In this case we expect to have defined all our volumes and know their mount_paths.
-            # FIXME: What if we've defined 69 volumes and we added 1, it'll be annoying to have to manually add them.
-            # Otherwise, we choose a mount_path based on convention, above.
-            my $volume = SDM::Disk::Volume->get( $volume_name );
-            unless ($volume) {
-                $self->logger->warn(__PACKAGE__ . " no volume found for " . $self->hostname . ": $physical_path");
-                $self->logger->warn(__PACKAGE__ . " consider using --discover-volumes");
-                next;
-            }
-            # We allow Volumes to be "moved" to other filers.  If the current host offers a physical path
-            # for a volume defined elsewhere, then ignore it here and warn.
-            if ($volume->filername ne $self->hostname) {
-                $self->logger->warn(__PACKAGE__ . " volume " . $volume->name . " is configured at filer " . $volume->filername . ", ignoring $physical_path on " . $self->hostname);
-                next;
-            }
-            $mount_path = $volume->mount_path;
-        }
+        my $mount_path;
+        my ($toss,$dev,$volume_name) = split(/\//,$physical_path,3);
+        $mount_path = $self->mount_point . "/" . $volume_name;
+        $mount_path = undef if ($physical_path =~ /.snapshot/);
 
         $volume_table->{$physical_path} = {} unless (exists $volume_table->{$physical_path});
-        $volume_table->{$physical_path}->{name} = $volume_name;
         $volume_table->{$physical_path}->{mount_path} = $mount_path;
         $volume_table->{$physical_path}->{used_kb} = $used;
         $volume_table->{$physical_path}->{total_kb} = $total;
@@ -396,30 +378,28 @@ sub _update_volumes {
     my $self = shift;
     my $volumedata = shift;
     my $filer = shift;
+    my $filername = $filer->name;
 
     unless ($filer->name) {
         $self->logger->error(__PACKAGE__ . " _update_volumes(): no filer given");
         return;
     }
     unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " _update_volumes(): filer " . $filer->name . " returned empty SNMP volumedata");
+        $self->logger->warn(__PACKAGE__ . " _update_volumes(): filer $filername returned empty SNMP volumedata");
         return;
     }
 
-    $self->logger->warn(__PACKAGE__ . " _update_volumes(" . $filer->name . ")");
+    $self->logger->warn(__PACKAGE__ . " _update_volumes($filername)");
 
     unless ($self->physical_path) {
         # QuerySnmp First find and remove volumes in the DB that are not detected on this filer
         # For this filer, find any stored volumes that aren't present in the volumedata retrieved via SNMP.
         # Note that we skip this step if we specified a single physical_path to update.
-        foreach my $volume ( SDM::Disk::Volume->get( filername => $filer->name ) ) {
+        foreach my $volume ( SDM::Disk::Volume->get( filername => $filername ) ) {
             foreach my $path ($volume->physical_path) {
-                next unless($path);
-                $path =~ s/\//\\\//g;
-                if ( ! grep /$path/, keys %$volumedata ) {
-                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '" . $filer->name . "': " . $volume->id);
-                    # FIXME: do we want to auto-remove like this?
-                    #$volume->delete;
+                if ( ! defined $volumedata->{$path} ) {
+                    $self->logger->warn(__PACKAGE__ . " volume is no longer exported by filer '$filername': $path");
+                    $volume->delete;
                 }
             }
         }
@@ -430,23 +410,17 @@ sub _update_volumes {
 
         next if ($physical_path eq '/');
 
-        my $name = $volumedata->{$physical_path}->{name};
-        if (! defined $name or $name eq '') {
-            $self->logger->error(__PACKAGE__ . " skipping volume with incomplete parameters: $physical_path");
-            next;
-        }
-
         my $volume;
         if ($filer->type eq 'polyserve') {
-            $volume = SDM::Disk::PolyserveVolume->get_or_create( filername => $filer->name, physical_path => $physical_path, name => $name );
+            $volume = SDM::Disk::PolyserveVolume->get_or_create( filername => $filername, physical_path => $physical_path );
         } else {
-            $volume = SDM::Disk::Volume->get_or_create( filername => $filer->name, physical_path => $physical_path, name => $name );
+            $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
         }
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: " . $filer->name . ", $physical_path, $name");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: " . $filername . ", $physical_path");
             next;
         }
-        $self->logger->debug(__PACKAGE__ . " found volume: $name: " . $filer->name . ", $physical_path");
+        $self->logger->debug(__PACKAGE__ . " found volume: " . $filername . ", $physical_path");
 
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
@@ -461,12 +435,10 @@ sub _update_volumes {
                 $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
                 next;
             }
-        } else {
-            $self->logger->warn(__PACKAGE__ . " no group found for volume: $name");
         }
 
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $name");
+            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername:$physical_path");
             next;
         }
 
@@ -477,7 +449,7 @@ sub _update_volumes {
             my $p = $volume->__meta__->property($attr);
             # Primary keys are immutable, don't try to update them
             $volume->$attr($volumedata->{$physical_path}->{$attr})
-                if (! $p->is_id and $p->is_mutable);
+                if ($p and ! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
         }
     }

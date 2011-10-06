@@ -386,7 +386,7 @@ sub _update_volumes {
         return;
     }
     unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer " . $filername . " returned empty volumedata");
+        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer $filername returned empty volumedata");
         return;
     }
 
@@ -435,18 +435,16 @@ sub _update_volumes {
 
         # Now we have groups, so add the volumes we've discovered.
         my $physical_path = $volumedata->{$name}->{physical_path};
-        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path, name => $name );
-        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, name => $name );
-        my $volume = SDM::Disk::Volume->get( filername => $filername, name => $name );
+        my $volume = SDM::Disk::Volume->get( filername => $filername, physical_path => $physical_path );
         unless ($volume) {
-            $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path, name => $name );
-            $self->logger->error(__PACKAGE__ . " create volume: $filername, $name");
+            $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path );
+            $self->logger->error(__PACKAGE__ . " create volume: $filername, $physical_path");
             unless ($volume) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path, $name");
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path");
                 next;
             }
         }
-        $self->logger->debug(__PACKAGE__ . " found volume: $name: $filername, $physical_path");
+        $self->logger->debug(__PACKAGE__ . " found volume: $filername, $physical_path");
         foreach my $attr (keys %{ $volumedata->{$name} }) {
             next unless (defined $volumedata->{$name}->{$attr});
             # FIXME: Don't update disk group from filesystem, only the reverse.
@@ -462,22 +460,26 @@ sub _update_volumes {
         # Create filesets if present
         foreach my $fileset (@{ $volumedata->{$name}->{filesets} }) {
 
+            my $parent = delete $fileset->{parent_volume_name};
+            my $physical_path = $volumedata->{$name}->{physical_path} . "/$parent";
+            my $id = SDM::Disk::Volume->get( physical_path => $physical_path );
+
             $fileset->{parent_volume_id} = $volume->id;
             $fileset->{filername} = $filername;
-            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . $fileset->{name};
+            $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . delete $fileset->{name};
             $fileset->{total_kb} = $fileset->{kb_limit};
             $fileset->{used_kb} = $fileset->{kb_size};
 
-            my $fs = SDM::Disk::Fileset->get( filername => $filername, name => $fileset->{name} );
+            my $fs = SDM::Disk::Fileset->get( filername => $filername, physical_path => $fileset->{physical_path} );
             unless ($fs) {
-                $self->logger->error(__PACKAGE__ . " create fileset: $filername, " . $fileset->{name});
+                $self->logger->error(__PACKAGE__ . " create fileset: $filername, " . $fileset->{physical_path});
                 $fs = SDM::Disk::Fileset->create( %$fileset );
                 unless ($fs) {
-                    $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{name});
+                    $self->logger->error(__PACKAGE__ . " failed to get_or_create fileset: " . $fileset->{physical_path});
                     next;
                 }
             }
-            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{name});
+            $self->logger->debug(__PACKAGE__ . " found fileset: " . $fileset->{physical_path});
             foreach my $attr (keys %$fileset) {
                 next unless (defined $fileset->{$attr});
                 my $p = $fs->__meta__->property($attr);
@@ -487,7 +489,7 @@ sub _update_volumes {
                     if (! $p->is_id and $p->is_mutable);
                 $fs->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
             }
-            $self->logger->debug(__PACKAGE__ . " updated volume for fileset: " . $fileset->{name} . ": $filername, ");
+            $self->logger->debug(__PACKAGE__ . " updated volume for fileset: " . $fileset->{physical_path} . ": $filername, ");
         }
 
     }
