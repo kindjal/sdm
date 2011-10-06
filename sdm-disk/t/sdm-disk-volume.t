@@ -21,23 +21,17 @@ my $params;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # Test insufficient creation params
 my @params = ();
 ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with empty param" );
-@params = ( mount_point => '/gscmnt', name => 'sata800' );
+@params = ( mount_point => '/gscmnt' );
 ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no filer or physical path" );
 @params = ( physical_path => '/vol/sata800' );
 ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no filer or mount_point" );
-@params = ( mount_point => '/gscmnt', physical_path => '/vol/sata800' );
-ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no name" );
-@params = ( mount_point => '/gscmnt', name => 'sata800', filername => 'nfs11' );
+@params = ( mount_point => '/gscmnt', filername => 'nfs11' );
 ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no physical_path" );
-@params = ( physical_path => '/vol/sata800', filername => 'nfs11' );
-ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no mount_point or name" );
-@params = ( filername => 'nfs11' );
-ok( ! defined SDM::Disk::Volume->create( @params ), "properly fail to create volume with no physical mount_point and name" );
 
 # Create filer to test with
 my $nfs11 = SDM::Disk::Filer->create( name => 'nfs11', type => 'polyserve' );
@@ -58,35 +52,35 @@ isa_ok( $r, "SDM::Disk::FilerHostBridge" );
 ok( defined SDM::Disk::Group->create( name => 'INFO_GENOME_MODELS' ), "created test group ok");
 
 # Test creation
-@params = ( filername => 'nfs11', mount_point => '/gscmnt', name => 'sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
-$res = SDM::Disk::PolyserveVolume->create( @params );
+@params = ( filername => 'nfs11', mount_point => '/gscmnt', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
+$res = SDM::Disk::Volume->create( @params );
 ok( defined $res->id, "properly created new volume");
 $res->delete;
 
 # Create via volume
-@params = ( mount_point => '/gscmnt', name => 'sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
+@params = ( mount_point => '/gscmnt', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
 $res = $nfs11->create_volume( @params );
 ok( defined $res->id, "properly created new volume");
 
-# Create polyservevolume directly
-@params = ( filername => 'nfs11', mount_point => '/gscmnt', name => 'sata800', physical_path => '/vol/sata800' );
-$res = SDM::Disk::PolyserveVolume->get( @params );
+# Create volume directly
+@params = ( mount_point => '/gscmnt', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
+$res = SDM::Disk::Volume->get( @params );
 ok( defined $res->id, "properly got new volume");
 
 # Test creation of new mount of same Volume mount_path
-@params = ( filername => 'nfs12', mount_point => '/gscmnt', name => 'sata800', physical_path => '/vol/sata800' );
-$res = SDM::Disk::PolyserveVolume->get_or_create( @params );
-warn "" . Data::Dumper::Dumper $res;
+@params = ( filername => 'nfs12', mount_point => '/gscmnt', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1, duplicates => $res->id );
+$res = SDM::Disk::Volume->get_or_create( @params );
 UR::Context->commit();
-#ok( ! defined $res, "properly prevented duplicate volume creation");
+ok( defined $res->id, "properly created duplicate volume");
 __END__
 
-# Test get() of calculated mount_path
-$res = SDM::Disk::Volume->get( mount_path => '/gscmnt/sata800' );
-ok( $res->name eq 'sata800', "properly prevented duplicate volume creation");
+@params = ( filername => 'nfs12', mount_point => '/gscmnt', physical_path => '/vol/sata800', duplicates => $res->id );
+$res = SDM::Disk::Volume->get_or_create( @params );
+UR::Context->commit();
+ok( defined $res->id, "properly created duplicate volume");
 
 # Test update of value
-@params = ( name => 'sata800' );
+@params = ( physical_path => '/vol/sata800' );
 $res = SDM::Disk::Volume->get( @params );
 $res->total_kb(1000);
 ok( $res->total_kb == 1000, "total_kb set to 1000");
@@ -102,7 +96,7 @@ stderr_like { $res->validate(); } qr|Aging volume: /gscmnt/sata800|, "validate r
 stderr_like { $res->purge(); } qr|Purging aging volume: /gscmnt/sata800|, "validate runs ok";
 
 # Now test 'delete'
-@params = ( name => 'sata800', mount_point => '/gscmnt', filername => 'nfs11', physical_path => '/vol/sata800' );
+@params = ( mount_point => '/gscmnt', filername => 'nfs11', physical_path => '/vol/sata800' );
 $res = SDM::Disk::Volume->create( @params );
 $res = SDM::Disk::Volume->get( @params );
 $res->delete();

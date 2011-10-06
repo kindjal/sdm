@@ -1,5 +1,5 @@
 
-package SDM::Test::Lib;
+package SDM::Disk::Lib;
 
 use strict;
 use warnings;
@@ -106,13 +106,13 @@ sub testinit {
 
 sub testdata {
     my $self = shift;
-    my $filer = SDM::Disk::Filer->create(name => "gpfs", status => 1, comments => "This is a comment");
+    my $filer = SDM::Disk::Filer->create(name => "gpfs", status => 1, comments => "This is a comment", type => "gpfs");
     $filer->created("0000-00-00 00:00:00");
     $filer->last_modified("0000-00-00 00:00:00");
-    $filer = SDM::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment");
+    $filer = SDM::Disk::Filer->create(name => "gpfs2", status => 1, comments => "This is another comment", type => "gpfs");
     $filer->created("0000-00-00 00:00:00");
     $filer->last_modified("0000-00-00 00:00:00");
-    $filer = SDM::Disk::Filer->create(name => "gpfs-dev", status => 1, comments => "This is another comment");
+    $filer = SDM::Disk::Filer->create(name => "gpfs-dev", status => 1, comments => "This is another comment", type => "gpfs");
     $filer->created("0000-00-00 00:00:00");
     $filer->last_modified("0000-00-00 00:00:00");
     my $host = SDM::Disk::Host->create(hostname => "linuscs103", master => 0);
@@ -129,13 +129,13 @@ sub testdata {
     SDM::Disk::Group->create(name => "INFO_APIPE");
 
     # If you change these sample volumes, unit tests expected values will also change.
-    SDM::Disk::Volume->create( name=>"gc2111", mount_point => '/gscmnt', physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
-    SDM::Disk::Volume->create( name=>"gpfsdev2", mount_point => '/gscmnt', physical_path=>"/vol/gpfsdev2", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
-    SDM::Disk::Volume->create( name=>"gc2112", mount_point => '/gscmnt', physical_path=>"/vol/gc2112", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs");
-    SDM::Disk::Volume->create( name=>"gc2113", mount_point => '/gscmnt', physical_path=>"/vol/gc2113", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs2");
-    SDM::Disk::Volume->create( name=>"gc2114", mount_point => '/gscmnt', physical_path=>"/vol/gc2114", disk_group=>"SYSTEMS", total_kb=>100, used_kb=>90, filername=>"gpfs2");
-    SDM::Disk::Volume->create( name=>"gc2115", mount_point => '/gscmnt', physical_path=>"/vol/gc2115", disk_group=>"INFO_APIPE", total_kb=>100, used_kb=>90, filername=>"gpfs2");
-    SDM::Disk::Volume->create( name=>"gc2116", mount_point => '/gscmnt', physical_path=>"/vol/gc2116", total_kb=>100, used_kb=>90, filername=>"gpfs-dev");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2111", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2116", total_kb=>100, used_kb=>90, filername=>"gpfs-dev");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gpfsdev2", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>50, filername=>"gpfs-dev");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2112", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2113", disk_group=>"SYSTEMS_DEVELOPMENT", total_kb=>100, used_kb=>90, filername=>"gpfs2");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2114", disk_group=>"SYSTEMS", total_kb=>100, used_kb=>90, filername=>"gpfs2");
+    SDM::Disk::Volume->create( mount_point => '/gscmnt', physical_path=>"/vol/gc2115", disk_group=>"INFO_APIPE", total_kb=>100, used_kb=>90, filername=>"gpfs2");
     UR::Context->commit();
     return 0;
 }

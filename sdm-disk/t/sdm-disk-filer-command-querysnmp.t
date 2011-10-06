@@ -28,9 +28,9 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Test::Lib->new();
+my $t = SDM::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
-ok( $t->testdata == 0, "ok: add data");
+#ok( $t->testdata == 0, "ok: add data");
 
 sub fileslurp {
     my $filename = shift;
@@ -40,14 +40,15 @@ sub fileslurp {
     return $content;
 }
 
-my $filer = SDM::Disk::Filer->get( name => 'gpfs-dev' );
+my $gpfsdev = SDM::Disk::Filer->create( name => 'gpfs-dev', type => 'gpfs' );
+ok( defined $gpfsdev->id, "created filer ok");
+my $gpfs2 = SDM::Disk::Filer->create( name => 'gpfs2', type => 'gpfs' );
+ok( defined $gpfs2->id, "created filer ok");
 
+# mimic acquire_volume_data and update_volumes
+my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0, discover_groups => 0 );
 my $d = SDM::SNMP::DiskUsage->create( loglevel => "DEBUG", discover_volumes => 1, hostname => 'linuscs107' );
 $d->hosttype('netapp');
-my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0 );
-
-#stderr_like { $c->execute(); } qr/DiskUsage no volume found for gpfs-dev/, "skipped unknown volume ok";
-# mimic acquire_volume_data and update_volumes
 # first with discover_volumes = 0 then 1
 # netapp and linux host
 my $oid = 'dfTable';
@@ -55,22 +56,18 @@ my $lines = fileslurp("$top/t/dfTable.txt");
 my @content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
 my $snmp_table = $d->read_snmp_into_table($oid, \@content);
 my $table = $d->_convert_to_volume_data( $snmp_table );
-$c->_update_volumes( $table, $filer->name );
-UR::Context->commit();
+$c->_update_volumes( $table, $gpfsdev );
+delete $table->{'/vol/x64mswin/'};
+$c->_update_volumes( $table, $gpfsdev );
 
-__END__
-
+$d->hosttype('linux');
 $oid = 'hrStorageTable';
-my $snmp_table = $c->read_snmp_into_table($oid);
-my $table = $c->_convert_to_volume_data( $snmp_table );
-$c->_update_volumes( $table, $filer->name );
+$lines = fileslurp("$top/t/hrStorageTable.txt");
+@content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+$snmp_table = $d->read_snmp_into_table($oid, \@content);
+$table = $d->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table, $gpfs2 );
 
-$c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 1 );
-lives_ok { $c->execute(); } "run lived";
-my @v = SDM::Disk::Volume->get( filername => "gpfs-dev" );
-my $v = shift @v;
-ok($v->filername eq 'gpfs-dev', "filername set");
-ok(defined $v->name, "volume name set");
-ok(defined $v->used_kb, "used_kb set");
+UR::Context->commit();
 
 done_testing();
