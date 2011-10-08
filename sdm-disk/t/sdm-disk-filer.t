@@ -21,29 +21,30 @@ my $params;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # Test insufficient creation params
 my @params = ();
+my $filer = SDM::Disk::Filer->create( @params );
 ok( ! defined SDM::Disk::Filer->create( @params ), "properly fail to create filer with empty param" );
 
 # Test creation
-@params = ( name => 'nfs11', type => 'polyserve' );
+@params = ( name => 'nfs11' );
 $res = SDM::Disk::Filer->create( @params );
-ok( $res->id eq 'nfs11', "properly created new filer");
+ok( $res->id eq 'nfs11', "properly created new filer nfs11");
 @params = ( name => 'nfs11' );
 $res = SDM::Disk::Filer->get( @params );
-ok( $res->id eq 'nfs11', "properly got new filer");
+ok( $res->id eq 'nfs11', "properly got new filer nfs11");
 
-@params = ( name => 'nfs12', type => 'polyserve' );
+@params = ( name => 'nfs12' );
 $res = SDM::Disk::Filer->create( @params );
-ok( $res->id eq 'nfs12', "properly created another new filer");
+ok( $res->id eq 'nfs12', "properly created another new filer nfs12");
 
 # Test deletion of 1 Filer
 @params = ( name => 'nfs11' );
 $res = SDM::Disk::Filer->get( @params );
 $res->delete();
-isa_ok( $res, 'UR::DeletedRef', "properly delete filer" );
+isa_ok( $res, 'UR::DeletedRef', "properly delete filer nfs11" );
 
 # Test update of value
 @params = ( name => 'nfs12' );
@@ -58,8 +59,9 @@ $res->last_modified( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() - 87000 ) 
 ok( $res->is_current(86400) == 1, "filer is aged");
 
 # Now test 'delete'
-$res = SDM::Disk::Filer->get();
+$res = SDM::Disk::Filer->get( name => 'nfs12' );
 $res->delete();
 isa_ok( $res, 'UR::DeletedRef' );
 
+UR::Context->commit();
 done_testing();

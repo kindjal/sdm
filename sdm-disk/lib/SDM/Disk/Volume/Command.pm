@@ -14,7 +14,7 @@ use SDM::Command::Crud;
 SDM::Command::Crud->init_sub_commands(
     target_class => 'SDM::Disk::Volume',
     target_name => 'volume',
-    list => { show => 'physical_path,filername,total_kb,used_kb,disk_group,hostname,arrayname' }
+    list => { show => 'id,physical_path,mount_path,filername,total_kb,used_kb,disk_group,hostname,arrayname' }
 );
 
 1;

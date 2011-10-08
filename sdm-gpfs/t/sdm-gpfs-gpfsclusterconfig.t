@@ -25,9 +25,9 @@ if ($top =~ /deploy/) {
 } else {
     require "$top/../sdm-disk/t/sdm-disk-lib.pm";
 }
-ok( SDM::Test::Lib->has_gpfs_snmp == 1, "has gpfs");
-ok( SDM::Test::Lib->testinit == 0, "init db");
-ok( SDM::Test::Lib->testdata == 0, "data db");
+ok( SDM::Disk::Lib->has_gpfs_snmp == 1, "has gpfs");
+ok( SDM::Disk::Lib->testinit == 0, "init db");
+ok( SDM::Disk::Lib->testdata == 0, "data db");
 
 my $res;
 

@@ -14,7 +14,7 @@ use SDM::Command::Crud;
 SDM::Command::Crud->init_sub_commands(
     target_class => 'SDM::Disk::Filer',
     target_name => 'filer',
-    list => { show => 'name,type,status,hostname,arrayname,comments' }
+    list => { show => 'name,status,hostname,arrayname,comments' }
 );
 
 1;

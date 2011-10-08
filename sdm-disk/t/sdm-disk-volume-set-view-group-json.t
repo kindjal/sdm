@@ -24,7 +24,7 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Test::Lib->new();
+my $t = SDM::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
@@ -33,7 +33,7 @@ my $s = SDM::Disk::Volume->define_set();
 my $v = $s->create_view( perspective => 'group', toolkit => 'json' );
 my $got = $v->_generate_content();
 
-# This must match the data used in SDM::Test::Lib->testdata
+# This must match the data used in SDM::Disk::Lib->testdata
 my $expected = {
    "aaData" => [
       [

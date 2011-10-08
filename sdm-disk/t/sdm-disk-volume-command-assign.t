@@ -29,7 +29,7 @@ my $params;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # Create filer and group to test with
 my $filer = SDM::Disk::Filer->create( name => 'localhost' );
@@ -42,7 +42,7 @@ ok( defined $group, "created test group ok");
 my $dir = "$top/t/test_volume";
 File::Path::rmtree $dir;
 mkdir $dir, 0755 or die "Can't make test dir: $dir: $!";
-my @params = ( filername => 'localhost', name => 'test_volume', mount_point => "$top/t", physical_path => $dir );
+my @params = ( filername => 'localhost', mount_path => $dir, physical_path => $dir );
 my $volume = SDM::Disk::Volume->create( @params );
 ok( defined $volume, "properly created new volume");
 

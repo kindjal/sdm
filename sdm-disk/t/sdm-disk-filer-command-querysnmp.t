@@ -40,9 +40,9 @@ sub fileslurp {
     return $content;
 }
 
-my $gpfsdev = SDM::Disk::Filer->create( name => 'gpfs-dev', type => 'gpfs' );
+my $gpfsdev = SDM::Disk::Filer->create( name => 'gpfs-dev' );
 ok( defined $gpfsdev->id, "created filer ok");
-my $gpfs2 = SDM::Disk::Filer->create( name => 'gpfs2', type => 'gpfs' );
+my $gpfs2 = SDM::Disk::Filer->create( name => 'gpfs2' );
 ok( defined $gpfs2->id, "created filer ok");
 
 # mimic acquire_volume_data and update_volumes

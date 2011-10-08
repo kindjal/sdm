@@ -24,19 +24,17 @@ require "$top/t/sdm-disk-lib.pm";
 ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # Test insufficient creation params
-my @params = ();
-ok( ! defined SDM::Disk::Fileset->create( @params ), "properly fail to create fileset with empty param" );
-@params = ( mount_point => '/gscmnt' );
-ok( ! defined SDM::Disk::Fileset->create( @params ), "properly fail to create fileset with no filer or physical path" );
-@params = ( physical_path => '/vol/sata800' );
-ok( ! defined SDM::Disk::Fileset->create( @params ), "properly fail to create fileset with no filer or mount_point" );
-@params = ( mount_point => '/gscmnt', filername => 'nfs11' );
-ok( ! defined SDM::Disk::Fileset->create( @params ), "properly fail to create fileset with no physical_path" );
+my %params = ();
+ok( ! defined SDM::Disk::Fileset->create( %params ), "properly fail to create fileset with empty param" );
+%params = ( physical_path => '/vol/sata800' );
+ok( ! defined SDM::Disk::Fileset->create( %params ), "properly fail to create fileset with no filer name" );
+%params = ( filername => 'nfs11' );
+ok( ! defined SDM::Disk::Fileset->create( %params ), "properly fail to create fileset with no physical_path" );
 
 # Create filer to test with
-ok( defined SDM::Disk::Filer->create( name => 'nfs11', type => 'polyserve' ), "created test filer ok");
-ok( defined SDM::Disk::Filer->create( name => 'nfs12', type => 'polyserve' ), "created test filer ok");
-ok( defined SDM::Disk::Filer->create( name => 'gpfs', type => 'gpfs' ), "created test filer ok");
+ok( defined SDM::Disk::Filer->create( name => 'nfs11' ), "created test filer ok");
+ok( defined SDM::Disk::Filer->create( name => 'nfs12' ), "created test filer ok");
+ok( defined SDM::Disk::Filer->create( name => 'gpfs' ), "created test filer ok");
 
 ok( my $array = SDM::Disk::Array->create( name => 'nsams2k1' ), "created test array ok");
 ok( my $host = SDM::Disk::Host->create( hostname => 'linuscs103' ), "created test host ok");
@@ -49,47 +47,46 @@ isa_ok( $r, "SDM::Disk::FilerHostBridge" );
 ok( defined SDM::Disk::Group->create( name => 'INFO_GENOME_MODELS' ), "created test group ok");
 
 # Test premature creation
-@params = ( filername => 'nfs11', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
-$res = SDM::Disk::Fileset->create( @params );
+%params = ( filername => 'nfs11', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 2, used_kb => 1 );
+$res = SDM::Disk::Fileset->create( %params );
 ok( ! defined $res, "properly failed to create new fileset without parent volume");
 
-@params = ( filername => 'gpfs', physical_path => '/vol/aggr0', disk_group => 'INFO_GENOME_MODELS', total_kb => 2000, used_kb => 1000 );
-my $volume = SDM::Disk::Volume->create( @params );
+%params = ( filername => 'gpfs', physical_path => '/vol/aggr0', disk_group => 'INFO_GENOME_MODELS', total_kb => 2000, used_kb => 1000 );
+my $volume = SDM::Disk::Volume->create( %params );
+
 ok( defined $volume->id, "properly created new parent volume aggr0");
 
-my %params = (
+%params = (
         filername => 'nfs11',
-        mount_point => '/gscmnt',
         parent_volume_id => $volume->id,
         physical_path => '/vol/aggr0/gc7000',
+        mount_path => '/gscmnt/aggr0/gc7000',
         disk_group => 'INFO_GENOME_MODELS',
         kb_size => 62210072304,
         kb_quota => 0,
         kb_limit => 214748364800,
         kb_in_doubt => 27967088,
-        kb_grace => undef,
+        kb_grace => 'none',
         files => 214324,
         file_quota => 0,
         file_limit => 0,
         file_in_doubt => 138,
-        file_grace => undef,
+        file_grace => 'none',
         file_entryType => 'e'
 );
 $res = SDM::Disk::Fileset->create( %params );
 ok( defined $res->id, "properly created new fileset");
 
-# Test creation of new mount of same Volume mount_path
-$params{ filername } = 'nfs12';
-$res = SDM::Disk::Fileset->get_or_create( %params );
+# Test creation of new mount of same Volume physical_path
+$res = SDM::Disk::Fileset->create( %params );
 ok( ! defined $res, "properly prevented duplicate volume creation");
 
-# Test get() of calculated mount_path
 $res = SDM::Disk::Volume->get( mount_path => '/gscmnt/aggr0/gc7000' );
 ok( $res->physical_path eq '/vol/aggr0/gc7000', "properly got via mount_path");
 
 # Test update of value
-@params = ( physical_path => '/vol/aggr0/gc7000' );
-$res = SDM::Disk::Volume->get( @params );
+%params = ( physical_path => '/vol/aggr0/gc7000' );
+$res = SDM::Disk::Volume->get( %params );
 $res->total_kb(70000000000);
 ok( $res->total_kb == 70000000000, "total_kb set to 70000000000");
 
@@ -99,42 +96,8 @@ ok( $res->is_current(86400) == 0, "volume is current" );
 $res->last_modified( Date::Format::time2str(q|%Y%m%d%H:%M:%S|, time() - 87000 ) );
 ok( $res->is_current(86400) == 1, "volume is aged");
 
-
 # Test validate and purge for aging volumes
-stderr_like { $res->validate(); } qr|Aging volume: /gscmnt/aggr0/gc7000|, "validate runs ok";
-stderr_like { $res->purge(); } qr|Purging aging volume: /gscmnt/aggr0/gc7000|, "validate runs ok";
-
-# Now test 'delete'
-%params = (
-        filername => 'nfs11',
-        mount_point => '/gscmnt',
-        name => 'gc7000',
-        parent_volume_name => 'aggr0',
-        physical_path => '/vol/aggr0/gc7000',
-        disk_group => 'INFO_GENOME_MODELS',
-        used_kb => 1,
-        total_kb => 62210072304,
-        kb_limit => 214748364800,
-        kb_quota => 0,
-        kb_in_doubt => 27967088,
-        kb_grace => undef,
-        files => 214324,
-        file_quota => 0,
-        file_limit => 0,
-        file_in_doubt => 138,
-        file_grace => undef,
-        file_entryType => 'e'
-);
-SDM::Disk::Fileset->create( %params );
-$res = SDM::Disk::Volume->get( name => 'aggr0' );
-stderr_like { $res->delete(); } qr|ERROR|, "delete properly prevented";
-
-$res = SDM::Disk::Volume->get( name => 'gc7000' );
-$res->delete();
-isa_ok( $res, 'UR::DeletedRef' );
-
-$res = SDM::Disk::Volume->get( name => 'aggr0' );
-$res->delete();
-isa_ok( $res, 'UR::DeletedRef' );
+stderr_like { $res->validate(); } qr|Aging volume|, "validate runs ok";
+stderr_like { $res->purge(); } qr|Purging aging volume|, "validate runs ok";
 
 done_testing();

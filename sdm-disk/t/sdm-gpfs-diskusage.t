@@ -22,7 +22,7 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # This test requires a real network connection to a lives host.
 my $host = 'linuscs107';

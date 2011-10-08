@@ -22,7 +22,7 @@ my $params;
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # Test insufficient creation params
 my @params = ();
@@ -35,19 +35,19 @@ ok( defined SDM::Disk::Group->create( name => 'INFO_GENOME_MODELS' ), "created t
 ok( defined SDM::Disk::Group->create( name => 'INFO_APIPE' ), "created test group ok");
 
 # Test creation
-@params = ( filername => 'nfs11', name => 'sata800', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 20, used_kb => 5 );
+@params = ( filername => 'nfs11', physical_path => '/vol/sata800', disk_group => 'INFO_GENOME_MODELS', total_kb => 20, used_kb => 5 );
 $res = SDM::Disk::Volume->create( @params );
 ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', name => 'sata801', physical_path => '/vol/sata801', disk_group => 'INFO_GENOME_MODELS', total_kb => 10, used_kb => 0 );
+@params = ( filername => 'nfs11', physical_path => '/vol/sata801', disk_group => 'INFO_GENOME_MODELS', total_kb => 10, used_kb => 0 );
 $res = SDM::Disk::Volume->create( @params );
 ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', name => 'sata802', physical_path => '/vol/sata802', disk_group => 'INFO_APIPE', total_kb => 30, used_kb => 2 );
+@params = ( filername => 'nfs11', physical_path => '/vol/sata802', disk_group => 'INFO_APIPE', total_kb => 30, used_kb => 2 );
 $res = SDM::Disk::Volume->create( @params );
 ok( defined $res, "properly created new volume");
 
-@params = ( filername => 'nfs11', name => 'sata803', physical_path => '/vol/sata803', disk_group => 'INFO_APIPE', total_kb => 5, used_kb => 8 );
+@params = ( filername => 'nfs11', physical_path => '/vol/sata803', disk_group => 'INFO_APIPE', total_kb => 5, used_kb => 8 );
 $res = SDM::Disk::Volume->create( @params );
 ok( defined $res, "properly created new volume");
 

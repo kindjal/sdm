@@ -410,12 +410,7 @@ sub _update_volumes {
 
         next if ($physical_path eq '/');
 
-        my $volume;
-        if ($filer->type eq 'polyserve') {
-            $volume = SDM::Disk::PolyserveVolume->get_or_create( filername => $filername, physical_path => $physical_path );
-        } else {
-            $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
-        }
+        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
         unless ($volume) {
             $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: " . $filername . ", $physical_path");
             next;
@@ -547,11 +542,7 @@ sub execute {
     if (defined $self->filername) {
         @filers = SDM::Disk::Filer->get( name => $self->filername );
         unless (@filers) {
-            unless ($self->type) {
-                $self->logger->error(__PACKAGE__ . " specify --type along with --filername");
-                return;
-            }
-            @filers = SDM::Disk::Filer->create( name => $self->filername, type => $self->type );
+            @filers = SDM::Disk::Filer->create( name => $self->filername );
             unless (@filers) {
                 $self->logger->error(__PACKAGE__ . " unable to create filer: " . $self->filername);
                 return;

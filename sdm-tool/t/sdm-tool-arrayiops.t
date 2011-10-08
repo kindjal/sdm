@@ -26,7 +26,7 @@ sub slurp {
 }
 
 my $table = "$top/../sdm/t/ifDescr.txt";
-my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', sloppy => 1 );
+my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', unittest => 1 );
 $snmp->tabledata( slurp($table) );
 my $a = $snmp->read_snmp_into_table('ifDescr');
 
@@ -51,5 +51,7 @@ while (my ($k,$v) = each %$c) {
 
 my $t = SDM::Tool::Command::ArrayIops->create( hostname => 'localhost', fcport => 'fc1/1', loglevel => 'DEBUG' );
 my ($write,$read) = $t->calculate( $result, "fc1/1" );
+ok( $write eq '799051318.039062', 'write ok' );
+ok( $read eq '1234676475.46875', 'read ok' );
 
 done_testing();

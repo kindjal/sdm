@@ -21,7 +21,7 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Test::Lib->testinit == 0, "ok: init db");
+ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # This test requires a real network connection to a lives host.
 my @params = ( loglevel => 'DEBUG', filername => "gpfs-dev", hostname => 'linuscs107', discover_groups => 1 );
@@ -34,7 +34,7 @@ $c->delete;
 $c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
 $c->execute();
 
-my $v = SDM::Disk::Volume->get( name => 'aggr0' );
+my $v = SDM::Disk::Volume->get( physical_path => '/vol/aggr0' );
 ok( defined $v->id );
 
 done_testing();

@@ -25,7 +25,7 @@ ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # This test requires a real network connection to a lives host.
 my $host = 'linuscs103';
-my $f = SDM::Disk::Filer->create( name => "gpfs-dev", type => "gpfs" );
+my $f = SDM::Disk::Filer->create( name => "gpfs-dev" );
 my $h = SDM::Disk::Host->create( hostname => $host );
 $h->assign($f->name);
 
@@ -64,7 +64,7 @@ $c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
 
 # Volume data must be updated before GPFS data is updated below.
 $c->_update_volumes( $vol, "gpfs-dev" );
-UR::Context->commit();
+stderr_unlike { UR::Context->commit(); } qr/ERROR/, "commit ok";
 
 my $v = SDM::Disk::Volume->get( physical_path => "/vol/aggr0/gc7001" );
 ok( $v->physical_path eq '/vol/aggr0/gc7001', "volume is fileset" );

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use SDM;
+use File::Basename qw/basename/;
 
 class SDM::Service::Automount::Command::Export {
     is  => 'SDM::Command::Base',
@@ -22,7 +23,6 @@ sub execute {
     $self->logger->debug(__PACKAGE__ . " execute");
 
     if ($self->filename) {
-        #SDM::DataSource::Automount->filename($self->filename);
         SDM::DataSource::Automount->_singleton_object->filename($self->filename);
         $self->logger->debug(__PACKAGE__ . " set db path to " .  SDM::DataSource::Automount->_singleton_object->filename);
     }
@@ -30,8 +30,9 @@ sub execute {
     my $data;
     foreach my $volume ( SDM::Disk::Volume->get() ) {
 
+        my $name = basename $volume->physical_path;
         my $item = SDM::Service::Automount->get_or_create(
-            name => $volume->name,
+            name => $name,
             mount_options => $volume->mount_options,
             filername => $volume->filername,
             physical_path => $volume->physical_path

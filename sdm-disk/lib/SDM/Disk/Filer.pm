@@ -13,16 +13,8 @@ class SDM::Disk::Filer {
     id_by => [
         name            => { is => 'Text' },
     ],
-    has => [
-        type            => {
-            # Filer->type was invented to distinguish between Volumes and PolyserveVolumes,
-            # which have different UNIQUEness constraints.  Only Polyserve is different at this time.
-            is => 'Text',
-            doc => 'Filer type',
-            valid_values => ['gpfs','polyserve','netapp','vcf','nfs'],
-        },
-    ],
     has_optional => [
+        duplicates      => { is => 'Text' },
         comments        => { is => 'Text' },
         filesystem      => { is => 'Text' },
         created         => { is => 'DATE' },
@@ -45,6 +37,8 @@ class SDM::Disk::Filer {
         hostmappings    => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'filer' },
         host            => { is => 'SDM::Disk::Host', via => 'hostmappings', to => 'host'  },
         hostname        => { is => 'Text', via => 'host', to => 'hostname' },
+        volumemappings  => { is => 'SDM::Disk::VolumeFilerBridge', reverse_as => 'filer' },
+        volume          => { is => 'SDM::Disk::Volume', via => 'volumemappings', to => 'volume' },
         # The obvious way to reference arraynames produces a list with duplicates
         #arrayname       => { via => 'host', to => 'arrayname' },
         # Use this calculation to produce a list of unique arraynames
@@ -89,24 +83,25 @@ sub is_current {
     return 0;
 }
 
+sub get_volume {
+    my $self = shift;
+    my (%params) = @_;
+    my @volumes = SDM::Disk::Volume->get();
+    return @volumes;
+}
+
 =head2 create_volume
-Convenience method to ensure that Volume objects are created properly
-for the complete set of Filer types.  Right now this is just to make
-sure polyserve filers get PolyserveVolumes.
+Create method for Volumes assigned to this Filer.
 =cut
 sub create_volume {
     my $self = shift;
     my (%params) = @_;
-    $params{filername} = $self->name;
     my $volume;
-    given ($self->type) {
-        default {
-            $volume = SDM::Disk::Volume->create( %params );
-            unless ($volume) {
-                $self->error_message("failed to create volume");
-                return;
-            }
-        }
+    $params{filername} = $self->name;
+    $volume = SDM::Disk::Volume->create( %params );
+    unless ($volume) {
+        $self->error_message("failed to create volume");
+        return;
     }
     return $volume;
 }
@@ -116,26 +111,57 @@ Create method for Filer sets created attribute.
 =cut
 sub create {
     my $self = shift;
-    my (%params) = @_;
+    my $bx = $self->define_boolexpr(@_);
 
     my @missing;
     foreach my $attr ( $self->__meta__->properties ) {
         next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or defined $attr->default_value);
-        push @missing, $attr->property_name unless (exists $params{$attr->property_name});
+        push @missing, $attr->property_name unless ($bx->value_for($attr->property_name));
     }
+    push @missing,"name" unless ($bx->value_for('name'));
     if (@missing) {
         $self->error_message("missing required attributes in create(): " . join(" ",@missing));
         return;
     }
 
-    $params{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-    return $self->SUPER::create( %params );
+    my $filer = $self->SUPER::create( $bx );
+    $filer->created( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+    return $filer;
+}
+
+sub duplicates {
+    # If we set this filer as a duplicate, then we must remove all its volumes
+    # since this means they are duplicates of some other filer and we don't
+    # want to double count them.
+    my $self = shift;
+    unless (@_) {
+        return $self->__duplicates;
+    }
+
+    my @volume_ids;
+    foreach my $vm ( $self->volumemappings ) {
+        $self->warning_message("Remove Volume-Filer mapping " . $vm->id . " for Filer " . $self->name);
+        push @volume_ids, $vm->volume_id;
+        $vm->delete() or
+            die "Failed to remove Volume-Filer map for Filer: " . $self->name;
+    }
+
+    # After we remove a filer, we iterate through Volumes that claimed to have been mounted
+    # on this filer and see if they're now orphans.
+    foreach my $vid (@volume_ids) {
+        my $volume = SDM::Disk::Volume->get( $vid );
+        if ($volume->is_orphan()) {
+            # FIXME: can't use warning_message here or we silently abort
+            $self->warning_message("Removing now orphaned Volume: " . $volume->physical_path);
+            $volume->delete();
+        }
+    }
+
+    return $self->__duplicates(@_);
 }
 
 sub delete {
     my $self = shift;
-
-    my @volumes = SDM::Disk::Volume->get( filername => $self->name );
 
     # Before we remove the Filer, we must remove its hostmappings
     foreach my $hm ( $self->hostmappings ) {
@@ -144,12 +170,22 @@ sub delete {
             die "Failed to remove Filer-Host map for Filer: " . $self->name;
     }
 
+    # Now the Volume mappings...
+    my @volume_ids;
+    foreach my $vm ( $self->volumemappings ) {
+        $self->warning_message("Remove Volume-Filer mapping " . $vm->id . " for Filer " . $self->name);
+        push @volume_ids, $vm->volume_id;
+        $vm->delete() or
+            die "Failed to remove Volume-Filer map for Filer: " . $self->name;
+    }
+
     $self->warning_message("Remove Filer " . $self->name);
     my $res = $self->SUPER::delete();
 
     # After we remove a filer, we iterate through Volumes that claimed to have been mounted
     # on this filer and see if they're now orphans.
-    foreach my $volume (@volumes) {
+    foreach my $vid (@volume_ids) {
+        my $volume = SDM::Disk::Volume->get( $vid );
         if ($volume->is_orphan()) {
             # FIXME: can't use warning_message here or we silently abort
             $self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);

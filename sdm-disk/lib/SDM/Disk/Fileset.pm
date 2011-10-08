@@ -41,21 +41,19 @@ class SDM::Disk::Fileset {
 sub create {
     my $self = shift;
     my (%param) = @_;
+    $param{ total_kb } = $param{ kb_limit };
+    $param{ used_kb  } = $param{ kb_size };
 
-    unless ($param{ parent_volume_id }) {
+    unless ($param{parent_volume_id}) {
         $self->error_message("missing required attribute parent_volume_id");
         return;
     }
 
     my $parent = SDM::Disk::Volume->get( id => $param{parent_volume_id} );
     unless ($parent) {
-        $self->error_message("no volume identified by parent_volume_id " . $param{ parent_volume_id});
+        $self->error_message("no volume identified by parent_volume_id $param{parent_volume_id}");
         return;
     }
-
-    # Set Volume attrs
-    $param{ total_kb } = $param{ kb_limit };
-    $param{ used_kb  } = $param{ kb_size };
 
     return $self->SUPER::create( %param );
 }

@@ -14,17 +14,7 @@ class SDM::Disk::Volume {
         id => { is => 'Text' },
     ],
     has => [
-        #name            => { is => 'Text', len => 255 },
-        filername       => { is => 'Text', len => 255 },
-        physical_path   => { is => 'Text', len => 255 },
-        # More than one filer named fname might have /vol/home
-        # but there can be only one way to nfs mount /gscmnt/home.
-        # There should not be more than one mount_path for fname+physical_path,
-        # this is enforce by the DB schema UNIQUE constraint.
-        mount_point     => { is => 'Text', default_value => '/gscmnt' },
-        filer           => { is => 'SDM::Disk::Filer', id_by => 'filername' },
-        hostname        => { is => 'Text', via => 'filer', to => 'hostname' },
-        arrayname       => { is => 'Text', via => 'filer', to => 'arrayname' },
+        physical_path   => { is => 'Text' },
         total_kb        => { is => 'Number', default_value => 0 },
         #total_kb        => { is => 'SDM::Value::KBytes', default_value => 0 },
         used_kb         => { is => 'Number', default_value => 0 },
@@ -35,26 +25,13 @@ class SDM::Disk::Volume {
         },
     ],
     has_optional => [
+        mount_path      => { is => 'Text' },
         comments        => { is => 'Text' },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
         mount_options   => { is => 'Text', default_value => '-intr,tcp,rsize=32768,wsize=32768' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
         #gpfs_disk_perf  => { is => 'SDM::Gpfs::GpfsDiskPerf', reverse_as => 'volume' },
-        duplicates => {
-            is => 'Text',
-            doc => 'ID of another volume, to allow a volume to be stored as unique but really be a duplicate. ie. Polyserve nfs11+/vol/sata800 duplicates nfs12+/vol/sata800'
-        },
-        duplicate => {
-            is => 'SDM::Disk::Volume',
-            id_by => 'duplicates',
-        },
-        same_as => {
-            is => 'Text',
-            doc => 'A printable form of "duplicates" to be used in an object lister',
-            calculate_from => 'duplicate',
-            calculate => q| return unless $duplicate; my $fn = $duplicate->filername; my $p = $duplicate->physical_path;  return "$fn:$p"; |,
-        },
         gpfs_fsperf_id  => {
             is => 'Number',
             calculate_from => 'mount_path',
@@ -89,6 +66,11 @@ class SDM::Disk::Volume {
         },
     ],
     has_many_optional => [
+        filermappings    => { is => 'SDM::Disk::VolumeFilerBridge', reverse_as => 'volume' },
+        filer   => { is => 'SDM::Disk::Filer', via => 'filermappings', to => 'filer' },
+        filername       => { is => 'Text', via => 'filer', to => 'name' },
+        hostname        => { is => 'Text', via => 'filer', to => 'hostname' },
+        arrayname       => { is => 'Text', via => 'filer', to => 'arrayname' },
         fileset => {
             is => 'SDM::Disk::Fileset',
             reverse_as => 'volume'
@@ -106,6 +88,26 @@ sub _new {
     my $class = shift;
     my $self = $class->SUPER::create( @_ );
     return $self;
+}
+
+
+=head2 assign
+Assign a volume to a filer.
+=cut
+sub assign {
+    my $self = shift;
+    my $filername = shift;
+    unless ($filername) {
+        $self->error_message("specify a filer name to assign this volume to");
+        return;
+    }
+    my $filer = SDM::Disk::Filer->get( name => $filername );
+    unless ($filer) {
+        $self->error_message("the filer named '$filername' is unknown");
+        return;
+    }
+    my $res = SDM::Disk::VolumeFilerBridge->get_or_create( volume => $self, filer => $filer );
+    return $res;
 }
 
 =head2 is_current
@@ -147,7 +149,7 @@ sub validate {
     my $self = shift;
     my $vol_maxage = shift;
     unless ($self->is_current($vol_maxage)) {
-        $self->warning_message("Aging volume: " . $self->mount_path . " " . join(',',$self->filername));
+        $self->warning_message("Aging volume: " . $self->id);
     }
 }
 
@@ -170,39 +172,9 @@ sub purge {
     my $self = shift;
     my $vol_maxage = shift;
     unless ($self->is_current($vol_maxage)) {
-        $self->warning_message("Purging aging volume: " . $self->mount_path . " " . join(',',$self->filername));
+        $self->warning_message("Purging aging volume: " . $self->id);
         $self->delete();
     }
-}
-
-#sub name {
-#    # Override the name accessor to prevent modifying an existing object into another existing object
-#    # Prevent changing filername1:name1 into an already existing filername1:name2
-#    my $self = shift;
-#    my $name = shift;
-#    my $filername = $self->__filername;
-#    if ($name) {
-#        if ( SDM::Disk::Volume->get( name => $name, filername => $filername ) ) {
-#            $self->error_message("an object already exists with name $name on filer $filername");
-#            return;
-#        }
-#        return $self->__name( $name );
-#    }
-#    return $self->__name();
-#}
-
-sub filername {
-    my $self = shift;
-    my $filername = shift;
-    my $physical_path = $self->physical_path;
-    if ($filername) {
-        if ( SDM::Disk::Volume->get( physical_path => $physical_path, filername => $filername ) ) {
-            $self->error_message("an object already exists with physical_path $physical_path on filer $filername");
-            return;
-        }
-        return $self->__filername( $filername );
-    }
-    return $self->__filername();
 }
 
 =head2 create
@@ -217,15 +189,19 @@ sub create {
         next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or defined $attr->default_value);
         push @missing, $attr->property_name unless (exists $param{$attr->property_name});
     }
+    # filername isn't required at the table level because we want to allow a many-to-many relationship
+    # via a bridge table.  So we want to "assign" a volume to a filer via the bridge table.  So, we
+    # need a filer to assign to (see below), but it's not a Volume attribute at the table level.
+    push @missing, 'filername' unless ($param{filername});
     if (@missing) {
         $self->error_message("missing required attributes in create(): " . join(" ",@missing));
         return;
     }
 
-    # Note: Is it ok to auto-create Filers?  I say no for now.
-    my $filer = SDM::Disk::Filer->get( name => $param{filername} );
-    unless ($filer) {
-        $self->error_message("failed to identify filer: " . $param{filername});
+    # Is this a duplictae volume?  Volume-Filer is many to many
+    my @volumes = SDM::Disk::Volume->get( physical_path => $param{physical_path}, filername => $param{filername} );
+    if (@volumes) {
+        $self->error_message("filer $param{filername} already has a volume $param{physical_path}");
         return;
     }
 
@@ -243,16 +219,18 @@ sub create {
         $param{disk_group} = $group_name;
     }
 
-    if ($param{filername} and $param{physical_path}) {
-        my @obj = SDM::Disk::Volume->get( filername => $param{filername}, physical_path => $param{physical_path} );
-        if (@obj) {
-            $self->error_message("an object already exists with filername $param{filername} and physical_path $param{physical_path}");
-            return;
-        }
+    # A volume must be assigned to a filer.
+    my $filername = delete $param{filername};
+    my $filer = SDM::Disk::Filer->get( name => $filername );
+    unless ($filer) {
+        $self->error_message("no filer named '$filername' known");
+        return;
     }
 
     $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-    return $self->SUPER::create( %param );
+    my $volume = $self->SUPER::create( %param );
+    $volume->assign( $filername );
+    return $volume;
 }
 
 sub delete {
@@ -262,6 +240,14 @@ sub delete {
         $self->error_message("cowardly refusing to delete a volume that contains filesets!  delete the filesets first!");
         return;
     }
+
+    # Remove Volume-Filer mappings
+    foreach my $fm ( $self->filermappings ) {
+        $self->warning_message("Remove Volume-Filer mapping " . $fm->filername . " for Volume " . $self->id);
+        $fm->delete() or
+            die "Failed to remove Volume-Filer map for Volume: " . $self->id;
+    }
+
     return $self->SUPER::delete();
 }
 

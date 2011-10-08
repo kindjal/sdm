@@ -13,7 +13,7 @@ BEGIN {
 
 my $top = dirname __FILE__;
 require "$top/sdm-disk-lib.pm";
-my $t = SDM::Test::Lib->new();
+my $t = SDM::Disk::Lib->new();
 my $perl = $t->{perl};
 my $sdm = $t->{sdm};
 # Start with a fresh database
@@ -40,11 +40,13 @@ $t->runcmd("$perl $sdm disk array add --name nsams2k1");
 stdout_like { $t->runcmd("$perl $sdm disk array list --noheaders --show name --filter name=nsams2k1"); } qr/nsams2k1/, "ok: array list works";
 $t->runcmd("$perl $sdm disk array update --model Foo nsams2k1");
 
-$t->runcmd("$perl $sdm disk volume add --name=ams1100 --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
-$t->runcmd("$perl $sdm disk volume update --total-kb=7438990688 ams1100");
+$t->runcmd("$perl $sdm disk volume add --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
+my $id = qx|$perl $sdm disk volume list --filter physical_path=/vol/ams1100,filername=gpfs --show id --noheaders|;
+chomp $id;
+$t->runcmd("$perl $sdm disk volume update --total-kb=7438990800 $id");
 stdout_like { $t->runcmd("$perl $sdm disk volume list --noheaders --show mount_path --filter mount_path=/gscmnt/ams1100"); } qr/ams1100/, "ok: volume list works";
 
-$t->runcmd("$perl $sdm disk volume delete ams1100");
+$t->runcmd("$perl $sdm disk volume delete $id");
 $t->runcmd("$perl $sdm disk group delete SYSTEMS");
 $t->runcmd("$perl $sdm disk filer delete gpfs");
 $t->runcmd("$perl $sdm disk host delete linuscs103");

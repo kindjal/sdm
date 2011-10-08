@@ -18,7 +18,7 @@ use Test::Exception;
 use File::Basename qw/dirname/;
 my $top = dirname __FILE__;
 require "$top/sdm-disk-lib.pm";
-my $t = SDM::Test::Lib->new();
+my $t = SDM::Disk::Lib->new();
 my $perl = $t->{perl};
 my $sdm = $t->{sdm};
 ok( $t->testinit == 0, "ok: init db");

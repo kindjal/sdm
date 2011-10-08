@@ -381,12 +381,17 @@ sub _update_volumes {
     #   }
     my $filername = shift;
 
+    unless ($volumedata) {
+        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer $filername returned empty volumedata");
+        return;
+    }
     unless ($filername) {
         $self->logger->error(__PACKAGE__ . " update_volumes(): no filer given");
         return;
     }
-    unless ($volumedata) {
-        $self->logger->warn(__PACKAGE__ . " update_volumes(): filer $filername returned empty volumedata");
+    my $filer = SDM::Disk::Filer->get( name => $filername );
+    unless ($filer) {
+        $self->logger->error(__PACKAGE__ . " no filer named $filername");
         return;
     }
 
@@ -590,7 +595,7 @@ sub execute {
 
     if ($self->filername) {
         # See if filer is present and has master host defined...
-        my $filer = SDM::Disk::Filer->get_or_create( name => $self->filername, type => 'gpfs' );
+        my $filer = SDM::Disk::Filer->get_or_create( name => $self->filername );
         unless ($filer) {
             $self->logger->error(__PACKAGE__ . " failed to get or create '" . $self->filername . "'");
             return;
@@ -611,11 +616,11 @@ sub execute {
     unless (@filers) {
         if ($self->force) {
             # If "force", get all Filers and query them even if status is 0.
-            @filers = SDM::Disk::Filer->get( type => 'gpfs' );
+            @filers = SDM::Disk::Filer->get( );
         } else {
             # Query all filers that have status => 1...
             # This is what we use for a cron job.
-            @filers = SDM::Disk::Filer->get( type => 'gpfs', status => 1 );
+            @filers = SDM::Disk::Filer->get( status => 1 );
         }
     }
 

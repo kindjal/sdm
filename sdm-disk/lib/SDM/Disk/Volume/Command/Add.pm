@@ -10,7 +10,6 @@ class SDM::Disk::Volume::Command::Add {
     is => 'SDM::Command::Base',
     doc => 'add volumes',
     has => [
-        name          => { is => 'Text' },
         filername     => { is => 'Text' },
         physical_path => { is => 'Text' },
     ],
@@ -26,7 +25,6 @@ sub execute {
     my $self = shift;
 
     my $param = {
-        name          => $self->name,
         filername     => $self->filername,
         physical_path => $self->physical_path,
     };
