@@ -410,21 +410,15 @@ sub _update_volumes {
 
         next if ($physical_path eq '/');
 
-        my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
-        unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: " . $filername . ", $physical_path");
-            next;
-        }
-        $self->logger->debug(__PACKAGE__ . " found volume: " . $filername . ", $physical_path");
-
         # Ensure we have the Group before we update this attribute of a Volume
         my $group_name = $volumedata->{$physical_path}->{disk_group};
         if ($group_name) {
             my $group;
             if ($self->discover_groups) {
-                $group = SDM::Disk::Group->get_or_create( name => $volumedata->{$physical_path}->{disk_group} );
+                $group = SDM::Disk::Group->get_or_create( name => $group_name );
+                $self->logger->debug(__PACKAGE__ . " created disk group: $group_name");
             } else {
-                $group = SDM::Disk::Group->get( name => $volumedata->{$physical_path}->{disk_group} );
+                $group = SDM::Disk::Group->get( name => $group_name );
             }
             unless ($group) {
                 $self->logger->error(__PACKAGE__ . " ignoring currently unknown disk group: $group_name");
@@ -432,11 +426,21 @@ sub _update_volumes {
             }
         }
 
+        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
+        my $volume = SDM::Disk::Volume->get( filername => $filername, physical_path => $physical_path );
         unless ($volume) {
-            $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername:$physical_path");
-            next;
+            unless ($self->discover_volumes) {
+                $self->logger->warn(__PACKAGE__ . " ignoring new volume: $filername, $physical_path, consider --discover-volumes");
+                next;
+            }
+            $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path );
+            $self->logger->error(__PACKAGE__ . " create volume: $filername, $physical_path");
+            unless ($volume) {
+                $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path");
+                next;
+            }
         }
-
+        $self->logger->debug(__PACKAGE__ . " found volume: $filername, $physical_path");
         foreach my $attr (keys %{ $volumedata->{$physical_path} }) {
             next unless (defined $volumedata->{$physical_path}->{$attr});
             # FIXME: Don't update disk group from filesystem, only the reverse.
@@ -446,6 +450,11 @@ sub _update_volumes {
             $volume->$attr($volumedata->{$physical_path}->{$attr})
                 if ($p and ! $p->is_id and $p->is_mutable);
             $volume->last_modified( Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+        }
+        # Special bits for duplicate filers
+        my @duplicate_filers = SDM::Disk::Filer->get( duplicates => $filername );
+        foreach my $dup_filer (@duplicate_filers) {
+            $volume->assign($dup_filer);
         }
     }
     return 1;
