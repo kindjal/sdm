@@ -32,10 +32,10 @@ class SDM::GPFS::DiskUsage {
         }
     ],
     has_optional => [
-        mount_point => {
+        mount_path_rule => {
             is => 'Text',
-            default_value => '/gscmnt',
-            doc => 'Mount point used by autofs to mount target filer.  Only for discover_volumes mode.'
+            default_value => '/vol:/gscmnt',
+            doc => 'Colon separated rule to translate physical_path to mount_path.  Used with discover_volumes. eg: /vol:/gscmnt'
         },
         translate_path => {
             is => 'Boolean',
@@ -58,24 +58,13 @@ sub _ssh_cmd {
     my $self = shift;
     my $cmd = shift;
     $self->logger->debug(__PACKAGE__ . " sshopen3: $cmd");
-    Net::SSH::sshopen3('root@' . $self->hostname, *WRITER, *READER, *ERROR, "$cmd") or die "error: $cmd: $!";
-    close(WRITER);
-    my $error = do { local $/; <ERROR> };
-    close(ERROR);
-    my $content = do { local $/; <READER> };
-    close(READER);
-    given ($error) {
-        when (defined $error and $error =~ /Permission denied/) {
-            chomp $error;
-            $self->logger->error(__PACKAGE__ . " " . $self->hostname . ": " . $error);
-            $self->logger->error(__PACKAGE__ . " please set up ssh keys");
-            exit 1;
-        }
-        when (defined $error and $error ne '') {
-            chomp $error;
-            $self->logger->error(__PACKAGE__ . " " . $self->hostname . ": " . $error);
-            exit 1;
-        }
+    my $content;
+    eval {
+        $content = Net::SSH::ssh_cmd('root@' . $self->hostname, "$cmd");
+    };
+    if ($@) {
+        $self->error_message("error with ssh: $@");
+        return;
     }
     return $content;
 }
@@ -145,7 +134,10 @@ sub _parse_mmlsnsd {
         $volumes->{$vol} = {} unless ($volumes->{$vol});
         $volumes->{$vol}->{$disk} = [ split(/,/,$hosts) ];
         $volumes->{$vol}->{'physical_path'} = "/vol/" . $vol;
-        $volumes->{$vol}->{'mount_path'} = $self->mount_point . "/" . $vol;
+        my $mount_path = $volumes->{$vol}->{'physical_path'};
+        my ($from,$to) = split(/:/,$self->mount_path_rule);
+        $mount_path =~ s/$from/$to/;
+        $volumes->{$vol}->{'mount_path'} = $mount_path;
     }
     return $volumes;
 }
@@ -290,10 +282,10 @@ class SDM::Disk::Filer::Command::QueryGpfs {
             default => 0,
             doc => 'Allow mounting of filesystems to discover disk groups',
         },
-        mount_point => {
+        mount_path_rule => {
             is => 'Text',
-            default => '/gscmnt',
-            doc => 'Specify the mount_point used by autofs to access volumes, this is used with --discover_volumes',
+            default => '/vol:/gscmnt',
+            doc => 'Colon separated rule to translate physical_path to mount_path.  Used with discover_volumes. eg: /vol:/gscmnt'
         },
         translate_path => {
             is => 'Boolean',
@@ -442,6 +434,10 @@ sub _update_volumes {
         my $physical_path = $volumedata->{$name}->{physical_path};
         my $volume = SDM::Disk::Volume->get( filername => $filername, physical_path => $physical_path );
         unless ($volume) {
+            unless ($self->discover_volumes) {
+                $self->logger->warn(__PACKAGE__ . " ignoring new volume: $filername, $physical_path, consider --discover-volumes");
+                next;
+            }
             $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path );
             $self->logger->error(__PACKAGE__ . " create volume: $filername, $physical_path");
             unless ($volume) {
@@ -474,6 +470,10 @@ sub _update_volumes {
             $fileset->{physical_path} = $volumedata->{$name}->{physical_path} . "/" . delete $fileset->{name};
             $fileset->{total_kb} = $fileset->{kb_limit};
             $fileset->{used_kb} = $fileset->{kb_size};
+            my $mount_path = $fileset->{physical_path};
+            my ($from,$to) = split(/:/,$self->mount_path_rule);
+            $mount_path =~ s/$from/$to/;
+            $fileset->{mount_path} = $mount_path;
 
             my $fs = SDM::Disk::Fileset->get( filername => $filername, physical_path => $fileset->{physical_path} );
             unless ($fs) {
@@ -553,7 +553,7 @@ sub _query_gpfs {
         push @params, ( allow_mount => $self->allow_mount ) if ($self->discover_groups);
         push @params, ( translate_path => $self->translate_path );
         push @params, ( discover_volumes => $self->discover_volumes );
-        push @params, ( mount_point => $self->mount_point );
+        push @params, ( mount_path_rule => $self->mount_path_rule );
 
         my $gpfs = SDM::GPFS::DiskUsage->create( @params );
         unless ($gpfs) {

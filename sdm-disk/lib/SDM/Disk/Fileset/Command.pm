@@ -15,9 +15,6 @@ SDM::Command::Crud->init_sub_commands(
     target_class => 'SDM::Disk::Fileset',
     target_name => 'fileset',
     list => { show => 'id,physical_path,mount_path,kb_size,kb_quota,kb_limit,kb_in_doubt,kb_grace,files,file_quota,file_limit,file_grace' },
-    delete => { do_not_init => 1, },
-    update => { do_not_init => 1, },
-    add    => { do_not_init => 1, },
 );
 
 1;

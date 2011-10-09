@@ -58,18 +58,23 @@ ok( $vol->{'ams1100'}->{'disk_group'} eq 'INFO_ALIGNMENTS' );
 ok( $vol->{'ams1100'}->{'total_kb'} eq '9034530816' );
 ok( $vol->{'ams1100'}->{'used_kb'} eq '8598247168' );
 
-@params = ( loglevel => 'DEBUG', filername => "gpfs", discover_groups => 1 );
-
+@params = ( loglevel => 'DEBUG', filername => "gpfs-dev", discover_groups => 0, discover_volumes => 0 );
 $c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
-
-# Volume data must be updated before GPFS data is updated below.
 $c->_update_volumes( $vol, "gpfs-dev" );
-stderr_unlike { UR::Context->commit(); } qr/ERROR/, "commit ok";
+stderr_unlike { UR::Context->commit(); } qr/ERROR/, 'commit runs ok';
+
+@params = ( loglevel => 'DEBUG', filername => "gpfs-dev", discover_groups => 1, discover_volumes => 1 );
+$c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
+$c->_update_volumes( $vol, "gpfs-dev" );
+stderr_unlike { UR::Context->commit(); } qr/ERROR/, 'commit runs ok';
 
 my $v = SDM::Disk::Volume->get( physical_path => "/vol/aggr0/gc7001" );
 ok( $v->physical_path eq '/vol/aggr0/gc7001', "volume is fileset" );
 
 my $rrd = SDM::Utility::DiskGroupRRD->create( loglevel => 'DEBUG' );
 $rrd->run();
+
+$f->delete();
+stderr_unlike { UR::Context->commit(); } qr/ERROR/, 'commit runs ok';
 
 done_testing();

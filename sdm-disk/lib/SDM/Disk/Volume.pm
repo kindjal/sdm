@@ -235,17 +235,17 @@ sub create {
 
 sub delete {
     my $self = shift;
-    my @filesets = SDM::Disk::Fileset->get( parent_volume_id => $self->id );
-    if (@filesets) {
-        $self->error_message("cowardly refusing to delete a volume that contains filesets!  delete the filesets first!");
-        return;
+    foreach my $fs (SDM::Disk::Fileset->get( parent_volume_id => $self->id )) {
+        $self->warning_message("Remove Fileset " . $fs->physical_path . " for Volume " . $self->physical_path);
+        $fs->delete() or
+            die "Failed to remove Fileset for Volume: $!";
     }
 
     # Remove Volume-Filer mappings
     foreach my $fm ( $self->filermappings ) {
         $self->warning_message("Remove Volume-Filer mapping " . $fm->filername . " for Volume " . $self->id);
         $fm->delete() or
-            die "Failed to remove Volume-Filer map for Volume: " . $self->id;
+            die "Failed to remove Volume-Filer map for Volume: $!";
     }
 
     return $self->SUPER::delete();

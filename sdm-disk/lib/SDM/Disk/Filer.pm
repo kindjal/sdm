@@ -187,12 +187,10 @@ sub delete {
     foreach my $vid (@volume_ids) {
         my $volume = SDM::Disk::Volume->get( $vid );
         if ($volume->is_orphan()) {
-            # FIXME: can't use warning_message here or we silently abort
-            $self->warning_message("Removing now orphaned Volume: " . $volume->mount_path);
+            $volume->warning_message("Removing now orphaned Volume: $vid");
             $volume->delete();
         }
     }
-
     return $res;
 }
 
