@@ -20,7 +20,6 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 }
 
 use SDM::Utility::SNMP;
-use SDM::Disk::Filer::Command::QuerySnmp;
 
 # Start with a fresh database
 use FindBin;
@@ -40,33 +39,57 @@ sub fileslurp {
     return $content;
 }
 
-my $gpfsdev = SDM::Disk::Filer->create( name => 'gpfs-dev' );
-ok( defined $gpfsdev->id, "created filer ok");
-my $gpfs2 = SDM::Disk::Filer->create( name => 'gpfs2' );
-ok( defined $gpfs2->id, "created filer ok");
+my $filername = 'nfs11';
+my $hostname = 'nfs11';
+my $filer = SDM::Disk::Filer->create( name => $filername, type => 'snmp' );
+my $host = SDM::Disk::Host->create( hostname => $hostname, master => 1 );
+$host->assign($filer->name);
+ok( defined $filer->id, "created filer ok");
 
 # mimic acquire_volume_data and update_volumes
-my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 0, discover_groups => 0 );
-my $d = SDM::SNMP::DiskUsage->create( loglevel => "DEBUG", discover_volumes => 1, hostname => 'linuscs107' );
-$d->hosttype('netapp');
+my $c = SDM::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 0, discover_groups => 0, unittest => 1 );
+$c->hosttype('netapp');
 # first with discover_volumes = 0 then 1
 # netapp and linux host
 my $oid = 'dfTable';
 my $lines = fileslurp("$top/t/dfTable.txt");
-my @content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
-my $snmp_table = $d->read_snmp_into_table($oid, \@content);
-my $table = $d->_convert_to_volume_data( $snmp_table );
-$c->_update_volumes( $table, $gpfsdev );
+my @content = map { $c->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+my $snmp_table = $c->read_snmp_into_table($oid, \@content);
+my $table = $c->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table );
 delete $table->{'/vol/x64mswin/'};
-$c->_update_volumes( $table, $gpfsdev );
+$c->_update_volumes( $table );
 
-$d->hosttype('linux');
+$c->hosttype('linux');
 $oid = 'hrStorageTable';
 $lines = fileslurp("$top/t/hrStorageTable.txt");
-@content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
-$snmp_table = $d->read_snmp_into_table($oid, \@content);
-$table = $d->_convert_to_volume_data( $snmp_table );
-$c->_update_volumes( $table, $gpfs2 );
+@content = map { $c->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+$snmp_table = $c->read_snmp_into_table($oid, \@content);
+$table = $c->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table );
+
+UR::Context->commit();
+
+$c = SDM::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 1, discover_groups => 1, unittest => 1 );
+$c->hosttype('netapp');
+# first with discover_volumes = 0 then 1
+# netapp and linux host
+$oid = 'dfTable';
+$lines = fileslurp("$top/t/dfTable.txt");
+@content = map { $c->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+$snmp_table = $c->read_snmp_into_table($oid, \@content);
+$table = $c->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table );
+delete $table->{'/vol/x64mswin/'};
+$c->_update_volumes( $table );
+
+$c->hosttype('linux');
+$oid = 'hrStorageTable';
+$lines = fileslurp("$top/t/hrStorageTable.txt");
+@content = map { $c->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+$snmp_table = $c->read_snmp_into_table($oid, \@content);
+$table = $c->_convert_to_volume_data( $snmp_table );
+$c->_update_volumes( $table );
 
 UR::Context->commit();
 

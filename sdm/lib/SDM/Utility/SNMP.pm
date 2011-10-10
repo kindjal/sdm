@@ -187,24 +187,34 @@ Note then that we run snmpget/walk as we create this object.
 =cut
 sub create {
     my $class = shift;
-    my (%params) = @_;
-    unless ($params{hostname}) {
-        $class->error_message("specify target hostname for create()");
+    my $bx = $class->define_boolexpr(@_);
+    my $hostname;
+    my $filer = $bx->value_for('filer');
+    if ($filer) {
+        $hostname = $filer->master;
+        unless ($hostname) {
+            $class->error_message("filer '" . $filer->name . "' has no master host associated with it.");
+            return;
+        }
+    } else {
+        $hostname = $bx->value_for('hostname');
+    }
+    unless ($hostname) {
+        $class->error_message("specify target hostname for query");
         return;
     }
-    my $obj = $class->SUPER::create( %params );
-
-    return $obj if ($params{unittest});
+    my $obj = $class->SUPER::create( $bx );
+    return $obj if ($bx->value_for('unittest'));
 
     # FIXME: This feels wrong, both to call SNMP at object creation time, and to use the _get_host_type method
     # both with or without arguments.
-    my $hosttype = $obj->_get_host_type($params{hostname});
+    my $hosttype = $obj->_get_host_type($bx->value_for('hostname'));
     unless ($hosttype) {
-        $class->error_message("failed to determine host type for $params{hostname}");
+        $class->error_message("failed to determine host type for " . $bx->value_for('hostname'));
         return;
     }
     $obj->hosttype($hosttype);
-    $obj->command($params{command}) if ($params{command});
+    $obj->command($bx->value_for('command')) if ($bx->value_for('command'));
     return $obj;
 }
 

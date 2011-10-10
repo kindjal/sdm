@@ -14,7 +14,16 @@ class SDM::Disk::Filer {
         name            => { is => 'Text' },
     ],
     has_optional => [
-        duplicates      => { is => 'Text' },
+        type            => {
+            is => 'Text',
+            doc => 'The type of filer determines the means of querying for usage info',
+            valid_values => ['gpfs','snmp'],
+            default_value => 'gpfs'
+        },
+        duplicates      => {
+            is => 'Text',
+            doc => 'Indicates if a filer duplicates another, eg. a polyserve node.  Enter a filer name here.',
+        },
         comments        => { is => 'Text' },
         filesystem      => { is => 'Text' },
         created         => { is => 'DATE' },
@@ -32,6 +41,10 @@ class SDM::Disk::Filer {
             calculate => q| my @f = SDM::Gpfs::GpfsClusterConfig->get( filername => $name); return map { $_->id } @f; |,
         },
         gpfs_cluster_config => { is => 'SDM::Gpfs::GpfsClusterConfig', id_by => 'gpfs_cluster_config_id' },
+        master          => {
+            is => 'Text',
+            calculate => q| return unless ($self->host); foreach my $h ($self->host) { return $h->hostname if ($h->master); }; |,
+        },
     ],
     has_many_optional => [
         hostmappings    => { is => 'SDM::Disk::FilerHostBridge', reverse_as => 'filer' },
