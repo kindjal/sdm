@@ -59,7 +59,7 @@ CREATE TABLE disk_filer_host (
 CREATE TABLE disk_volume (
   id            VARCHAR(255) PRIMARY KEY,
   physical_path VARCHAR(255) NOT NULL,
-  mount_point   VARCHAR(255) NOT NULL,
+  mount_path    VARCHAR(255),
   total_kb      BIGINT DEFAULT 0 NOT NULL,
   used_kb       BIGINT DEFAULT 0 NOT NULL,
   created       DATE,
