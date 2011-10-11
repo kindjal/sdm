@@ -35,7 +35,7 @@ sub aaData {
         @filernames = [] unless (@filernames);
         my $filername = join(",",$item->filername);
         push @data, [
-            $item->mount_path,
+            $item->physical_path,
             $item->total_kb,
             $item->used_kb,
             $capacity,

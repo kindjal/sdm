@@ -43,7 +43,7 @@ class SDM::Disk::Filer {
         gpfs_cluster_config => { is => 'SDM::Gpfs::GpfsClusterConfig', id_by => 'gpfs_cluster_config_id' },
         master          => {
             is => 'Text',
-            calculate => q| return unless ($self->host); foreach my $h ($self->host) { return $h->hostname if ($h->master); }; |,
+            calculate => q| foreach my $h ($self->host) { return $h->hostname if ($h->master); }; |,
         },
     ],
     has_many_optional => [

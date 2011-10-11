@@ -141,7 +141,7 @@ sub _purge_volumes {
     }
 }
 
-=head2 query_gpfs
+=head2 _query
 Query the master host of a filer and update volume data.
 =cut
 sub _query {

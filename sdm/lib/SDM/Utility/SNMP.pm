@@ -210,7 +210,7 @@ sub create {
     # both with or without arguments.
     my $hosttype = $obj->_get_host_type($bx->value_for('hostname'));
     unless ($hosttype) {
-        $class->error_message("failed to determine host type for " . $bx->value_for('hostname'));
+        $class->error_message("failed to determine host type for $hostname");
         return;
     }
     $obj->hosttype($hosttype);

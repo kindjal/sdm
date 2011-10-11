@@ -11,7 +11,7 @@ function drawVolumeTable () {
         /* Sort by Total KB column by default */
         "aaSorting": [ [1,'desc'] ],
         "aoColumns": [
-            { "sTitle": "Mount Path" },
+            { "sTitle": "Physical Path" },
             { "sTitle": "Total KB",
               "sType": "numeric",
               "bUseRendered": false,

@@ -101,7 +101,6 @@ CREATE TABLE disk_fileset (
   file_grace    UNSIGNED INTEGER NOT NULL,
   file_entryType VARCHAR(1) NOT NULL,
   parent_volume_id VARCHAR(255) NOT NULL,
-  UNIQUE (physical_path),
   CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
 );
 CREATE TABLE IF NOT EXISTS disk_array (

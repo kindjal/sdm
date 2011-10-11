@@ -21,6 +21,7 @@ CREATE TABLE disk_filer (
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   comments      VARCHAR(255),
+  duplicates    VARCHAR(255),
   created       DATE,
   last_modified DATE
 );
@@ -57,7 +58,6 @@ CREATE TABLE disk_filer_host (
 );
 CREATE TABLE disk_volume (
   id            VARCHAR(255) PRIMARY KEY,
-  filername     VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
   mount_point   VARCHAR(255) NOT NULL,
   total_kb      BIGINT DEFAULT 0 NOT NULL,
@@ -67,14 +67,17 @@ CREATE TABLE disk_volume (
   comments      VARCHAR(255),
   mount_options VARCHAR(255) NOT NULL,
   disk_group    VARCHAR(255),
-  duplicates    VARCHAR(255),
-  UNIQUE (filername,physical_path),
-  CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL,
-  CONSTRAINT disk_volume_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name)
+  CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS disk_volume_filer (
+  filername     VARCHAR(255),
+  volume_id     VARCHAR(255),
+  PRIMARY KEY (filername,volume_id),
+  CONSTRAINT disk_vol_filer_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) ON DELETE CASCADE,
+  CONSTRAINT disk_vol_filer_hostname_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) ON DELETE CASCADE
 );
 CREATE TABLE disk_fileset (
   id            VARCHAR(255) PRIMARY KEY,
-  filername     VARCHAR(255) NOT NULL,
   physical_path VARCHAR(255) NOT NULL,
   mount_point   VARCHAR(255) NOT NULL,
   total_kb      BIGINT DEFAULT 0 NOT NULL,
@@ -84,7 +87,6 @@ CREATE TABLE disk_fileset (
   comments      VARCHAR(255),
   mount_options VARCHAR(255) NOT NULL,
   disk_group    VARCHAR(255),
-  duplicates    VARCHAR(255),
   type          VARCHAR(255) NOT NULL,
   kb_size       BIGINT NOT NULL,
   kb_quota      BIGINT NOT NULL,
@@ -98,8 +100,6 @@ CREATE TABLE disk_fileset (
   file_grace    BIGINT NOT NULL,
   file_entryType VARCHAR(1) NOT NULL,
   parent_volume_id VARCHAR(255) NOT NULL,
-  UNIQUE (filername,physical_path),
-  CONSTRAINT disk_fileset_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name),
   CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_id) REFERENCES disk_volume (id)
 );
 CREATE TABLE disk_array (

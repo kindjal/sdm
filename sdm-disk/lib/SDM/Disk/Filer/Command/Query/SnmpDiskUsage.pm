@@ -19,8 +19,8 @@ class SDM::Disk::Filer::Command::Query::SnmpDiskUsage {
         hostname => {
             is => 'Text',
             via => 'filer',
-            to => 'master',
-            doc => 'Hostname of the cluster master'
+            to => 'name',
+            doc => 'With snmp queries, we query the filer by name'
         },
         allow_mount => {
             is => 'Boolean',
@@ -318,11 +318,6 @@ Run this subclass of SNMP to gather DiskUsage data.
 sub acquire_volume_data {
     my $self = shift;
     $self->logger->debug(__PACKAGE__ . " acquire_volume_data");
-
-    unless ($self->hostname) {
-        $self->logger->error(__PACKAGE__ . " filer '" . $self->filer->name . "' has no master host associated with it.");
-        return;
-    }
 
     unless ($self->hosttype) {
         $self->logger->error(__PACKAGE__ . " can't determine hosttype of host: " . $self->hostname);

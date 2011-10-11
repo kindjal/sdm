@@ -60,8 +60,9 @@ sub execute {
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
             if ($row->[0] ne "name" or
-                $row->[1] ne "hosts" or
-                $row->[2] ne "comments") {
+                $row->[1] ne "type" or
+                $row->[2] ne "hosts" or
+                $row->[3] ne "comments") {
                 $self->logger->error(__PACKAGE__ . " CSV file header does not match what is expected for Filers: " . $self->csv);
                 return;
             }
@@ -72,8 +73,9 @@ sub execute {
         # Build an object out of a row by hand because the column
         # headers are useless as is, with unpredictable/unusable text.
         $self->_store($filer, "name",         $row->[0]);
-        $self->_store($filer, "hosts",        $row->[1]);
-        $self->_store($filer, "comments",     $row->[2]);
+        $self->_store($filer, "type",         $row->[1]);
+        $self->_store($filer, "hosts",        $row->[2]);
+        $self->_store($filer, "comments",     $row->[3]);
         next unless (scalar keys %$filer);
         push @filers, $filer;
     }
@@ -102,7 +104,8 @@ sub execute {
                 return;
             }
         }
-        my $filer = SDM::Disk::Filer->get_or_create(name => $filerdata->{name}, comments => $filerdata->{comments});
+        # Now create the filer
+        my $filer = SDM::Disk::Filer->get_or_create(name => $filerdata->{name}, comments => $filerdata->{comments}, type => $filerdata->{type} );
         unless ($filer) {
             $self->logger->error(__PACKAGE__ . " error creating filer: " . Data::Dumper::Dumper $filerdata . ": $!");
         }
@@ -110,7 +113,10 @@ sub execute {
             my $host = SDM::Disk::Host->get(hostname => $hostname);
             $host->assign( $filer->{name} );
         }
-
+        # Make the first listed host the master
+        my $master = shift @hosts;
+        my $host = SDM::Disk::Host->get(hostname => $master);
+        $host->master(1);
     }
 
     UR::Context->commit() if ($self->commit);
