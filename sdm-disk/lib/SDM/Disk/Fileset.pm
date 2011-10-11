@@ -25,7 +25,7 @@ class SDM::Disk::Fileset {
         file_limit      => { is => 'Number' },
         file_in_doubt   => { is => 'Number' },
         file_grace      => { is => 'Number' },
-        file_entryType  => { is => 'Text' },
+        file_entrytype  => { is => 'Text' },
         parent_volume_id => { is => 'Text' },
         volume          => {
             is => 'SDM::Disk::Volume',
@@ -54,6 +54,7 @@ sub create {
         $self->error_message("no volume identified by parent_volume_id $param{parent_volume_id}");
         return;
     }
+    $param{ filername } = $parent->filername;
 
     return $self->SUPER::create( %param );
 }
