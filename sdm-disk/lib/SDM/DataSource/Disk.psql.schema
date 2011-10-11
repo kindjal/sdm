@@ -69,7 +69,7 @@ CREATE TABLE disk_volume (
   disk_group    VARCHAR(255),
   CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL
 );
-CREATE TABLE IF NOT EXISTS disk_volume_filer (
+CREATE TABLE disk_volume_filer (
   filername     VARCHAR(255),
   volume_id     VARCHAR(255),
   PRIMARY KEY (filername,volume_id),
