@@ -26,7 +26,7 @@ sub slurp {
 }
 
 my $table = "$top/t/ifDescr.txt";
-my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', sloppy => 1 );
+my $snmp = SDM::Utility::SNMP->create( hostname => 'localhost', unittest => 1 );
 $snmp->tabledata( slurp($table) );
 my $a = $snmp->read_snmp_into_table('ifDescr');
 
