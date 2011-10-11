@@ -42,10 +42,6 @@ $t->runcmd("$perl $sdm disk array assign nsams2k1 linuscs103");
 $t->runcmd("$perl $sdm disk host assign linuscs103 gpfs");
 
 $t->runcmd("$perl $sdm disk volume add --physical-path=/vol/ams1100 --total-kb=6438990688 --used-kb=5722964896 --filername=gpfs --disk-group=SYSTEMS");
-# Note mixed case group name which is fixed in Volume.pm
-$t->runcmd("$perl $sdm disk volume add --physical-path=/vol/ams1101 --total-kb=18438990688 --used-kb=7722964896 --filername=gpfs --disk-group=SYSTems");
-
-stdout_like { $t->runcmd("$perl $sdm disk volume list --noheaders --show mount_path --filter mount_path~%ams1101"); } qr/ams1101/, "ok: volume list works";
 
 stdout_like { $t->runcmd("$perl $sdm disk volume list --noheaders --show mount_path --filter mount_path~%ams1101"); } qr/ams1101/, "ok: volume list works";
 

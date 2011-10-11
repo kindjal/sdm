@@ -17,7 +17,6 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 }
 
 use SDM::Utility::SNMP;
-use SDM::Disk::Filer::Command::QuerySnmp;
 
 # Start with a fresh database
 use FindBin;
@@ -27,7 +26,6 @@ require "$top/t/sdm-disk-lib.pm";
 
 my $t = SDM::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
-#ok( $t->testdata == 0, "ok: add data");
 
 sub fileslurp {
     my $filename = shift;
@@ -37,21 +35,20 @@ sub fileslurp {
     return $content;
 }
 
-my $nfs11 = SDM::Disk::Filer->create( name => 'nfs11' );
+my $nfs11 = SDM::Disk::Filer->create( name => 'nfs11', type => 'snmp' );
 ok( defined $nfs11->id, "created filer nfs11");
-my $nfs12 = SDM::Disk::Filer->create( name => 'nfs12' );
+my $nfs12 = SDM::Disk::Filer->create( name => 'nfs12', type => 'snmp' );
 ok( defined $nfs12->id, "created filer nfs12");
 $nfs12->duplicates('nfs11');
 
 # mimic acquire_volume_data and update_volumes
-my $c = SDM::Disk::Filer::Command::QuerySnmp->create( loglevel => "DEBUG", filername => "gpfs-dev", discover_volumes => 1, discover_groups => 1 );
-my $d = SDM::SNMP::DiskUsage->create( loglevel => "DEBUG", discover_volumes => 1, hostname => 'nfs11' );
-$d->hosttype('netapp');
+my $c = SDM::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $nfs11, discover_volumes => 1, discover_groups => 1, unittest => 1 );
+$c->hosttype('netapp');
 my $oid = 'dfTable';
 my $lines = fileslurp("$top/t/dfTable.txt");
-my @content = map { $d->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
-my $snmp_table = $d->read_snmp_into_table($oid, \@content);
-my $table = $d->_convert_to_volume_data( $snmp_table );
+my @content = map { $c->_parse_snmp_line($_) } @{ [ split("\n",$lines) ] };
+my $snmp_table = $c->read_snmp_into_table($oid, \@content);
+my $table = $c->_convert_to_volume_data( $snmp_table );
 $c->_update_volumes( $table, $nfs11 );
 
 UR::Context->commit();

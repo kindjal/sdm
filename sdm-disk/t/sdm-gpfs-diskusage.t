@@ -7,8 +7,6 @@ BEGIN {
 };
 
 use SDM;
-#use SDM::GPFS::DiskUsage;
-use SDM::Disk::Filer::Command::QueryGpfs;
 
 use Test::More;
 use Test::Output;
@@ -24,11 +22,6 @@ my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
-# This test requires a real network connection to a lives host.
-my $host = 'linuscs107';
-
-my @params = ( loglevel => 'DEBUG', hostname => $host );
-
 sub fileslurp {
     my $filename = shift;
     return unless (defined $filename);
@@ -38,7 +31,13 @@ sub fileslurp {
     return $content;
 }
 
-my $c = SDM::GPFS::DiskUsage->create( @params );
+my $hostname = 'linuscs107';
+my $filername = 'gpfs-dev';
+my $filer = SDM::Disk::Filer->create( name => $filername );
+my $host = SDM::Disk::Host->create( hostname => $hostname );
+$host->assign($filer->name);
+my @params = ( loglevel => 'DEBUG', filer => $filer );
+my $c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 
 $c->_parse_mmlscluster( fileslurp( "$top/t/mmlscluster.txt" ) );
 my $h = SDM::Disk::Host->get( hostname => "linuscs103" );

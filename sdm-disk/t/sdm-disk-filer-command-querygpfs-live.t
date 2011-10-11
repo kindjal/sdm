@@ -7,7 +7,6 @@ BEGIN {
 };
 
 use SDM;
-use SDM::Disk::Filer::Command::QueryGpfs;
 
 use Test::More;
 use Test::Output;
@@ -16,6 +15,7 @@ use Test::Exception;
 unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
     plan skip_all => "Test only valid on GI networks";
 }
+plan skip_all => "Test only valid on GI networks";
 
 # Start with a fresh database
 use File::Basename qw/dirname/;
@@ -24,15 +24,17 @@ require "$top/t/sdm-disk-lib.pm";
 ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
 
 # This test requires a real network connection to a lives host.
-my @params = ( loglevel => 'DEBUG', filername => "gpfs-dev", hostname => 'linuscs107', discover_groups => 1 );
-my $c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
+my $filername = 'gpfs-dev';
+my $hostname = 'linuscs107';
+my $filer = SDM::Disk::Filer->create( name => $filername );
+my $host = SDM::Disk::Host->create( hostname => $hostname, master => 1 );
+$host->assign( $filer->name );
+my @params = ( loglevel => 'DEBUG', filer => $filer, discover_groups => 1, discover_volumes => 1 );
+my $c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 
 # Volume data must be updated before GPFS data is updated below.
-$c->execute();
+$c->acquire_volume_data();
 $c->delete;
-
-$c = SDM::Disk::Filer::Command::QueryGpfs->create( @params );
-$c->execute();
 
 my $v = SDM::Disk::Volume->get( physical_path => '/vol/aggr0' );
 ok( defined $v->id );
