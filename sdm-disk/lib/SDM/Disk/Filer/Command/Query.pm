@@ -200,7 +200,7 @@ sub _query {
 }
 
 =head2 execute
-Execute QueryGpfs() queries on a named Filer and stores disk usage information.
+Execute queries on a named Filer and stores disk usage information.
 =cut
 sub execute {
     my $self = shift;
@@ -208,7 +208,6 @@ sub execute {
 
     my @filers;
     if ($self->filername) {
-        # See if filer is present and has master host defined...
         my $filer = SDM::Disk::Filer->get_or_create( name => $self->filername );
         unless ($filer) {
             $self->logger->error(__PACKAGE__ . " failed to get or create '" . $self->filername . "'");
