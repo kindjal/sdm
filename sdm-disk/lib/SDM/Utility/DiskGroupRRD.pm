@@ -96,7 +96,7 @@ sub create_or_update {
     }
     my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
 
-    $self->logger->debug(__PACKAGE__ . " create_or_update($rrdfile,$group,$total,$used)");
+    $self->logger->info(__PACKAGE__ . " create_or_update($rrdfile,$group,$total,$used)");
 
     my $rrd = RRDTool::OO->new(
         file => $rrdfile,
@@ -106,7 +106,12 @@ sub create_or_update {
         $self->create_rrd($rrd);
     }
 
-    $rrd->update( values => { total => $total, used => $used } );
+    my $rc;
+    eval {
+        $rc = $rrd->update( values => { total => $total, used => $used } );
+    };
+    warn "update returns $rc and $@";
+
     return $rrdfile;
 }
 

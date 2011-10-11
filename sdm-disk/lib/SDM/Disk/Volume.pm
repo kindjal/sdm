@@ -210,13 +210,13 @@ sub create {
     # If a group is specified, make sure we have that too
     my $group_name;
     if ($param{disk_group}) {
-        $group_name = uc($param{disk_group});
+        $group_name = $param{disk_group};
         my $group = SDM::Disk::Group->get( name => $group_name );
-        unless ($group) {
+        if ($group) {
+            $param{disk_group} = $group_name;
+        } else {
             $self->error_message("failed to identify group: " . $group_name );
-            return;
         }
-        $param{disk_group} = $group_name;
     }
 
     # A volume must be assigned to a filer.

@@ -266,7 +266,7 @@ sub _update_volumes {
             my $group;
             if ($self->discover_groups) {
                 $group = SDM::Disk::Group->get_or_create( name => $group_name );
-                $self->logger->debug(__PACKAGE__ . " created disk group: $group_name");
+                $self->logger->debug(__PACKAGE__ . " get_or_create disk group: $group_name");
             } else {
                 $group = SDM::Disk::Group->get( name => $group_name );
             }
@@ -276,7 +276,6 @@ sub _update_volumes {
             }
         }
 
-        #my $volume = SDM::Disk::Volume->get_or_create( filername => $filername, physical_path => $physical_path );
         my $volume = SDM::Disk::Volume->get( filername => $filername, physical_path => $physical_path );
         unless ($volume) {
             unless ($self->discover_volumes) {
@@ -286,7 +285,7 @@ sub _update_volumes {
             $volume = SDM::Disk::Volume->create( filername => $filername, physical_path => $physical_path );
             $self->logger->error(__PACKAGE__ . " create volume: $filername, $physical_path");
             unless ($volume) {
-                $self->logger->error(__PACKAGE__ . " failed to get_or_create volume: $filername, $physical_path");
+                $self->logger->error(__PACKAGE__ . " failed to get or create volume: $filername, $physical_path");
                 next;
             }
         }
