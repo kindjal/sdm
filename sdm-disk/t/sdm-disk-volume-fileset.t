@@ -72,7 +72,7 @@ ok( defined $volume->id, "properly created new parent volume aggr0");
         file_limit => 0,
         file_in_doubt => 138,
         file_grace => 'none',
-        file_entryType => 'e'
+        file_entrytype => 'e'
 );
 $res = SDM::Disk::Fileset->create( %params );
 ok( defined $res->id, "properly created new fileset");

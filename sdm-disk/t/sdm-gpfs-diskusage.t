@@ -87,7 +87,7 @@ my %fs1 = (
         file_limit => '0',
         file_in_doubt => '138',
         file_grace => 'none',
-        file_entryType => 'e',
+        file_entrytype => 'e',
         parent_volume_name => 'aggr0'
 );
 my %fs2 = (
@@ -103,7 +103,7 @@ my %fs2 = (
         file_limit => '0',
         file_in_doubt => '574',
         file_grace => 'none',
-        file_entryType => 'e',
+        file_entrytype => 'e',
         parent_volume_name => 'aggr0'
 );
 $expected = [
