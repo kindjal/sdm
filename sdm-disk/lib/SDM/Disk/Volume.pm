@@ -51,6 +51,7 @@ class SDM::Disk::Volume {
                 foreach my $fs ( $self->fileset ) {
                     $kb += $fs->kb_limit;
                 }
+                return unless (defined $kb and defined $total_kb);
                 return sprintf "%0.2d%%", $kb/$total_kb*100;
             |,
         },
