@@ -3,6 +3,6 @@ MAILTO=storage@genome.wustl.edu
 #1 1 * * 1 root /usr/bin/disk_usage.pl -fF -r /var/www/domains/gsc.wustl.edu/diskusage/htdocs/rrd -i /var/www/domains/gsc.wustl.edu/diskusage/cgi-bin/du.cache -D /gsc/scripts/share/automount/gscmnt -H linuscs103,linuscs66,linuscs62,blade7-2-12,blade7-2-13,blade10-1-1,linuscs56,linuscs55,nbmaster -L WARN
 
 # nightly update of filer data
-1 1 * * * root /usr/bin/sdm disk filer query-snmp --discover-groups --discover-volumes --allow-mount
+1 1 * * * root /usr/bin/sdm disk filer query --discover-groups --discover-volumes --allow-mount
 # weekly purge of aged volumes
-1 1 * * 1 root /usr/bin/sdm disk filer query-snmp --discover-groups --discover-volumes --allow-mount --force --purge
+1 1 * * 1 root /usr/bin/sdm disk filer query --discover-groups --discover-volumes --allow-mount --force --purge
