@@ -219,7 +219,7 @@ sub _parse_mmrepquota {
         $line =~ s/\s+$//g;
         next unless ($volumeref->{$parentVolume});
 
-        my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entryType','parent_volume_name');
+        my @keys = ('name','type','kb_size','kb_quota','kb_limit','kb_in_doubt','kb_grace','files','file_quota','file_limit','file_in_doubt','file_grace','file_entrytype','parent_volume_name');
         my @values = split(/\s+/,$line,13);
         my %params;
         @params{@keys} = @values;

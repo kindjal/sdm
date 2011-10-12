@@ -163,7 +163,7 @@ sub duplicates {
     # on this filer and see if they're now orphans.
     foreach my $vid (@volume_ids) {
         my $volume = SDM::Disk::Volume->get( $vid );
-        if ($volume->is_orphan()) {
+        if (defined $volume and $volume->is_orphan()) {
             # FIXME: can't use warning_message here or we silently abort
             $self->warning_message("Removing now orphaned Volume: " . $volume->physical_path);
             $volume->delete();
