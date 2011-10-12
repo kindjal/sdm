@@ -19,12 +19,12 @@ class SDM::Disk::Fileset {
         kb_quota        => { is => 'Number' },
         kb_limit        => { is => 'Number' },
         kb_in_doubt     => { is => 'Number' },
-        kb_grace        => { is => 'Number' },
+        kb_grace        => { is => 'Text' },
         files           => { is => 'Number' },
         file_quota      => { is => 'Number' },
         file_limit      => { is => 'Number' },
         file_in_doubt   => { is => 'Number' },
-        file_grace      => { is => 'Number' },
+        file_grace      => { is => 'Text' },
         file_entrytype  => { is => 'Text' },
         parent_volume_id => { is => 'Text' },
         volume          => {
@@ -40,23 +40,26 @@ class SDM::Disk::Fileset {
 
 sub create {
     my $self = shift;
-    my (%param) = @_;
-    $param{ total_kb } = $param{ kb_limit };
-    $param{ used_kb  } = $param{ kb_size };
+    my $bx = $self->define_boolexpr(@_);
 
-    unless ($param{parent_volume_id}) {
+    my $kb_limit = $bx->value_for('kb_limit');
+    my $kb_size  = $bx->value_for('kb_size');
+    $bx = $bx->add_filter( total_kb => $kb_limit );
+    $bx = $bx->add_filter( used_kb => $kb_size );
+
+    unless ($bx->value_for('parent_volume_id')) {
         $self->error_message("missing required attribute parent_volume_id");
         return;
     }
 
-    my $parent = SDM::Disk::Volume->get( id => $param{parent_volume_id} );
+    my $parent = SDM::Disk::Volume->get( id => $bx->value_for('parent_volume_id'));
     unless ($parent) {
-        $self->error_message("no volume identified by parent_volume_id $param{parent_volume_id}");
+        $self->error_message("no volume identified by parent_volume_id " . $bx->value_for('parent_volume_id'));
         return;
     }
-    $param{ filername } = $parent->filername;
+    $bx = $bx->add_filter( filername => $parent->filername );
 
-    return $self->SUPER::create( %param );
+    return $self->SUPER::create( $bx );
 }
 
 1;

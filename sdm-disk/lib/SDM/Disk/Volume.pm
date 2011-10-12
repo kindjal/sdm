@@ -182,26 +182,26 @@ Create a volume, error if it already exists.
 =cut
 sub create {
     my $self = shift;
-    my (%param) = @_ if (scalar @_);
+    my $bx = $self->define_boolexpr(@_);
 
     my @missing;
     foreach my $attr ( $self->__meta__->properties ) {
         next if ($attr->is_optional or $attr->via or $attr->is_calculated or $attr->is_id or $attr->id_by or defined $attr->default_value);
-        push @missing, $attr->property_name unless (exists $param{$attr->property_name});
+        push @missing, $attr->property_name unless (defined $bx->value_for($attr->property_name));
     }
     # filername isn't required at the table level because we want to allow a many-to-many relationship
     # via a bridge table.  So we want to "assign" a volume to a filer via the bridge table.  So, we
     # need a filer to assign to (see below), but it's not a Volume attribute at the table level.
-    push @missing, 'filername' unless ($param{filername});
+    push @missing, 'filername' unless ($bx->value_for('filername'));
     if (@missing) {
         $self->error_message("missing required attributes in create(): " . join(" ",@missing));
         return;
     }
 
     # Is this a duplictae volume?  Volume-Filer is many to many
-    my @volumes = SDM::Disk::Volume->get( physical_path => $param{physical_path}, filername => $param{filername} );
+    my @volumes = SDM::Disk::Volume->get( physical_path => $bx->value_for('physical_path'), filername => $bx->value_for('filername') );
     if (@volumes) {
-        $self->error_message("filer $param{filername} already has a volume $param{physical_path}");
+        $self->error_message("filer " . $bx->value_for('filername') . " already has a volume " . $bx->value_for('physical_path'));
         return;
     }
 
@@ -209,26 +209,27 @@ sub create {
     # and they represent real people, which we should be careful to not mess with.
     # If a group is specified, make sure we have that too
     my $group_name;
-    if ($param{disk_group}) {
-        $group_name = $param{disk_group};
+    if ($bx->value_for('disk_group')) {
+        $group_name = $bx->value_for('disk_group');
         my $group = SDM::Disk::Group->get( name => $group_name );
         if ($group) {
-            $param{disk_group} = $group_name;
+            $bx = $bx->add_filter( disk_group => $group_name);
         } else {
             $self->error_message("failed to identify group: " . $group_name );
         }
     }
 
     # A volume must be assigned to a filer.
-    my $filername = delete $param{filername};
+    my $filername = $bx->value_for('filername');
+    $bx = $bx->remove_filter('filername');
     my $filer = SDM::Disk::Filer->get( name => $filername );
     unless ($filer) {
         $self->error_message("no filer named '$filername' known");
         return;
     }
 
-    $param{created} = Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time());
-    my $volume = $self->SUPER::create( %param );
+    $bx = $bx->add_filter( created => Date::Format::time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
+    my $volume = $self->SUPER::create( $bx );
     $volume->assign( $filername );
     return $volume;
 }

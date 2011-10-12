@@ -76,6 +76,7 @@ ok( defined $volume->id, "properly created new parent volume aggr0");
 );
 $res = SDM::Disk::Fileset->create( %params );
 ok( defined $res->id, "properly created new fileset");
+UR::Context->commit();
 
 # Test creation of new mount of same Volume physical_path
 $res = SDM::Disk::Fileset->create( %params );
