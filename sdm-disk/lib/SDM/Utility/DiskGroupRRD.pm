@@ -10,7 +10,7 @@ use Time::Local;
 use Log::Log4perl qw/:levels/;
 
 class SDM::Utility::DiskGroupRRD {
-    is => "SDM::Utility",
+    is => "SDM::Command::Base",
     has => [
         rrdpath => {
             is => 'Text',
