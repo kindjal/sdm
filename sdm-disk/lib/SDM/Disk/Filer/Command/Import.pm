@@ -59,6 +59,7 @@ sub execute {
     open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
     while ( my $row = $csv->getline( $fh ) ) {
         unless (@header) {
+            next if ($row->[0] =~ /^#/);
             if ($row->[0] ne "name" or
                 $row->[1] ne "type" or
                 $row->[2] ne "hosts" or
