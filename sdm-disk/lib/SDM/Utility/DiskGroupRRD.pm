@@ -106,12 +106,7 @@ sub create_or_update {
         $self->create_rrd($rrd);
     }
 
-    my $rc;
-    eval {
-        $rc = $rrd->update( values => { total => $total, used => $used } );
-    };
-    warn "update returns $rc and $@";
-
+    $rrd->update( values => { total => $total, used => $used } );
     return $rrdfile;
 }
 
