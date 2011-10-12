@@ -2,7 +2,7 @@ Build.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml
-cron/filer-snmp-query.cron
+cron/sdm-disk-filer-query
 debian/changelog
 debian/compat
 debian/control
