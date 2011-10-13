@@ -3,7 +3,7 @@
 
 =head2 System Data Miner (SDM)
 
-System Data Miner (SDM) is software that represents TGI systems infrastructure.
+System Data Miner (SDM) is software that represents TGI systems infrastructure.  This likely won't be useful to anybody outside The Genome Institute, but you never know.
 
 The idea is to leverage UR's (http://www.urobject.org/) ability to perform cross datasource joins to build relationships between objects stored in different systems. We have classes that represent storage infrastructure, we hook into Zenoss, Platform RTM, Jira, and other data sources.
 
