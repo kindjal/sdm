@@ -27,7 +27,7 @@ Also, the web interface provides a mechanism to build custom views of objects on
 
 =head2 Get the code
 
-git clone ssh://git/srv/git/SDM.git
+git clone git@github.com:kindjal/SDM.git
 
 The code is separated into sub units that can each be built into .deb packages, eg. sdm-disk, sdm-jira, sdm-rtm, etc.  Each depends upon the toplevel ./sdm namespace definition area.  Code may be executed from the checkout and applied to SQLite databases.  Some of the units expect a separate instance of a running database, eg. Jira, RT, Zenoss.  But specifically the sdm-disk unit can be run entirely within SQLite local to the checkout.  I use a bash shell alias like this:
 
