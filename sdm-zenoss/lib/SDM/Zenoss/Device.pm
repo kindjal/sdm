@@ -15,9 +15,9 @@ class SDM::Zenoss::Device {
             is => 'Hash'
         },
         name => { is => 'Text' },
-        deviceclass => { is => 'Text' },
+        deviceclass => { is => 'Text', default_value => '/Server/Linux' },
         ipaddress => { is => 'SDM::Value::Ipaddress' },
-        productionatate => { is => 'Text' },
+        productionstate => { is => 'Text' },
     ],
 };
 
@@ -35,22 +35,26 @@ sub __load__ {
     # Return an empty list if error.
     my @rows = [];
     foreach my $item ('name','ipAddress','deviceClass','productionState') {
-        my $value = $bx->value_for(lc($item));
+        # Update if we asked for something specific
+        my $dv = $bx->subject_class_name->__meta__->property_meta_for_name(lc($item))->default_value;
+        $params->{$item} = $dv if (defined $dv);
+        $value = $bx->value_for(lc($item));
         $params->{$item} = $value if (defined $value);
     }
     my $uid = $bx->value_for('uid');
+    die "You must specify deviceClass if uid is given"
+        if ( defined $uid and not defined $params->{deviceClass} );
     my $response = $class->_api->connection->device_getDevices(
         {
             uid => $uid,
             params => $params,
             start => 0,
             limit => undef,
-            sort => uid,
             dir => 'ASC',
         }
     )->decoded;
-    if ( $response->{message} =~ /error/i ) {
-        warn $response->{message};
+    if ( defined $response and $response->{message} =~ /error/i ) {
+        warn "Zenoss API returns error: " . $response->{message};
         return \@header, \@rows;
     }
     my $id;
@@ -62,6 +66,9 @@ sub __load__ {
         while (my ($key, $value) = each %$result) {
             $lcresult->{lc($key)} = $value;
         }
+        # Not sure how to use uid here.  getDevices wants a uid
+        # of a device organizer, but the results back are devices
+        # where the uid is of the device returned.
         $lcresult->{duid} = $lcresult->{uid};
         $lcresult->{uid} = $uid;
         # make IP address object
