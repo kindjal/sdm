@@ -14,6 +14,7 @@ class SDM::Zenoss::API {
         username   => { is => 'Text', default_value => 'restuser' },
         password   => { is => 'Text', default_value => 'Poh0quoh' },
         url        => { is => 'Text', default_value => 'http://monitor.gsc.wustl.edu:8080/' },
+        timeout    => { is => 'Number', default_value => 300 },
     ]
 };
 
@@ -24,6 +25,7 @@ sub connect {
             username    => $self->{username},
             password    => $self->{password},
             url         => $self->{url},
+            timeout     => $self->{timeout},
         }
     );
     $self->connection( $api );

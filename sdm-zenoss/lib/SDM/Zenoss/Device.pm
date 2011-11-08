@@ -15,7 +15,7 @@ class SDM::Zenoss::Device {
             is => 'Hash'
         },
         name => { is => 'Text' },
-        deviceclass => { is => 'Text', default_value => '/Server/Linux' },
+        deviceclass => { is => 'Text', default_value => '/' },
         ipaddress => { is => 'SDM::Value::Ipaddress' },
         productionstate => { is => 'Text' },
     ],
