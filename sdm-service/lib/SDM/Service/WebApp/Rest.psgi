@@ -22,7 +22,7 @@ sub load_modules {
     }
 
     # search's callbacks are expensive, web server can't change anything anyway so don't waste the time
-    SDM::Search->unregister_callbacks('UR::Object');
+    #SDM::Search->unregister_callbacks('UR::Object');
     $loaded = 1;
 }
 

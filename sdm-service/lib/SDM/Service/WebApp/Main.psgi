@@ -28,6 +28,7 @@ our %app = map { $_ => load_app($_) } qw/
   Dump.psgi
   Cache.psgi
   Lsof.psgi
+  Asset.psgi
   /;
 
 ## Utility functions
@@ -69,6 +70,10 @@ dispatch {
 
       sub (POST + /service/lsof) {
         redispatch_psgi $app{'Lsof.psgi'};
+      },
+
+      sub (POST + /service/asset) {
+        redispatch_psgi $app{'Asset.psgi'};
       },
 
       sub (/res/**) {
