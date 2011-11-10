@@ -25,7 +25,7 @@ sub _generate_content {
 
     my @properties = $class->__meta__->properties;
     my @attributes = map { $_->property_name } @properties;
-    my @attributes = sort @attributes;
+    @attributes = sort @attributes;
     # id must be the first attribute
     @attributes = grep { ! /id/ } @attributes;
     unshift @attributes,'id';
@@ -42,7 +42,7 @@ sub _generate_content {
                     "sAjaxSource": "$jsonpath",
                     "aoColumns": [
 EOF
-    foreach my $attr (sort @attributes) {
+    foreach my $attr (@attributes) {
         $tablescript .= qq/{ "sTitle": "$attr" },\n/;
     }
     $tablescript .= <<EOF;
