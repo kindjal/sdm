@@ -21,13 +21,16 @@ sub aaData {
     return [] unless ($subject);
 
     foreach my $item ( $subject->members ) {
-        push @data, [
-            $item->manufacturer,
-            $item->model,
-            $item->serial,
-            $item->created ? $item->created : "0000-00-00 00:00:00",
-            $item->last_modified ? $item->last_modified : "0000-00-00 00:00:00",
-        ];
+        my $class = $item->__meta__->class_name;
+        my @properties = $class->__meta__->properties;
+        my @attributes = map { $_->property_name } @properties;
+        # sort so we have the same order as Html.pm
+        @attributes = sort @attributes;
+        # id must be first
+        @attributes = grep { ! /id/ } @attributes;
+        unshift @attributes,'id';
+        my @bdata = map { $item->$_ } @attributes;
+        push @data, [ @bdata] ;
     }
     return @data;
 }

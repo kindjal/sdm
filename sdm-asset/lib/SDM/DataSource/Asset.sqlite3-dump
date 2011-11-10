@@ -11,5 +11,5 @@ CREATE TABLE asset_hardware (
   created       DATETIME,
   last_modified DATETIME
 );
-INSERT INTO "asset_hardware" VALUES('adf1606d976e49a5978705d5c965b83a','Dell','G3730','xa1234yz','This is a sample piece of hardware','This is a comment','The astral plane','2011-11-06 00:12:34',null);
+INSERT INTO "asset_hardware" VALUES('170a0e61a42e4eef82d81c103ae32295','Dell','G3730','xa1234yz','This is a sample piece of hardware','This is a comment','The astral plane','2011-11-09 22:52:23',null);
 COMMIT;

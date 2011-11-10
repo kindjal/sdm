@@ -31,48 +31,25 @@ sub load_modules {
     $loaded = 1;
 }
 
-=head2 process
-=cut
-sub process {
-    my $self = shift;
-
-    #my $content = shift;
-    #my $json = JSON->new;
-    #my $data = $json->decode($content);
-
-    # Enter fresh JSON records.
-    #warn "post data: " . Data::Dumper::Dumper $data;
-
-    # We're about to commit().  UR catches RDBMS errors and pushes them into a stack which
-    # we copy here.  Then if commit returns undef, we examine the stack for known error conditions.
-    #UR::Context->message_callback('error', sub { push @errors, $_[0]->text });
-    #UR::Context->commit();
-}
-
 post '/service/asset' => sub {
 
     my $self = shift;
-    my ($params) = @_;
-    my $msg = "OK";
-
-    warn "args " . Data::Dumper::Dumper @_;
-    warn "params " . Data::Dumper::Dumper params;
-
+    my $msg;
     eval {
-        #$self->process();
         my $attr = params->{columnName};
         my $value = params->{value};
-        my $obj = SDM::Asset::Hardware->get( manufacturer => params->{id} );
+        my $obj = SDM::Asset::Hardware->get( id => params->{id} );
+        unless ($obj) {
+            return send_error(__PACKAGE__ . " No object found for id " . params->{id});
+        }
+        $msg = $value;
         $obj->$attr( $value );
         UR::Context->commit();
     };
     if ($@) {
-        $msg = __PACKAGE__ . " Error in process: $@";
-        # Print to local error log
-        send_error($msg, 500);
+        return send_error(__PACKAGE__ . " Error in process: $@",500);
     }
 
-    warn "return $msg";
     return $msg;
 };
 
