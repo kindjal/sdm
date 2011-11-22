@@ -31,7 +31,7 @@ ok( $t->testdata == 0, "ok: add data");
 my @s = SDM::Disk::Volume->define_set();
 my $v = $s[0]->create_view( perspective => 'summary', toolkit => 'json' );
 my $json = $v->_jsobj();
-print Data::Dumper::Dumper $json;
+#print Data::Dumper::Dumper $json;
 
 # This must match the data used in SDM::Disk::Lib->testdata
 my $expected = {
