@@ -185,6 +185,7 @@ sub _query {
 
         unless ($obj) {
             $self->logger->error(__PACKAGE__ . " unable to query filer " . $filer->name);
+            $filer->status(0);
             return;
         }
 

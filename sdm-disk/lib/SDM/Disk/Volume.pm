@@ -32,17 +32,17 @@ class SDM::Disk::Volume {
         mount_options   => { is => 'Text', default_value => '-intr,tcp,rsize=32768,wsize=32768' },
         group           => { is => 'SDM::Disk::Group', id_by => 'disk_group' },
         #gpfs_disk_perf  => { is => 'SDM::Gpfs::GpfsDiskPerf', reverse_as => 'volume' },
-        gpfs_fsperf_id  => {
-            is => 'Number',
-            calculate_from => 'mount_path',
-            calculate   => q/
-                use File::Basename;
-                my $name = File::Basename::basename $mount_path;
-                my @f = SDM::Gpfs::GpfsFileSystemPerf->get( gpfsFileSystemPerfName => $name );
-                return map { $_->id } @f;
-            /,
-        },
-        gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
+        #gpfs_fsperf_id  => {
+        #    is => 'Number',
+        #    calculate_from => 'mount_path',
+        #    calculate   => q/
+        #        use File::Basename;
+        #        my $name = File::Basename::basename $mount_path;
+        #        my @f = SDM::Gpfs::GpfsFileSystemPerf->get( gpfsFileSystemPerfName => $name );
+        #        return map { $_->id } @f;
+        #    /,
+        #},
+        #gpfs_filesystem_perf => { is => 'SDM::Gpfs::GpfsFileSystemPerf', id_by => 'gpfs_fsperf_id' },
         fileset_cap => {
             is => 'Number',
             calculate_from => 'total_kb',
