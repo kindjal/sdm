@@ -28,7 +28,6 @@ my $c = SDM::Asset::Software::Command::Import->create( loglevel => "DEBUG", csv 
 lives_ok { $c->execute(); } "import run lived";
 
 my $s = SDM::Asset::Software->define_set();
-#my $v = $s->create_view( subject_class_name => 'SDM::Asset::Software::Set', perspective => 'table', toolkit => 'json' );
 my $v = $s->create_view( perspective => 'table', toolkit => 'json' );
 my $out = $v->_generate_content();
 warn "" . Data::Dumper::Dumper $out;

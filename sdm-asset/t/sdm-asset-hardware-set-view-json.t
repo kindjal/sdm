@@ -27,9 +27,17 @@ my $csvfile = "$top/t/hardware-inventory.csv";
 my $c = SDM::Asset::Hardware::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "import run lived";
 
-my @s = SDM::Asset::Hardware->define_set();
-my $v = $s[0]->create_view( perspective => 'table', toolkit => 'json' );
-my $json = $v->_jsobj();
-
-warn "" . Data::Dumper::Dumper $json;
+my $s = SDM::Asset::Hardware->define_set();
+my $v;
+eval {
+  $v = $s->create_view( perspective => 'table', toolkit => 'json' );
+};
+warn "first " . Data::Dumper::Dumper $v;
+eval {
+  $v = $s->create_view( subject_class_name => 'SDM::Object::Set', perspective => 'table', toolkit => 'json' );
+};
+die $@ if ($@);
+warn "next " . Data::Dumper::Dumper $v;
+my $out = $v->_generate_content();
+warn "" . Data::Dumper::Dumper $out;
 done_testing();

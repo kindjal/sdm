@@ -27,9 +27,15 @@ my $csvfile = "$top/t/hardware-inventory.csv";
 my $c = SDM::Asset::Hardware::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "import run lived";
 
-
-my $view = SDM::Asset::Hardware::Set::View::Table::Html->create();
-
+my $s = SDM::Asset::Hardware->define_set();
+my $view;
+eval {
+    $view = $s->create_view( perspective => 'table', toolkit => 'html' );
+};
+unless ($view) {
+    $view = $s->create_view( subject_class_name => 'SDM::Object::Set', perspective => 'table', toolkit => 'html' );
+}
 my $output = $view->_generate_content();
+__END__
 warn "" . Data::Dumper::Dumper $output;
 done_testing();
