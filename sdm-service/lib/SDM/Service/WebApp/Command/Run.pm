@@ -122,7 +122,7 @@ sub run_starman {
         env    => $self->env,
     );
 
-    my $psgi_path = $self->psgi_path . '/Main.psgi';
+    my $psgi_path = $self->psgi_path . '/bin/app.pl';
 
     my %options = (
         '--app' => $psgi_path,
