@@ -11,3 +11,7 @@ sdm-service/lib/SDM/DataSource/Service.sqlite3-journal
 sdm/lib/SDM/DataSource/Meta.sqlite3
 sdm/lib/SDM/DataSource/Meta.sqlite3-bak
 sdm/lib/SDM/DataSource/Meta.sqlite3-dump
+sdm-asset/lib/SDM/DataSource/Asset.sqlite3
+sdm-asset/lib/SDM/DataSource/Asset.sqlite3-bak
+sdm-asset/lib/SDM/DataSource/Asset.sqlite3-dump
+sdm-asset/lib/SDM/DataSource/Asset.sqlite3-journal
