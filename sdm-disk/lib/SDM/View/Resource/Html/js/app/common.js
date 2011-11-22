@@ -30,8 +30,9 @@ function sizeSuffix ( n ) {
         divisor = 1000000000000000
         break
   }
-  var shortVal = n / divisor
-  return "(" + String( shortVal.toFixed(0) ) + " " + units + ")"
+  // round to 1 decimal by * 10 / 10
+  var shortVal = Math.round( n * 10 / divisor * 10 )
+  return "(" + String( shortVal.toFixed(1) ) + " " + units + ")"
 };
 
 /* Add commas to a number */

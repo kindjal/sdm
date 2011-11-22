@@ -309,13 +309,13 @@ rrdFlot.prototype.drawFlotGraph = function() {
 
 function suffixFormatter(val, axis) {
   if (val > 1000000000000)
-    return (val / 1000000000000).toFixed(axis.tickDecimals) + " PB";
+    return (Math.round(val*10)/10000000000000).toFixed(axis.tickDecimals+1) + " PB";
   else if (val > 1000000000)
-    return (val / 1000000000).toFixed(axis.tickDecimals) + " TB";
+    return (Math.round(val*10)/10000000000).toFixed(axis.tickDecimals+1) + " TB";
   else if (val > 1000000)
-    return (val / 1000000).toFixed(axis.tickDecimals) + " GB";
+    return (Math.round(val*10)/10000000).toFixed(axis.tickDecimals+1) + " GB";
   else if (val > 1000)
-    return (val / 1000).toFixed(axis.tickDecimals) + " MB";
+    return (Math.round(val*10)/10000).toFixed(axis.tickDecimals+1) + " MB";
   else
     return val.toFixed(axis.tickDecimals) + " KB";
 }

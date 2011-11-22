@@ -96,7 +96,7 @@ sub create_or_update {
     }
     my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
 
-    $self->logger->info(__PACKAGE__ . " create_or_update($rrdfile,$group,$total,$used)");
+    $self->logger->debug(__PACKAGE__ . " create_or_update($rrdfile,$group,$total,$used)");
 
     unless (-w $rrdpath) {
         $self->logger->warn(__PACKAGE__ . " no write permission for '$rrdpath', skipping rrd update");
