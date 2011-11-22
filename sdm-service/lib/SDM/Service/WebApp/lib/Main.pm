@@ -173,6 +173,10 @@ get qr{/view/(.*)/(.*)\.(.*)} => sub {
     eval {
         $view = $result->create_view(%view_args, %view_special_args);
     };
+    $view_args{subject_class_name} = "SDM::Object::Set";
+    eval {
+        $view = $result->create_view(%view_args, %view_special_args);
+    };
     unless ($view) {
         # Try the default view
         $view_args{perspective} = 'default';
