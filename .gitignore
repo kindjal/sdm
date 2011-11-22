@@ -15,3 +15,4 @@ sdm-asset/lib/SDM/DataSource/Asset.sqlite3
 sdm-asset/lib/SDM/DataSource/Asset.sqlite3-bak
 sdm-asset/lib/SDM/DataSource/Asset.sqlite3-dump
 sdm-asset/lib/SDM/DataSource/Asset.sqlite3-journal
+sdm-disk/lib/SDM/View/Resource/Html/rrd
