@@ -7,7 +7,13 @@ use warnings;
 use SDM;
 
 class SDM::Object::Set::View::Table::Json {
-    is => 'UR::Object::Set::View::Default::Json'
+    is => 'UR::Object::Set::View::Default::Json',
+    has_constant => [
+        # Empty default aspects and calculate them on the fly based on subject attributes below
+        default_aspects => {
+            value => []
+        }
+    ]
 };
 
 sub _generate_content {
@@ -32,7 +38,16 @@ sub _jsobj {
             perspective => 'default',
             toolkit => 'json',
         );
-        $args{aspects} = $self->default_aspects if ($self->default_aspects);
+
+        # Use our default_aspects if we have them defined.
+        my @default_aspects = @{ $self->default_aspects };
+        unless (@default_aspects) {
+            # Otherwise, make them the attributes of our subject.
+            @default_aspects = map { $_->property_name } $member->__meta__->properties;
+        }
+        @default_aspects = grep {!/id/} @default_aspects;
+        unshift @default_aspects, 'id';
+        $args{aspects} = [ @default_aspects ];
         my $v = $member->create_view(%args);
         my @data = $v->aspects;
         @data = map { $v->_generate_content_for_aspect($_) } @data;

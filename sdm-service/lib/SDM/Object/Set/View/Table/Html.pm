@@ -9,7 +9,12 @@ use SDM;
 use Data::Dumper;
 
 class SDM::Object::Set::View::Table::Html {
-    is => 'UR::Object::View::Default::Html'
+    is => 'UR::Object::View::Default::Html',
+    has_constant => [
+        default_aspects => {
+            value => []
+        }
+    ]
 };
 
 sub _generate_content {
@@ -20,7 +25,18 @@ sub _generate_content {
 
     # Build JSON view of aaData using Json.pm peer class
     my $subject = $self->subject;
-    my $jsview = $subject->create_view('perspective'=>'table','toolkit'=>'json');
+    my $jsview;
+    eval {
+        $jsview = $subject->create_view('perspective'=>'table','toolkit'=>'json');
+    };
+    unless ($jsview) {
+        eval {
+            $jsview = $subject->create_view(subject_class_name => 'SDM::Object::Set', 'perspective'=>'table','toolkit'=>'json');
+        };
+    }
+    unless ($jsview) {
+        die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
+    }
     my $aaData = $jsview->_json->encode( $jsview->_jsobj->{aaData} );
 
     # Determine column headers for javascript
@@ -31,9 +47,26 @@ sub _generate_content {
             perspective => 'default',
             toolkit => 'json',
     );
-    $args{aspects} = $self->default_aspects if ($self->default_aspects);
-    my $v = $member->create_view(%args);
-    my @attributes = $v->aspects;
+    my @default_aspects = @{ $self->default_aspects };
+    unless (@default_aspects) {
+        @default_aspects = map { $_->property_name } $member->__meta__->properties;
+    }
+    @default_aspects = grep {!/id/} @default_aspects;
+    unshift @default_aspects,'id';
+    $args{aspects} = [ @default_aspects ];
+    my $view;
+    eval {
+        $view = $member->create_view(%args);
+    };
+    unless ($view) {
+        eval {
+            $view = $subject->create_view(subject_class_name=>'SDM::Object::Set',perspective=>'table',toolkit=>'html');
+        };
+    }
+    unless ($view) {
+        die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
+    }
+    my @attributes = $view->aspects;
     @attributes = map { $_->name } @attributes;
 
     # Here's the javascript datatable for the class attributes.
