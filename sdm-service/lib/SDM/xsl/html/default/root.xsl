@@ -28,8 +28,8 @@ $(this).parent().next(".toggle_container").slideToggle("slow");
 });
           ]]>
         </script>
-        <link rel="shortcut icon" href="/res/img/gc_favicon.png" type="image/png" />
-        <link rel="stylesheet" href="/res/css/master.css" type="text/css" media="screen" />
+        <link rel="shortcut icon" href="/img/gc_favicon.png" type="image/png" />
+        <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen" />
         <style type="text/css" media="screen">
           <![CDATA[
                    body {

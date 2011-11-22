@@ -51,40 +51,40 @@
     </xsl:variable>
 
     <title><xsl:value-of select="normalize-space($title)"/></title>
-    <link rel="shortcut icon" href="/res/img/gc_favicon.png" type="image/png" />
+    <link rel="shortcut icon" href="/img/gc_favicon.png" type="image/png" />
 
     <!-- blueprint CSS -->
-    <link rel="stylesheet" href="/res/css/blueprint/screen.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/res/css/blueprint/print.css" type="text/css" media="print"/>
+    <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"/>
     <!--[if lt IE 8]><link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
     <!-- report styles  -->
-    <link rel="stylesheet" href="/res/css/master.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/res/css/buttons.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/res/css/icons.css" type="text/css" media="screen, projection"/>
-    <link rel="stylesheet" href="/res/css/forms.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/buttons.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/icons.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="/css/forms.css" type="text/css" media="screen, projection"/>
 
     <!-- GENOME_DEV_MODE is removed, if this is to be renabled, check for window.console instead -->
     <!--    <xsl:if test="$GENOME_DEV_MODE != 1"> -->
     <!-- prevent console() statements from being called on non-dev servers -->
-    <!--      <script type="text/javascript" src="/res/js/app/console.js"></script> -->
+    <!--      <script type="text/javascript" src="/js/app/console.js"></script> -->
     <!--    </xsl:if> -->
 
     <!-- jquery and jquery UI -->
-    <link type="text/css" href="/res/js/pkg/jquery-ui-1.8.1.custom/css/gsc-theme/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
-    <link href="/res/css/jquery-ui-overrides.css" type="text/css" rel="stylesheet" media="screen, projection"/>
-    <script type="text/javascript" src="/res/js/pkg/jquery.js"></script>
-    <script type="text/javascript" src="/res/js/pkg/jquery-ui.js"></script>
+    <link type="text/css" href="/js/pkg/jquery-ui-1.8.1.custom/css/gsc-theme/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
+    <link href="/css/jquery-ui-overrides.css" type="text/css" rel="stylesheet" media="screen, projection"/>
+    <script type="text/javascript" src="/js/pkg/jquery.js"></script>
+    <script type="text/javascript" src="/js/pkg/jquery-ui.js"></script>
 
     <!-- jquery.easydate for natural time displays -->
-    <script type="text/javascript" src="/res/js/pkg/jquery.easydate.js"></script>
+    <script type="text/javascript" src="/js/pkg/jquery.easydate.js"></script>
 
     <!-- jquery.masonry to arrange the object info boxes-->
-    <script type="text/javascript" src="/res/js/pkg/jquery.masonry.min.js"></script>
+    <script type="text/javascript" src="/js/pkg/jquery.masonry.min.js"></script>
 
     <!-- jquery.dataTables for spiffy feature-laden lists -->
-    <script type="text/javascript" src="/res/js/pkg/dataTables/media/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="/res/css/dataTables.css" type="text/css" media="screen, projection"/>
+    <script type="text/javascript" src="/js/pkg/dataTables/media/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="/css/dataTables.css" type="text/css" media="screen, projection"/>
 
     <script type="text/javascript">
       <![CDATA[
@@ -107,7 +107,7 @@ $(document).data('updatedOn', new Date(]]><xsl:copy-of select="$currentTime"/><!
     </script>
 
     <!-- fire up spiffy UI scripts-->
-    <script type="text/javascript" src="/res/js/app/ui-init.js"></script>
+    <script type="text/javascript" src="/js/app/ui-init.js"></script>
 
   </xsl:template>
 
@@ -205,13 +205,13 @@ $(document).data('updatedOn', new Date(]]><xsl:copy-of select="$currentTime"/><!
     <ul class="app_menu">
       <li>
         <a href="/view/genome/status.html" class="app btn shadow">
-          <div class="icon"><img src="/res/img/icons/app_deprecated_search_16.png" width="16" height="16"/></div>
+          <div class="icon"><img src="/img/icons/app_deprecated_search_16.png" width="16" height="16"/></div>
           Deprecated Search
         </a>
       </li>
       <li>
         <a href="/view/genome/search/status.html" class="app btn shadow">
-          <div class="icon"><img src="/res/img/icons/app_analysis_search_16.png" width="16" height="16"/></div>
+          <div class="icon"><img src="/img/icons/app_analysis_search_16.png" width="16" height="16"/></div>
           Analysis Search
         </a>
       </li>

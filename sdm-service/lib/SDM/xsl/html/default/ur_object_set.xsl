@@ -41,14 +41,16 @@
         <!-- not sure what this is -->
         <xsl:apply-templates select="aspect[@name='members']/object[1]" mode="set_table_init" />
 
-      </div> <!-- end container -->
-    </div> <!-- end content -->
-
+    <!--
     <xsl:call-template name="footer">
       <xsl:with-param name="footer_text">
         <br/>
       </xsl:with-param>
     </xsl:call-template>
+    -->
+
+      </div> <!-- end container -->
+    </div> <!-- end content -->
 
   </xsl:template>
 
