@@ -23,7 +23,7 @@ my $t = SDM::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 
 # We need hosts to map to filers.
-my $csvfile = "$top/t/asset-inventory.csv";
+my $csvfile = "$top/t/hardware-inventory.csv";
 my $c = SDM::Asset::Hardware::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "import run lived";
 
