@@ -36,6 +36,5 @@ unless ($view) {
     $view = $s->create_view( subject_class_name => 'SDM::Object::Set', perspective => 'table', toolkit => 'html' );
 }
 my $output = $view->_generate_content();
-__END__
 warn "" . Data::Dumper::Dumper $output;
 done_testing();

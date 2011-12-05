@@ -107,6 +107,11 @@ get qr{/view/(.*)/(.*)\.(.*)} => sub {
 
     # Fix auto-camel-casing thing for SDM base class.
     $class =~ s/sdm/SDM/i;
+
+    # Support our old REST scheme of view/namespace/object/set/perspective.toolkit
+    # by removing ::Set, we assume everything is a Set now.
+    $class =~ s/::Set//;
+
     $perspective =~ s/\.$toolkit$//g;
 
     # flatten these where only one arg came in (don't want x=>['y'], just x=>'y')
@@ -125,29 +130,15 @@ get qr{/view/(.*)/(.*)\.(.*)} => sub {
         $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
     }
 
-    my @matches;
-    # An Object::Set view is different than an Object view.
-    my $classname = $class->__meta__->class_name;
-    if ($class->isa("UR::Object::Set")) {
-        $class =~ s/::Set$//;
-        eval { @matches = $class->define_set(%$args); };
-    } else {
-        eval { @matches = $class->get(%$args); };
-        # More than one result is made into a set.
-        if (@matches > 1) {
-            eval { @matches = $class->define_set(%$args); };
-        }
-    }
+    my $set;
+    eval { $set = $class->define_set(%$args); };
     if ($@) {
-        return send_error "Invalid arguments to define_set or get: " . Data::Dumper::Dumper $args;
+        return send_error "Invalid arguments to define_set: " . Data::Dumper::Dumper $args;
     }
-
-    unless (@matches) {
-        return send_error "No object found";
+    unless ($set) {
+        return send_error "No object set found";
     }
-
-    # We get either 1 set or 1 object.
-    return send_error "Matched too many, list not supported" unless ( @matches == 1 );
+    warning "set: " . Data::Dumper::Dumper $set;
 
     my %view_args = (
         perspective => $perspective,
@@ -168,20 +159,19 @@ get qr{/view/(.*)/(.*)\.(.*)} => sub {
     # All objects in UR have create_view
     # this probably ought to be revisited for performance reasons because it has to do a lot of hierarchy walking
     my $view;
-    my $result = shift @matches;
     # Our first create_view attempt will find explicit Object View definitions.
     eval {
-        $view = $result->create_view(%view_args, %view_special_args);
+        $view = $set->create_view(%view_args, %view_special_args);
     };
     $view_args{subject_class_name} = "SDM::Object::Set";
     eval {
-        $view = $result->create_view(%view_args, %view_special_args);
+        $view = $set->create_view(%view_args, %view_special_args);
     };
     unless ($view) {
         # Try the default view
         $view_args{perspective} = 'default';
         eval {
-            $view = $result->create_view(%view_args, %view_special_args);
+            $view = $set->create_view(%view_args, %view_special_args);
         };
     }
     if ($@) {
