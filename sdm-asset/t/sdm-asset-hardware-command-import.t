@@ -26,7 +26,7 @@ my $csvfile = "$top/t/hardware-inventory.csv";
 my $c = SDM::Asset::Hardware::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "import run lived";
 
-my @o = SDM::Asset::Hardware->get();
+my @o = SDM::Asset::Hardware->get( serial => 'xa1234yz' );
 my $obj = pop @o;
 ok($obj->location eq 'The astral plane');
 ok($obj->serial eq 'xa1234yz');

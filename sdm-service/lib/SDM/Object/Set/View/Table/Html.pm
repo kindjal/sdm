@@ -20,8 +20,11 @@ class SDM::Object::Set::View::Table::Html {
 sub _generate_content {
     my $self = shift;
 
+    my $content = do { local $/; <DATA> };
+
     # Determine attributes of class for columns of the table
     my $class = $self->subject_class_name;
+    $content =~ s/<%= class =>/$class/g;
 
     # Build JSON view of aaData using Json.pm peer class
     my $subject = $self->subject;
@@ -38,17 +41,20 @@ sub _generate_content {
         die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
     }
     my $aaData = $jsview->_json->encode( $jsview->_jsobj->{aaData} );
+    $content =~ s/<%= aaData =>/$aaData/;
 
     # Determine column headers for javascript
     my @members = $subject->members;
     my $member = $members[0];
+    return $content unless ($member);
+
     my %args = (
             subject_class_name => $class,
             perspective => 'default',
             toolkit => 'json',
     );
     my @default_aspects = @{ $self->default_aspects };
-    unless (@default_aspects) {
+    unless (@default_aspects and $member) {
         @default_aspects = map { $_->property_name } $member->__meta__->properties;
     }
     @default_aspects = grep {!/id/} @default_aspects;
@@ -69,108 +75,49 @@ sub _generate_content {
     my @attributes = $view->aspects;
     @attributes = map { $_->name } @attributes;
 
-    # Here's the javascript datatable for the class attributes.
-    my $tablescript =<<EOF;
-    <script type="text/javascript" language="javascript" charset="utf-8">
-        var oTable;
-        function drawTable () {
-            oTable = \$('#datatable').dataTable( {
-                    "sDom": 'T<"clear">lfrtip',
-                    "bProcessing": true,
-                    "bServerSide": false,
-                    // This callback adds the "id" tr attribute required for sUpdateURL to work
-                    "fnRowCallback": function( nRow, aaData, iDisplayIndex ) {
-                        var id = aaData[0];
-                        \$(nRow).attr("id",id);
-                        return nRow;
-                    },
-                    // aaData is generated automatically by Json.pm
-                    "aaData":
-EOF
-    # aaData is the JSON formatted table row data.
-    $tablescript .= $aaData;
-    $tablescript .= <<EOF;
-                    ,
-                    // hide the id which is a UUID
-                    "aoColumns": [
-                        { "sTitle":'id', "bVisible": false },
-EOF
     # Here we set column attributes, like title.
+    my $sTitles = qq/{ "sTitle":'id', "bVisible": false },\n/;
     foreach my $attr (@attributes) {
         next if ($attr eq 'id');
-        $tablescript .= qq/{ "sTitle": "$attr" },\n/;
+        $sTitles .= qq/{ "sTitle": "$attr" },\n/;
     }
-    # Here we define the makeEditable block for editable datatable.
-    $tablescript .= <<EOF;
-                    ],
-                    } ).makeEditable( {
-                        sUpdateURL: "/service/update?class=$class",
-                        sAddURL: "/service/add?class=$class",
-                        fnOnAdded: function(status) {
-                          location.reload();
-                        },
-                        sDeleteURL: "/service/delete?class=$class",
-                        // Define columns here, which can be reordered in {Html,Json}.pm
-                        // Prevent users from modifying created and last_modified
-                        "aoColumns": [
-EOF
+    $content =~ s/<%= sTitles =>/$sTitles/;
+
     # Here we specify which columns are not editable by setting 'null' in aoColumns
+    my $aoColumns;
     foreach my $attr (@attributes) {
         given ($attr) {
             when ($attr eq 'id') { next; };
             when ($attr =~ /(created|last_modified)/i) {
-                $tablescript .= qq/null,\n/;
+                $aoColumns .= qq/null,\n/;
                 next;
             }
             default {
-                $tablescript .= qq/{},\n/;
+                $aoColumns .= qq/{},\n/;
             }
         }
     }
-    $tablescript .= <<EOF;
-                        ]
-            } );
-        }
-    </script>
-EOF
+    $content =~ s/<%= aoColumns =>/$aoColumns/;
 
-    my $addrecordform = <<EOF;
-  <!-- Custom form for adding new records -->
-   <form id="formAddNewRow" action="#" title="Add new record">
-EOF
     my $idx = 0;
+    my $addRecord;
     foreach my $attr (@attributes) {
         given ($attr) {
             # These are the none editable columns, hidden in the add form
             when ($attr =~ /^(id|created|last_modified)$/) {
-                $addrecordform .= <<EOF;
-                <input type="hidden" name="$attr" id="$attr" rel="$idx" /><br />
-EOF
+                $addRecord .= qq{  <input type="hidden" name="$attr" id="$attr" rel="$idx" /><br />\n };
                 $idx++;
                 next;
             }
             default {
-                $addrecordform .= <<EOF;
-                <label for="$attr">$attr</label><br />
-                <input type="text" name="$attr" id="$attr" class="required" rel="$idx" /><br />
-EOF
-               $idx++;
+                $addRecord .= qq{  <label for="$attr">$attr</label><br />\n  <input type="text" name="$attr" id="$attr" class="required" rel="$idx" /><br />\n };
+                $idx++;
             }
         }
     }
-    $addrecordform .= <<EOF;
-  </form>
-EOF
+    $content =~ s/<%= addrecordform =>/$addRecord/;
 
-    # Here's the rest of the HTML document
-    my $content;
-    while (my $line = <DATA>) {
-        $line =~ s/<%= classname %>/$class/;
-        $line =~ s/<%= tablescript %>/$tablescript/;
-        $line =~ s/<%= addrecordform %>/$addrecordform/;
-        $content .= $line;
-    }
-
+    # Here's the HTML document we return
     return $content;
 }
 
@@ -184,7 +131,7 @@ __DATA__
     <meta http-equiv='Pragma' content='no-cache'/>
     <!-- Microsoft browsers require this additional meta tag as well -->
     <meta http-equiv='Expires' content='-1'/>
-    <title><%= classname %></title>
+    <title><%= class =></title>
     <style type="text/css" title="currentStyle">
       @import "/css/status_page.css";
       @import "/css/status_table.css";
@@ -201,7 +148,42 @@ __DATA__
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/jquery-datatables-editable/jquery.validate.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/jquery-datatables-editable/jquery.dataTables.editable.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/common.js"></script>
-    <%= tablescript %>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+        var oTable;
+        function drawTable () {
+            oTable = $('#datatable').dataTable( {
+                    "sDom": 'T<"clear">lfrtip',
+                    "bProcessing": true,
+                    "bServerSide": false,
+                    // This callback adds the "id" tr attribute required for sUpdateURL to work
+                    "fnRowCallback": function( nRow, aaData, iDisplayIndex ) {
+                        var id = aaData[0];
+                        $(nRow).attr("id",id);
+                        return nRow;
+                    },
+                    // aaData is generated automatically by Json.pm
+                    "aaData":
+                      <%= aaData =>
+                    ,
+                    // hide the id which is a UUID
+                    "aoColumns": [
+                        <%= sTitles =>
+                    ],
+                    } ).makeEditable( {
+                        sUpdateURL: "/service/update?class=<%= class =>",
+                        sAddURL: "/service/add?class=<%= class =>",
+                        fnOnAdded: function(status) {
+                          location.reload();
+                        },
+                        sDeleteURL: "/service/delete?class=<%= class =>",
+                        // Define columns here, which can be reordered in {Html,Json}.pm
+                        // Prevent users from modifying created and last_modified
+                        "aoColumns": [
+                          <%= aoColumns =>
+                        ]
+            } );
+        }
+    </script>
     <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
 TableToolsInit.sSwfPath = "/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
@@ -217,7 +199,10 @@ drawTable();
   <!-- Placeholder where add and delete buttons will be generated -->
   <div class="add_delete_toolbar" />
   </div>
-  <%= addrecordform %>
+  <!-- Custom form for adding new records -->
+  <form id="formAddNewRow" action="#" title="Add new record">
+    <%= addrecordform =>
+  </form>
   </body>
   <head>
     <meta http-equiv='Pragma' content='no-cache'>

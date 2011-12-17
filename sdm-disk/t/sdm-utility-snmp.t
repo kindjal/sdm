@@ -14,9 +14,10 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
-unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
+#unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
+# disabled, not ready to delete this just yet
     plan skip_all => "Don't assume we can reach SNMP on named hosts for non GI networks";
-}
+#}
 
 my $obj = SDM::Utility::SNMP->create( hostname => 'localhost' );
 ok( $obj->hosttype eq 'linux', "ok: snmp obj for localhost");
