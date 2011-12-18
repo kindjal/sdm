@@ -6,7 +6,7 @@ BEGIN {
     $ENV{SDM_DEPLOYMENT} ||= "testing";
 };
 
-use SDM;
+use Sdm;
 
 use Test::More;
 use Test::Output;
@@ -20,13 +20,13 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
+ok( Sdm::Disk::Lib->testinit == 0, "ok: init db");
 
 # This test requires a real network connection to a lives host.
 my $filername = 'gpfs-dev';
 my $hostname = 'linuscs103';
-my $filer = SDM::Disk::Filer->create( name => $filername );
-my $host = SDM::Disk::Host->create( hostname => $hostname );
+my $filer = Sdm::Disk::Filer->create( name => $filername );
+my $host = Sdm::Disk::Host->create( hostname => $hostname );
 $host->assign($filer->name);
 
 sub fileslurp {
@@ -39,9 +39,9 @@ sub fileslurp {
 }
 
 my @params = ( loglevel => 'DEBUG', filer => $filer );
-my $c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
+my $c = Sdm::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 
-# The following mimic SDM::GPFS::DiskUsage->acquire_volume_data
+# The following mimic Sdm::GPFS::DiskUsage->acquire_volume_data
 my $vol;
 $c->_parse_mmlscluster( fileslurp( "$top/t/mmlscluster.txt" ) );
 $vol = $c->_parse_mmlsnsd( fileslurp( "$top/t/mmlsnsd.txt" ) );
@@ -56,19 +56,19 @@ ok( $vol->{'ams1100'}->{'total_kb'} eq '9034530816' );
 ok( $vol->{'ams1100'}->{'used_kb'} eq '8598247168' );
 
 @params = ( loglevel => 'DEBUG', filer => $filer, discover_groups => 0, discover_volumes => 0 );
-$c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
+$c = Sdm::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 $c->_update_volumes( $vol, $filer );
 stderr_unlike { UR::Context->commit(); } qr/ERROR/, 'commit runs ok';
 
 @params = ( loglevel => 'DEBUG', filer => $filer, discover_groups => 1, discover_volumes => 1 );
-$c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
+$c = Sdm::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 $c->_update_volumes( $vol, $filer );
 stderr_unlike { UR::Context->commit(); } qr/ERROR/, 'commit runs ok';
 
-my $v = SDM::Disk::Volume->get( physical_path => "/vol/aggr0/gc7001" );
+my $v = Sdm::Disk::Volume->get( physical_path => "/vol/aggr0/gc7001" );
 ok( $v->physical_path eq '/vol/aggr0/gc7001', "volume is fileset" );
 
-my $rrd = SDM::Utility::DiskGroupRRD->create( loglevel => 'DEBUG' );
+my $rrd = Sdm::Utility::DiskGroupRRD->create( loglevel => 'DEBUG' );
 $rrd->run();
 
 $filer->delete();

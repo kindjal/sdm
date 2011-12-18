@@ -3,7 +3,7 @@
 use Module::Build;
 
 my $build = Module::Build->new(
-  module_name => 'SDM',
+  module_name => 'Sdm',
   license => 'lgpl',
   dist_version => '0.16',
   dist_abstract => 'Modules for system data miner',

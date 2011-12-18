@@ -12,7 +12,7 @@ BEGIN {
 
 my $top = dirname __FILE__;
 require "$top/sdm-service-lib.pm";
-my $t = SDM::Test::Lib->new();
+my $t = Sdm::Test::Lib->new();
 my $perl = $t->{perl};
 my $sdm = $t->{sdm};
 # Start with a fresh database
@@ -29,11 +29,11 @@ $params = {
   nfsd     => '192.168.56.101',
   name     => \@files,
 };
-$r = SDM::Service::Lsof::Process->create( $params );
+$r = Sdm::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 UR::Context->commit();
 
-$r = SDM::Service::Lsof::File->get( "physical_path like" => "%gc2112%" );
+$r = Sdm::Service::Lsof::File->get( "physical_path like" => "%gc2112%" );
 ok( $r->process->uid == 500, "filter ok" );
 
 # -- Now we're prepped, run some commands

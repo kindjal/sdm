@@ -6,7 +6,7 @@ BEGIN {
     $ENV{SDM_DEPLOYMENT} ||= "testing";
 };
 
-use SDM;
+use Sdm;
 
 use Test::More;
 use Test::Output;
@@ -20,7 +20,7 @@ unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
 use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
-ok( SDM::Disk::Lib->testinit == 0, "ok: init db");
+ok( Sdm::Disk::Lib->testinit == 0, "ok: init db");
 
 sub fileslurp {
     my $filename = shift;
@@ -33,14 +33,14 @@ sub fileslurp {
 
 my $hostname = 'linuscs107';
 my $filername = 'gpfs-dev';
-my $filer = SDM::Disk::Filer->create( name => $filername );
-my $host = SDM::Disk::Host->create( hostname => $hostname );
+my $filer = Sdm::Disk::Filer->create( name => $filername );
+my $host = Sdm::Disk::Host->create( hostname => $hostname );
 $host->assign($filer->name);
 my @params = ( loglevel => 'DEBUG', filer => $filer );
-my $c = SDM::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
+my $c = Sdm::Disk::Filer::Command::Query::GpfsDiskUsage->create( @params );
 
 $c->_parse_mmlscluster( fileslurp( "$top/t/mmlscluster.txt" ) );
-my $h = SDM::Disk::Host->get( hostname => "linuscs103" );
+my $h = Sdm::Disk::Host->get( hostname => "linuscs103" );
 ok( $h->master == 1, "master host found" );
 
 my $vol = $c->_parse_mmlsnsd( fileslurp( "$top/t/mmlsnsd.txt" ) );

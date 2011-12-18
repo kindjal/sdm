@@ -6,7 +6,7 @@ BEGIN {
     $ENV{SDM_DEPLOYMENT} ||= "testing";
 };
 
-use SDM;
+use Sdm;
 
 use Test::More;
 use Test::Output;
@@ -25,21 +25,21 @@ if ($top =~ /deploy/) {
 } else {
     require "$top/../sdm-disk/t/sdm-disk-lib.pm";
 }
-ok( SDM::Disk::Lib->has_gpfs_snmp == 1, "has gpfs");
-ok( SDM::Disk::Lib->testinit == 0, "init db");
-ok( SDM::Disk::Lib->testdata == 0, "data db");
+ok( Sdm::Disk::Lib->has_gpfs_snmp == 1, "has gpfs");
+ok( Sdm::Disk::Lib->testinit == 0, "init db");
+ok( Sdm::Disk::Lib->testdata == 0, "data db");
 
 my $res;
 
-$res  = SDM::Gpfs::GpfsClusterConfig->get( filername => 'fakefiler' );
+$res  = Sdm::Gpfs::GpfsClusterConfig->get( filername => 'fakefiler' );
 ok( ! defined $res, "fake filer returns undef" );
 
-$res  = SDM::Gpfs::GpfsClusterConfig->get( filername => 'gpfs-dev' );
-ok( ref $res eq "SDM::Gpfs::GpfsClusterConfig", "object made correctly");
+$res  = Sdm::Gpfs::GpfsClusterConfig->get( filername => 'gpfs-dev' );
+ok( ref $res eq "Sdm::Gpfs::GpfsClusterConfig", "object made correctly");
 ok( defined $res->id, "object created ok");
 
 ok( $res->filername eq 'gpfs-dev', "filername set");
-ok( ref $res->filer eq 'SDM::Disk::Filer', "filer object related");
+ok( ref $res->filer eq 'Sdm::Disk::Filer', "filer object related");
 
 ok( defined $res->gpfsClusterConfigName, "attr set" );
 ok( defined $res->gpfsClusterUidDomain, "attr set" );

@@ -15,8 +15,8 @@ use Data::Dumper;
 
 use HTML::TreeBuilder;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Volume::Set::View::Summary::Json' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Disk::Volume::Set::View::Summary::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -24,16 +24,16 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my @s = SDM::Disk::Volume->define_set();
+my @s = Sdm::Disk::Volume->define_set();
 my $v = $s[0]->create_view( perspective => 'summary', toolkit => 'json' );
 my $json = $v->_jsobj();
 #print Data::Dumper::Dumper $json;
 
-# This must match the data used in SDM::Disk::Lib->testdata
+# This must match the data used in Sdm::Disk::Lib->testdata
 my $expected = {
   'total_kb' => 700,
   'last_modified' => '0000:00:00:00:00:00',

@@ -3,7 +3,7 @@ debian/ur-sdm-tool*
 debian/files
 blib
 _build
-lib/SDM/DataSource/*-bak
-lib/SDM/DataSource/*-dump
-lib/SDM/DataSource/*-journal
+lib/Sdm/DataSource/*-bak
+lib/Sdm/DataSource/*-dump
+lib/Sdm/DataSource/*-journal
 build_deb_test_results/t/sdm-search.t

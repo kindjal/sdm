@@ -1,8 +1,0 @@
-PRAGMA foreign_keys = ON;
-DROP TABLE IF EXISTS service_automount;
-CREATE TABLE IF NOT EXISTS service_automount (
-  name          VARCHAR(255) PRIMARY KEY,
-  mount_options VARCHAR(255),
-  filername     VARCHAR(255),
-  physical_path VARCHAR(255)
-);

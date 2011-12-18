@@ -1,8 +1,8 @@
 bin/sdm-automount.pl
-lib/SDM/Tool/Command/LunReport.pm
-lib/SDM/Tool/Command/AllocationReport.pm
-lib/SDM/Tool/Command.pm
-lib/SDM/Tool.pm
+lib/Sdm/Tool/Command/LunReport.pm
+lib/Sdm/Tool/Command/AllocationReport.pm
+lib/Sdm/Tool/Command.pm
+lib/Sdm/Tool.pm
 bin/sdm-automount.pl
 debian/changelog
 debian/compat

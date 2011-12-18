@@ -12,7 +12,7 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
-use_ok( 'SDM' );
+use_ok( 'Sdm' );
 
 # Start with a fresh database
 use FindBin;
@@ -20,13 +20,13 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $s = SDM::Disk::Filer->define_set();
+my $s = Sdm::Disk::Filer->define_set();
 my $v = $s->create_view( perspective => 'table', toolkit => 'xml' );
 my $xml = $v->_generate_content();
-ok( $xml =~ m!<object type="SDM::Disk::Filer::Set" id="SDM::Disk::Filer/And//O:O:">!, "output is XML set");
+ok( $xml =~ m!<object type="Sdm::Disk::Filer::Set" id="Sdm::Disk::Filer/And//O:O:">!, "output is XML set");
 
 done_testing();

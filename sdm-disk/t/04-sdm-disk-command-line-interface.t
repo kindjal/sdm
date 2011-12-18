@@ -13,7 +13,7 @@ BEGIN {
 
 my $top = dirname __FILE__;
 require "$top/sdm-disk-lib.pm";
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 my $perl = $t->{perl};
 my $sdm = $t->{sdm};
 

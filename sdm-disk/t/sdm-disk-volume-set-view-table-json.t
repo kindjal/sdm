@@ -15,8 +15,8 @@ use Data::Dumper;
 
 use JSON;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Volume::Set::View::Table::Json' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Disk::Volume::Set::View::Table::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -24,11 +24,11 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $s = SDM::Disk::Volume->define_set();
+my $s = Sdm::Disk::Volume->define_set();
 my $v = $s->create_view( perspective => 'table', toolkit => 'json' );
 my $got = $v->_generate_content();
 use JSON;

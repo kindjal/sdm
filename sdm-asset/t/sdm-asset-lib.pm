@@ -1,5 +1,5 @@
 
-package SDM::Test::Lib;
+package Sdm::Test::Lib;
 
 use strict;
 use warnings;
@@ -17,12 +17,12 @@ use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
-use SDM;
+use Sdm;
 
-my $ds = SDM::DataSource::Asset->get();
+my $ds = Sdm::DataSource::Asset->get();
 my $driver = $ds->driver;
 my $top = dirname dirname abs_path(__FILE__);
-my $base = "$top/lib/SDM";
+my $base = "$top/lib/Sdm";
 my $perl = "$^X -I $top/lib -I $top/../sdm/lib";
 my $sdm = can_run("sdm");
 unless ($sdm) {
@@ -83,7 +83,7 @@ sub testinit {
     }
 
     print "flush and remake Meta\n";
-    my $ds = "$top/../sdm/lib/SDM/DataSource";
+    my $ds = "$top/../sdm/lib/Sdm/DataSource";
     unlink "$ds/Meta.sqlite3";
     unlink "$ds/Meta.sqlite3-dump";
     $self->runcmd("/usr/bin/sqlite3 $ds/Meta.sqlite3 < $ds/Meta.sqlite3-schema");
@@ -101,7 +101,7 @@ sub testdata {
         comments      => 'comments',
         location      => 'location',
     );
-    my $a = SDM::Asset::Hardware->create( @params );
+    my $a = Sdm::Asset::Hardware->create( @params );
     ok( defined $a );
     warn "" . Data::Dumper::Dumper $a;
 

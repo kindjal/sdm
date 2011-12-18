@@ -23,7 +23,7 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-service-lib.pm";
 
-use_ok( 'SDM' );
+use_ok( 'Sdm' );
 
 my @desired_files;
 foreach my $install (glob("$top/debian/ur-sdm-service*.install")) {

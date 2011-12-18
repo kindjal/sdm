@@ -10,7 +10,7 @@ BEGIN {
     # The code is in an eval to prevent problems on hosts which do not have Getopt::Complete
     # installed.  The code is in a BEGIN block to ensure it still runs before anything else.
     if ($ENV{COMP_LINE}) {
-        eval "use Getopt::Complete::Cache (class => 'SDM::Command', above => 1)";
+        eval "use Getopt::Complete::Cache (class => 'Sdm::Command', above => 1)";
         if ($@) {
             die "Error with tab completion: $@";
         }
@@ -20,7 +20,7 @@ BEGIN {
     @INC = map { $_ if (!/^\/(gapp|gsc)\//) } @INC;
 };
 
-use above "SDM";
+use above "Sdm";
 
-use SDM::Command;
-SDM::Command->execute_with_shell_params_and_exit();
+use Sdm::Command;
+Sdm::Command->execute_with_shell_params_and_exit();

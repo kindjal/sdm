@@ -1,5 +1,5 @@
 
-package SDM::Test::Lib;
+package Sdm::Test::Lib;
 
 use strict;
 use warnings;
@@ -18,13 +18,13 @@ use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
 use Data::Dumper;
 
-use_ok( 'SDM', "ok: loaded SDM");
-use_ok( 'SDM::DataSource::Service', "ok: loaded SDM::DataSource::Service");
+use_ok( 'Sdm', "ok: loaded Sdm");
+use_ok( 'Sdm::DataSource::Service', "ok: loaded Sdm::DataSource::Service");
 
-my $ds = SDM::DataSource::Service->get();
+my $ds = Sdm::DataSource::Service->get();
 my $driver = $ds->driver;
 my $top = dirname dirname abs_path(__FILE__);
-my $base = "$top/lib/SDM";
+my $base = "$top/lib/Sdm";
 my $perl = "$^X -I $top/lib -I $top/../sdm/lib";
 my $sdm = can_run("sdm");
 unless ($sdm) {

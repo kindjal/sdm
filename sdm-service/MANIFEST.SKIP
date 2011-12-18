@@ -2,8 +2,8 @@ debian/*.log
 debian/ur-sdm-service*
 blib
 _build
-lib/SDM/DataSource/Service.sqlite3n
-lib/SDM/DataSource/*-bak
-lib/SDM/DataSource/*-dump
-lib/SDM/DataSource/*-journal
+lib/Sdm/DataSource/Service.sqlite3n
+lib/Sdm/DataSource/*-bak
+lib/Sdm/DataSource/*-dump
+lib/Sdm/DataSource/*-journal
 build_deb_test_results/t/sdm-search.t

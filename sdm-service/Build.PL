@@ -30,13 +30,13 @@ my $class = Module::Build->subclass (
           local @INC = @INC;
           unshift @INC, 'blib/lib';
           die $@ if $@;
-          eval "use SDM::Service";
+          eval "use Sdm::Service";
           die $@ if $@;
 
           foreach my $exec ('sdm') {
             UR::Namespace::Command::Update::Doc->execute(
-                class_name => 'SDM::Service',
-                targets => [ 'SDM::Service::Lsofc::Command' ],
+                class_name => 'Sdm::Service',
+                targets => [ 'Sdm::Service::Lsofc::Command' ],
                 executable_name => $exec,
                 output_path => 'cmd-bindoc',
                 output_format => 'pod',
@@ -63,7 +63,7 @@ EOS
 );
 
 my $build = $class->new(
-  module_name => 'SDM',
+  module_name => 'Sdm',
   license => 'lgpl',
   dist_version => '0.16',
   dist_abstract => 'Modules for service management',

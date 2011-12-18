@@ -15,8 +15,8 @@ use Data::Dumper;
 
 use HTML::TreeBuilder;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Filer::Set::View::Status::Json' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Disk::Filer::Set::View::Status::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -24,15 +24,15 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my @s = SDM::Disk::Filer->define_set();
+my @s = Sdm::Disk::Filer->define_set();
 my $v = $s[0]->create_view( perspective => 'status', toolkit => 'json' );
 my $json = $v->_jsobj();
 
-# This must match the data used in SDM::Disk::Lib->testdata
+# This must match the data used in Sdm::Disk::Lib->testdata
 my $expected = {
     'iTotalDisplayRecords' => '3',
     'iTotalRecords' => '3',

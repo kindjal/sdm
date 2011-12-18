@@ -12,8 +12,8 @@ use Test::More;
 use Test::Output;
 use Test::Exception;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Utility::DiskGroupRRD' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Utility::DiskGroupRRD' );
 
 # Start with a fresh database
 use FindBin;
@@ -21,14 +21,14 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
-my $u = SDM::Utility::DiskGroupRRD->create( loglevel => "DEBUG" );
+my $u = Sdm::Utility::DiskGroupRRD->create( loglevel => "DEBUG" );
 lives_ok { $u->run(); } "run lived";
 
-my $rrdpath = SDM::Env::SDM_DISK_RRDPATH->value;
+my $rrdpath = Sdm::Env::SDM_DISK_RRDPATH->value;
 my $group = "SYSTEMS_DEVELOPMENT"; # Set in sdm-disk-lib->testdata
 my $rrdfile = $rrdpath . "/" . lc($group) . ".rrd";
 ok( -f $rrdfile, "ok: rrd file made" );

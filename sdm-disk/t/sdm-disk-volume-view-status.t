@@ -15,8 +15,8 @@ use Data::Dumper;
 
 use HTML::TreeBuilder;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Volume::Set::View::Status::Json' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Disk::Volume::Set::View::Status::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -24,12 +24,12 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
 # This is what Rest.psgi does
-my @s = SDM::Disk::Volume->get();
+my @s = Sdm::Disk::Volume->get();
 my $vol = $s[0];
 $vol->total_kb(145000000);
 my $v = $vol->create_view( perspective => 'default', toolkit => 'text' );

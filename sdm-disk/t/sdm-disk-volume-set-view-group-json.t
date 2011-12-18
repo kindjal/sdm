@@ -15,8 +15,8 @@ use Data::Dumper;
 
 use HTML::TreeBuilder;
 
-use_ok( 'SDM' );
-use_ok( 'SDM::Disk::Volume::Set::View::Group::Json' );
+use_ok( 'Sdm' );
+use_ok( 'Sdm::Disk::Volume::Set::View::Group::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -24,16 +24,16 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
 # This is what Rest.psgi does
-my $s = SDM::Disk::Volume->define_set();
+my $s = Sdm::Disk::Volume->define_set();
 my $v = $s->create_view( perspective => 'group', toolkit => 'json' );
 my $got = $v->_generate_content();
 
-# This must match the data used in SDM::Disk::Lib->testdata
+# This must match the data used in Sdm::Disk::Lib->testdata
 my $expected = {
    "aaData" => [
       [

@@ -12,7 +12,7 @@ use Test::Exception;
 use Data::Dumper;
 $Data::Dumper::Indent = 1;
 
-use_ok( 'SDM' );
+use_ok( 'Sdm' );
 
 # Start with a fresh database
 use FindBin;
@@ -20,11 +20,11 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-service-lib.pm";
 
-my $t = SDM::Test::Lib->new();
+my $t = Sdm::Test::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 
 my $params = { hostname => "vm75.gsc.wustl.edu", pid => 1 };
-my $r = SDM::Service::Lsof::Process->create( $params );
+my $r = Sdm::Service::Lsof::Process->create( $params );
 ok( UR::Context->commit(), "basic commit ok" );
 $r->delete;
 
@@ -38,7 +38,7 @@ $params = {
   name     => \@files,
   nfsd     => '192.168.56.100',
 };
-$r = SDM::Service::Lsof::Process->create( $params );
+$r = Sdm::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 ok( UR::Context->commit(), "commit ok" );
 $r->delete;
@@ -55,7 +55,7 @@ $params = {
   nfsd     => '192.168.56.101',
   name     => \@files,
 };
-$r = SDM::Service::Lsof::Process->create( $params );
+$r = Sdm::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 
 $params = {
@@ -66,7 +66,7 @@ $params = {
   command  => 'perl',
   name     => \@files,
 };
-$r = SDM::Service::Lsof::Process->create( $params );
+$r = Sdm::Service::Lsof::Process->create( $params );
 my @f = $r->files;
 
 ok( scalar @f == 3, "file list ok");
@@ -82,16 +82,16 @@ $params = {
   command  => 'perl',
   name     => \@files2,
 };
-$r = SDM::Service::Lsof::Process->create( $params );
+$r = Sdm::Service::Lsof::Process->create( $params );
 ok( defined $r, "create ok");
 ok( UR::Context->commit(), "commit ok" );
 
 # This should get what we just created.
-my $s = SDM::Service::Lsof::Process->get_or_create( $params );
+my $s = Sdm::Service::Lsof::Process->get_or_create( $params );
 ok( is_deeply( $r, $s, "is_deeply" ), "get_or_create ok" );
 
-my @p = SDM::Service::Lsof::Process->get( hostname => "vm76.gsc.wustl.edu" );
-@f = SDM::Service::Lsof::File->get( hostname => "vm76.gsc.wustl.edu" );
+my @p = Sdm::Service::Lsof::Process->get( hostname => "vm76.gsc.wustl.edu" );
+@f = Sdm::Service::Lsof::File->get( hostname => "vm76.gsc.wustl.edu" );
 @f = map { $_->filename } @f;
 
 my @expected = (@files,@files2);
@@ -104,11 +104,11 @@ foreach my $pid (@p) {
 UR::Context->commit();
 
 # This should show only files from the remaning pid
-@f = SDM::Service::Lsof::File->get();
+@f = Sdm::Service::Lsof::File->get();
 @f = map { $_->filename } @f;
 ok( is_deeply( [ sort @files ], [ sort @f ], "is_deeply" ), "files match" );
 
-foreach my $pid ( SDM::Service::Lsof::Process->get() ) {
+foreach my $pid ( Sdm::Service::Lsof::Process->get() ) {
     $pid->delete;
 }
 UR::Context->commit();

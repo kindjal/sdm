@@ -13,13 +13,13 @@ use Test::Output;
 use Test::Exception;
 use Data::Dumper;
 
-use_ok( 'SDM' );
+use_ok( 'Sdm' );
 
 unless ($ENV{SDM_GENOME_INSTITUTE_NETWORKS}) {
     plan skip_all => "Don't assume we can reach SNMP on named hosts for non GI networks";
 }
 
-use SDM::Utility::SNMP;
+use Sdm::Utility::SNMP;
 
 # Start with a fresh database
 use FindBin;
@@ -27,7 +27,7 @@ use File::Basename qw/dirname/;
 my $top = dirname $FindBin::Bin;
 require "$top/t/sdm-disk-lib.pm";
 
-my $t = SDM::Disk::Lib->new();
+my $t = Sdm::Disk::Lib->new();
 ok( $t->testinit == 0, "ok: init db");
 #ok( $t->testdata == 0, "ok: add data");
 
@@ -41,13 +41,13 @@ sub fileslurp {
 
 my $filername = 'nfs11';
 my $hostname = 'nfs11';
-my $filer = SDM::Disk::Filer->create( name => $filername, type => 'snmp' );
-my $host = SDM::Disk::Host->create( hostname => $hostname, master => 1 );
+my $filer = Sdm::Disk::Filer->create( name => $filername, type => 'snmp' );
+my $host = Sdm::Disk::Host->create( hostname => $hostname, master => 1 );
 $host->assign($filer->name);
 ok( defined $filer->id, "created filer ok");
 
 # mimic acquire_volume_data and update_volumes
-my $c = SDM::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 0, discover_groups => 0, unittest => 1 );
+my $c = Sdm::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 0, discover_groups => 0, unittest => 1 );
 $c->hosttype('netapp');
 # first with discover_volumes = 0 then 1
 # netapp and linux host
@@ -70,7 +70,7 @@ $c->_update_volumes( $table );
 
 UR::Context->commit();
 
-$c = SDM::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 1, discover_groups => 1, unittest => 1 );
+$c = Sdm::Disk::Filer::Command::Query::SnmpDiskUsage->create( loglevel => "DEBUG", filer => $filer, discover_volumes => 1, discover_groups => 1, unittest => 1 );
 $c->hosttype('netapp');
 # first with discover_volumes = 0 then 1
 # netapp and linux host

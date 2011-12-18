@@ -1,5 +1,5 @@
 ---
-name: SDM::Disk
+name: Sdm::Disk
 version: 0.01
 author: [Matthew Callaway <mcallawa@genome.wustl.edu>]
 abstract: Modules for disk management
@@ -18,70 +18,70 @@ requires:
 configure_requires:
   Module::Build: 0.340201
 provides:
-  SDM::DataSource::Disk:
-    file: lib/SDM/DataSource/Disk.pm
-  SDM::Disk:
-    file: lib/SDM/Disk.pm
-  SDM::Disk::Array:
-    file: lib/SDM/Disk/Array.pm
-  SDM::Disk::Array::Command:
-    file: lib/SDM/Disk/Array/Command.pm
-  SDM::Disk::Array::View::Default::Html:
-    file: lib/SDM/Disk/Array/View/Default/Html.pm
-  SDM::Disk::Assignment:
-    file: lib/SDM/Disk/Assignment.pm
-  SDM::Disk::Assignment::Command:
-    file: lib/SDM/Disk/Assignment/Command.pm
-  SDM::Disk::Command:
-    file: lib/SDM/Disk/Command.pm
-  SDM::Disk::Export:
-    file: lib/SDM/Disk/Export.pm
-  SDM::Disk::Export::Command:
-    file: lib/SDM/Disk/Export/Command.pm
-  SDM::Disk::Filer:
-    file: lib/SDM/Disk/Filer.pm
-  SDM::Disk::Filer::Command:
-    file: lib/SDM/Disk/Filer/Command.pm
-  SDM::Disk::Filer::Command::Usage:
-    file: lib/SDM/Disk/Filer/Command/Usage.pm
-  SDM::Disk::Filer::View::Status::Cgi:
-    file: lib/SDM/Disk/Filer/View/Status/Cgi.pm
-  SDM::Disk::Filer::View::Summary::Cgi:
-    file: lib/SDM/Disk/Filer/View/Summary/Cgi.pm
-  SDM::Disk::Group:
-    file: lib/SDM/Disk/Group.pm
-  SDM::Disk::Group::Command:
-    file: lib/SDM/Disk/Group/Command.pm
-  SDM::Disk::Host:
-    file: lib/SDM/Disk/Host.pm
-  SDM::Disk::Host::Command:
-    file: lib/SDM/Disk/Host/Command.pm
-  SDM::Disk::Mount:
-    file: lib/SDM/Disk/Mount.pm
-  SDM::Disk::Mount::Command:
-    file: lib/SDM/Disk/Mount/Command.pm
-  SDM::Disk::User:
-    file: lib/SDM/Disk/User.pm
-  SDM::Disk::User::Command:
-    file: lib/SDM/Disk/User/Command.pm
-  SDM::Disk::View::Lib:
-    file: lib/SDM/Disk/View/Lib.pm
-  SDM::Disk::View::Status::Html:
-    file: lib/SDM/Disk/View/Status/Html.pm
-  SDM::Disk::Volume:
-    file: lib/SDM/Disk/Volume.pm
-  SDM::Disk::Volume::Command:
-    file: lib/SDM/Disk/Volume/Command.pm
-  SDM::Disk::Volume::Command::Add:
-    file: lib/SDM/Disk/Volume/Command/Add.pm
-  SDM::Disk::Volume::View::Status::Cgi:
-    file: lib/SDM/Disk/Volume/View/Status/Cgi.pm
-  SDM::Disk::Volume::View::Summary::Cgi:
-    file: lib/SDM/Disk/Volume/View/Summary/Cgi.pm
-  SDM::Utility::RRD:
-    file: lib/SDM/Utility/RRD.pm
-  SDM::Utility::SNMP:
-    file: lib/SDM/Utility/SNMP.pm
+  Sdm::DataSource::Disk:
+    file: lib/Sdm/DataSource/Disk.pm
+  Sdm::Disk:
+    file: lib/Sdm/Disk.pm
+  Sdm::Disk::Array:
+    file: lib/Sdm/Disk/Array.pm
+  Sdm::Disk::Array::Command:
+    file: lib/Sdm/Disk/Array/Command.pm
+  Sdm::Disk::Array::View::Default::Html:
+    file: lib/Sdm/Disk/Array/View/Default/Html.pm
+  Sdm::Disk::Assignment:
+    file: lib/Sdm/Disk/Assignment.pm
+  Sdm::Disk::Assignment::Command:
+    file: lib/Sdm/Disk/Assignment/Command.pm
+  Sdm::Disk::Command:
+    file: lib/Sdm/Disk/Command.pm
+  Sdm::Disk::Export:
+    file: lib/Sdm/Disk/Export.pm
+  Sdm::Disk::Export::Command:
+    file: lib/Sdm/Disk/Export/Command.pm
+  Sdm::Disk::Filer:
+    file: lib/Sdm/Disk/Filer.pm
+  Sdm::Disk::Filer::Command:
+    file: lib/Sdm/Disk/Filer/Command.pm
+  Sdm::Disk::Filer::Command::Usage:
+    file: lib/Sdm/Disk/Filer/Command/Usage.pm
+  Sdm::Disk::Filer::View::Status::Cgi:
+    file: lib/Sdm/Disk/Filer/View/Status/Cgi.pm
+  Sdm::Disk::Filer::View::Summary::Cgi:
+    file: lib/Sdm/Disk/Filer/View/Summary/Cgi.pm
+  Sdm::Disk::Group:
+    file: lib/Sdm/Disk/Group.pm
+  Sdm::Disk::Group::Command:
+    file: lib/Sdm/Disk/Group/Command.pm
+  Sdm::Disk::Host:
+    file: lib/Sdm/Disk/Host.pm
+  Sdm::Disk::Host::Command:
+    file: lib/Sdm/Disk/Host/Command.pm
+  Sdm::Disk::Mount:
+    file: lib/Sdm/Disk/Mount.pm
+  Sdm::Disk::Mount::Command:
+    file: lib/Sdm/Disk/Mount/Command.pm
+  Sdm::Disk::User:
+    file: lib/Sdm/Disk/User.pm
+  Sdm::Disk::User::Command:
+    file: lib/Sdm/Disk/User/Command.pm
+  Sdm::Disk::View::Lib:
+    file: lib/Sdm/Disk/View/Lib.pm
+  Sdm::Disk::View::Status::Html:
+    file: lib/Sdm/Disk/View/Status/Html.pm
+  Sdm::Disk::Volume:
+    file: lib/Sdm/Disk/Volume.pm
+  Sdm::Disk::Volume::Command:
+    file: lib/Sdm/Disk/Volume/Command.pm
+  Sdm::Disk::Volume::Command::Add:
+    file: lib/Sdm/Disk/Volume/Command/Add.pm
+  Sdm::Disk::Volume::View::Status::Cgi:
+    file: lib/Sdm/Disk/Volume/View/Status/Cgi.pm
+  Sdm::Disk::Volume::View::Summary::Cgi:
+    file: lib/Sdm/Disk/Volume/View/Summary/Cgi.pm
+  Sdm::Utility::RRD:
+    file: lib/Sdm/Utility/RRD.pm
+  Sdm::Utility::SNMP:
+    file: lib/Sdm/Utility/SNMP.pm
 generated_by: Module::Build version 0.340201
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
