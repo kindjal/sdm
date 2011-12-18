@@ -1,0 +1,153 @@
+PRAGMA foreign_keys = ON;
+BEGIN TRANSACTION;
+CREATE TABLE disk_array (
+  name          VARCHAR(255) PRIMARY KEY,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  serial        VARCHAR(255),
+  description   VARCHAR(255),
+  comments      VARCHAR(255),
+  location      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_array" VALUES('nsams2k2',null,null,null,null,null,null,'2011-12-17 22:40:39',null);
+INSERT INTO "disk_array" VALUES('nsams2k1',null,null,null,null,null,null,'2011-12-17 22:40:39',null);
+CREATE TABLE disk_array_disk_set (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  disk_type     VARCHAR(255),
+  disk_num      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  disk_size     UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  comments      VARCHAR(255),
+  created       VARCHAR(255),
+  last_modified VARCHAR(255),
+  arrayname     VARCHAR(255) CONSTRAINT disk_array_name_fk REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_filer (
+  name          VARCHAR(255) PRIMARY KEY,
+  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  type          VARCHAR(255),
+  filesystem    VARCHAR(255),
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  comments      VARCHAR(255),
+  duplicates    VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_filer" VALUES('gpfs-dev',1,'gpfs',null,null,null,'This is another comment',null,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO "disk_filer" VALUES('gpfs2',1,'gpfs',null,null,null,'This is another comment',null,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO "disk_filer" VALUES('gpfs',1,'gpfs',null,null,null,'This is a comment',null,'0000-00-00 00:00:00','0000-00-00 00:00:00');
+CREATE TABLE disk_filer_host (
+  filername     VARCHAR(255),
+  hostname      VARCHAR(255),
+  PRIMARY KEY(filername,hostname),
+  CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY (hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_filer_host" VALUES('gpfs','linuscs103');
+INSERT INTO "disk_filer_host" VALUES('gpfs-dev','linuscs107');
+CREATE TABLE disk_fileset (
+  id            VARCHAR(255) PRIMARY KEY,
+  physical_path VARCHAR(255) NOT NULL,
+  mount_path    VARCHAR(255),
+  total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  type          VARCHAR(255) NOT NULL,
+  kb_size       UNSIGNED INTEGER NOT NULL,
+  kb_quota      UNSIGNED INTEGER NOT NULL,
+  kb_limit      UNSIGNED INTEGER NOT NULL,
+  kb_in_doubt   UNSIGNED INTEGER NOT NULL,
+  kb_grace      VARCHAR(255) NOT NULL,
+  files         UNSIGNED INTEGER NOT NULL,
+  file_quota    UNSIGNED INTEGER NOT NULL,
+  file_limit    UNSIGNED INTEGER NOT NULL,
+  file_in_doubt UNSIGNED INTEGER NOT NULL,
+  file_grace    VARCHAR(255) NOT NULL,
+  file_entryType VARCHAR(1) NOT NULL,
+  parent_volume_id VARCHAR(255) NOT NULL,
+  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_group (
+  name          VARCHAR(255) NOT NULL PRIMARY KEY,
+  permissions   UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  sticky        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  subdirectory  VARCHAR(255) NOT NULL,
+  unix_uid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  unix_gid      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  username      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_group" VALUES('SYSTEMS_DEVELOPMENT',0,0,'info',0,0,null,null,'2011-12-17 22:40:39',null);
+INSERT INTO "disk_group" VALUES('SYSTEMS',0,0,'info',0,0,null,null,'2011-12-17 22:40:39',null);
+INSERT INTO "disk_group" VALUES('INFO_APIPE',0,0,'info',0,0,null,null,'2011-12-17 22:40:39',null);
+CREATE TABLE disk_host (
+  hostname      VARCHAR(255) NOT NULL PRIMARY KEY,
+  status        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  master        UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+INSERT INTO "disk_host" VALUES('linuscs103',0,0,null,null,null,null,null,'2011-12-17 22:40:39',null);
+INSERT INTO "disk_host" VALUES('linuscs107',0,1,null,null,null,null,null,'2011-12-17 22:40:39',null);
+CREATE TABLE disk_host_array (
+  hostname      VARCHAR(255),
+  arrayname     VARCHAR(255),
+  PRIMARY KEY(hostname,arrayname),
+  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_host_array" VALUES('linuscs107','nsams2k2');
+INSERT INTO "disk_host_array" VALUES('linuscs103','nsams2k1');
+CREATE TABLE disk_user (
+  email         VARCHAR(255) PRIMARY KEY,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_volume (
+  id            VARCHAR(255) PRIMARY KEY,
+  physical_path VARCHAR(255) NOT NULL,
+  mount_path    VARCHAR(255),
+  total_kb      UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  used_kb       UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_volume" VALUES('64b917cb3b96434abd42e7428180eff3','/vol/gpfsdev2','/gscmnt/gpfsdev2',100,50,'2011-12-17 22:40:39',null,null,'-intr,tcp,rsize=32768,wsize=32768','SYSTEMS_DEVELOPMENT');
+INSERT INTO "disk_volume" VALUES('df7b74edd02c4970859df1c65851338f','/vol/gc2116','/gscmnt/gc2116',100,90,'2011-12-17 22:40:39',null,null,'-intr,tcp,rsize=32768,wsize=32768',null);
+INSERT INTO "disk_volume" VALUES('3e0925a69bb74aa0b436c5ba37d9b489','/vol/gc2115','/gscmnt/gc2115',100,90,'2011-12-17 22:40:40',null,null,'-intr,tcp,rsize=32768,wsize=32768','INFO_APIPE');
+INSERT INTO "disk_volume" VALUES('aea0a27a4659444f90db06f2d4a968f5','/vol/gc2114','/gscmnt/gc2114',100,90,'2011-12-17 22:40:40',null,null,'-intr,tcp,rsize=32768,wsize=32768','SYSTEMS');
+INSERT INTO "disk_volume" VALUES('cc552ffa38044195bd96b32e07cf1c22','/vol/gc2113','/gscmnt/gc2113',100,90,'2011-12-17 22:40:40',null,null,'-intr,tcp,rsize=32768,wsize=32768','SYSTEMS_DEVELOPMENT');
+INSERT INTO "disk_volume" VALUES('9ce95f90b2bd4ab29b6a44c120df138f','/vol/gc2112','/gscmnt/gc2112',100,90,'2011-12-17 22:40:39',null,null,'-intr,tcp,rsize=32768,wsize=32768','SYSTEMS_DEVELOPMENT');
+INSERT INTO "disk_volume" VALUES('765d31be488941f6bf07476821249d5d','/vol/gc2111','/gscmnt/gc2111',100,50,'2011-12-17 22:40:39',null,null,'-intr,tcp,rsize=32768,wsize=32768','SYSTEMS_DEVELOPMENT');
+CREATE TABLE disk_volume_filer (
+  filername     VARCHAR(255),
+  volume_id     VARCHAR(255),
+  PRIMARY KEY (filername,volume_id),
+  CONSTRAINT disk_vol_filer_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT disk_vol_filer_hostname_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) DEFERRABLE INITIALLY DEFERRED
+);
+INSERT INTO "disk_volume_filer" VALUES('gpfs2','cc552ffa38044195bd96b32e07cf1c22');
+INSERT INTO "disk_volume_filer" VALUES('gpfs','9ce95f90b2bd4ab29b6a44c120df138f');
+INSERT INTO "disk_volume_filer" VALUES('gpfs-dev','df7b74edd02c4970859df1c65851338f');
+INSERT INTO "disk_volume_filer" VALUES('gpfs-dev','765d31be488941f6bf07476821249d5d');
+INSERT INTO "disk_volume_filer" VALUES('gpfs2','3e0925a69bb74aa0b436c5ba37d9b489');
+INSERT INTO "disk_volume_filer" VALUES('gpfs2','aea0a27a4659444f90db06f2d4a968f5');
+INSERT INTO "disk_volume_filer" VALUES('gpfs-dev','64b917cb3b96434abd42e7428180eff3');
+COMMIT;

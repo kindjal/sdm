@@ -1,0 +1,22 @@
+PRAGMA foreign_keys = ON;
+DROP TABLE IF EXISTS service_lsof_file;
+DROP TABLE IF EXISTS service_lsof_process;
+CREATE TABLE IF NOT EXISTS service_lsof_process (
+  hostname      VARCHAR(255) NOT NULL DEFAULT '',
+  pid           UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  pgid          UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  uid           UNSIGNED INTEGER NOT NULL DEFAULT 0,
+  username      VARCHAR(255) NOT NULL DEFAULT '',
+  command       VARCHAR(255) NOT NULL DEFAULT '',
+  nfsd          VARCHAR(255),
+  created       DATETIME,
+  last_modified DATETIME,
+  PRIMARY KEY(hostname,pid)
+);
+CREATE TABLE IF NOT EXISTS service_lsof_file (
+  pid           UNSIGNED INTEGER,
+  hostname      VARCHAR(255),
+  filename      VARCHAR(255),
+  PRIMARY KEY (pid,hostname,filename),
+  CONSTRAINT    service_lsof_hostname_fk FOREIGN KEY (hostname,pid) REFERENCES service_lsof_process (hostname,pid) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED
+);

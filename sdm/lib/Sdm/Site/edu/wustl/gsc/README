@@ -1,0 +1,19 @@
+
+For host specific overrides, make a class here like "hostname.pm"
+
+
+package Sdm::Site::edu::wustl::gsc::vm75;
+
+use strict;
+use warnings;
+
+# ensure nothing loads the old Sdm::Config module
+BEGIN { $INC{"Sdm/Config.pm"} = 'no' };
+
+# Default production DB settings
+$ENV{SDM_DEPLOYMENT} ||= 'testing';
+$ENV{SDM_DATABASE_DRIVER} ||= 'SQLite';
+$ENV{SDM_DATABASE_HOSTNAME} ||= 'localhost';
+
+1;
+

@@ -1,0 +1,132 @@
+DROP TABLE IF EXISTS disk_user cascade;
+DROP TABLE IF EXISTS disk_group cascade;
+DROP TABLE IF EXISTS disk_array_disk_set cascade;
+DROP TABLE IF EXISTS disk_host_array cascade;
+DROP TABLE IF EXISTS disk_array cascade;
+DROP TABLE IF EXISTS disk_host cascade;
+DROP TABLE IF EXISTS disk_fileset cascade;
+DROP TABLE IF EXISTS disk_volume cascade;
+DROP TABLE IF EXISTS disk_filer_host cascade;
+DROP TABLE IF EXISTS disk_filer cascade;
+CREATE TABLE disk_user (
+  email         VARCHAR(255) PRIMARY KEY,
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_filer (
+  name          VARCHAR(255) PRIMARY KEY,
+  status        SMALLINT NOT NULL DEFAULT 0,
+  type          VARCHAR(255),
+  filesystem    VARCHAR(255),
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  comments      VARCHAR(255),
+  duplicates    VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_host (
+  hostname      VARCHAR(255) PRIMARY KEY,
+  status        SMALLINT NOT NULL DEFAULT 0,
+  master        SMALLINT NOT NULL DEFAULT 0,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  os            VARCHAR(255),
+  location      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_group (
+  name          VARCHAR(255) PRIMARY KEY,
+  permissions   SMALLINT NOT NULL DEFAULT 0,
+  sticky        SMALLINT NOT NULL DEFAULT 0,
+  subdirectory  VARCHAR(255) NOT NULL,
+  unix_uid      SMALLINT NOT NULL DEFAULT 0,
+  unix_gid      SMALLINT NOT NULL DEFAULT 0,
+  username      VARCHAR(255),
+  comments      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_filer_host (
+  filername     VARCHAR(255),
+  hostname      VARCHAR(255),
+  PRIMARY KEY(filername,hostname),
+  CONSTRAINT disk_filer_host_filername_fk FOREIGN KEY(filername) REFERENCES disk_filer (name) ON DELETE CASCADE,
+  CONSTRAINT disk_filer_host_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) ON DELETE CASCADE
+);
+CREATE TABLE disk_volume (
+  id            VARCHAR(255) PRIMARY KEY,
+  physical_path VARCHAR(255) NOT NULL,
+  mount_path    VARCHAR(255),
+  total_kb      BIGINT DEFAULT 0 NOT NULL,
+  used_kb       BIGINT DEFAULT 0 NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  CONSTRAINT disk_volume_group_fk FOREIGN KEY (disk_group) REFERENCES disk_group (name) ON DELETE SET NULL
+);
+CREATE TABLE disk_volume_filer (
+  filername     VARCHAR(255),
+  volume_id     VARCHAR(255),
+  PRIMARY KEY (filername,volume_id),
+  CONSTRAINT disk_vol_filer_filername_fk FOREIGN KEY (filername) REFERENCES disk_filer (name) ON DELETE CASCADE,
+  CONSTRAINT disk_vol_filer_hostname_fk FOREIGN KEY (volume_id) REFERENCES disk_volume (id) ON DELETE CASCADE
+);
+CREATE TABLE disk_fileset (
+  id            VARCHAR(255) PRIMARY KEY,
+  physical_path VARCHAR(255) NOT NULL,
+  mount_path    VARCHAR(255),
+  total_kb      BIGINT DEFAULT 0 NOT NULL,
+  used_kb       BIGINT DEFAULT 0 NOT NULL,
+  created       DATE,
+  last_modified DATE,
+  comments      VARCHAR(255),
+  mount_options VARCHAR(255) NOT NULL,
+  disk_group    VARCHAR(255),
+  type          VARCHAR(255) NOT NULL,
+  kb_size       BIGINT NOT NULL,
+  kb_quota      BIGINT NOT NULL,
+  kb_limit      BIGINT NOT NULL,
+  kb_in_doubt   BIGINT NOT NULL,
+  kb_grace      VARCHAR(255) NOT NULL,
+  files         BIGINT NOT NULL,
+  file_quota    BIGINT NOT NULL,
+  file_limit    BIGINT NOT NULL,
+  file_in_doubt BIGINT NOT NULL,
+  file_grace    VARCHAR(255) NOT NULL,
+  file_entryType VARCHAR(1) NOT NULL,
+  parent_volume_id VARCHAR(255) NOT NULL,
+  CONSTRAINT disk_fileset_volume_fk FOREIGN KEY (parent_volume_id) REFERENCES disk_volume (id)
+);
+CREATE TABLE disk_array (
+  name          VARCHAR(255) PRIMARY KEY,
+  manufacturer  VARCHAR(255),
+  model         VARCHAR(255),
+  serial        VARCHAR(255),
+  description   VARCHAR(255),
+  comments      VARCHAR(255),
+  location      VARCHAR(255),
+  created       DATE,
+  last_modified DATE
+);
+CREATE TABLE disk_array_disk_set (
+  id            BIGSERIAL PRIMARY KEY,
+  disk_type     VARCHAR(255),
+  disk_num      BIGINT DEFAULT 0 NOT NULL,
+  disk_size     BIGINT DEFAULT 0 NOT NULL,
+  comments      VARCHAR(255),
+  created       VARCHAR(255),
+  last_modified VARCHAR(255),
+  arrayname     VARCHAR(255) CONSTRAINT disk_array_name_fk REFERENCES disk_array (name) DEFERRABLE INITIALLY DEFERRED
+);
+CREATE TABLE disk_host_array (
+  hostname      VARCHAR(255),
+  arrayname     VARCHAR(255),
+  PRIMARY KEY(hostname,arrayname),
+  CONSTRAINT disk_host_array_hostname_fk FOREIGN KEY(hostname) REFERENCES disk_host (hostname) ON DELETE CASCADE,
+  CONSTRAINT disk_host_array_arraynme_fk FOREIGN KEY(arrayname) REFERENCES disk_array (name) ON DELETE CASCADE
+);

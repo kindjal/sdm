@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <!-- Disable browser caching -->
+    <meta http-equiv='Pragma' content='no-cache'>
+    <!-- Microsoft browsers require this additional meta tag as well -->
+    <meta http-equiv='Expires' content='-1'>
+
+    <title>Disk Usage Information</title>
+    <style type="text/css" title="currentStyle">
+      @import "/css/status_page.css";
+      @import "/css/status_table.css";
+      @import "/js/pkg/TableTools/media/css/TableTools.css";
+    </style>
+    <link rel="shortcut icon" href="/img/gc_favicon.png" />
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/DataTables/media/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/TableTools/media/ZeroClipboard/ZeroClipboard.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/TableTools/media/js/TableTools.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/common.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/diskstatus.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/arraytable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/hosttable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/filertable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/groupvolumetable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/volumetable.js"></script>
+  </head>
+  <body id="dt_example">
+    <div id="container">
+      <h1>Disk Usage Report</h1>
+
+      <p>This table shows disk consumption information as reported by SNMP from NFS servers.</p>
+
+      <div id="narrow"> <div id="total"> </div> </div>
+
+      <h1>Filers Providing Storage Volumes</h1>
+
+      <div class="emphasis" id="narrow">
+      Hosts that reported SNMP errors are red.<br/>
+      Hosts that reported no Volume data are orange.<br/>
+      </div>
+
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="filertable">
+      </table>
+
+      <div class="clear"></div>
+
+      <h1>Arrays Serving Storage Space</h1>
+
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="arraytable">
+      </table>
+
+      <div class="clear"></div>
+
+      <h1>Disk Usage by Disk Group</h1>
+
+      <div class="emphasis" id="narrow">
+      Groups over 95% capacity are red, as is the 'unknown' group.<br/>
+      </div>
+
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="grouptable">
+      </table>
+
+      <div class="clear"></div>
+
+      <h1>Disk Usage By Volume</h1>
+
+      <div class="emphasis" id="narrow">
+      Volumes over 95% capacity are colored red, as is the 'unkown' group.
+      </div>
+
+      <table cellpadding="0" cellspacing="0" border="0" class="display" id="volumetable">
+      </table>
+
+    </div>
+  </body>
+  <head>
+    <meta http-equiv='Pragma' content='no-cache'>
+  </head>
+</html>
+

@@ -1,0 +1,2 @@
+package Sdm::Env::SDM_ZENOSS_DATABASE_HOSTNAME;
+1;
