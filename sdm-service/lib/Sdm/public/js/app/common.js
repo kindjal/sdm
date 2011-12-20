@@ -31,7 +31,8 @@ function sizeSuffix ( n ) {
         break
   }
   // round to 1 decimal by * 10 / 10
-  var shortVal = Math.round( n * 10 / divisor * 10 )
+  //var shortVal = Math.round( n * 10 / divisor * 10 )
+  var shortVal = Math.round( n / divisor )
   return "(" + String( shortVal.toFixed(1) ) + " " + units + ")"
 };
 

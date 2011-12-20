@@ -111,8 +111,10 @@ rrdFlot.prototype.createHTML = function() {
   cellGraph.colSpan=3;
 
   var elGraph=document.createElement("Div");
-  elGraph.style.width="500px";
-  elGraph.style.height="300px";
+  //elGraph.style.width="500px";
+  elGraph.style.width="700px";
+  //elGraph.style.height="300px";
+  elGraph.style.height="400px";
   elGraph.id=this.graph_id;
   cellGraph.appendChild(elGraph);
 
@@ -308,14 +310,16 @@ rrdFlot.prototype.drawFlotGraph = function() {
 
 
 function suffixFormatter(val, axis) {
-  if (val > 1000000000000)
-    return (Math.round(val*10)/10000000000000).toFixed(axis.tickDecimals+1) + " PB";
-  else if (val > 1000000000)
-    return (Math.round(val*10)/10000000000).toFixed(axis.tickDecimals+1) + " TB";
-  else if (val > 1000000)
-    return (Math.round(val*10)/10000000).toFixed(axis.tickDecimals+1) + " GB";
-  else if (val > 1000)
-    return (Math.round(val*10)/10000).toFixed(axis.tickDecimals+1) + " MB";
+  if (val >= 1000000000000000)
+    return (Math.round(val*10)/(1000000000000000 * 10)).toFixed(axis.tickDecimals+1) + " EB";
+  else if (val >= 1000000000000)
+    return (Math.round(val*10)/(1000000000000 * 10)).toFixed(axis.tickDecimals+1) + " PB";
+  else if (val >= 1000000000)
+    return (Math.round(val*10)/(1000000000 * 10)).toFixed(axis.tickDecimals+1) + " TB";
+  else if (val >= 1000000)
+    return (Math.round(val*10)/(1000000 * 10)).toFixed(axis.tickDecimals+1) + " GB";
+  else if (val >= 1000)
+    return (Math.round(val*10)/(1000 * 10)).toFixed(axis.tickDecimals+1) + " MB";
   else
     return val.toFixed(axis.tickDecimals) + " KB";
 }
@@ -339,7 +343,8 @@ rrdFlot.prototype.bindFlotGraph = function(flot_obj) {
     xaxis: { mode: "time" },
     // Add tickFormatter to commify and shorten yaxis ticks
     yaxis: {
-      autoscaleMargin: 0.20,
+      //autoscaleMargin: .20,
+      autoscaleMargin: 1.00,
       tickFormatter: function (v,axis) { return suffixFormatter(v,axis) },
     },
     selection: { mode: "x" },
