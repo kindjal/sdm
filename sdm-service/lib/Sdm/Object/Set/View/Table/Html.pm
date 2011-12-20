@@ -3,7 +3,6 @@ package Sdm::Object::Set::View::Table::Html;
 
 use strict;
 use warnings;
-use feature 'switch';
 
 use Sdm;
 use Data::Dumper;
@@ -19,7 +18,6 @@ class Sdm::Object::Set::View::Table::Html {
 
 sub _generate_content {
     my $self = shift;
-
     my $content = do { local $/; <DATA> };
 
     # Determine attributes of class for columns of the table
@@ -40,6 +38,8 @@ sub _generate_content {
     unless ($jsview) {
         die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
     }
+
+    # This is the table data
     my $aaData = $jsview->_json->encode( $jsview->_jsobj->{aaData} );
     $content =~ s/<%= aaData =>/$aaData/;
 
@@ -47,72 +47,59 @@ sub _generate_content {
     my @members = $subject->members;
     my $member = $members[0];
     return $content unless ($member);
-
     my %args = (
             subject_class_name => $class,
             perspective => 'default',
             toolkit => 'json',
     );
-    my @default_aspects = @{ $self->default_aspects };
-    unless (@default_aspects and $member) {
+    my @default_aspects = @{ $member->default_aspects->{visible} };
+    unless (@default_aspects) {
+        # Make the default_aspects all attributes of the member object.
+        warn "using all properties for table";
         @default_aspects = map { $_->property_name } $member->__meta__->properties;
     }
-    @default_aspects = grep {!/id/} @default_aspects;
-    unshift @default_aspects,'id';
-    $args{aspects} = [ @default_aspects ];
-    my $view;
-    eval {
-        $view = $member->create_view(%args);
-    };
-    unless ($view) {
-        eval {
-            $view = $subject->create_view(subject_class_name=>'Sdm::Object::Set',perspective=>'table',toolkit=>'html');
-        };
-    }
-    unless ($view) {
-        die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
-    }
-    my @attributes = $view->aspects;
-    @attributes = map { $_->name } @attributes;
 
     # Here we set column attributes, like title.
-    my $sTitles = qq/{ "sTitle":'id', "bVisible": false },\n/;
-    foreach my $attr (@attributes) {
+    # We MUST include id, and it must be first, but may or may not be visible.
+    my $sTitles;
+    if ( grep { /^id$/ } @default_aspects ) {
+        $sTitles .= qq/{ "sTitle": "id" },\n/;
+    } else {
+        $sTitles .= qq/{ "sTitle": "id", "bVisible": false },\n/;
+    }
+    foreach my $attr (@default_aspects) {
         next if ($attr eq 'id');
         $sTitles .= qq/{ "sTitle": "$attr" },\n/;
     }
     $content =~ s/<%= sTitles =>/$sTitles/;
 
     # Here we specify which columns are not editable by setting 'null' in aoColumns
-    my $aoColumns;
-    foreach my $attr (@attributes) {
-        given ($attr) {
-            when ($attr eq 'id') { next; };
-            when ($attr =~ /(created|last_modified)/i) {
-                $aoColumns .= qq/null,\n/;
-                next;
-            }
-            default {
-                $aoColumns .= qq/{},\n/;
-            }
+    my $editable = $member->default_aspects->{editable};
+    my $aoColumns = qq/null,\n/; # id is never editable and always first
+    foreach my $attr (@default_aspects) {
+        if ( $attr eq 'id' ) {
+            next;
+        } elsif ( grep { /$attr/ } @$editable ) {
+            $aoColumns .= qq/{},\n/;
+        } else {
+            $aoColumns .= qq/null,\n/;
         }
     }
     $content =~ s/<%= aoColumns =>/$aoColumns/;
 
     my $idx = 0;
-    my $addRecord;
-    foreach my $attr (@attributes) {
-        given ($attr) {
-            # These are the none editable columns, hidden in the add form
-            when ($attr =~ /^(id|created|last_modified)$/) {
-                $addRecord .= qq{  <input type="hidden" name="$attr" id="$attr" rel="$idx" /><br />\n };
-                $idx++;
-                next;
-            }
-            default {
-                $addRecord .= qq{  <label for="$attr">$attr</label><br />\n  <input type="text" name="$attr" id="$attr" class="required" rel="$idx" /><br />\n };
-                $idx++;
-            }
+    # id is always first (0), and hidden in creation of a new record.
+    my $addRecord = qq{  <input type="hidden" name="id" id="id" rel="$idx" /><br />\n };
+    $idx++;
+    foreach my $attr (@default_aspects) {
+        if ($attr eq 'id') {
+            $idx++;
+        } elsif (grep { /$attr/ } @$editable) {
+            $addRecord .= qq{  <label for="$attr">$attr</label><br />\n  <input type="text" name="$attr" id="$attr" class="required" rel="$idx" /><br />\n };
+            $idx++;
+        } else {
+            $addRecord .= qq{  <input type="hidden" name="$attr" id="$attr" rel="$idx" /><br />\n };
+            $idx++;
         }
     }
     $content =~ s/<%= addrecordform =>/$addRecord/;
@@ -135,6 +122,7 @@ __DATA__
     <style type="text/css" title="currentStyle">
       @import "/css/status_page.css";
       @import "/css/status_table.css";
+      @import "/css/jquery-ui.css";
       @import "/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/images/gc_favicon.png" />
@@ -172,9 +160,9 @@ __DATA__
                     } ).makeEditable( {
                         sUpdateURL: "/service/update?class=<%= class =>",
                         sAddURL: "/service/add?class=<%= class =>",
-                        fnOnAdded: function(status) {
-                          location.reload();
-                        },
+                        //fnOnAdded: function(status) {
+                        //  location.reload();
+                        //},
                         sDeleteURL: "/service/delete?class=<%= class =>",
                         // Define columns here, which can be reordered in {Html,Json}.pm
                         // Prevent users from modifying created and last_modified
@@ -196,7 +184,6 @@ drawTable();
   <div id="container">
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="datatable">
   </table>
-  <!-- Placeholder where add and delete buttons will be generated -->
   <div class="add_delete_toolbar" />
   </div>
   <!-- Custom form for adding new records -->
