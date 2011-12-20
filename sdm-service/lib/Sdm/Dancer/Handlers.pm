@@ -13,6 +13,14 @@ get '/' => sub {
     return default_route();
 };
 
+get qr{/((?!view).*)} => sub {
+    return static_content();
+};
+
+get qr{/view/(.*)/(.*)\.(.*)} => sub {
+    return rest_handler();
+};
+
 post '/service/add' => sub {
     return add_handler();
 };
@@ -22,19 +30,11 @@ post '/service/update' => sub {
 };
 
 post '/service/delete' => sub {
-    return delete_handler();
+    delete_handler();
 };
 
 post '/service/lsof' => sub {
     return lsof_handler( params->{data} );
-};
-
-get qr{/((?!view).*)} => sub {
-    return static_content();
-};
-
-get qr{/view/(.*)/(.*)\.(.*)} => sub {
-    return rest_handler();
 };
 
 sub url_to_type {
@@ -49,14 +49,13 @@ sub url_to_type {
 }
 
 sub default_route {
-    warn "Using default route handler";
-    return send_error("Default search page not yet implemented",404);
+    return send_error("Default search page not yet implemented");
 }
 
 sub static_content {
     warn "Using static content route handler: " . Data::Dumper::Dumper splat;
     my ($file) = splat;
-    my $path = Sdm->base_dir . '/Service/WebApp/public';
+    my $path = Sdm->base_dir . '/public';
     return send_file("$path/$file", system_path => 1);
 }
 
@@ -77,12 +76,13 @@ sub add_handler {
         UR::Context->commit();
     };
     if ($@) {
-        warn "error: " . Data::Dumper::Dumper $@;
-        return send_error();
+        return "Error: $@";
     }
     warn "returning: " . $obj->id;
     # Send back the ID, which should be used by
-    # datatables editable as a new row id
+    # datatables editable as a new row id.  This fails to be used in the added row
+    # because "jquery-editable" looks for a class="id" which we use elsewhere.  This
+    # name conflict of "id" prevents the proper auto-adding of the id attribute to the new row.
     return $obj->id;
 }
 
@@ -108,8 +108,7 @@ sub update_handler {
         UR::Context->commit();
     };
     if ($@) {
-        warn "error: " . Data::Dumper::Dumper $@;
-        return send_error();
+        return "Error: $@";
     }
     return $msg;
 }
@@ -117,6 +116,12 @@ sub update_handler {
 sub delete_handler {
     my $class = delete params->{class};
     $class =~ s/::Set//g;
+    unless (params->{id}) {
+        # This usually happens when someone tries to delete a row they
+        # just added.  jQuery has added the row to the DB but doesn't
+        # have it in the page yet.  Refresh and try again.
+        return "This row has no 'id'.  Refresh the page and try again.";
+    }
 
     # Load the requested namespace
     my ($namespace,$toss) = split(/\:\:/,$class,2);
@@ -124,12 +129,14 @@ sub delete_handler {
 
     eval {
         my $obj = $class->get( params );
+        unless ($obj) {
+            return "no object found matching the query: " . Data::Dumper::Dumper params;
+        }
         $obj->delete;
         UR::Context->commit();
     };
     if ($@) {
-        warn "error: " . Data::Dumper::Dumper $@;
-        return send_error();
+        return "Error: $@";
     }
 }
 
@@ -170,11 +177,9 @@ sub rest_handler {
     my $set;
     eval { $set = $class->define_set(%$args); };
     if ($@) {
-        warn "invalid args";
-        return send_error("Invalid arguments to define_set: $@",500);
+        return "Error: $@";
     }
     unless ($set) {
-        warn "no set found";
         return send_error("No object set found",500);
     }
 
@@ -239,7 +244,7 @@ sub rest_handler {
         };
     }
     if ($@) {
-        return send_error "No view found: $@";
+        return send_error("Error in create_view(): $@");
     }
     return send_error("No view found",404) unless ($view);
 
