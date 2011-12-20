@@ -24,18 +24,6 @@ class Sdm::Disk::Host {
         location        => { is => 'Text', len => 255 },
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
-        gpfs_node_status_id => {
-            is => 'Number',
-            calculate_from => 'hostname',
-            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = Sdm::Gpfs::GpfsNodeStatus->get( gpfsNodeName => "$hostname.$domain" ); return $h[0]->id; |,
-        },
-        gpfs_node_status => { is => 'Sdm::Gpfs::GpfsNodeStatus', id_by => 'gpfs_node_status_id' },
-        gpfs_node_config_id => {
-            is => 'Number',
-            calculate_from => 'hostname',
-            calculate => q| use Net::Domain qw/hostfqdn/; my $fqdn = hostfqdn; my ($toss,$domain) = split(/\./,$fqdn,2); my @h = Sdm::Gpfs::GpfsNodeConfig->get( gpfsNodeConfigName => "$hostname.$domain" ); return $h[0]->id; |,
-        },
-        gpfs_node_config => { is => 'Sdm::Gpfs::GpfsNodeConfig', id_by => 'gpfs_node_config_id' },
     ],
     has_many_optional => [
         arraymappings   => { is => 'Sdm::Disk::HostArrayBridge', reverse_as => 'host' },

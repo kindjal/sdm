@@ -29,18 +29,6 @@ class Sdm::Disk::Filer {
         created         => { is => 'DATE' },
         last_modified   => { is => 'DATE' },
         status          => { is => 'UnsignedInteger', default => 0 },
-        gpfs_cluster_status_id => {
-            is => 'Number',
-            calculate_from => 'name',
-            calculate => q| my @f = Sdm::Gpfs::GpfsClusterStatus->get( filername => $name); return map { $_->id } @f; |,
-        },
-        gpfs_cluster_status => { is => 'Sdm::Gpfs::GpfsClusterStatus', id_by => 'gpfs_cluster_status_id' },
-        gpfs_cluster_config_id => {
-            is => 'Number',
-            calculate_from => 'name',
-            calculate => q| my @f = Sdm::Gpfs::GpfsClusterConfig->get( filername => $name); return map { $_->id } @f; |,
-        },
-        gpfs_cluster_config => { is => 'Sdm::Gpfs::GpfsClusterConfig', id_by => 'gpfs_cluster_config_id' },
         master          => {
             is => 'Text',
             calculate => q| return $self->name if ($self->type eq 'snmp'); foreach my $h ($self->host) { return $h->hostname if ($h->master); }; |,
