@@ -16,13 +16,13 @@ This is part of Diskstatus/Html.pm.
 =cut
 sub _generate_content {
     my $self = shift;
-    __FILE__ =~ /^(.*\/Sdm\/).*/;
-    my $base = $1;
-    my $html = $base . "/Service/WebApp/public/rrd.html";
+    #__FILE__ =~ /^(.*\/Sdm\/).*/;
+    #my $base = $1;
+    #my $html = $base . "/Service/WebApp/public/rrd.html";
+    my $html = Sdm->base_dir . "/public/rrd.html";
     open(FH,"<$html") or die "Failed to open $html: $!";
     my $content = do { local $/; <FH> };
     close(FH);
-warn "html $html";
     return $content;
 }
 
