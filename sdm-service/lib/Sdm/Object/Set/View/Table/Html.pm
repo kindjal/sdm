@@ -16,6 +16,11 @@ class Sdm::Object::Set::View::Table::Html {
     ]
 };
 
+=head2 _generate_content
+Take the DATA content from the bottom of this file and text replace important bits.
+We insert JSON data representing table rows.  We define sTitles for column headers.
+We define a form to add a new row.
+=cut
 sub _generate_content {
     my $self = shift;
     my $content = do { local $/; <DATA> };
@@ -178,7 +183,7 @@ __DATA__
                         "aoColumns": [
                           <%= aoColumns =>
                         ]
-            } );
+                    } );
         }
     </script>
     <script type="text/javascript" language="javascript" charset="utf-8">
