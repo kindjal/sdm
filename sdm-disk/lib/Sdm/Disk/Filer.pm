@@ -48,6 +48,18 @@ class Sdm::Disk::Filer {
             calculate => q/ my %h; foreach my $h ($self->host) { map { $h{$_} = 1 } $h->arrayname }; return keys %h; /
         },
     ],
+    has_constant => [
+        default_aspects => {
+            column_name => '',
+            doc => 'This is used by the web UI to draw a jquery-datatables view of a set of objects. Here we specify which attributes are visible and their     order, and which attributes should be editable.',
+            is_classwide => 1,
+            is => 'HASH',
+            value => {
+                'visible'  => ['name','type','comments','filesystem','status','master','created','last_modified'],
+                'editable' => ['name','type','comments','filesystem','master'],
+            }
+        }
+    ],
     schema_name => 'Disk',
     data_source => 'Sdm::DataSource::Disk',
 };
