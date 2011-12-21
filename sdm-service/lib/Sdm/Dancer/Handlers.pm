@@ -97,11 +97,8 @@ sub add_handler {
 }
 
 sub update_handler {
-    # Load the requested namespace
     my $class = delete params->{class};
-    my ($namespace,$toss) = split(/\:\:/,$class,2);
-    $namespace = ucfirst(lc($namespace));
-
+    # Column name comes from aoColumns sTitle in datatable
     my $attr = params->{columnName};
     my $value = params->{value};
     $class =~ s/::Set//g;
@@ -110,12 +107,15 @@ sub update_handler {
     eval {
         my $obj = $class->get( id => params->{id} );
         unless ($obj) {
-            die __PACKAGE__ . " No object found for id " . params->{id};
+            die "No object found for id " . params->{id};
         }
         $msg = $value;
         $obj->$attr( $value );
         $obj->last_modified( time2str(q|%Y-%m-%d %H:%M:%S|,time()) );
-        UR::Context->commit();
+        my $rc = UR::Context->commit();
+        unless ($rc) {
+            die "Failed to commit update";
+        }
     };
     if ($@) {
         return "Error: $@";
@@ -132,10 +132,6 @@ sub delete_handler {
         # have it in the page yet.  Refresh and try again.
         return "This row has no 'id'.  Refresh the page and try again.";
     }
-
-    # Load the requested namespace
-    my ($namespace,$toss) = split(/\:\:/,$class,2);
-    $namespace = ucfirst(lc($namespace));
 
     eval {
         my $obj = $class->get( params );
@@ -157,10 +153,6 @@ sub rest_handler {
 
     # This is in our XML/XSL UR stuff, should be made local to this package.
     $class = url_to_type($class);
-
-    # Load the requested namespace
-    my ($namespace,$toss) = split(/\:\:/,$class,2);
-    $namespace = ucfirst(lc($namespace));
 
     # Support our old REST scheme of view/namespace/object/set/perspective.toolkit
     # by removing ::Set, we assume everything is a Set now.
@@ -184,20 +176,26 @@ sub rest_handler {
         $view_special_args{substr($view_key,1,length($view_key))} = delete $args->{$view_key}; 
     }
 
-    my $set;
-    eval { $set = $class->define_set($args); };
-    if ($@) {
-        return "Error in REST handler: $class: " . Data::Dumper::Dumper $args . ": $@";
-    }
-    unless ($set) {
-        return send_error("No object set found",500);
-    }
-
-    my @members = $set->members;
-    unless (@members) {
-        warn "empty set returned";
-        my $path = Sdm->base_dir . '/public/empty.html';
-        return send_file($path, system_path => 1);
+    my $subject;
+    if ($class eq 'Sdm') {
+        # This will resolve view classes from Sdm/View/* which we use
+        # for some special pages like the diskstatus page.
+        $subject = $class;
+    } else {
+        eval { $subject = $class->define_set($args); };
+        if ($@) {
+            return "Error in REST handler: $class: " . Data::Dumper::Dumper $args . ": $@";
+        }
+        unless ($subject) {
+            return send_error("No object set found",500);
+        }
+        my @members = $subject->members;
+        # Return a decent empty set page
+        unless (@members) {
+            warn "empty set returned";
+            my $path = Sdm->base_dir . '/public/empty.html';
+            return send_file($path, system_path => 1);
+        }
     }
 
     my %view_args = (
@@ -210,14 +208,14 @@ sub rest_handler {
     # This is the default UR XML -> XSL translation layer.
     # Default object views are XML documents transformed to HTML via XSL.
     if ( $toolkit eq 'xsl' || $toolkit eq 'html' ) {
-        $view_args{'xsl_root'} = $namespace->base_dir . '/xsl';    ## maybe move this to $res_path?
+        $view_args{'xsl_root'} = Sdm->base_dir . '/xsl';    ## maybe move this to $res_path?
         $view_args{'xsl_path'} = '/static/xsl';
-        $view_args{'html_root'} = $namespace->base_dir . '/View/Resource/Html/html';
+        $view_args{'html_root'} = Sdm->base_dir . '/View/Resource/Html/html';
         $view_args{'xsl_variables'} = {
             rest      => '/view',
             # Is this actually used?  I think this builds a URL in an old-fashioned
             # /view/$namespace/resource.html/foo.bar scheme that I'm not sure we do.
-            resources => "/view/$namespace/resource.html"
+            resources => "/view/sdm/resource.html"
         };
     }
 
@@ -227,14 +225,14 @@ sub rest_handler {
 
     # Our first create_view attempt will find explicit Object View definitions.
     eval {
-        $view = $set->create_view(%view_args, %view_special_args);
+        $view = $subject->create_view(%view_args, %view_special_args);
     };
     if ($@ or ! defined $view) {
         # Try again with Sdm default object set.
         warn "No view found: " . $@;
         $view_args{subject_class_name} = "Sdm::Object::Set";
         eval {
-            $view = $set->create_view(%view_args, %view_special_args);
+            $view = $subject->create_view(%view_args, %view_special_args);
         };
     }
     if ($@ or ! defined $view) {
@@ -242,7 +240,7 @@ sub rest_handler {
         warn "No view found: " . $@;
         $view_args{subject_class_name} = "UR::Object::Set";
         eval {
-            $view = $set->create_view(%view_args, %view_special_args);
+            $view = $subject->create_view(%view_args, %view_special_args);
         };
     }
     if ($@ or ! defined $view) {
@@ -251,7 +249,7 @@ sub rest_handler {
         warn "looking for default view";
         $view_args{perspective} = 'default';
         eval {
-            $view = $set->create_view(%view_args, %view_special_args);
+            $view = $subject->create_view(%view_args, %view_special_args);
         };
     }
     if ($@) {
