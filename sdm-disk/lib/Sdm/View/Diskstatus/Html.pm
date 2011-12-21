@@ -20,12 +20,9 @@ class Sdm::View::Diskstatus::Html {
 =head2 _generate_content
 This returns an HTML page we store elsewhere relative to this module tree.
 =cut
-sub _generate_content {
+sub content {
     my $self = shift;
-    warn "base: " . Sdm->base_dir;
-    __FILE__ =~ /^(.*\/Sdm\/).*/;
-    my $base = $1;
-    my $html = $base . "/Service/WebApp/public/diskstatus.html";
+    my $html = Sdm->base_dir . "/public/diskstatus.html";
     open(FH,"<$html") or die "Failed to open $html: $!";
     my $content = do { local $/; <FH> };
     close(FH);
