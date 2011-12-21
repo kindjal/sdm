@@ -9,13 +9,13 @@ function drawFilerTable () {
         "sPaginationType": "full_numbers",
         "bAutoWidth": false,
         "aoColumns": [
-            { "sWidth": "6%",  "sTitle": "Name" },
-            { "sWidth": "5%",  "sTitle": "Status", "sClass": "center"  },
-            { "sWidth": "12%", "sTitle": "Hosts" },
-            { "sWidth": "12%", "sTitle": "Arrays" },
-            { "sWidth": "10%", "sTitle": "Comments"  },
-            { "sWidth": "12%", "sTitle": "Created", "sClass": "center" },
-            { "sWidth": "12%", "sTitle": "Last Checked", "sClass": "center" },
+            { "sWidth": "6%",  "sTitle": "name" },
+            { "sWidth": "5%",  "sTitle": "status", "sClass": "center"  },
+            { "sWidth": "12%", "sTitle": "hosts" },
+            { "sWidth": "12%", "sTitle": "arrays" },
+            { "sWidth": "10%", "sTitle": "comments"  },
+            { "sWidth": "12%", "sTitle": "created", "sClass": "center" },
+            { "sWidth": "12%", "sTitle": "last_modified", "sClass": "center" },
         ],
         "aaSorting": [ [1,'asc'] ],
         "fnRowCallback": function( nRow, aaData, iDisplayIndex ) {
@@ -38,5 +38,19 @@ function drawFilerTable () {
 
             return nRow;
         }
-    } );
+    } ).makeEditable( {
+                         sUpdateURL: "/service/update?class=Sdm::Disk::Filer",
+                         sAddURL: "/service/add?class=Sdm::Disk::Filer",
+                         sDeleteURL: "/service/delete?class=Sdm::Disk::Filer",
+                         // Set editable columns with {}, non-editable with null
+                         "aoColumns": [
+                         {},
+                         null,
+                         null,
+                         null,
+                         {},
+                         null,
+                         null
+                         ]
+     } );
 }
