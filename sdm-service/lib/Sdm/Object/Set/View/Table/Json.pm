@@ -40,8 +40,19 @@ sub _jsobj {
         );
 
         # Use our default_aspects if we have them defined.
-        my @aspects = @{ $member->default_aspects->{visible} };
-        unshift @aspects, 'id' unless (grep { /^id$/ } @aspects); # id must be present in the table, even if it's hidden
+        my @aspects;
+        if ( $member->can('default_aspects') ) {
+            @aspects = @{ $member->default_aspects->{visible} };
+        }
+        unless (@aspects) {
+            @aspects = @{ $self->default_aspects };
+        }
+        unless (@aspects) {
+            # Otherwise, make them the attributes of our subject.
+            @aspects = map { $_->property_name } $member->__meta__->properties;
+        }
+        # FIXME: find the id_by attribute and ensure its presence
+        unshift @aspects, 'id' unless (grep { /^id$/ } @aspects); # id must be present and first in the table, even if it's hidden
         $args{aspects} = \@aspects;
         my $v = $member->create_view(%args);
         my @data = $v->aspects;
