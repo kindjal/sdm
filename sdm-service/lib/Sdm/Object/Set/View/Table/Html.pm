@@ -39,14 +39,15 @@ sub _generate_content {
         die __PACKAGE__ . " failed to create view for JSON object for $class: $@";
     }
 
-    # This is the table data
+    # This is the table data.
+    # Later we must figure out column headers and addForm data.
+    # FIXME: Note multi-column IDs are not going to work.
     my $aaData = $jsview->_json->encode( $jsview->_jsobj->{aaData} );
     $content =~ s/<%= aaData =>/$aaData/;
 
     # Determine column headers for javascript
     my @members = $subject->members;
     my $member = $members[0];
-    return $content unless ($member);
     my %args = (
             subject_class_name => $class,
             perspective => 'default',
@@ -61,6 +62,7 @@ sub _generate_content {
 
     # Here we set column attributes, like title.
     # We MUST include id, and it must be first, but may or may not be visible.
+    # FIXME: replace 'id' with the id_by attribute of the member
     my $sTitles;
     if ( grep { /^id$/ } @default_aspects ) {
         $sTitles .= qq/{ "sTitle": "id" },\n/;
@@ -74,12 +76,16 @@ sub _generate_content {
     $content =~ s/<%= sTitles =>/$sTitles/;
 
     # Here we specify which columns are not editable by setting 'null' in aoColumns
+    # Note that 'id' is always present and first.
     my $editable = $member->default_aspects->{editable};
-    my $aoColumns = qq/null,\n/; # id is never editable and always first
+    my $aoColumns;
+    if ( grep { /^id$/ } @default_aspects ) {
+        $aoColumns = qq/null,\n/; # id is never editable and always first, here it's visible too.
+    } else {
+        # Otherwise we ignore 'id'
+    }
     foreach my $attr (@default_aspects) {
-        if ( $attr eq 'id' ) {
-            next;
-        } elsif ( grep { /$attr/ } @$editable ) {
+        if ( grep { /$attr/ } @$editable ) {
             $aoColumns .= qq/{},\n/;
         } else {
             $aoColumns .= qq/null,\n/;
@@ -87,14 +93,17 @@ sub _generate_content {
     }
     $content =~ s/<%= aoColumns =>/$aoColumns/;
 
+    # Here we build the Add Record form
+    # Be careful.  We must have 'id' and we've made sure we have it present first and hidden.
+    # We might also display the 'id' or an id_by attribute.  These are sometimes even editable.
+    # So make sure you have 'id' first hidden, then present all editable attributes in the form.
     my $idx = 0;
     # id is always first (0), and hidden in creation of a new record.
+    my $addRecord;
     my $addRecord = qq{  <input type="hidden" name="id" id="id" rel="$idx" /><br />\n };
     $idx++;
     foreach my $attr (@default_aspects) {
-        if ($attr eq 'id') {
-            $idx++;
-        } elsif (grep { /$attr/ } @$editable) {
+        if (grep { /$attr/ } @$editable) {
             $addRecord .= qq{  <label for="$attr">$attr</label><br />\n  <input type="text" name="$attr" id="$attr" class="required" rel="$idx" /><br />\n };
             $idx++;
         } else {
