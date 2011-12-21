@@ -62,23 +62,33 @@ sub static_content {
 sub add_handler {
     # What kind of object are we adding?
     my $class = delete params->{class};
+
     # Don't confuse UR, let it come up with the id.
     delete params->{id};
     # Everything's a Set, no need to say it.
     $class =~ s/::Set$//;
 
+    # Remove non-editable params
+    my %newparams;
+    my $params = params;
+    my @editable = @{ $class->default_aspects->{editable} };
+    @newparams{@editable} = @$params{@editable};
+
     my $obj;
+    my $rc;
     eval {
-        $obj = $class->create( params );
+        $obj = $class->create( \%newparams );
         unless ($obj) {
-            die __PACKAGE__ . " Failed to create object";
+            die "Failed to create object";
         }
-        UR::Context->commit();
+        $rc = UR::Context->commit();
+        unless ($rc) {
+            die "Failed to commit new object";
+        }
     };
     if ($@) {
-        return "Error: $@";
+        return "Failed to save new object: $@";
     }
-    warn "returning: " . $obj->id;
     # Send back the ID, which should be used by
     # datatables editable as a new row id.  This fails to be used in the added row
     # because "jquery-editable" looks for a class="id" which we use elsewhere.  This
@@ -175,17 +185,18 @@ sub rest_handler {
     }
 
     my $set;
-    eval { $set = $class->define_set(%$args); };
+    eval { $set = $class->define_set($args); };
     if ($@) {
-        return "Error: $@";
+        return "Error in REST handler: $class: " . Data::Dumper::Dumper $args . ": $@";
     }
     unless ($set) {
         return send_error("No object set found",500);
     }
 
-    unless ($set->count) {
-        warn "no objects found";
-        my $path = Sdm->base_dir . '/Service/WebApp/public/empty.html';
+    my @members = $set->members;
+    unless (@members) {
+        warn "empty set returned";
+        my $path = Sdm->base_dir . '/public/empty.html';
         return send_file($path, system_path => 1);
     }
 
