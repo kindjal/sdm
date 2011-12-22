@@ -44,6 +44,13 @@ post '/service/lsof' => sub {
     return lsof_handler( params->{data} );
 };
 
+sub _error_template {
+    my $msg = shift;
+    $msg =~ s/\n/<br\/>/g;
+    $msg = encode_entities($msg);
+    return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
+}
+
 sub url_to_type {
     join(
         '::',
@@ -56,7 +63,7 @@ sub url_to_type {
 }
 
 sub default_route {
-    return send_error("Default search page not yet implemented");
+    return _error_template("Default page not yet implemented");
 }
 
 sub static_content {
@@ -76,10 +83,15 @@ sub add_handler {
     $class =~ s/::Set$//;
 
     # Remove non-editable params
-    my %newparams;
     my $params = params;
-    my @editable = @{ $class->default_aspects->{editable} };
-    @newparams{@editable} = @$params{@editable};
+    my %newparams = %$params;
+    my @editable;
+    if ( $class->can('default_aspects') and exists $class->default_aspects->{editable} ) {
+        @editable = @{ $class->default_aspects->{editable} };
+    }
+    if (@editable) {
+        @newparams{@editable} = @$params{@editable};
+    }
 
     my $obj;
     my $rc;
@@ -94,7 +106,7 @@ sub add_handler {
         }
     };
     if ($@) {
-        return "Failed to save new object: $@";
+        return _error_template("Failed to save new object: $@");
     }
     # Send back the ID, which should be used by
     # datatables editable as a new row id.  This fails to be used in the added row
@@ -125,7 +137,7 @@ sub update_handler {
         }
     };
     if ($@) {
-        return "Error: $@";
+        return _error_template("Error: $@");
     }
     return $msg;
 }
@@ -137,19 +149,19 @@ sub delete_handler {
         # This usually happens when someone tries to delete a row they
         # just added.  jQuery has added the row to the DB but doesn't
         # have it in the page yet.  Refresh and try again.
-        return "This row has no 'id'.  Refresh the page and try again.";
+        return _error_template("This row has no 'id'.  Refresh the page and try again.");
     }
 
     eval {
         my $obj = $class->get( params );
         unless ($obj) {
-            return "no object found matching the query: " . Data::Dumper::Dumper params;
+            return _error_template("no object found matching the query: " . Data::Dumper::Dumper(params));
         }
         $obj->delete;
         UR::Context->commit();
     };
     if ($@) {
-        return "Error: $@";
+        return _error_template("Error: $@");
     }
 }
 
@@ -189,9 +201,7 @@ sub rest_handler {
         my $d = Data::Dumper->new([$args]);
         $d->Indent(0)->Terse(1);
         my $msg = "Error in REST handler: $class: " . $d->Dump($args) . ": $@";
-        $msg = encode_entities($msg);
-        $msg =~ s/\n//g;
-        return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
+        return _error_template($msg);
     }
     unless ($subject) {
         return send_error("No object set found",500);
@@ -203,7 +213,7 @@ sub rest_handler {
         my $d = Data::Dumper->new([$args]);
         $d->Terse(1)->Indent(0);
         my $msg = sprintf "Query returns an empty set:<br/><br/>  $class->define_set(%s)", $d->Dump();
-        return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
+        return _error_template($msg);
     }
 
     my %view_args = (
