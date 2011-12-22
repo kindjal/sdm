@@ -5,7 +5,7 @@ use Sdm;
 
 class Sdm::Service {
     is          => 'Sdm::Command::Base',
-    doc         => 'Work with services',
+    doc         => 'Work with SDM services',
 };
 
 1;
