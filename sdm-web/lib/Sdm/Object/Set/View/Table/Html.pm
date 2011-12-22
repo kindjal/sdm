@@ -58,7 +58,10 @@ sub _generate_content {
             perspective => 'default',
             toolkit => 'json',
     );
-    my @default_aspects = @{ $member->default_aspects->{visible} };
+    my @default_aspects;
+    if ( $member->can('default_aspects') ) {
+        @default_aspects = @{ $member->default_aspects->{visible} };
+    }
     unless (@default_aspects) {
         # Make the default_aspects all attributes of the member object.
         warn "using all properties for table";
@@ -104,7 +107,6 @@ sub _generate_content {
     # So make sure you have 'id' first hidden, then present all editable attributes in the form.
     my $idx = 0;
     # id is always first (0), and hidden in creation of a new record.
-    my $addRecord;
     my $addRecord = qq{  <input type="hidden" name="id" id="id" rel="$idx" /><br />\n };
     $idx++;
     foreach my $attr (@default_aspects) {
