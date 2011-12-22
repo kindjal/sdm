@@ -5,9 +5,16 @@ use strict;
 use warnings;
 
 use Sdm;
-use JSON;
+use JSON qw(); # Don't load what JSON exports so we don't fight with Dancer.
 use Dancer ':syntax';
 use Date::Format qw/time2str/;
+use Data::Dumper;
+use HTML::Entities;
+
+set appdir => Sdm->base_dir;
+set public => Sdm->base_dir . "/public";
+set views => Sdm->base_dir . "/views";
+warn "reset dancer appdir to " . Sdm->base_dir;
 
 get '/' => sub {
     return default_route();
@@ -177,25 +184,26 @@ sub rest_handler {
     }
 
     my $subject;
-    if ($class eq 'Sdm') {
-        # This will resolve view classes from Sdm/View/* which we use
-        # for some special pages like the diskstatus page.
-        $subject = $class;
-    } else {
-        eval { $subject = $class->define_set($args); };
-        if ($@) {
-            return "Error in REST handler: $class: " . Data::Dumper::Dumper $args . ": $@";
-        }
-        unless ($subject) {
-            return send_error("No object set found",500);
-        }
-        my @members = $subject->members;
-        # Return a decent empty set page
-        unless (@members) {
-            warn "empty set returned";
-            my $path = Sdm->base_dir . '/public/empty.html';
-            return send_file($path, system_path => 1);
-        }
+    eval { $subject = $class->define_set($args); };
+    if ($@) {
+        my $d = Data::Dumper->new([$args]);
+        $d->Indent(0)->Terse(1);
+        my $msg = "Error in REST handler: $class: " . $d->Dump($args) . ": $@";
+        $msg = encode_entities($msg);
+        $msg =~ s/\n//g;
+        return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
+    }
+    unless ($subject) {
+        return send_error("No object set found",500);
+    }
+    my @members = $subject->members;
+
+    # Return a decent empty set page
+    if (!@members or $class eq 'Sdm') {
+        my $d = Data::Dumper->new([$args]);
+        $d->Terse(1)->Indent(0);
+        my $msg = sprintf "Query returns an empty set:<br/><br/>  $class->define_set(%s)", $d->Dump();
+        return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
     }
 
     my %view_args = (
