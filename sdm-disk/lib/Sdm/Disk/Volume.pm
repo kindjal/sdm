@@ -65,6 +65,16 @@ class Sdm::Disk::Volume {
             reverse_as => 'volume'
         }
     ],
+    has_constant => [
+        default_aspects => {
+            column_name => "",
+            is => 'HASH',
+            is_classwide => 1,
+            value => {
+                visible => ['mount_path','total_kb','used_kb','capacity','disk_group','filername','last_modified'],
+            }
+        }
+    ],
     schema_name => 'Disk',
     data_source => 'Sdm::DataSource::Disk',
 };

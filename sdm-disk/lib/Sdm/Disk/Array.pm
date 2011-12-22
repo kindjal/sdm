@@ -36,6 +36,17 @@ class Sdm::Disk::Array {
         host          => { is => 'Sdm::Disk::Host', via => 'mappings', to => 'host' },
         hostname      => { is => 'Text', via => 'host', to => 'hostname' },
     ],
+    has_constant => [
+        default_aspects => {
+            column_name => '',
+            is_classwide => 1,
+            is => 'HASH',
+            value => {
+                visible  => [ 'name','manufacturer','model','serial','arraysize','created','last_modified','hostname' ],
+                editable => [ 'name','manufacturer','model','serial' ],
+            }
+        }
+    ],
     schema_name => 'Disk',
     data_source => 'Sdm::DataSource::Disk',
 };

@@ -35,6 +35,14 @@ class Sdm::Disk::Fileset {
             via => 'volume', to => 'physical_path'
         },
     ],
+    has_contant => [
+        default_aspects => {
+            column_name => '',
+            is_classwide => 1,
+            is => 'HASH',
+            visible  => ['mount_path','total_kb','used_kb','capacity','disk_group','filername','last_modified']
+        }
+    ],
     data_source => 'Sdm::DataSource::Disk',
 };
 

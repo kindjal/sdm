@@ -33,6 +33,17 @@ class Sdm::Disk::Host {
         filer           => { is => 'Sdm::Disk::Filer', via => 'filermappings', to => 'filer' },
         filername       => { is => 'Text', via => 'filer', to => 'name' },
     ],
+    has_constant => [
+        default_aspects => {
+            column_name => '',
+            is => 'HASH',
+            is_classwide => 1,
+            value => {
+                'visible'  => ['hostname','filername','arrayname','os','location','status','comments','created','last_modified'],
+                'editable' => ['hostname','os','location','comments']
+            }
+        }
+    ],
     schema_name => 'Disk',
     data_source => 'Sdm::DataSource::Disk',
 };
