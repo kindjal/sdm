@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+unexport PERL_MM_OPT
+unexport PERL_MB_OPT
+
+%:
+	PATH="/bin:/usr/bin"; \
+	/usr/bin/env dh $@
+
+override_dh_auto_test:
+override_dh_auto_install:
+	dh_auto_install
+	cp -ap lib/Sdm/public ./debian/ur-sdm-service-webapp/usr/share/perl5/Sdm/public
+	cp -ap lib/Sdm/xsl ./debian/ur-sdm-service-webapp/usr/share/perl5/Sdm/xsl

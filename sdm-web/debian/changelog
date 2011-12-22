@@ -1,0 +1,5 @@
+ur-sdm-web (0.17-1) unstable; urgency=low
+
+  * Move web services to their own package requiring dancer and ur-web.
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Wed, 21 Dec 2011 09:29:42 -0600

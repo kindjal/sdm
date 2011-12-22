@@ -1,0 +1,7 @@
+debian/*.log
+debian/ur-sdm-web*
+blib
+_build
+lib/Sdm/DataSource/*-bak
+lib/Sdm/DataSource/*-dump
+lib/Sdm/DataSource/*-journal
