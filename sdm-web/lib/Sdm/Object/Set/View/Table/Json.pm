@@ -29,9 +29,8 @@ sub _jsobj {
     my $self = shift;
 
     my $subject = $self->subject();
-    return '' unless $subject =~ /::Set/;
 
-    my @aData;
+    my @aData = ();
     foreach my $member ($subject->members) {
         my %args = (
             subject_class_name => $self->subject_class_name,

@@ -262,6 +262,7 @@ sub rest_handler {
         # Try again with Sdm default object set.
         warn "No view found: " . $@;
         $view_args{subject_class_name} = "Sdm::Object::Set";
+        warn "Trying " .  $view_args{subject_class_name};
         eval {
             $view = $subject->create_view(%view_args, %view_special_args);
         };
@@ -270,6 +271,7 @@ sub rest_handler {
         # Try again with UR Object Set.
         warn "No view found: " . $@;
         $view_args{subject_class_name} = "UR::Object::Set";
+        warn "Trying " .  $view_args{subject_class_name};
         eval {
             $view = $subject->create_view(%view_args, %view_special_args);
         };
@@ -277,8 +279,8 @@ sub rest_handler {
     if ($@ or ! defined $view) {
         # Try the default view
         warn "No view found: " . $@;
-        warn "looking for default view";
         $view_args{perspective} = 'default';
+        warn "Trying " .  $view_args{subject_class_name};
         eval {
             $view = $subject->create_view(%view_args, %view_special_args);
         };
