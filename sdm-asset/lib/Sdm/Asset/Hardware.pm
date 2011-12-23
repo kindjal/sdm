@@ -15,12 +15,14 @@ class Sdm::Asset::Hardware {
         }
     },
     has_optional => [
+        tag           => { is => 'Text' },
         manufacturer  => { is => 'Text' },
         model         => { is => 'Text' },
         serial        => { is => 'Text' },
         description   => { is => 'Text' },
         comments      => { is => 'Text' },
         location      => { is => 'Text' },
+        warranty_expires => { is => 'Date' },
         created       => { is => 'Date' },
         last_modified => { is => 'Date' },
     ],
@@ -30,8 +32,8 @@ class Sdm::Asset::Hardware {
             is => 'HASH',
             is_classwide => 1,
             value => {
-                visible  => ['manufacturer','model','serial','description','comments','location','created','last_modified'],
-                editable => ['manufacturer','model','serial','description','comments','location']
+                visible  => ['tag','manufacturer','model','serial','description','comments','location','warranty_expires','created','last_modified'],
+                editable => ['tag','manufacturer','model','serial','description','comments','location','warranty_expires']
             }
         }
     ]
