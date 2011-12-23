@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Sdm;
-use JSON qw(); # Don't load what JSON exports so we don't fight with Dancer.
+use JSON qw//; # Don't load what JSON exports so we don't fight with Dancer.
 use Dancer ':syntax';
 use Date::Format qw/time2str/;
 use Data::Dumper;
@@ -17,7 +17,7 @@ set views => Sdm->base_dir . "/views";
 warn "reset dancer appdir to " . Sdm->base_dir;
 
 get '/' => sub {
-    return default_route();
+    return _error_template("SDM is ready to serve!  Ask me for a URL that I know about.","success");
 };
 
 get qr{/((?!view).*)} => sub {
@@ -44,11 +44,27 @@ post '/service/lsof' => sub {
     return lsof_handler( params->{data} );
 };
 
+# The default route handler should be last
+any qr{.*} => sub {
+    my $path = request->uri();
+    warn "default route handler: $path";
+    return _error_template("You tried to reach '$path' which has no handler.  Contact the developer to report this if you think it should be present.");
+};
+
+sub _serialize {
+    my $obj = shift;
+    my $d = Data::Dumper->new([$obj]);
+    $d->Indent(0)->Terse(1);
+    return $d->Dump();
+}
+
 sub _error_template {
     my $msg = shift;
-    $msg =~ s/\n/<br\/>/g;
+    my $class = shift;
+    $class = 'error' unless ($class);
+    my $heading = ucfirst(lc($class));
     $msg = encode_entities($msg);
-    return template 'error.tt', { message => '<pre>' . $msg . '</pre>' };
+    return template 'error.tt', { heading => $heading, class => $class, message => '<pre>' . $msg . '</pre>' };
 }
 
 sub url_to_type {
@@ -62,18 +78,19 @@ sub url_to_type {
     );
 }
 
-sub default_route {
-    return _error_template("Default page not yet implemented");
-}
-
 sub static_content {
-    warn "Using static content route handler: " . Data::Dumper::Dumper splat;
+    warn "static content route handler: " . _serialize(splat);
     my ($file) = splat;
-    my $path = Sdm->base_dir . '/public';
-    return send_file("$path/$file", system_path => 1);
+    my $path = Sdm->base_dir . '/public/' . $file;
+    if (-e $file) {
+        return send_file("$path/$file", system_path => 1);
+    } else {
+        return _error_template("This file or view does not exist: $path/$file");
+    }
 }
 
 sub add_handler {
+    warn "add route handler";
     # What kind of object are we adding?
     my $class = delete params->{class};
 
@@ -86,7 +103,7 @@ sub add_handler {
     my $params = params;
     my %newparams = %$params;
     my @editable;
-    if ( $class->can('default_aspects') and exists $class->default_aspects->{editable} ) {
+    if ( $class->default_aspects and exists $class->default_aspects->{editable} ) {
         @editable = @{ $class->default_aspects->{editable} };
     }
     if (@editable) {
@@ -116,6 +133,7 @@ sub add_handler {
 }
 
 sub update_handler {
+    warn "update route handler";
     my $class = delete params->{class};
     # Column name comes from aoColumns sTitle in datatable
     my $attr = params->{columnName};
@@ -143,6 +161,7 @@ sub update_handler {
 }
 
 sub delete_handler {
+    warn "delete route handler";
     my $class = delete params->{class};
     $class =~ s/::Set//g;
     unless (params->{id}) {
@@ -155,7 +174,7 @@ sub delete_handler {
     eval {
         my $obj = $class->get( params );
         unless ($obj) {
-            return _error_template("no object found matching the query: " . Data::Dumper::Dumper(params));
+            return _error_template("no object found matching the query: " . _serialize(params));
         }
         $obj->delete;
         UR::Context->commit();
@@ -166,9 +185,9 @@ sub delete_handler {
 }
 
 sub rest_handler {
-    warn "Using REST API route handler";
-    warning "Using REST API route handler";
+    warn "REST route handler";
     my ( $class, $perspective, $toolkit ) = @{ delete params->{splat} };
+
 
     # This is in our XML/XSL UR stuff, should be made local to this package.
     $class = url_to_type($class);
@@ -198,22 +217,16 @@ sub rest_handler {
     my $subject;
     eval { $subject = $class->define_set($args); };
     if ($@) {
-        my $d = Data::Dumper->new([$args]);
-        $d->Indent(0)->Terse(1);
-        my $msg = "Error in REST handler: $class: " . $d->Dump($args) . ": $@";
+        my $msg = "Error in REST handler: $class: " . _serialize($args) . ": $@";
         return _error_template($msg);
     }
     unless ($subject) {
         return send_error("No object set found",500);
     }
-    my @members = $subject->members;
 
-    # Return a decent empty set page
-    if (!@members or $class eq 'Sdm') {
-        my $d = Data::Dumper->new([$args]);
-        $d->Terse(1)->Indent(0);
-        my $msg = sprintf "Query returns an empty set:<br/><br/>  $class->define_set(%s)", $d->Dump();
-        return _error_template($msg);
+    if ($class eq 'Sdm') {
+        my $msg = sprintf "You aren't asking for a known object.  Please inspect the URL and try again.";
+        return _error_template($msg,'notice');
     }
 
     my %view_args = (
@@ -279,6 +292,7 @@ sub rest_handler {
 }
 
 sub lsof_handler {
+    warn "lsof route handler";
     my $content = shift;
     my $json = JSON->new;
     my $data = $json->decode($content);
