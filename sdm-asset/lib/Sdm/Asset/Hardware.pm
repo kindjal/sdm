@@ -23,6 +23,17 @@ class Sdm::Asset::Hardware {
         location      => { is => 'Text' },
         created       => { is => 'Date' },
         last_modified => { is => 'Date' },
+    ],
+    has_constant => [
+        default_aspects => {
+            column_name => '',
+            is => 'HASH',
+            is_classwide => 1,
+            value => {
+                visible  => ['manufacturer','model','serial','description','comments','location','created','last_modified'],
+                editable => ['manufacturer','model','serial','description','comments','location']
+            }
+        }
     ]
 };
 
