@@ -23,7 +23,11 @@ We define a form to add a new row.
 =cut
 sub _generate_content {
     my $self = shift;
-    my $content = do { local $/; <DATA> };
+    my $content = do {
+        local $/;
+        <DATA>;
+    };
+    seek DATA, 0, 0;
 
     # Determine attributes of class for columns of the table
     my $class = $self->subject_class_name;
@@ -58,7 +62,7 @@ sub _generate_content {
             toolkit => 'json',
     );
     my @default_aspects;
-    if ( $class->default_aspects ) {
+    if ( $class->can('default_aspects') and $class->default_aspects ) {
         @default_aspects = @{ $class->default_aspects->{visible} };
     }
     unless (@default_aspects) {
@@ -84,7 +88,10 @@ sub _generate_content {
 
     # Here we specify which columns are not editable by setting 'null' in aoColumns
     # Note that 'id' is always present and first.
-    my $editable = $class->default_aspects->{editable};
+    my $editable = [];
+    if ( $class->can('default_aspects') and $class->default_aspects ) {
+        $editable = $class->default_aspects->{editable};
+    }
     my $aoColumns;
     if ( grep { /^id$/ } @default_aspects ) {
         $aoColumns = qq/null,\n/; # id is never editable and always first, here it's visible too.
