@@ -27,6 +27,7 @@ sub _generate_content {
 
     # Determine attributes of class for columns of the table
     my $class = $self->subject_class_name;
+    $class =~ s/::Set//g;
     $content =~ s/<%= class =>/$class/g;
 
     # Build JSON view of aaData using Json.pm peer class
@@ -51,26 +52,24 @@ sub _generate_content {
     $content =~ s/<%= aaData =>/$aaData/;
 
     # Determine column headers for javascript
-    my @members = $subject->members;
-    my $member = $members[0];
     my %args = (
             subject_class_name => $class,
             perspective => 'default',
             toolkit => 'json',
     );
     my @default_aspects;
-    if ( $member->can('default_aspects') ) {
-        @default_aspects = @{ $member->default_aspects->{visible} };
+    if ( $class->default_aspects ) {
+        @default_aspects = @{ $class->default_aspects->{visible} };
     }
     unless (@default_aspects) {
-        # Make the default_aspects all attributes of the member object.
+        # Make the default_aspects all attributes of the object.
         warn "using all properties for table";
-        @default_aspects = map { $_->property_name } $member->__meta__->properties;
+        @default_aspects = map { $_->property_name } $class->__meta__->properties;
     }
 
     # Here we set column attributes, like title.
     # We MUST include id, and it must be first, but may or may not be visible.
-    # FIXME: replace 'id' with the id_by attribute of the member
+    # FIXME: replace 'id' with the id_by attribute of the object
     my $sTitles;
     if ( grep { /^id$/ } @default_aspects ) {
         $sTitles .= qq/{ "sTitle": "id" },\n/;
@@ -85,7 +84,7 @@ sub _generate_content {
 
     # Here we specify which columns are not editable by setting 'null' in aoColumns
     # Note that 'id' is always present and first.
-    my $editable = $member->default_aspects->{editable};
+    my $editable = $class->default_aspects->{editable};
     my $aoColumns;
     if ( grep { /^id$/ } @default_aspects ) {
         $aoColumns = qq/null,\n/; # id is never editable and always first, here it's visible too.
