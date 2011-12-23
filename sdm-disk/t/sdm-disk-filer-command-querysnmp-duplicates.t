@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    $ENV{SDM_DEPLOYMENT} ||= "testing";
+    $ENV{SDM_DEPLOYMENT} = "testing";
 };
 
 use Test::More;

@@ -7,7 +7,7 @@ use IPC::Cmd;
 use File::Basename qw/dirname/;
 
 BEGIN {
-    $ENV{SDM_DEPLOYMENT} ||= "testing";
+    $ENV{SDM_DEPLOYMENT} = "testing";
     $ENV{SDM_NO_REQUIRE_USER_VERIFY} = 1;
 };
 
