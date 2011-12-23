@@ -18,6 +18,10 @@ class Sdm::Zenoss::Device {
         deviceclass => { is => 'Text', default_value => '/' },
         ipaddress => { is => 'Sdm::Value::Ipaddress' },
         productionstate => { is => 'Text' },
+        hwmodel => { is => 'Text' },
+        hwmanufacturer => { is => 'Text' },
+        osmodel => { is => 'Text' },
+        osmanufacturer => { is => 'Text' },
     ],
 };
 
@@ -76,6 +80,8 @@ sub __load__ {
             if ($key eq 'ipaddress') {
                 next unless ($value);
                 $lcresult->{lc($key)} = Sdm::Value::Ipaddress->get_or_create( id => $value );
+            } elsif ( grep {/$key/} ('hwmodel','hwmanufacturer','osmodel','osmanufacturer') ) {
+                $lcresult->{lc($key)} = $value->{name};
             }
         }
         my @row = map { $lcresult->{$_} } @header;

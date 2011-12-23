@@ -15,7 +15,7 @@ use Sdm::Command::Crud;
 Sdm::Command::Crud->init_sub_commands(
     target_class => 'Sdm::Zenoss::Device',
     target_name => 'device',
-    list => { show => 'uid,duid,name,ipaddress,deviceclass,productionstate' },
+    list => { show => 'name,ipaddress,deviceclass,productionstate,hwmanufacturer,hwmodel,osmodel' },
     delete => { do_not_init => 1, },
     update => { do_not_init => 1, },
     add    => { do_not_init => 1, },
