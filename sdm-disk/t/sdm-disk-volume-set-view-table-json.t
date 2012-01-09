@@ -16,7 +16,6 @@ use Data::Dumper;
 use JSON;
 
 use_ok( 'Sdm' );
-use_ok( 'Sdm::Disk::Volume::Set::View::Table::Json' );
 
 # Start with a fresh database
 use FindBin;
@@ -29,12 +28,11 @@ ok( $t->testinit == 0, "ok: init db");
 ok( $t->testdata == 0, "ok: add data");
 
 my $s = Sdm::Disk::Volume->define_set();
-my $v = $s->create_view( perspective => 'table', toolkit => 'json' );
+my $v = $s->create_view( subject_class_name => "Sdm::Object::Set", perspective => 'table', toolkit => 'json' );
 my $got = $v->_generate_content();
 use JSON;
 my $json = JSON->new();
 my $result = $json->decode($got);
-#print "got: " . Data::Dumper::Dumper $result;
-ok( scalar @{ $result->{members} } > 1, "has content");
+ok( scalar @{ $result->{aaData} } > 1, "has content");
 
 done_testing();
