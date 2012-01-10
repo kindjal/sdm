@@ -14,6 +14,9 @@ class Sdm::Asset::Hardware {
             doc => 'The generated UUID id for hardware'
         }
     },
+    has => [
+        hostname      => { is => 'Text' },
+    ],
     has_optional => [
         tag           => { is => 'Text' },
         manufacturer  => { is => 'Text' },
@@ -32,8 +35,8 @@ class Sdm::Asset::Hardware {
             is => 'HASH',
             is_classwide => 1,
             value => {
-                visible  => ['tag','manufacturer','model','serial','description','comments','location','warranty_expires','created','last_modified'],
-                editable => ['tag','manufacturer','model','serial','description','comments','location','warranty_expires']
+                visible  => ['hostname','tag','manufacturer','model','serial','description','comments','location','warranty_expires','created','last_modified'],
+                editable => ['hostname','tag','manufacturer','model','serial','description','comments','location','warranty_expires']
             }
         }
     ]

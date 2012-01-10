@@ -47,6 +47,7 @@ sub _store ($$$) {
 
 sub execute {
     my $self = shift;
+    my $class = 'Sdm::Asset::Hardware';
 
     my $csv = Text::CSV->new ( { binary => 1 } )  # should set binary attribute.
         or die "Cannot use CSV: " . Text::CSV->error_diag();
@@ -56,36 +57,16 @@ sub execute {
 
     open my $fh, "<:encoding(utf8)", $self->csv or die "error opening file: " . $self->csv . ": $!";
     while ( my $row = $csv->getline( $fh ) ) {
+        # Assume header is first row.
         unless (@header) {
-            # Here represent reading columns from CSV, which must match table columns
-            #  manufacturer  VARCHAR(255),
-            #  model         VARCHAR(255),
-            #  serial        VARCHAR(255),
-            #  description   VARCHAR(255),
-            #  comments      VARCHAR(255),
-            #  location      VARCHAR(255),
-            if ($row->[0] ne "manufacturer" or
-                $row->[1] ne "model" or
-                $row->[2] ne "serial" or
-                $row->[3] ne "description" or
-                $row->[4] ne "comments" or
-                $row->[5] ne "location"
-               ) {
-                $self->logger->error(__PACKAGE__ . " CSV file header does not match what is expected for Assets: " . $self->csv);
-                return;
-            }
-            push @header, $row;
+            @header = @$row;
             next;
         }
         my $asset = {};
-        # Build an object out of a row by hand because the column
-        # headers are useless as is, with unpredictable/unusable text.
-        $self->_store($asset, "manufacturer", $row->[0]);
-        $self->_store($asset, "model",        $row->[1]);
-        $self->_store($asset, "serial",       $row->[2]);
-        $self->_store($asset, "description",  $row->[3]);
-        $self->_store($asset, "comments",     $row->[4]);
-        $self->_store($asset, "location",     $row->[5]);
+        foreach my $i (0..$#header) {
+            next unless ($class->can($header[$i]));
+            $self->_store($asset, $header[$i], $row->[$i]);
+        }
         next unless (scalar keys %$asset);
         push @assets, $asset;
     }
@@ -94,7 +75,7 @@ sub execute {
     close $fh;
 
     if ($self->flush) {
-        foreach my $asset (Sdm::Asset::Hardware->get()) {
+        foreach my $asset ($class->get()) {
             $asset->delete();
         }
     }
