@@ -26,13 +26,11 @@ my $csvfile = "$top/t/hardware-inventory.csv";
 my $c = Sdm::Asset::Hardware::Command::Import->create( loglevel => "DEBUG", csv => $csvfile, flush => 1, commit => 1 );
 lives_ok { $c->execute(); } "import run lived";
 
-my @o = Sdm::Asset::Hardware->get( serial => 'xa1234yz' );
+my @o = Sdm::Asset::Hardware->get( tag => 'AB1CD21' );
 my $obj = pop @o;
-ok($obj->location eq 'The astral plane');
-ok($obj->serial eq 'xa1234yz');
-ok($obj->model eq 'G3730');
-ok($obj->comments eq 'This is a comment');
-ok($obj->description eq 'This is a sample piece of hardware');
-ok($obj->manufacturer eq 'Dell');
-
+ok($obj->{tag} eq 'AB1CD21');
+ok($obj->{location} eq 'here');
+ok($obj->{model} eq 'model foo');
+ok($obj->{hostname} eq 'testhost.gsc.wustl.edu');
+ok($obj->{comments} eq 'this is a test');
 done_testing();
