@@ -11,6 +11,7 @@ BEGIN {
 use Test::More;
 use Test::Output;
 use Test::Exception;
+use Test::Deep;
 use Data::Dumper;
 
 use HTML::TreeBuilder;
@@ -35,40 +36,40 @@ my $got = $v->_generate_content();
 
 # This must match the data used in Sdm::Disk::Lib->testdata
 my $expected = {
-   "aaData" => [
-      [
-         "unknown",
-         100,
-         90,
-         90
-      ],
-      [
-         "INFO_APIPE",
-         100,
-         90,
-         90
-      ],
-      [
-         "SYSTEMS",
-         100,
-         90,
-         90
-      ],
-      [
-         "SYSTEMS_DEVELOPMENT",
-         400,
-         280,
-         70
-      ]
+  'aaData' => [
+                        [
+                          'INFO_APIPE',
+                          100,
+                          90,
+                          90
+                        ],
+                        [
+                          'SYSTEMS',
+                          100,
+                          90,
+                          90
+                        ],
+                        [
+                          'SYSTEMS_DEVELOPMENT',
+                          400,
+                          280,
+                          70
+                        ],
+                        [
+                          'unknown',
+                          100,
+                          90,
+                          90
+                        ],
    ],
-   "iTotalRecords" => 4,
-   "iTotalDisplayRecords" => 4,
+   "iTotalRecords" => 5,
+   "iTotalDisplayRecords" => 5,
    "sEcho" => 1
 };
 use JSON;
 my $json = JSON->new->ascii->pretty->allow_nonref;
 $got = $json->decode($got);
 
-ok( is_deeply( $got, $expected, "ok: is_deeply" ), "ok: json match");
+cmp_deeply( $expected->{aaData},  bag( @{ $got->{aaData} } ), "ok: is_deeply" );
 
 done_testing();
