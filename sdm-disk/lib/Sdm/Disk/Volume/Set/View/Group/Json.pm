@@ -28,7 +28,7 @@ sub aaData {
         return;
     }
 
-    my @disk_groups = $subject->members( -group_by => [ 'disk_group' ], -order_by => [ 'disk_group' ] );
+    my @disk_groups = $subject->members( -group_by => [ 'disk_group' ] );
     return unless (@disk_groups);
 
     foreach my $item ( @disk_groups ) {
