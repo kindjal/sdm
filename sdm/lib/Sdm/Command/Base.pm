@@ -59,13 +59,17 @@ This should go back into UR/lib/Command/V2.pm
 =cut
 sub _ask_user_question {
     my $self = shift;
-    my $question = shift;    my $timeout = shift;
+    my $question = shift;
+    my $timeout = shift;
     my $valid_values = shift || "yes|no";
     my $default_value = shift || undef;
     my $pretty_valid_values = shift || $valid_values;
     $valid_values = lc($valid_values);
     my $input;
     $timeout = 60 unless(defined($timeout));
+
+    # Depends on UR using '*' for the default answer being "continue".
+    return "*" if ($ENV{SDM_NO_REQUIRE_USER_VERIFY});
 
     local $SIG{ALRM} = sub { print STDERR "Exiting, failed to reply to question '$question' within '$timeout' seconds.\n"; exit; };
     print STDERR "\n$question\n";
