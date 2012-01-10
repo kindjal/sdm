@@ -12,7 +12,6 @@ BEGIN {
 };
 
 use Test::More;
-use FindBin;
 use Cwd qw/abs_path/;
 use File::Basename qw/dirname/;
 use IPC::Cmd qw/can_run/;
@@ -26,7 +25,7 @@ my $driver = $ds->driver;
 my $top = dirname dirname abs_path(__FILE__);
 my $base = "$top/lib/Sdm";
 my $perl = "$^X -I $top/lib -I $top/../sdm/lib";
-my $sdm = can_run("sdm");
+my $sdm = can_run("./bin/sdm");
 unless ($sdm) {
     if (-e "./sdm-service/sdm/bin/sdm") {
         $sdm = "./sdm-service/sdm/bin/sdm";
@@ -97,8 +96,11 @@ sub testinit {
     }
 
     print "flush and remake Meta\n";
-    unlink "$base/DataSource/Meta.sqlite3";
-    unlink "$base/DataSource/Meta.sqlite3-dump";
+    my $ds = "$top/../sdm/lib/Sdm/DataSource";
+    unlink "$ds/Meta.sqlite3";
+    unlink "$ds/Meta.sqlite3-dump";
+    $self->runcmd("/usr/bin/sqlite3 $ds/Meta.sqlite3 < $ds/Meta.sqlite3-schema");
+    $self->runcmd("/usr/bin/sqlite3 $ds/Meta.sqlite3 .dump > $ds/Meta.sqlite3-dump");
     return 0;
 }
 
