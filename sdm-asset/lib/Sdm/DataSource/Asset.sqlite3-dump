@@ -2,12 +2,15 @@ PRAGMA foreign_keys = ON;
 BEGIN TRANSACTION;
 CREATE TABLE asset_hardware (
   id            VARCHAR(255) PRIMARY KEY,
+  tag           VARCHAR(255),
+  hostname      VARCHAR(255),
   manufacturer  VARCHAR(255),
   model         VARCHAR(255),
   serial        VARCHAR(255),
   description   VARCHAR(255),
   comments      VARCHAR(255),
   location      VARCHAR(255),
+  warranty_expires DATETIME,
   created       DATETIME,
   last_modified DATETIME
 );
@@ -22,6 +25,6 @@ CREATE TABLE asset_software (
   created       DATETIME,
   last_modified DATETIME
 );
-INSERT INTO "asset_software" VALUES('04bb7cba8b5e4742927fc5cc3676ac2c','Oracle','Oracle RDBMS','Proprietary Thing',1,'It is what it is','PostgreSQL rocks!','2011-12-17 22:21:17',null);
-INSERT INTO "asset_software" VALUES('f7b3b86188ef4af99fb805316e98a3e8','Microsoft','Shitty Stuff','Proprietary Thing',1,'This stuff sucks','I am biased','2011-12-17 22:21:17',null);
+INSERT INTO "asset_software" VALUES('124b206b0b524bfc98da0030c1bb4a1a','Oracle','Oracle RDBMS','Proprietary Thing',1,'It is what it is','PostgreSQL rocks!','2012-01-06 12:08:54',null);
+INSERT INTO "asset_software" VALUES('3275ff486c0547dbbe6c6fb31a703124','Microsoft','Bad Stuff','Proprietary Thing',1,'This stuff is bad','I am biased','2012-01-06 12:08:54',null);
 COMMIT;
