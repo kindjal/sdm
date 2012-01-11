@@ -1,7 +1,6 @@
-PRAGMA foreign_keys = ON;
 DROP TABLE IF EXISTS asset_hardware;
 DROP TABLE IF EXISTS asset_software;
-CREATE TABLE IF NOT EXISTS asset_hardware (
+CREATE TABLE asset_hardware (
   id            VARCHAR(255) PRIMARY KEY,
   tag           VARCHAR(255),
   hostname      VARCHAR(255),
@@ -15,12 +14,12 @@ CREATE TABLE IF NOT EXISTS asset_hardware (
   created       DATE,
   last_modified DATE
 );
-CREATE TABLE IF NOT EXISTS asset_software (
+CREATE TABLE asset_software (
   id            VARCHAR(255) PRIMARY KEY,
   manufacturer  VARCHAR(255),
   product       VARCHAR(255),
   license       VARCHAR(255),
-  seats         UNSIGNED INTEGER DEFAULT 0 NOT NULL ON CONFLICT REPLACE,
+  seats         SMALLINT NOT NULL DEFAULT 0,
   description   VARCHAR(255),
   comments      VARCHAR(255),
   created       DATE,
