@@ -10,10 +10,5 @@ unexport PERL_MB_OPT
 override_dh_auto_test:
 override_dh_auto_install:
 	dh_auto_install
-	install -d ./debian/ur-sdm-service-webapp/usr/share/perl5/Sdm/View/Resource
-	cp -ap lib/Sdm/View/Resource/Html ./debian/ur-sdm-service-webapp/usr/share/perl5/Sdm/View/Resource/Html
-	cp -ap lib/Sdm/xsl ./debian/ur-sdm-service-webapp/usr/share/perl5/Sdm/xsl
-	install -d ./debian/tmp/var/log/ur-sdm-service
-	touch ./debian/tmp/var/log/ur-sdm-service/ur-sdm-service-webapp.log
 	install -d ./debian/tmp/var/log/ur-sdm-service
 	touch ./debian/tmp/var/log/ur-sdm-service/ur-sdm-service-lsofc.log
