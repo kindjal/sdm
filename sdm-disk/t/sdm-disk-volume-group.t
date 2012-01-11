@@ -46,8 +46,7 @@ $res = Sdm::Disk::Volume->create( @params );
 ok( defined $res, "properly created new volume");
 
 my @res = Sdm::Disk::Volume->get( -group_by => ['disk_group'], -order_by => ['disk_group'] );
-warn "result of get: " . Data::Dumper::Dumper @res;
-__END__
+
 my $item = $res[0];
 ok($item->disk_group() eq 'INFO_APIPE', "ok: INFO_APIPE comes first");
 ok($item->count() == 2, "ok: 2 members of INFO_APIPE");
