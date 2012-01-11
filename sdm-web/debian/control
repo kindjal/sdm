@@ -2,7 +2,7 @@ Source: ur-sdm-web
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl,libur-perl,libdancer-perl,ur-web
+Build-Depends-Indep: perl,libur-perl,libdancer-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 
