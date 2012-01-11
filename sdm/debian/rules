@@ -5,9 +5,3 @@ PACKAGE=$(shell dh_listpackages)
 %:
 	PATH="/bin:/usr/bin" ; \
 	dh $@
-
-override_dh_auto_install:
-	dh_auto_install
-	install -d ./debian/$(PACKAGE)/usr/share/perl5/Sdm/View/Resource
-	cp -ap lib/Sdm/View/Resource/Html ./debian/$(PACKAGE)/usr/share/perl5/Sdm/View/Resource/Html
-	cp -ap lib/Sdm/xsl ./debian/$(PACKAGE)/usr/share/perl5/Sdm/xsl
