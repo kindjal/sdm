@@ -10,10 +10,6 @@ debian/rules
 debian/ur-sdm-service-lsofc.install
 debian/ur-sdm-service-lsofc.logrotate
 debian/ur-sdm-service-lsofc.upstart
-debian/ur-sdm-service-webapp.install
-debian/ur-sdm-service-webapp.logrotate
-debian/ur-sdm-service-webapp.preinst
-debian/ur-sdm-service-webapp.upstart
 debian/ur-sdm-service.install
 lib/Sdm/DataSource/Automount.pm
 lib/Sdm/DataSource/Automount.sqlite3.schema
@@ -49,7 +45,6 @@ lib/Sdm/Service/Lsof/Process/Set/View/Table/Xml.pm
 lib/Sdm/Service/Lsofc/Command.pm
 lib/Sdm/Service/Lsofc/Command/README
 lib/Sdm/Service/Lsofc/Command/Run.pm
-lib/Sdm/Service/WebApp.pm
 t/01-sdm-service-command-line-interface.t
 t/README
 t/lsof.sample
@@ -59,5 +54,3 @@ t/sdm-service-lib.pm
 t/sdm-service-lsof-command-purge.t
 t/sdm-service-lsof.t
 t/sdm-service-test.t
-t/sdm-service-webapp-core.t
-t/sdm-service-webapp-lsof.t

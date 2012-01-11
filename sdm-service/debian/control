@@ -2,7 +2,7 @@ Source: ur-sdm-service
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
-Build-Depends-Indep: perl,libur-perl,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libtest-simple-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl
+Build-Depends-Indep: perl,libur-perl
 Maintainer: Matthew Callaway <mcallawa@genome.wustl.edu>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/Object-Accessor/
@@ -12,17 +12,10 @@ Architecture: all
 # Service::Process links to Rtm::Job
 Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),libur-perl,ur-sdm-namespace,ur-sdm-rtm
 Description: A UR Object framework for running SDM services data management
- UR Object framework for running SDM services data management, currently just
- includes a development web server.
+ UR Object framework for running SDM services data management.
 
 Package: ur-sdm-service-lsofc
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, perl (>= 5.9.5),ur-sdm-service,libwww-perl,libjson-perl
 Description: An NSF open files monitoring client.
  An NSF open files monitoring client.
-
-Package: ur-sdm-service-webapp
-Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends},perl (>= 5.9.5),ur-sdm-service,libanyevent-perl,libdbi-perl,libev-perl,libfcgi-perl,libplack-perl,libweb-simple-perl,libfcgi-procmanager-perl,libworkflow-perl,libstarman-perl
-Description: A starman based web server.
- A starman based web server.

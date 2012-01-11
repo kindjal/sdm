@@ -13,13 +13,9 @@
 /usr/share/perl5/Sdm/Service/Automount/Command/Export.pm
 /usr/share/perl5/Sdm/Service/Automount/Command.pm
 /usr/share/perl5/Sdm/Service/Automount.pm
-/usr/share/perl5/Sdm/Service/Lsof/Process/Set/View/Table/Json.pm
-/usr/share/perl5/Sdm/Service/Lsof/Process/Set/View/Table/Xml.pm
 /usr/share/perl5/Sdm/Service/Lsof/Process/Set/View/Status/Json.pm
 /usr/share/perl5/Sdm/Service/Lsof/Process/Command.pm
 /usr/share/perl5/Sdm/Service/Lsof/Process/Command/Purge.pm
-/usr/share/perl5/Sdm/Service/Lsof/File/Set/View/Table/Json.pm
-/usr/share/perl5/Sdm/Service/Lsof/File/Set/View/Table/Xml.pm
 /usr/share/perl5/Sdm/Service/Lsof/File/Set/View/Status/Json.pm
 /usr/share/perl5/Sdm/Service/Lsof/File/Command.pm
 /usr/share/perl5/Sdm/Service/Lsof/Command.pm
