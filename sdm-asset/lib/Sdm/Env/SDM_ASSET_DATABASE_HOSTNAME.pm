@@ -1,2 +1,0 @@
-package Sdm::Env::SDM_ASSET_DATABASE_HOSTNAME;
-1;
