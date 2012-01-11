@@ -10,7 +10,7 @@ BEGIN {
 my $build = Module::Build->new(
   module_name => 'Sdm',
   license => 'lgpl',
-  dist_version => '0.16',
+  dist_version => '0.17',
   dist_abstract => 'Modules for GPFS querying',
   build_requires => {
     'Module::Build' => '',

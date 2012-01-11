@@ -1,3 +1,10 @@
+ur-sdm-lims (0.17-1) unstable; urgency=low
+
+  * Add Asset system.
+  * Move sdm-service webapp to sdm-web for use with new Dancer based ur-web
+
+ -- Matthew Callaway <mcallawa@genome.wustl.edu>  Wed, 11 Jan 2012 10:52:30 -0600
+
 ur-sdm-lims (0.16-1) unstable; urgency=low
 
   * Add GPFS fileset support and QueryGpfs command to sdm-disk.
