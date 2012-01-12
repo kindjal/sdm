@@ -206,7 +206,7 @@ drawTable();
   <div id="container">
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="datatable">
   </table>
-  <div class="add_delete_toolbar" />
+  <div class="add_delete_toolbar clear" />
   </div>
   <!-- Custom form for adding new records -->
   <form id="formAddNewRow" action="#" title="Add new record">
