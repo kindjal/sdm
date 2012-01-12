@@ -10,6 +10,7 @@ $(document).ready(function() {
       + 'Used KB: ' + commify(result.used_kb) + " " + sizeSuffix( result.used_kb ) + '<br/>'
       + 'Percentage Consumed: ' + result.capacity.toFixed(0) + ' %<br/>'
       + 'Last Check: ' + result.last_modified + '<br/>'
+      + '<i>Storage, we like it raw -- Micah McCarty</i>'
     );
     $("div#total").addClass('emphasis');
   });

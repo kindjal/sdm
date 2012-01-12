@@ -11,6 +11,7 @@
     <style type="text/css" title="currentStyle">
       @import "/css/status_page.css";
       @import "/css/status_table.css";
+      @import "/css/jquery-ui.css";
       @import "/js/pkg/TableTools/media/css/TableTools.css";
     </style>
     <link rel="shortcut icon" href="/img/gc_favicon.png" />
@@ -45,10 +46,29 @@
       Hosts that reported no Volume data are orange.<br/>
       </div>
 
+      <div id="filertablediv">
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="filertable">
       </table>
+      <!-- Custom form for adding new filers -->
+      <div class="add_delete_toolbar clear" />
+      <form id="formAddNewRow" action="#" title="Add new record">
+        <input type="hidden" name="id" id="id" rel="0" /><br />
+        <label for="name">name</label><br />
+        <input type="text" name="name" id="name" class="required" rel="1" /><br />
+        <input type="hidden" name="status" id="status" rel="2" value="0" /><br />
+        <label for="type">type</label><br />
+        <input type="text" name="type" id="type" class="required" rel="3" /><br />
+        <input type="hidden" name="master" id="master" rel="4" /><br />
+        <input type="hidden" name="hosts" id="hosts" rel="5" /><br />
+        <input type="hidden" name="arrays" id="arrays" rel="6" /><br />
+        <label for="comments">comments</label><br />
+        <input type="text" name="comments" id="comments" class="required" rel="7" /><br />
+        <input type="hidden" name="created" id="created" rel="8" /><br />
+        <input type="hidden" name="last_modified" id="last_modified" rel="9" /><br />
+      </form>
+      </div>
 
-      <div class="clear"></div>
+      <div class="clear"/>
 
       <h1>Arrays Serving Storage Space</h1>
 

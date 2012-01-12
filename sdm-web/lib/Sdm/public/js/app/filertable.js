@@ -8,9 +8,13 @@ function drawFilerTable () {
         "iDisplayLength": 10,
         "sPaginationType": "full_numbers",
         "bAutoWidth": false,
+        // These columns must match the columns returned by sAjaxSource
         "aoColumns": [
+            { "sWidth": "6%",  "sTitle": "id", "bVisible": false },
             { "sWidth": "6%",  "sTitle": "name" },
             { "sWidth": "5%",  "sTitle": "status", "sClass": "center"  },
+            { "sWidth": "5%",  "sTitle": "type", "sClass": "center"  },
+            { "sWidth": "10%", "sTitle": "master"  },
             { "sWidth": "12%", "sTitle": "hosts" },
             { "sWidth": "12%", "sTitle": "arrays" },
             { "sWidth": "10%", "sTitle": "comments"  },
@@ -43,7 +47,11 @@ function drawFilerTable () {
                          sAddURL: "/service/add?class=Sdm::Disk::Filer",
                          sDeleteURL: "/service/delete?class=Sdm::Disk::Filer",
                          // Set editable columns with {}, non-editable with null
+                         // These columns must match the list of bVisbile columns
+                         // from aoColumns above, in the dataTable() declaration.
                          "aoColumns": [
+                         {},
+                         null,
                          {},
                          null,
                          null,
