@@ -108,6 +108,10 @@ sub add_handler {
     }
     if (@editable) {
         @newparams{@editable} = @$params{@editable};
+        # Remove empty params to allow creation to use the target object's default value
+        foreach my $key (keys %newparams) {
+            delete $newparams{$key} unless ( $newparams{$key} );
+        }
     }
 
     my $obj;
