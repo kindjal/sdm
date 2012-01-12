@@ -180,7 +180,8 @@ sub delete_handler {
         UR::Context->commit();
     };
     if ($@) {
-        return _error_template("Error: $@");
+        # This is going to a browser dialog box, not a web page.
+        return "Error: $@";
     }
 }
 

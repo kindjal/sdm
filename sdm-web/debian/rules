@@ -11,4 +11,5 @@ override_dh_auto_test:
 override_dh_auto_install:
 	dh_auto_install
 	cp -ap lib/Sdm/public ./debian/ur-sdm-web/usr/share/perl5/Sdm/public
+	cp -ap lib/Sdm/views ./debian/ur-sdm-web/usr/share/perl5/Sdm/views
 	cp -ap lib/Sdm/xsl ./debian/ur-sdm-web/usr/share/perl5/Sdm/xsl

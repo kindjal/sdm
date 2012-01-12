@@ -15,7 +15,7 @@ use Sdm::Command::Crud;
 Sdm::Command::Crud->init_sub_commands(
     target_class => 'Sdm::Asset::Software',
     target_name => 'software',
-    list => { show => 'manufacturer,product' },
+    list => { show => 'manufacturer,product,license,seats,description,comments' },
 );
 
 1;

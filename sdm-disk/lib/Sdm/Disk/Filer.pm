@@ -199,6 +199,7 @@ sub delete {
     # on this filer and see if they're now orphans.
     foreach my $vid (@volume_ids) {
         my $volume = Sdm::Disk::Volume->get( $vid );
+        next unless ($volume);
         if ($volume->is_orphan()) {
             $volume->warning_message("Removing now orphaned Volume: $vid");
             $volume->delete();
