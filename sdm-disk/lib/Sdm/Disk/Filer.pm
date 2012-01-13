@@ -56,7 +56,7 @@ class Sdm::Disk::Filer {
             is => 'HASH',
             value => {
                 'visible'  => ['name','type','comments','filesystem','status','master','created','last_modified'],
-                'editable' => ['name','type','comments','filesystem','master'],
+                'editable' => ['name','type','comments','filesystem'],
             }
         }
     ],
