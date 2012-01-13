@@ -48,4 +48,7 @@ my @got = $array->disk_type();
 my @expected = ("sata","sas");
 ok( is_deeply( \@got, \@expected, "is_deeply"), "disk_type matches");
 
+$array->delete();
+UR::Context->commit();
+
 done_testing();
