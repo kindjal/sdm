@@ -24,12 +24,29 @@
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/jquery-datatables-editable/jquery.validate.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/pkg/jquery-datatables-editable/jquery.dataTables.editable.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/common.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/diskstatus.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/arraytable.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/hosttable.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/filertable.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/groupvolumetable.js"></script>
-    <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/volumetable.js"></script>
+    <script type="text/javascript" language="javascript" charset="utf-8">
+$(document).ready(function() {  TableToolsInit.sSwfPath = "/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
+$.getJSON('/view/sdm/disk/volume/set/summary.json', function(result) {
+$("div#total").html(
+'<h2><a href="rrd.html?total">Cumulative Disk Usage</a></h2>'
++ '<h3>Disk usage added over all reporting NFS servers</h3>'
++ 'Total KB: ' + commify(result.total_kb) + " " + sizeSuffix( result.total_kb ) + '<br/>'
++ 'Used KB: ' + commify(result.used_kb) + " " + sizeSuffix( result.used_kb ) + '<br/>'
++ 'Percentage Consumed: ' + result.capacity.toFixed(0) + ' %<br/>'
++ 'Last Check: ' + result.last_modified + '<br/>'
++ '<i>Storage, we like it raw -- Micah McCarty</i>'
+);
+$("div#total").addClass('emphasis');
+});
+// The filer array and volume tables are "built in" object set views, just load them.
+$("#filertablediv").html("Loading...").load("/view/sdm/disk/filer/table.html");
+$("#arraytablediv").html("Loading...").load("/view/sdm/disk/array/table.html");
+// The group table is a special table we build "by hand" in groupvolumetable.js
+drawGroupTable();
+$("#volumetablediv").html("Loading...").load("/view/sdm/disk/volume/table.html");
+});
+</script>
   </head>
   <body id="dt_example">
     <div id="container">
@@ -37,7 +54,7 @@
 
       <p>This table shows disk consumption information as reported by SNMP from NFS servers.</p>
 
-      <div id="narrow"> <div id="total"> </div> </div>
+      <div id="narrow"><div id="total"></div></div>
 
       <h1>Filers Providing Storage Volumes</h1>
 
@@ -46,36 +63,13 @@
       Hosts that reported no Volume data are orange.<br/>
       </div>
 
-      <div id="filertablediv">
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="filertable">
-      </table>
-      <!-- Custom form for adding new filers -->
-      <div class="add_delete_toolbar clear" />
-      <form id="formAddNewRow" action="#" title="Add new record">
-        <input type="hidden" name="id" id="id" rel="0" /><br />
-        <label for="name">name</label><br />
-        <input type="text" name="name" id="name" class="required" rel="1" /><br />
-        <input type="hidden" name="status" id="status" rel="2" value="0" /><br />
-        <label for="type">type</label><br />
-        <input type="text" name="type" id="type" class="required" rel="3" /><br />
-        <input type="hidden" name="master" id="master" rel="4" /><br />
-        <input type="hidden" name="hosts" id="hosts" rel="5" /><br />
-        <input type="hidden" name="arrays" id="arrays" rel="6" /><br />
-        <label for="comments">comments</label><br />
-        <input type="text" name="comments" id="comments" class="required" rel="7" /><br />
-        <input type="hidden" name="created" id="created" rel="8" /><br />
-        <input type="hidden" name="last_modified" id="last_modified" rel="9" /><br />
-      </form>
-      </div>
-
+      <div id="filertablediv"></div>
       <div class="clear"/>
 
       <h1>Arrays Serving Storage Space</h1>
 
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="arraytable">
-      </table>
-
-      <div class="clear"></div>
+      <div id="arraytablediv"></div>
+      <div class="clear"/>
 
       <h1>Disk Usage by Disk Group</h1>
 
@@ -83,19 +77,18 @@
       Groups over 95% capacity are red, as is the 'unknown' group.<br/>
       </div>
 
+      <div id="grouptablediv">
       <table cellpadding="0" cellspacing="0" border="0" class="display" id="grouptable">
       </table>
-
-      <div class="clear"></div>
+      </div>
+      <div class="clear"/>
 
       <h1>Disk Usage By Volume</h1>
 
       <div class="emphasis" id="narrow">
       Volumes over 95% capacity are colored red, as is the 'unkown' group.
       </div>
-
-      <table cellpadding="0" cellspacing="0" border="0" class="display" id="volumetable">
-      </table>
+      <div id="volumetablediv"></div>
 
     </div>
   </body>
