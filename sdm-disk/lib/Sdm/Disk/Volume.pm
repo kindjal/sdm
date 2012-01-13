@@ -16,8 +16,10 @@ class Sdm::Disk::Volume {
     has => [
         physical_path   => { is => 'Text' },
         total_kb        => { is => 'Number', default_value => 0 },
-        #total_kb        => { is => 'Sdm::Value::KBytes', default_value => 0 },
         used_kb         => { is => 'Number', default_value => 0 },
+        # FIXME: why did I not use KBytes?  If I use KBytes the web view is formatted.
+        # Does this break the volume by group table?
+        #total_kb        => { is => 'Sdm::Value::KBytes', default_value => 0 },
         #used_kb         => { is => 'Sdm::Value::KBytes', default_value => 0 },
         capacity        => {
             is => 'Number',
