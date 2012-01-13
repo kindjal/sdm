@@ -34,6 +34,11 @@ sub _generate_content {
     $class =~ s/::Set//g;
     $content =~ s/<%= class =>/$class/g;
 
+    # Create a unique table name for the DOM
+    my $tablename = lc($class) . "table";
+    $tablename =~ s/:://g;
+    $content =~ s/<%= tablename =>/$tablename/g;
+
     # Build JSON view of aaData using Json.pm peer class
     my $subject = $self->subject;
     my $jsview;
@@ -160,8 +165,8 @@ __DATA__
     <script type="text/javascript" language="javascript" charset="utf-8" src="/js/app/common.js"></script>
     <script type="text/javascript" language="javascript" charset="utf-8">
         var oTable;
-        function drawTable () {
-            oTable = $('#datatable').dataTable( {
+        function draw<%= tablename =>Table () {
+            oTable = $('#<%= tablename =>').dataTable( {
                     "sDom": 'T<"clear">lfrtip',
                     "bProcessing": true,
                     "bServerSide": false,
@@ -197,14 +202,14 @@ __DATA__
     <script type="text/javascript" language="javascript" charset="utf-8">
 $(document).ready(function() {
 TableToolsInit.sSwfPath = "/js/pkg/TableTools/media/swf/ZeroClipboard.swf";
-drawTable();
+draw<%= tablename =>Table();
 });
     </script>
   </head>
 
   <body id="dt_example">
-  <div id="container">
-  <table cellpadding="0" cellspacing="0" border="0" class="display" id="datatable">
+  <div id="<%= tablename =>container">
+  <table cellpadding="0" cellspacing="0" border="0" class="display" id="<%= tablename =>">
   </table>
   <div class="add_delete_toolbar clear" />
   </div>
