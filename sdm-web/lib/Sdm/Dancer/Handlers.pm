@@ -117,7 +117,7 @@ sub add_handler {
     my $obj;
     my $rc;
     eval {
-        $obj = $class->create( \%newparams );
+        $obj = $class->create( %newparams );
         unless ($obj) {
             die "Failed to create object";
         }
