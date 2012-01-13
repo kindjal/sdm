@@ -214,6 +214,7 @@ draw<%= tablename =>Table();
   </head>
 
   <body id="dt_example">
+  <div id="container">
   <div id="<%= tablename =>container">
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="<%= tablename =>">
   </table>
@@ -224,6 +225,7 @@ draw<%= tablename =>Table();
   <form id="<%= tablename =>_formAddNewRow" action="#" title="Add new record">
     <%= addrecordform =>
   </form>
+  </div>
   </div>
   </body>
   <head>
