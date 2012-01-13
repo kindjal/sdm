@@ -195,7 +195,13 @@ __DATA__
                         // Prevent users from modifying created and last_modified
                         "aoColumns": [
                           <%= aoColumns =>
-                        ]
+                        ],
+                        "sAddNewRowFormId": "<%= tablename =>_formAddNewRow",
+                        "sAddNewRowButtonId": "<%= tablename =>_btnAddNewRow",
+                        "sAddNewRowOkButtonId": "<%= tablename =>_btnAddNewRowOk",
+                        "sAddNewRowCancelButtonId": "<%= tablename =>_btnAddNewRowCancel",
+                        "sDeleteRowButtonId": "<%= tablename =>_btnDeleteRow",
+                        "sAddDeleteToolbarSelector": ".<%= tablename =>_toolbarSelector",
                     } );
         }
     </script>
@@ -211,12 +217,14 @@ draw<%= tablename =>Table();
   <div id="<%= tablename =>container">
   <table cellpadding="0" cellspacing="0" border="0" class="display" id="<%= tablename =>">
   </table>
-  <div class="add_delete_toolbar clear" />
+
+  <div class="<%= tablename =>_toolbarSelector clear" />
   </div>
   <!-- Custom form for adding new records -->
-  <form id="formAddNewRow" action="#" title="Add new record">
+  <form id="<%= tablename =>_formAddNewRow" action="#" title="Add new record">
     <%= addrecordform =>
   </form>
+  </div>
   </body>
   <head>
     <meta http-equiv='Pragma' content='no-cache'>
