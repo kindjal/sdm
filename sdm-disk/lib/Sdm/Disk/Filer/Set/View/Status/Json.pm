@@ -38,8 +38,11 @@ sub aaData {
         }
 
         push @data, [
+            $item->id,
             $item->name,
             $item->status,
+            $item->type,
+            $item->master,
             $hostname,
             $arrayname,
             $item->comments,
