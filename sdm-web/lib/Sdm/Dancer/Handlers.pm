@@ -159,7 +159,11 @@ sub update_handler {
         }
     };
     if ($@) {
-        return _error_template("Error: $@");
+        if ($@ =~ /No object found for id/) {
+            return "No object found for id. Try refreshing the page then editing the row.";
+        } else {
+            return "Error: $@";
+        }
     }
     return $msg;
 }
